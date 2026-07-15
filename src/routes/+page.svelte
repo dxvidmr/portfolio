@@ -1,5 +1,7 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
+	import ArrowRight from '@lucide/svelte/icons/arrow-right';
+	import ChevronDown from '@lucide/svelte/icons/chevron-down';
 	import { page } from '$app/state';
 	import { localeFromPathname, localizedPath } from '$lib/i18n';
 	import { profile, t } from '$lib/content/profile';
@@ -40,8 +42,6 @@
 		es: {
 			navProjects: 'Proyectos',
 			navAbout: 'Sobre mí',
-			viewWork: 'Ver trabajos',
-			fullCv: 'CV completo',
 			selectedWork: 'Trabajos seleccionados',
 			aboutLabel: 'Perfil',
 			aboutTitle: 'Sobre mí',
@@ -51,8 +51,11 @@
 			portraitCaption: 'Investigador · creador escénico',
 			contactTitle: 'Contacto',
 			profilesLabel: 'Perfiles y redes',
-			featuredTitle: 'Publicaciones, eventos y docencia destacados',
-			openCv: 'Abrir CV',
+			recentLabel: 'Actualidad',
+			recentTitle: 'Actividad reciente',
+			cvLabel: 'Currículum completo',
+			cvCta: 'Ver la trayectoria completa',
+			cvSummary: 'Publicaciones, investigación, docencia y actividad académica.',
 			tags: 'Etiquetas',
 			affiliation: 'Universitat Autònoma de Barcelona',
 			thesisLine1Before: 'Estudio el ',
@@ -66,8 +69,6 @@
 		en: {
 			navProjects: 'Projects',
 			navAbout: 'About',
-			viewWork: 'View work',
-			fullCv: 'Full CV',
 			selectedWork: 'Selected work',
 			aboutLabel: 'Profile',
 			aboutTitle: 'About me',
@@ -77,8 +78,11 @@
 			portraitCaption: 'Researcher · theatre practitioner',
 			contactTitle: 'Contact',
 			profilesLabel: 'Profiles and networks',
-			featuredTitle: 'Featured publications, events, and teaching',
-			openCv: 'Open CV',
+			recentLabel: 'Now',
+			recentTitle: 'Recent activity',
+			cvLabel: 'Full curriculum vitae',
+			cvCta: 'View the complete trajectory',
+			cvSummary: 'Publications, research, teaching, and academic activity.',
 			tags: 'Tags',
 			affiliation: 'Universitat Autònoma de Barcelona',
 			thesisLine1Before: 'I study ',
@@ -176,11 +180,9 @@
 		</div>
 
 		<div class="landing-foot">
-			<div class="landing-actions">
-				<a class="meta cta cta--primary" href="#proyectos">{ui.viewWork}<span>↘</span></a>
-				<a class="meta cta cta--secondary" href={localizedPath('/cv', locale)}>{ui.fullCv}</a>
-			</div>
-			<span class="meta scroll-hint"><i></i>{ui.scrollHint}</span>
+			<a class="scroll-cue" href="#proyectos" aria-label={ui.scrollHint} title={ui.scrollHint}>
+				<ChevronDown size={30} strokeWidth={1.4} aria-hidden="true" />
+			</a>
 		</div>
 	</section>
 
@@ -209,6 +211,21 @@
 							height="1024"
 							loading="lazy"
 						/>
+						<img
+							class="portrait-hover"
+							src="/images/about/david-merino-recalde-hover.webp"
+							alt=""
+							width="820"
+							height="1024"
+							loading="lazy"
+							aria-hidden="true"
+						/>
+						<div class="portrait-data" aria-hidden="true">
+							<span class="portrait-data__label">// DMR [ DECODED ]</span>
+							<span>01100100 01100001 01110110 01101001 01100100</span>
+							<span>01110100 01100101 01111000 01110100 01101111</span>
+							<span>01100101 01110011 01100011 01100101 01101110 01100001</span>
+						</div>
 					</div>
 					<figcaption class="meta">
 						<span>{ui.portraitCaption}</span>
@@ -250,15 +267,13 @@
 		</section>
 
 		<section id="cv" class="section wrap">
-			<div class="section-head section-head--inline">
-				<div>
-					<h2>{ui.featuredTitle}</h2>
-				</div>
-				<a class="meta cta" href={localizedPath('/cv', locale)}>{ui.openCv}</a>
+			<div class="section-head">
+				<span class="meta tag">{ui.recentLabel}</span>
+				<h2>{ui.recentTitle}</h2>
 			</div>
 			<div class="rule"></div>
 			<ol class="rows dense">
-				{#each data.highlights as e, i (e.entity_type + e.entity_id)}
+				{#each data.recentActivity as e, i (e.entity_type + e.entity_id)}
 					<li class="row">
 						<span class="idx meta--faint">{String(i + 1).padStart(2, '0')}</span>
 						<span class="etype meta">{entityLabel(e.entity_type, locale)}</span>
@@ -267,6 +282,16 @@
 					</li>
 				{/each}
 			</ol>
+			<a class="cv-gateway" href={localizedPath('/cv', locale)}>
+				<span class="cv-gateway__copy">
+					<span class="meta tag">{ui.cvLabel}</span>
+					<strong>{ui.cvCta}</strong>
+					<small>{ui.cvSummary}</small>
+				</span>
+				<span class="cv-gateway__icon" aria-hidden="true">
+					<ArrowRight size={32} strokeWidth={1.4} />
+				</span>
+			</a>
 		</section>
 	</main>
 </div>
@@ -533,68 +558,31 @@
 	}
 
 	.landing-foot {
-		display: flex;
-		align-items: center;
-		justify-content: space-between;
-		gap: 22px;
-		padding-top: 18px;
-		border-top: 1px solid var(--line-strong);
+		display: grid;
+		place-items: center;
 	}
 
-	.landing-actions {
-		display: flex;
-		gap: 8px;
-		flex-wrap: wrap;
-	}
-
-	.cta {
-		display: inline-flex;
-		align-items: center;
-		justify-content: space-between;
-		gap: 18px;
-		min-height: 34px;
-		padding: 7px 12px;
-		border: 1px solid var(--line-strong);
-		border-radius: var(--radius);
-		color: var(--fg);
-		background: var(--surface-tint);
-	}
-
-	.cta:hover {
-		border-color: var(--accent);
-	}
-
-	.cta--primary {
-		min-width: 180px;
-		border-color: var(--accent);
-		background-color: var(--accent);
-		background-image: var(--accent-grain);
-		background-size: 180px 180px;
-		background-blend-mode: soft-light;
-		color: var(--on-accent);
-	}
-
-	.cta--primary:hover {
-		border-color: var(--accent-strong);
-		background-color: var(--accent-strong);
-		color: var(--on-accent);
-	}
-
-	.cta--secondary {
-		background: color-mix(in srgb, var(--bg) 72%, transparent);
-	}
-
-	.scroll-hint {
-		display: inline-flex;
-		align-items: center;
-		gap: 10px;
+	.scroll-cue {
+		display: grid;
+		place-items: center;
+		width: 42px;
+		height: 42px;
 		color: var(--fg-faint);
+		animation: scroll-cue 1700ms ease-in-out infinite;
 	}
 
-	.scroll-hint i {
-		width: 32px;
-		height: 1px;
-		background: var(--accent);
+	.scroll-cue:hover {
+		color: var(--accent-strong);
+	}
+
+	@keyframes scroll-cue {
+		0%,
+		100% {
+			transform: translateY(-2px);
+		}
+		50% {
+			transform: translateY(7px);
+		}
 	}
 
 	main {
@@ -614,14 +602,6 @@
 		font-size: clamp(1.45rem, 4vw, 3rem);
 		line-height: 1.05;
 	}
-	.section-head--inline {
-		display: flex;
-		align-items: end;
-		justify-content: space-between;
-		gap: 18px;
-		flex-wrap: wrap;
-	}
-
 	.about-editorial {
 		position: relative;
 		isolation: isolate;
@@ -677,38 +657,76 @@
 		position: relative;
 		border: 1px solid var(--line-strong);
 		border-radius: var(--radius);
+		background: #777;
 		overflow: hidden;
 	}
 
-	.portrait-image::after {
-		position: absolute;
-		inset: 0;
-		background-color: var(--accent);
-		background-image: var(--accent-grain);
-		background-size: 180px 180px;
-		mix-blend-mode: multiply;
-		opacity: 0;
-		content: '';
-		pointer-events: none;
-		transition: opacity 420ms ease;
-	}
-
-	.portrait-image:hover::after {
-		opacity: 0.16;
-	}
-
 	.portrait-image img {
+		display: block;
 		width: 100%;
 		height: auto;
-		filter: grayscale(1) contrast(0.98);
-		transition:
-			filter 420ms ease,
-			transform 700ms cubic-bezier(0.22, 1, 0.36, 1);
 	}
 
-	.portrait-image:hover img {
-		filter: grayscale(1) contrast(1.04);
-		transform: scale(1.018);
+	.portrait-image .portrait-hover {
+		position: absolute;
+		inset: 0;
+		height: 100%;
+		object-fit: cover;
+		opacity: 0;
+		pointer-events: none;
+		transform: scale(1);
+		transform-origin: center;
+		transition:
+			opacity 520ms cubic-bezier(0.22, 1, 0.36, 1),
+			transform 900ms cubic-bezier(0.22, 1, 0.36, 1);
+	}
+
+	.portrait-data {
+		position: absolute;
+		z-index: 2;
+		left: 7%;
+		right: 5%;
+		bottom: 12%;
+		display: grid;
+		gap: 4px;
+		color: rgba(255, 255, 255, 0.82);
+		font-family: var(--font-mono);
+		font-size: clamp(0.42rem, 0.72vw, 0.58rem);
+		letter-spacing: 0.08em;
+		line-height: 1.25;
+		opacity: 0;
+		pointer-events: none;
+		text-shadow: 0 1px 8px rgba(0, 0, 0, 0.72);
+		transition: opacity 360ms ease 90ms;
+	}
+
+	.portrait-data span {
+		overflow: hidden;
+		white-space: nowrap;
+	}
+
+	.portrait-data span:nth-child(3) {
+		margin-left: 8%;
+		opacity: 0.68;
+	}
+
+	.portrait-data span:nth-child(4) {
+		margin-left: 3%;
+		opacity: 0.44;
+	}
+
+	.portrait-data__label {
+		margin-bottom: 8px;
+		font-size: 0.92em;
+	}
+
+	.portrait-image:hover .portrait-hover {
+		opacity: 1;
+		transform: scale(1.035);
+	}
+
+	.portrait-image:hover .portrait-data {
+		opacity: 1;
 	}
 
 	.about-portrait figcaption {
@@ -866,6 +884,67 @@
 		text-align: right;
 	}
 
+	.cv-gateway {
+		display: grid;
+		grid-template-columns: minmax(0, 1fr) auto;
+		gap: 24px;
+		align-items: center;
+		margin-top: clamp(30px, 5vw, 54px);
+		padding: clamp(22px, 3.4vw, 38px);
+		border: 1px solid var(--line-strong);
+		border-radius: var(--radius);
+		background: color-mix(in srgb, var(--bg-panel) 72%, transparent);
+		transition:
+			border-color 180ms ease,
+			background-color 180ms ease;
+	}
+
+	.cv-gateway:hover {
+		border-color: var(--accent-strong);
+		background-color: var(--accent-wash);
+		color: var(--fg);
+	}
+
+	.cv-gateway__copy {
+		display: grid;
+		justify-items: start;
+		gap: 7px;
+		min-width: 0;
+	}
+
+	.cv-gateway__copy strong {
+		font-family: var(--font-title);
+		font-size: clamp(1.65rem, 3.8vw, 3.2rem);
+		font-weight: 500;
+		line-height: 1;
+		letter-spacing: -0.035em;
+	}
+
+	.cv-gateway__copy small {
+		color: var(--fg-dim);
+		font-size: 0.72rem;
+	}
+
+	.cv-gateway__icon {
+		display: grid;
+		place-items: center;
+		width: clamp(48px, 6vw, 66px);
+		aspect-ratio: 1;
+		border-radius: 50%;
+		background-color: var(--accent);
+		background-image: var(--accent-grain);
+		background-size: 150px 150px;
+		color: var(--on-accent);
+	}
+
+	.cv-gateway__icon :global(svg) {
+		transition: transform 220ms cubic-bezier(0.22, 1, 0.36, 1);
+	}
+
+	.cv-gateway:hover .cv-gateway__icon :global(svg) {
+		transform: translateX(4px);
+	}
+
 	@media (max-width: 780px) {
 		.site-header,
 		.site-header.is-scrolled {
@@ -938,14 +1017,6 @@
 			line-height: 0.9;
 		}
 
-		.landing-foot {
-			align-items: flex-end;
-		}
-
-		.scroll-hint {
-			font-size: 0.58rem;
-		}
-
 		.row {
 			grid-template-columns: 26px 1fr 46px;
 		}
@@ -976,14 +1047,6 @@
 			font-size: 1rem;
 		}
 
-		.landing-foot {
-			align-items: stretch;
-			flex-direction: column;
-		}
-
-		.scroll-hint {
-			align-self: flex-end;
-		}
 	}
 
 	@media (prefers-reduced-motion: reduce) {
@@ -998,6 +1061,15 @@
 		.home.intro-ready .affiliation,
 		.home.intro-ready .landing-foot {
 			animation: none;
+		}
+
+		.scroll-cue {
+			animation: none;
+		}
+
+		.portrait-hover,
+		.portrait-data {
+			transition: none;
 		}
 	}
 </style>

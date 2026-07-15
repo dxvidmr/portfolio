@@ -1,4 +1,4 @@
-// Extractor puntual del CV (docx -> texto plano + HTML) para análisis previo al seed.
+// Extractor puntual del CV (docx -> texto plano + HTML) usado durante la importación inicial.
 // Uso: node scripts/extract-cv.mjs
 import mammoth from 'mammoth';
 import { writeFileSync } from 'node:fs';

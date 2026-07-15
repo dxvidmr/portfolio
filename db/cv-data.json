@@ -1,6 +1,6 @@
 {
   "_meta": {
-    "note": "JSON intermedio generado a partir de es-cv_davidmr.docx. Los 'project_ref' se resuelven a project_id real en scripts/seed.ts. NULL = dato no presente en el CV (no inventado). Sin duplicados: cada hecho vive en una sola tabla. TODAS las filas de contenido se dan de alta también en `entries`.",
+    "note": "JSON intermedio histórico generado a partir de es-cv_davidmr.docx para la importación inicial de Turso. NULL = dato no presente en el CV (no inventado). La base de datos es ahora la fuente de verdad y este archivo no se usa para sincronizar contenido.",
     "entity_types_a_entries": [
       "projects", "education", "research_stays", "courses", "funding_awards",
       "publications", "academic_works", "academic_events", "teaching",

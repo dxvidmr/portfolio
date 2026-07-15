@@ -10,8 +10,7 @@
 		"prepare": "svelte-kit sync || echo ''",
 		"check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
 		"check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch",
-		"migrate:portfolio": "tsx scripts/migrate-portfolio-items.ts",
-		"seed": "tsx scripts/seed.ts"
+		"migrate:portfolio": "tsx scripts/migrate-portfolio-items.ts"
 	},
 	"devDependencies": {
 		"@inlang/paraglide-js": "^2.18.2",

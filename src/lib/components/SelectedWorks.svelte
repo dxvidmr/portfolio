@@ -36,13 +36,11 @@
 		locale === 'es'
 			? {
 					open: 'Explorar proyecto completo',
-					rowAction: 'Ver proyecto',
 					contents: 'Índice de trabajos seleccionados',
 					preview: 'Proyecto seleccionado'
 				}
 			: {
 					open: 'Explore full project',
-					rowAction: 'View project',
 					contents: 'Selected work index',
 					preview: 'Selected project'
 				}
@@ -118,7 +116,6 @@
 					</span>
 					<span class="entry-end">
 						<span class="meta entry-year">{project.year}</span>
-						<span class="meta entry-action">{copy.rowAction}<MoveUpRight size={15} strokeWidth={1.7} /></span>
 					</span>
 				</a>
 			</li>
@@ -178,13 +175,9 @@
 	.entry-main { display: grid; gap: 8px; min-width: 0; }
 	.entry-kind { transition: color 180ms ease; }
 	.entry-title { font-family: var(--font-title); font-size: clamp(1.9rem, 3.9vw, 4.4rem); font-weight: 450; line-height: .9; letter-spacing: -.04em; transition: color 180ms ease, transform 320ms cubic-bezier(.16, 1, .3, 1); }
-	.entry-end { display: grid; gap: 13px; justify-items: end; }
-	.entry-action { display: inline-flex; gap: 7px; align-items: center; color: var(--fg-dim); opacity: .48; transition: color 180ms ease, opacity 180ms ease; }
-	.entry-action :global(svg) { color: var(--accent-strong); transition: transform 180ms ease; }
+	.entry-end { justify-self: end; }
 	.typographic-index li.is-active .entry-title { color: var(--accent-strong); transform: translateX(9px); }
 	.typographic-index li.is-active .entry-kind { color: var(--fg-dim); }
-	.typographic-index li.is-active .entry-action { color: var(--fg); opacity: 1; }
-	.typographic-index a:hover .entry-action :global(svg), .typographic-index a:focus-visible .entry-action :global(svg) { transform: translate(3px, -3px); }
 
 	.project-preview { position: relative; height: 100%; }
 	.preview-sticky { position: sticky; top: clamp(82px, 11vh, 118px); }
@@ -213,6 +206,6 @@
 	}
 	@media (prefers-reduced-motion: reduce) {
 		.preview-change { animation: none; }
-		.entry-title, .entry-action, .entry-action :global(svg), .preview-cta > span:last-child { transition: none; }
+		.entry-title, .preview-cta > span:last-child { transition: none; }
 	}
 </style>
