@@ -1,0 +1,12 @@
+{
+	"$schema": "https://inlang.com/schema/inlang-message-format",
+	"site_tagline": "Humanista digital · Teatro del Siglo de Oro",
+	"nav_index": "ÍNDICE",
+	"section_recent": "RECIENTE",
+	"section_contact": "CONTACTO",
+	"section_areas": "ÁREAS",
+	"label_mail": "MAIL",
+	"label_web": "WEB",
+	"label_repo": "REPO",
+	"cta_view_all": "VER TODO"
+}

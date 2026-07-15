@@ -1,0 +1,12 @@
+{
+	"$schema": "https://inlang.com/schema/inlang-message-format",
+	"site_tagline": "Digital humanist · Spanish Golden Age Theatre",
+	"nav_index": "INDEX",
+	"section_recent": "RECENT",
+	"section_contact": "CONTACT",
+	"section_areas": "AREAS",
+	"label_mail": "MAIL",
+	"label_web": "WEB",
+	"label_repo": "REPO",
+	"cta_view_all": "VIEW ALL"
+}

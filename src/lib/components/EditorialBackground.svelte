@@ -1,0 +1,752 @@
+<script lang="ts">
+	import { onMount } from 'svelte';
+
+	let { onIntroComplete }: { onIntroComplete?: () => void } = $props();
+
+	type XmlMark = { text: string; id: string };
+	type TextPart = { text: string; marked: boolean; id?: string };
+	type Verse = { n: string; parts: TextPart[]; segmentIds: string[] };
+	type Passage = {
+		id: string;
+		label: string;
+		speaker: string;
+		range: string;
+		lines: Verse[];
+		scene: 'hero' | 'projects' | 'about' | 'cv';
+	};
+
+	function verse(n: string, text: string, marks: XmlMark[] = []): Verse {
+		const parts: TextPart[] = [];
+		let cursor = 0;
+
+		for (const mark of marks) {
+			const index = text.indexOf(mark.text, cursor);
+			if (index < 0) continue;
+			if (index > cursor) parts.push({ text: text.slice(cursor, index), marked: false });
+			parts.push({ text: mark.text, marked: true, id: mark.id });
+			cursor = index + mark.text.length;
+		}
+
+		if (cursor < text.length) parts.push({ text: text.slice(cursor), marked: false });
+		if (parts.length === 0) parts.push({ text, marked: false });
+
+		return { n, parts, segmentIds: marks.map((mark) => mark.id) };
+	}
+
+	// Fragmentos transcritos de data/fuenteovejuna.xml. El componente no carga
+	// el XML en tiempo de ejecución: los identificadores y el texto quedan fijados aquí.
+	const passages: Passage[] = [
+		{
+			id: 'arenga-inicio',
+			scene: 'hero',
+			label: '<sp who="#laurencia" xml:id="sp-503">',
+			speaker: 'LAURENCIA',
+			range: 'vv. 1725b–1741',
+			lines: [
+				verse('1725b', 'Por muchas razones,'),
+				verse('1726', 'y sean las principales:'),
+				verse('1727', 'porque dejas que me roben'),
+				verse('1728', 'tiranos sin que me vengues,'),
+				verse('1729', 'traidores sin que me cobres.'),
+				verse('1730', 'Aún no era yo de Frondoso'),
+				verse('1731', 'para que digas que tome,'),
+				verse('1732', 'como marido, venganza,'),
+				verse('1733', 'que aquí por tu cuenta corre:'),
+				verse('1734', 'que, en tanto que de las bodas'),
+				verse('1735', 'no haya llegado la noche,'),
+				verse('1736', 'del padre, y no del marido,'),
+				verse('1737', 'la obligación presupone;'),
+				verse('1738', 'que, en tanto que no me entregan'),
+				verse('1739', 'una joya, aunque la compre,'),
+				verse('1740', 'no ha de correr por mi cuenta'),
+				verse('1741', 'las guardas ni los ladrones.', [
+					{ text: 'guardas', id: 'seg-1741-1' }
+				])
+			]
+		},
+		{
+			id: 'arenga-centro',
+			scene: 'hero',
+			label: '<sp who="#laurencia" xml:id="sp-503">',
+			speaker: 'LAURENCIA',
+			range: 'vv. 1750–1764',
+			lines: [
+				verse('1750', 'por rendir mi castidad'),
+				verse('1751', 'a sus apetitos torpes?', [
+					{ text: 'apetitos torpes', id: 'seg-1751-1' }
+				]),
+				verse('1752', 'Mis cabellos, ¿no lo dicen?'),
+				verse('1753', '¿No se ven aquí los golpes'),
+				verse('1754', 'de la sangre y las señales?'),
+				verse('1755', '¿Vosotros sois hombres nobles?', [
+					{ text: 'nobles', id: 'seg-1755-1' }
+				]),
+				verse('1756', '¿Vosotros padres y deudos?', [{ text: 'deudos', id: 'seg-1756-1' }]),
+				verse('1757', '¡Vosotros, que no se os rompen'),
+				verse('1758', 'las entrañas de dolor'),
+				verse('1759', 'de verme en tantos dolores,'),
+				verse('1760', 'ovejas sois: bien lo dice', [{ text: 'ovejas sois', id: 'seg-1760-1' }]),
+				verse('1761', 'de Fuenteovejuna el nombre!'),
+				verse('1762', 'Dadme unas armas a mí'),
+				verse('1763', 'pues sois piedras, pues sois bronces,'),
+				verse('1764', 'pues sois jaspes, pues sois tigres…', [
+					{ text: 'jaspes', id: 'seg-1764-1' }
+				])
+			]
+		},
+		{
+			id: 'arenga-final',
+			scene: 'hero',
+			label: '<sp who="#laurencia" xml:id="sp-503">',
+			speaker: 'LAURENCIA',
+			range: 'vv. 1770–1785',
+			lines: [
+				verse('1770', 'liebres cobardes nacistes;', [{ text: 'nacistes', id: 'seg-1770-1' }]),
+				verse('1771', 'bárbaros sois, no españoles;', [{ text: 'bárbaros', id: 'seg-1771-1' }]),
+				verse('1772', 'gallinas, ¡vuestras mujeres'),
+				verse('1773', 'sufrís que otros hombres gocen!', [{ text: 'sufrís', id: 'seg-1773-1' }]),
+				verse('1774', 'Poneos ruecas en la cinta.', [{ text: 'cinta', id: 'seg-1774-1' }]),
+				verse('1775', '¿Para qué os ceñís estoques?'),
+				verse('1776', '¡Vive Dios, que he de trazar'),
+				verse('1777', 'que solas mujeres cobren'),
+				verse('1778', 'la honra de estos tiranos,'),
+				verse('1779', 'la sangre destos traidores,'),
+				verse('1780', 'y que os han de tirar piedras,', [
+					{ text: 'os han de tirar piedras', id: 'seg-1780-1' }
+				]),
+				verse('1781', 'hilanderas, maricones,'),
+				verse('1782', 'amujerados, cobardes,'),
+				verse('1783', 'y que mañana os adornen'),
+				verse('1784', 'nuestras tocas y basquiñas,', [
+					{ text: 'tocas', id: 'seg-1784-1' },
+					{ text: 'basquiñas', id: 'seg-1784-2' }
+				]),
+				verse('1785', 'solimanes y colores!', [
+					{ text: 'solimanes', id: 'seg-1785-1' },
+					{ text: 'colores', id: 'seg-1785-2' }
+				])
+			]
+		},
+		{
+			id: 'frondoso',
+			scene: 'about',
+			label: '<sp who="#frondoso" xml:id="sp-665">',
+			speaker: 'FRONDOSO',
+			range: 'vv. 2191–2200',
+			lines: [
+				verse('2191', '¿Cómo? ¿Qué procure quieres'),
+				verse('2192', 'cosa tan mal recebida?'),
+				verse('2193', '¿Es bien que los demás deje'),
+				verse('2194', 'en el peligro presente'),
+				verse('2195', 'y de tu vista me ausente?'),
+				verse('2196', 'No me mandes que me aleje,'),
+				verse('2197', 'porque no es puesto en razón', [
+					{ text: 'puesto en razón', id: 'seg-2197-1' }
+				]),
+				verse('2198', 'que por evitar mi daño,'),
+				verse('2199', 'sea con mi sangre estraño'),
+				verse('2200', 'en tan terrible ocasión.')
+			]
+		},
+		{
+			id: 'voces',
+			scene: 'projects',
+			label: '<sp who="#laurencia" xml:id="sp-666">',
+			speaker: 'LAURENCIA',
+			range: 'vv. 2201–2204',
+			lines: [
+				verse('2201', 'Voces parece que he oído,'),
+				verse('2202', 'y son, si yo mal no siento,'),
+				verse('2203', 'de alguno que dan tormento.'),
+				verse('2204', 'Oye con atento oído.')
+			]
+		},
+		{
+			id: 'flores',
+			scene: 'projects',
+			label: '<sp who="#flores" xml:id="sp-10">',
+			speaker: 'FLORES',
+			range: 'vv. 23–31',
+			lines: [
+				verse('23', '¡Qué cansado es de sufrir!'),
+				verse('24', '¡Qué áspero y qué importuno!'),
+				verse('25', 'Llaman la descortesía'),
+				verse('26', '«necedad» en los iguales,'),
+				verse('27', 'porque es entre desiguales'),
+				verse('28', 'linaje de tiranía.'),
+				verse('29', 'Aquí no te toca nada,'),
+				verse('30', 'que un muchacho aún no ha llegado'),
+				verse('31', 'a saber qué es ser amado.')
+			]
+		},
+		{
+			id: 'mujeres',
+			scene: 'about',
+			label: '<sp who="#laurencia" xml:id="sp-517">',
+			speaker: 'LAURENCIA',
+			range: 'vv. 1822–1829',
+			lines: [
+				verse('1822', '¿No veis cómo todos van'),
+				verse('1823', 'a matar a Fernán Gómez,'),
+				verse('1824', 'y hombres, mozos y muchachos'),
+				verse('1825', 'furiosos al hecho corren?'),
+				verse('1826', '¿Será bien que solos ellos'),
+				verse('1827', 'de esta hazaña el honor gocen?'),
+				verse('1828', '¡Pues no son de las mujeres'),
+				verse('1829', 'sus agravios los menores!')
+			]
+		},
+		{
+			id: 'pesquisidor',
+			scene: 'cv',
+			label: '<sp xml:id="sp-709">',
+			speaker: 'JUEZ',
+			range: 'vv. 2253–2257',
+			lines: [
+				verse('2253', '¿Hay tan gran bellaquería?'),
+				verse('2254', 'Del dolor se están burlando.'),
+				verse('2255', 'En quien estaba esperando,'),
+				verse('2256', 'niega con mayor porfía.'),
+				verse('2257', 'Dejaldos, que estoy cansado.')
+			]
+		},
+		{
+			id: 'mengo',
+			scene: 'cv',
+			label: '<sp who="#mengo" xml:id="sp-509">',
+			speaker: 'MENGO',
+			range: 'vv. 1807–1810',
+			lines: [
+				verse('1807', 'Ir a matarle sin orden.'),
+				verse('1808', 'Juntad el pueblo a una voz,'),
+				verse('1809', 'que todos están conformes'),
+				verse('1810', 'en que los tiranos mueran.')
+			]
+		}
+	];
+
+	let root = $state<HTMLDivElement | null>(null);
+
+	onMount(() => {
+		if (!root) return;
+
+		const background = root;
+		const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+		const items = Array.from(background.querySelectorAll<HTMLElement>('.passage'));
+		type Scene = Passage['scene'];
+		type GlyphPosition = { node: HTMLElement; x: number; y: number };
+		let glyphs: GlyphPosition[] = [];
+		const glyphAnimations = new Map<HTMLElement, Animation>();
+		let pointerX = 0;
+		let pointerY = 0;
+		let pointerFrame = 0;
+		let scrollFrame = 0;
+		let resizeTimer = 0;
+		let sceneTimer = 0;
+		let interactionAttached = false;
+		let active = true;
+		let currentScene: Scene | '' = '';
+
+		const cancelGlyphAnimations = () => {
+			for (const animation of glyphAnimations.values()) animation.cancel();
+			glyphAnimations.clear();
+		};
+
+		const cacheGlyphs = () => {
+			cancelGlyphAnimations();
+			glyphs = Array.from(background.querySelectorAll<HTMLElement>('.glyph'))
+				.filter(
+					(node) =>
+						node.textContent?.trim() &&
+						node.closest<HTMLElement>('.passage')?.classList.contains('is-scene-active')
+				)
+				.map((node) => {
+					const rect = node.getBoundingClientRect();
+					return {
+						node,
+						x: rect.left + rect.width / 2,
+						y: rect.top + rect.height / 2
+					};
+				})
+				.filter(
+					(glyph) =>
+						glyph.x > -24 &&
+						glyph.x < window.innerWidth + 24 &&
+						glyph.y > -24 &&
+						glyph.y < window.innerHeight + 24
+				);
+		};
+
+		const scatterGlyph = (node: HTMLElement, force: number) => {
+			const angle = Math.random() * Math.PI * 2;
+			const distance = (7 + Math.random() * 14) * (0.48 + force * 0.62);
+			const shiftX = Math.cos(angle) * distance;
+			const shiftY = Math.sin(angle) * distance * (0.72 + Math.random() * 0.42);
+			const rotation = (Math.random() - 0.5) * 26 * (0.62 + force * 0.42);
+			const duration = 760 + Math.random() * 380;
+			const transform = (factor: number, rotationFactor: number) =>
+				`translate3d(${(shiftX * factor).toFixed(2)}px, ${(shiftY * factor).toFixed(2)}px, 0) rotate(${(rotation * rotationFactor).toFixed(2)}deg)`;
+
+			const animation = node.animate(
+				[
+					{ transform: 'translate3d(0, 0, 0) rotate(0deg)', offset: 0 },
+					{ transform: transform(1, 1), offset: 0.2, easing: 'cubic-bezier(0.2, 0.8, 0.2, 1)' },
+					{ transform: transform(-0.24, -0.2), offset: 0.5, easing: 'ease-out' },
+					{ transform: transform(0.11, 0.08), offset: 0.7, easing: 'ease-out' },
+					{ transform: transform(-0.045, -0.035), offset: 0.86, easing: 'ease-out' },
+					{ transform: 'translate3d(0, 0, 0) rotate(0deg)', offset: 1 }
+				],
+				{ duration, easing: 'linear' }
+			);
+
+			glyphAnimations.set(node, animation);
+			void animation.finished
+				.then(() => {
+					if (glyphAnimations.get(node) === animation) glyphAnimations.delete(node);
+				})
+				.catch(() => {});
+		};
+
+		const paintDisplacement = () => {
+			pointerFrame = 0;
+			const radius = 82;
+			let scatteredCount = 0;
+
+			for (const glyph of glyphs) {
+				if (scatteredCount >= 6) break;
+				if (glyphAnimations.has(glyph.node)) continue;
+				const dx = glyph.x - pointerX;
+				const dy = glyph.y - pointerY;
+				const distance = Math.hypot(dx, dy);
+				if (distance >= radius) continue;
+
+				const force = 1 - distance / radius;
+				if (Math.random() > 0.08 + force * 0.34) continue;
+				scatterGlyph(glyph.node, force);
+				scatteredCount += 1;
+			}
+		};
+
+		const handlePointer = (event: PointerEvent) => {
+			pointerX = event.clientX;
+			pointerY = event.clientY;
+			if (!pointerFrame) pointerFrame = window.requestAnimationFrame(paintDisplacement);
+		};
+
+		const handleResize = () => {
+			window.clearTimeout(resizeTimer);
+			resizeTimer = window.setTimeout(() => {
+				updateScrollScene();
+				if (interactionAttached) cacheGlyphs();
+			}, 160);
+		};
+
+		const updateScrollScene = () => {
+			scrollFrame = 0;
+			const marker = window.scrollY + window.innerHeight * 0.42;
+			const projectsTop = document.querySelector<HTMLElement>('#proyectos')?.offsetTop ?? Infinity;
+			const aboutTop = document.querySelector<HTMLElement>('#about')?.offsetTop ?? Infinity;
+			const cvTop = document.querySelector<HTMLElement>('#cv')?.offsetTop ?? Infinity;
+			let nextScene: Scene = 'hero';
+
+			if (marker >= cvTop) nextScene = 'cv';
+			else if (marker >= aboutTop) nextScene = 'about';
+			else if (marker >= projectsTop) nextScene = 'projects';
+
+			if (nextScene === currentScene) return;
+			currentScene = nextScene;
+			background.dataset.scene = nextScene;
+			cancelGlyphAnimations();
+
+			for (const item of items) {
+				item.classList.toggle('is-scene-active', item.dataset.scene === nextScene);
+			}
+
+			window.clearTimeout(sceneTimer);
+			if (interactionAttached) sceneTimer = window.setTimeout(cacheGlyphs, reducedMotion ? 0 : 1250);
+		};
+
+		const handleScroll = () => {
+			if (!scrollFrame) scrollFrame = window.requestAnimationFrame(updateScrollScene);
+		};
+
+		const attachInteraction = () => {
+			if (!active || interactionAttached) return;
+			interactionAttached = true;
+			cacheGlyphs();
+			window.addEventListener('pointermove', handlePointer, { passive: true });
+		};
+
+		updateScrollScene();
+		window.addEventListener('scroll', handleScroll, { passive: true });
+		window.addEventListener('resize', handleResize, { passive: true });
+
+		if (reducedMotion) {
+			background.classList.add('is-ready', 'is-settled');
+			onIntroComplete?.();
+			return () => {
+				window.cancelAnimationFrame(scrollFrame);
+				window.clearTimeout(resizeTimer);
+				window.clearTimeout(sceneTimer);
+				window.removeEventListener('scroll', handleScroll);
+				window.removeEventListener('resize', handleResize);
+			};
+		}
+
+		background.classList.add('is-ready');
+		const entranceItems = items.filter((item) => item.classList.contains('is-scene-active'));
+		const animations = entranceItems.map((item, index) => {
+			const rect = item.getBoundingClientRect();
+			const originX = window.innerWidth / 2 - (rect.left + rect.width / 2);
+			const originY = window.innerHeight / 2 - (rect.top + rect.height / 2);
+			const targetOpacity = window.getComputedStyle(item).opacity;
+
+			return item.animate(
+				[
+					{
+						transform: `translate3d(${originX}px, ${originY}px, 0) scale(0.34) rotate(${index % 2 === 0 ? -7 : 7}deg)`,
+						opacity: 0,
+						filter: 'blur(14px)'
+					},
+					{
+						offset: 0.3,
+						opacity: Number(targetOpacity) * 0.3,
+						filter: 'blur(5px)'
+					},
+					{ transform: 'translate3d(0, 0, 0) scale(1)', opacity: targetOpacity, filter: 'blur(0)' }
+				],
+				{
+					duration: 1450 + index * 150,
+					delay: 80 + index * 100,
+					easing: 'cubic-bezier(0.22, 1, 0.36, 1)',
+					fill: 'none'
+				}
+			);
+		});
+
+		void Promise.allSettled(animations.map((animation) => animation.finished)).then(() => {
+			if (!active) return;
+			background.classList.add('is-settled');
+			onIntroComplete?.();
+			void document.fonts.ready.then(attachInteraction);
+		});
+
+		return () => {
+			active = false;
+			animations.forEach((animation) => animation.cancel());
+			window.cancelAnimationFrame(pointerFrame);
+			window.cancelAnimationFrame(scrollFrame);
+			window.clearTimeout(resizeTimer);
+			window.clearTimeout(sceneTimer);
+			window.removeEventListener('pointermove', handlePointer);
+			window.removeEventListener('scroll', handleScroll);
+			window.removeEventListener('resize', handleResize);
+			cancelGlyphAnimations();
+		};
+	});
+</script>
+
+<div class="editorial-background" bind:this={root} aria-hidden="true">
+	<div class="editorial-background__wash"></div>
+
+	{#each passages as passage (passage.id)}
+		<article class="passage passage--{passage.id}" data-scene={passage.scene}>
+			<header>
+				<span>{passage.label}</span>
+				<span>{passage.range}</span>
+			</header>
+			<strong>{passage.speaker}</strong>
+			<div class="verses">
+				{#each passage.lines as line (line.n)}
+					<div>
+						<span class="verse-number">{line.n}</span>
+						<p>
+							{#each line.parts as part}
+								{#if part.marked}
+									<mark>
+										{#each [...part.text] as character}
+											<span class="glyph">{character}</span>
+										{/each}
+									</mark>
+								{:else}
+									{#each [...part.text] as character}
+										<span class="glyph">{character}</span>
+									{/each}
+								{/if}
+							{/each}
+						</p>
+						{#if line.segmentIds.length}
+							<small>{line.segmentIds.join(' · ')}</small>
+						{/if}
+					</div>
+				{/each}
+			</div>
+			<footer>&lt;/sp&gt;</footer>
+		</article>
+	{/each}
+</div>
+
+<style>
+	.editorial-background {
+		position: fixed;
+		inset: 0;
+		z-index: 0;
+		overflow: hidden;
+		pointer-events: none;
+		contain: strict;
+	}
+
+	.editorial-background__wash {
+		position: absolute;
+		inset: 0;
+		background: radial-gradient(ellipse at 49% 46%, var(--bg) 0 22%, transparent 65%);
+		opacity: 0.92;
+	}
+
+	.passage {
+		--scene-x: 0vw;
+		--scene-y: 18vh;
+		--scene-rotation: 0deg;
+		position: absolute;
+		width: min(32rem, 39vw);
+		color: var(--text-background);
+		font-family: var(--font-mono);
+		font-size: clamp(0.56rem, 0.61vw, 0.68rem);
+		line-height: 1.18;
+		opacity: 0;
+		filter: blur(4px);
+		transform: translate3d(var(--scene-x), var(--scene-y), 0) scale(0.84)
+			rotate(var(--scene-rotation));
+		transition:
+			opacity 760ms ease,
+			filter 900ms ease,
+			transform 1150ms cubic-bezier(0.22, 1, 0.36, 1);
+		will-change: opacity, filter, transform;
+	}
+
+	.editorial-background:global(.is-ready) .passage:global(.is-scene-active) {
+		opacity: 0.78;
+		filter: blur(0);
+		transform: translate3d(0, 0, 0);
+	}
+
+	.passage header,
+	.passage footer {
+		display: flex;
+		justify-content: space-between;
+		gap: 1rem;
+		color: var(--text-background-strong);
+		font-size: 0.82em;
+		letter-spacing: 0.045em;
+	}
+
+	.passage strong {
+		display: block;
+		margin: 0.48rem 0 0.32rem 3.2rem;
+		color: var(--text-background-strong);
+		font-weight: 500;
+		letter-spacing: 0.15em;
+	}
+
+	.verses {
+		display: grid;
+		gap: 0.12rem;
+	}
+
+	.verses > div {
+		display: grid;
+		grid-template-columns: 2.65rem minmax(0, 1fr) auto;
+		gap: 0.55rem;
+		align-items: baseline;
+	}
+
+	.verse-number {
+		color: var(--text-background-faint);
+		text-align: right;
+		font-variant-numeric: tabular-nums;
+	}
+
+	.verses p {
+		margin: 0;
+		white-space: nowrap;
+	}
+
+	.verses small {
+		color: var(--accent-background-text);
+		font-size: 0.69em;
+		letter-spacing: 0.025em;
+	}
+
+	mark {
+		padding: 0 0.12em;
+		background: var(--accent-wash);
+		color: var(--accent-background-text);
+	}
+
+	.glyph {
+		display: inline-block;
+		white-space: pre;
+	}
+
+	.passage footer {
+		justify-content: flex-end;
+		margin-top: 0.38rem;
+	}
+
+	.passage--arenga-inicio {
+		--scene-x: -24vw;
+		--scene-y: -20vh;
+		--scene-rotation: -5deg;
+		left: -7.5rem;
+		top: 8vh;
+	}
+
+	.passage--arenga-centro {
+		--scene-x: 24vw;
+		--scene-y: -18vh;
+		--scene-rotation: 5deg;
+		right: -8rem;
+		top: 7vh;
+	}
+
+	.passage--arenga-final {
+		--scene-x: -22vw;
+		--scene-y: 23vh;
+		--scene-rotation: -4deg;
+		left: -6rem;
+		bottom: -3.5vh;
+	}
+
+	.passage--frondoso {
+		--scene-x: -28vw;
+		--scene-y: 22vh;
+		--scene-rotation: -5deg;
+		left: 4vw;
+		bottom: 7vh;
+		width: min(29rem, 35vw);
+	}
+
+	.passage--voces {
+		--scene-x: 28vw;
+		--scene-y: 22vh;
+		--scene-rotation: 6deg;
+		right: 8vw;
+		top: 45vh;
+		width: min(25rem, 31vw);
+	}
+
+	.passage--flores {
+		--scene-x: -28vw;
+		--scene-y: -22vh;
+		--scene-rotation: -6deg;
+		left: 18vw;
+		top: 14vh;
+		width: min(27rem, 33vw);
+	}
+
+	.passage--mujeres {
+		--scene-x: 28vw;
+		--scene-y: -18vh;
+		--scene-rotation: 5deg;
+		right: 10vw;
+		top: 27vh;
+		width: min(28rem, 34vw);
+	}
+
+	.passage--pesquisidor {
+		--scene-x: -26vw;
+		--scene-y: 24vh;
+		--scene-rotation: -5deg;
+		left: 25vw;
+		bottom: 11vh;
+		width: min(26rem, 32vw);
+	}
+
+	.passage--mengo {
+		--scene-x: 26vw;
+		--scene-y: -22vh;
+		--scene-rotation: 5deg;
+		right: 16vw;
+		top: 18vh;
+		width: min(25rem, 31vw);
+	}
+
+	@media (max-width: 780px) {
+		.editorial-background__wash {
+			background: radial-gradient(ellipse at 46% 42%, var(--bg) 0 30%, transparent 76%);
+		}
+
+		.passage {
+			width: 25rem;
+			font-size: 0.55rem;
+		}
+
+		.editorial-background:global(.is-ready) .passage:global(.is-scene-active) {
+			opacity: 0.64;
+		}
+
+		.verses small {
+			display: none;
+		}
+
+		.passage--arenga-inicio {
+			left: -17rem;
+			top: 7vh;
+		}
+
+		.passage--arenga-centro {
+			right: -17rem;
+			top: 5vh;
+		}
+
+		.passage--arenga-final {
+			left: -17rem;
+			bottom: -3vh;
+		}
+
+		.passage--frondoso {
+			left: -15rem;
+			bottom: 5vh;
+			width: 25rem;
+		}
+
+		.passage--voces {
+			right: -14rem;
+			top: 48vh;
+			width: 23rem;
+		}
+
+		.passage--flores {
+			left: -9rem;
+			top: 17vh;
+			width: 24rem;
+		}
+
+		.passage--mujeres {
+			right: -12rem;
+			top: 29vh;
+			width: 24rem;
+		}
+
+		.passage--pesquisidor {
+			left: -8rem;
+			bottom: 16vh;
+			width: 23rem;
+		}
+
+		.passage--mengo {
+			right: -10rem;
+			top: 20vh;
+			width: 23rem;
+		}
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		.passage {
+			filter: none;
+			transform: none;
+			transition-duration: 1ms;
+		}
+	}
+
+</style>

@@ -1,0 +1,193 @@
+@import url('https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,700;1,9..144,400&display=swap');
+@import '@fontsource/jetbrains-mono/latin-400.css';
+@import '@fontsource/jetbrains-mono/latin-500.css';
+@import '@fontsource/jetbrains-mono/latin-700.css';
+@import 'academicons/css/academicons.min.css';
+@import '@fortawesome/fontawesome-free/css/fontawesome.min.css';
+@import '@fortawesome/fontawesome-free/css/brands.min.css';
+
+/* ============================================================
+   Sistema de diseño — edición crítica contemporánea.
+   Serif para la voz editorial, mono para datos y anotaciones.
+   El verde cardenillo funciona como tinta de destaque.
+   ============================================================ */
+:root {
+	--bg: #e6e7e5;
+	--bg-panel: #daddd9;
+	--fg: #171916;
+	--fg-dim: #50534d;
+	--fg-faint: #767970;
+	--line: #c3c6c2;
+	--line-strong: #929790;
+	--accent: #758f6f;
+	--accent-strong: #536a4f;
+	--accent-soft: #c1cfbd;
+	--accent-wash: rgba(117, 143, 111, 0.17);
+	--accent-background-text: rgba(83, 106, 79, 0.44);
+	--on-accent: #111610;
+	--accent-grain: url("data:image/svg+xml,%3Csvg viewBox='0 0 180 180' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.2'/%3E%3C/svg%3E");
+	--grid-line: rgba(23, 25, 22, 0.035);
+	--selection-fg: #f8f5ec;
+	--surface-tint: rgba(23, 25, 22, 0.025);
+	--surface-glass: rgba(230, 231, 229, 0.88);
+	--visual-bg: #ced1cd;
+	--visual-grid: rgba(23, 25, 22, 0.07);
+	--text-background: rgba(23, 25, 22, 0.105);
+	--text-background-strong: rgba(23, 25, 22, 0.18);
+	--text-background-faint: rgba(23, 25, 22, 0.075);
+	--text-ghost: rgba(23, 25, 22, 0.055);
+	--tone-green: #758f6f;
+	--tone-blue: #356b8c;
+	--tone-amber: #9a6829;
+
+	--font-title: 'Fraunces', 'Newsreader', 'Iowan Old Style', 'Palatino Linotype', 'Book Antiqua', Georgia, serif;
+	--font-mono: 'JetBrains Mono', ui-monospace, 'SFMono-Regular', 'Cascadia Mono', 'Menlo', monospace;
+
+	--radius: 8px; /* redondeo ligero, no líneas rectas perfectas */
+	--radius-sm: 4px;
+	--step: 4px;
+	--gutter: clamp(16px, 4vw, 40px);
+
+	--fs-meta: 0.72rem;   /* etiquetas de instrumento */
+	--fs-body: 0.86rem;   /* cuerpo, denso */
+	--tracking-meta: 0.16em;
+}
+
+html[data-theme='dark'] {
+	--bg: #0e1210;
+	--bg-panel: #151a17;
+	--fg: #e8e6dd;
+	--fg-dim: #aaa99f;
+	--fg-faint: #74776f;
+	--line: #29312c;
+	--line-strong: #465049;
+	--accent: #758f6f;
+	--accent-strong: #a8bda2;
+	--accent-soft: #283428;
+	--accent-wash: rgba(117, 143, 111, 0.15);
+	--accent-background-text: rgba(168, 189, 162, 0.34);
+	--on-accent: #0b100b;
+	--grid-line: rgba(232, 230, 221, 0.018);
+	--selection-fg: #08100d;
+	--surface-tint: rgba(232, 230, 221, 0.02);
+	--surface-glass: rgba(14, 18, 16, 0.88);
+	--visual-bg: #1b211d;
+	--visual-grid: rgba(232, 230, 221, 0.065);
+	--text-background: rgba(232, 230, 221, 0.08);
+	--text-background-strong: rgba(232, 230, 221, 0.14);
+	--text-background-faint: rgba(232, 230, 221, 0.055);
+	--text-ghost: rgba(232, 230, 221, 0.045);
+	--tone-green: #758f6f;
+	--tone-blue: #7aa7ff;
+	--tone-amber: #ffce6a;
+}
+
+*,
+*::before,
+*::after {
+	box-sizing: border-box;
+}
+
+html {
+	color-scheme: light;
+	-webkit-text-size-adjust: 100%;
+}
+
+html[data-theme='dark'] {
+	color-scheme: dark;
+}
+
+body {
+	margin: 0;
+	background: var(--bg);
+	color: var(--fg);
+	font-family: var(--font-mono);
+	font-size: var(--fs-body);
+	line-height: 1.5;
+	font-weight: 400;
+	/* rejilla de fondo tenue */
+	background-image:
+		linear-gradient(to right, var(--grid-line) 1px, transparent 1px),
+		linear-gradient(to bottom, var(--grid-line) 1px, transparent 1px);
+	background-size: 56px 56px;
+	-webkit-font-smoothing: antialiased;
+	text-rendering: optimizeLegibility;
+}
+
+a {
+	color: inherit;
+	text-decoration: none;
+	transition: color 90ms linear;
+}
+a:hover {
+	color: var(--accent);
+}
+
+button,
+input,
+select {
+	font: inherit;
+	color: inherit;
+}
+
+img {
+	display: block;
+	max-width: 100%;
+}
+
+/* Foco: único uso "de superficie" del acento */
+:where(a, button, input, [tabindex]):focus-visible {
+	outline: 1px solid var(--accent);
+	outline-offset: 2px;
+}
+
+::selection {
+	background: var(--accent);
+	color: var(--selection-fg);
+}
+
+/* ---- Etiquetas de metadato: "líneas de instrumento" ---- */
+.meta {
+	font-size: var(--fs-meta);
+	letter-spacing: var(--tracking-meta);
+	text-transform: uppercase;
+	color: var(--fg-dim);
+	font-weight: 500;
+}
+.meta--faint {
+	color: var(--fg-faint);
+}
+/* Etiqueta entre llaves tipo {MAIL} */
+.tag::before { content: '{'; }
+.tag::after { content: '}'; }
+
+/* ---- Regla / separadores ---- */
+hr,
+.rule {
+	border: 0;
+	border-top: 1px solid var(--line);
+	margin: 0;
+}
+
+h1, h2, h3, h4 {
+	font-family: var(--font-title);
+	font-weight: 500;
+	margin: 0;
+	letter-spacing: -0.025em;
+}
+
+.mono-caps {
+	text-transform: uppercase;
+	letter-spacing: var(--tracking-meta);
+}
+
+/* Contenedor general */
+.wrap {
+	width: min(1180px, 100% - 2 * var(--gutter));
+	margin-inline: auto;
+}
+
+/* Utilidad de densidad para listados de datos */
+.dense {
+	font-variant-numeric: tabular-nums;
+}
