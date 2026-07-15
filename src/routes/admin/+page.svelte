@@ -24,7 +24,7 @@
 	</article>
 	<article>
 		<strong>{data.summary.draftCount}</strong>
-		<span>borradores</span>
+		<span>privadas</span>
 	</article>
 	<article>
 		<strong>{data.summary.homeCount}</strong>
@@ -39,6 +39,7 @@
 <section class="actions" aria-labelledby="quick-actions">
 	<h2 id="quick-actions">Acciones rápidas</h2>
 	<div>
+		<a href="/admin/entradas/nueva">Nueva entrada</a>
 		<a href="/admin/entradas">Gestionar entradas</a>
 		<a href="/admin/portada">Ordenar portada</a>
 		<a href="/es" class="secondary">Ver web pública</a>

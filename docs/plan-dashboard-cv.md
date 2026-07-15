@@ -1,7 +1,7 @@
 # Plan persistente: índice transversal automático y dashboard privado del CV
 
 > Última actualización: 2026-07-15  
-> Estado general: **Fases 0–3 completadas y en producción; Fase 4 en curso — migración `004` (type_vocab) aplicada y web pública leyendo etiquetas del vocabulario; faltan formularios CRUD**
+> Estado general: **Fases 0–3 en producción; Fase 4 completa en local (los 13 tipos editables + mejoras de la prueba editorial; migración `005` de roles aplicada) — pendiente commit, despliegue y segunda prueba del autor**
 > Fuente de verdad: **Turso**. `db/cv-data.json` es histórico y no debe sincronizar contenido.  
 > Propósito: este documento debe permitir retomar el trabajo en sesiones distintas sin reconstruir decisiones ni contexto.
 
@@ -38,7 +38,8 @@ Estas decisiones se consideran aceptadas salvo que se documenten explícitamente
 13. La portada muestra **todas** las entradas con `show_home = 1`: no hay límite editorial fijo y el `LIMIT 5` actual se retira (decisión 2026-07-15). El fallback de actividad reciente conserva su propio límite.
 14. «Proyecto de investigación» (fila de la tabla `projects`, referenciada por `project_id`) y «ficha del portfolio» (slug de `projects.ts` que consume `portfolio_items`) son relaciones distintas y la UI las nombrará de forma distinta (decisión 2026-07-15).
 15. Las etiquetas de las fichas del home («líneas de trabajo») son contenido de los componentes (`projects.ts`) y **no** se migran a la BD; la base de datos solo conoce la relación entrada↔ficha por slug (`portfolio_items`). `tags`/`entity_tags` quedan reservadas para clasificación temática transversal, sin consumidor actual (decisión 2026-07-15; corrige la redacción anterior de este punto).
-16. Los campos `*_type` dejan de ser TEXT libre: pasan a referenciar un vocabulario controlado en BD (`type_vocab`, con `label_es`/`label_en`), para impedir errores de escritura al rellenar y sacar las traducciones de subtipos de `labels.ts` (decisión 2026-07-15; ver sección 5.5, resuelve la pregunta 7).
+16. Los campos `*_type` dejan de ser TEXT libre: pasan a referenciar un vocabulario controlado en BD (`type_vocab`, con `label_es`/`label_en`), para impedir errores de escritura al rellenar y sacar las traducciones de subtipos de `labels.ts` (decisión 2026-07-15; ver sección 5.5, resuelve la pregunta 7). Extensión (mismo día): también los roles con datos y semántica clara — `projects.role` (dominio `project_role`) y `service_activities.role` (`service_role`), migración `005`. `academic_events.role` (sin datos) y `memberships.role` (valor descriptivo con matices y periodos) permanecen como texto libre hasta que haya vocabulario real que codificar.
+17. Una entrada privada **no es un borrador**: es un elemento completo del CV que el autor decide no publicar. La UI habla de «privada/pública», nunca de «borrador» (decisión 2026-07-15). El campo `url` de cada entidad es el enlace canónico público del ítem (DOI, web del evento, editorial…); los archivos y certificados (Drive) se gestionarán aparte en `documents` (Fase 5).
 
 ## 3. Estado actual del repositorio
 
@@ -502,6 +503,8 @@ La primera versión no debe intentar hacer un CRUD completamente genérico media
 
 Usar `zod` para esquemas de validación compartidos en servidor. Evaluar una librería de formularios solo si reduce complejidad real; SvelteKit form actions son suficientes para la primera versión.
 
+**Decisión final (2026-07-15)**: zod evaluado y descartado. Con las definiciones de campo declarativas de `entity-definitions.ts`, un validador propio por tipo de campo (`validation.ts`, ~100 líneas, errores en español junto al campo) resultó menos código que el pegamento de esquemas dinámicos, sin dependencia nueva. Las form actions de SvelteKit se confirmaron suficientes.
+
 ### Comportamiento común
 
 - Errores junto al campo correspondiente.
@@ -862,18 +865,22 @@ Criterio de aceptación:
 
 ### Fase 4 — CRUD de tipos prioritarios
 
-Estado: `en curso` — vocabulario en producción y etiquetas públicas conectadas; faltan formularios
+Estado: `en curso` — implementación completa en local y verificada con smoke test; falta la prueba editorial real del autor (crear/editar/publicar/eliminar), commit y despliegue
 
-- [ ] Añadir allowlist y validación.
+- [x] Añadir allowlist y validación: definiciones de campo declarativas por tipo en `entity-definitions.ts` (nombres de tabla/columna nunca del navegador) y validador propio en `validation.ts` (zod descartado, ver §11).
 - [x] Migración `004`: `type_vocab` creado y sembrado (27 códigos, 7 dominios; incluye los 3 `award_type` con traducción nueva) y las 7 tablas reconstruidas con FK y sin los CHECK antiguos. Ensayo local 20/20; validación en producción 18/18. **Verificado que Turso aplica las FK**: un código inexistente se rechaza a nivel de BD.
-- [ ] Alimentar los selectores de tipo desde `type_vocab` filtrado por dominio.
+- [x] Alimentar los selectores de tipo desde `type_vocab` filtrado por dominio (`getFieldOptions` en `crud.ts`; revalidación código+dominio contra BD en cada envío).
 - [x] Sustituir `entitySubtypeLabels` de `labels.ts` por lecturas del vocabulario: `portfolio-items.ts` devuelve `subtype_label_es/en` vía JOIN y `ProjectModal` elige por locale con fallback al código. El diccionario se eliminó de `labels.ts` (solo queda `entityLabel`).
-- [ ] `/cv`: mostrar etiquetas del vocabulario en vez de códigos crudos (`book_review`…) en chips y filtro de tipo — deficiencia preexistente detectada al hacer el cambio anterior.
-- [ ] Implementar formularios de la primera tanda.
-- [ ] Incluir en los formularios los campos FK como selectores («evento de origen», «proyecto de investigación»), con lookup allowlistado.
-- [ ] Crear borradores privados.
-- [ ] Editar y publicar.
-- [ ] Implementar archivado o eliminación segura.
+- [x] `/cv`: chips y filtro de tipo muestran etiquetas del vocabulario por idioma (verificado en `/es/cv` y `/en/cv`; cero códigos crudos). Los pseudotipos literales `education`/`research_stay` se retiraron: solo duplicaban el nombre de la sección.
+- [x] Implementar formularios de la primera tanda: los 8 tipos (`publications`, `academic_events`, `teaching`, `projects`, `education`, `research_stays`, `funding_awards`, `service_activities`) comparten `EntityForm`/`FormField` con campos declarados por tipo.
+- [x] Incluir los campos FK como selectores («Evento de origen», «Proyecto de investigación»), con lookup allowlistado y verificación de existencia en servidor.
+- [x] Crear borradores privados: `/admin/entradas/nueva/[type]` inserta contenido + control `is_public = 0` en la misma transacción.
+- [x] Editar y publicar: `/admin/entradas/[type]/[id]` con secciones Contenido / Visibilidad (publicar–despublicar reutiliza `updateEntryControl`, que en cascada apaga portada y CV al despublicar) / Zona peligrosa. Aviso de cambios sin guardar (`beforeunload`), errores junto al campo con valores conservados, confirmación tras guardar.
+- [x] Eliminación segura: casilla de confirmación obligatoria + batch transaccional que borra relaciones → control → fila, y pone a `NULL` las referencias entrantes (`project_id` de las 4 tablas al borrar un proyecto; `event_id` de `publications` al borrar un evento).
+- [x] Prueba editorial real del autor superada (2026-07-15); de ella salieron las mejoras siguientes.
+- [x] Formularios de la segunda tanda (`academic_works`, `courses`, `memberships`, `skills`, `languages`): los 13 tipos son editables.
+- [x] Mejoras tras la prueba editorial (2026-07-15): terminología «privada» en toda la UI (decisión 17); roles de `projects` y `service_activities` como vocabulario con FK (migración `005`, valores libres convertidos a códigos); toggle de portada en la propia ficha de edición junto a visibilidad; feedback como toasts temporales (mismo diseño que el índice); enlace «Volver» además del breadcrumb; orden del índice por fecha/nombre/actualización; retirado el aviso «Filtrado local»; ayuda del campo URL aclarando su semántica frente a los futuros Documentos.
+- [ ] Segunda prueba editorial del autor sobre las mejoras y despliegue.
 
 Criterio de aceptación:
 
@@ -1002,6 +1009,8 @@ El proyecto se considera completado cuando:
 | 2026-07-15 | Fase 3 — feedback temporal | Creado `AdminToast.svelte` y sustituido el feedback fijo de Entradas y Portada por notificaciones flotantes: éxito 3,5 s, error 6 s, cierre manual, animación breve y semántica accesible `status`/`alert` con `aria-live`. | `npm run check`: 0 errores y 0 avisos; `npm run build`: OK. | Revisar posición y duración del toast en escritorio y móvil durante la prueba editorial. |
 | 2026-07-15 | Revisión de estado entre sesiones | Contrastado el plan con repo, Turso y producción: todo commiteado y pusheado (`e4c2433`); deploy de producción verificado sirviendo la curación completa (título en posición 7 presente en la home, imposible con el antiguo `LIMIT 5`); dominio canónico = apex (`www` redirige 308). BD: 9 filas en portada (`home_order` 20–100), incluida `academic_events#6` añadida durante las pruebas de controles; 90 controles, todos públicos. Corregidas líneas de estado obsoletas de Fases 1 y 3 | Consultas Turso de solo lectura + curl a producción; sin cambios de código | El autor: prueba editorial visual en `davidmerinorecalde.com/admin` (ciclos portada, reordenar y guardar, toasts) y decidir si `academic_events#6` se queda en portada. Después: Fase 4 (migración `004` de `type_vocab` + allowlist/validación + formularios de la primera tanda) |
 | 2026-07-15 | Fase 3 cierre + Fase 4 arranque | Fase 3 completada (prueba editorial del autor superada en local y producción; portada final: 8 filas con `research_stays#1` primera y `academic_events#6` incluida). Fase 4: script permanente `scripts/backup.ts` (`npm run backup`, verificación por restauración); migración `004` aplicada — `type_vocab` con 27 códigos en 7 dominios, 7 tablas reconstruidas con FK, CHECKs de tipos retirados, vistas recreadas; `portfolio-items.ts` + `ProjectModal` leen etiquetas del vocabulario por locale; `entitySubtypeLabels` eliminado de `labels.ts` | Ensayo local 20/20 (vista `entries` byte a byte idéntica); producción 18/18 incl. FK activas en Turso; `npm run check` 0 errores; `npm run build` OK | Continuar Fase 4: `/cv` con etiquetas del vocabulario (hoy muestra códigos crudos, preexistente); después allowlist + validación (zod) y formularios de la primera tanda con selectores desde `type_vocab`. Pendiente commit + push de todo esto |
+| 2026-07-15 | Fase 4 — CRUD primera tanda | `/cv` con etiquetas del vocabulario en chips y filtro (ES/EN, pseudotipos literales retirados). Infraestructura CRUD: campos declarativos por tipo en `entity-definitions.ts` (8 tipos), `validation.ts` propio (zod descartado, documentado en §11), `crud.ts` (crear con transacción contenido+control borrador; editar solo columnas allowlist con `updated_at`; eliminar en batch con limpieza de relaciones y `NULL` en FKs entrantes; opciones de selectores y revalidación código+dominio). Rutas `nueva`, `nueva/[type]` y `[type]/[id]` (Contenido / Visibilidad / Zona peligrosa con confirmación), componentes `EntityForm`/`FormField` (accesibles, errores junto al campo, aviso de cambios sin guardar). Índice con botón «Nueva entrada» y títulos enlazados a edición | `npm run check` 0 errores; `npm run build` OK; smoke test: GET y POST de `/admin/entradas/**` sin sesión → 303 signin (acción no ejecutada, verificado el sobre de redirección); `/es/cv` y `/en/cv` con etiquetas y cero códigos crudos | El autor: commit + push, y prueba editorial completa en producción — crear borrador, editar, publicar, verificar CV/portada, eliminar. Después: segunda tanda de formularios o Fase 5 (relaciones) |
+| 2026-07-15 | Fase 4 — mejoras tras prueba editorial | Decisión 17 (privada ≠ borrador, terminología cambiada en toda la UI). Migración `005`: dominios `project_role` y `service_role` en `type_vocab` (9 códigos, traducciones nuevas revisables), valores libres de `service_activities.role` convertidos a códigos, FK en `projects.role` y `service_activities.role`; `academic_events.role` y `memberships.role` quedan texto libre (sin datos / valor descriptivo). Formularios de la segunda tanda: los 13 tipos editables. Ficha de edición: toggle de portada junto a visibilidad (sin ir a otra pantalla), toasts temporales en vez de avisos fijos, «Volver» + chip «En portada». Índice: orden por fecha/nombre/actualización, sin aviso de filtrado. Ayuda del campo URL (enlace canónico; Drive → Documentos, Fase 5) | Ensayo local de `005` 9/9 y producción 6/6; `npm run check` 0 errores; `npm run build` OK; smoke: rutas de tanda 2 activas y protegidas (303 sin sesión), `/es/cv` 200 | El autor: commit + push, segunda prueba editorial (roles como selector, portada desde la ficha, toasts) y revisar las traducciones EN de los 9 roles nuevos. Después: Fase 5 (relaciones: `portfolio_items`, enlaces, documentos) |
 
 ## 24. Registro de migraciones en Turso
 
@@ -1011,6 +1020,7 @@ El proyecto se considera completado cuando:
 | `002_entry_controls_and_views.sql` | **aplicada** | 2026-07-15 | producción | ensayo local contra respaldo (23/23) + 10 comprobaciones en producción; edición de tabla base se refleja en la vista | `DROP VIEW entries; ALTER TABLE entries_legacy RENAME TO entries;` (documentado en el propio archivo) |
 | `003_drop_entries_legacy.sql` | pendiente | — | — | — | requerirá snapshot previo |
 | `004_type_vocabulary.sql` | **aplicada** | 2026-07-15 | producción | ensayo local contra respaldo (20/20: vista `entries` byte a byte idéntica, FK activas, CHECKs retirados) + 18 comprobaciones en producción (FK verificadas en Turso) | restaurar respaldo `backups/curriculum-2026-07-15-1313.sql` (la reconstrucción no es reversible por sentencias) |
+| `005_role_vocabulary.sql` | **aplicada** | 2026-07-15 | producción | ensayo local 9/9 (vista idéntica, conversión de valores libres a códigos verificada) + 6 comprobaciones en producción (12 roles codificados, FK activa) | restaurar respaldo `backups/curriculum-2026-07-15-1358.sql` |
 
 ## 25. Preguntas que deben resolverse durante la Fase 0
 

@@ -26,3 +26,263 @@ export const entityTypeOptions = entityTypes.map((value) => ({
 	label: entityDefinitions[value]
 }));
 
+// ── Definiciones de formulario (plan §10): allowlist central de columnas ──────
+// Los nombres de tabla y columna salen SIEMPRE de aquí, nunca del navegador.
+
+export type VocabDomain =
+	| 'publication_type'
+	| 'contribution_type'
+	| 'teaching_type'
+	| 'activity_type'
+	| 'award_type'
+	| 'project_type'
+	| 'work_type'
+	| 'project_role'
+	| 'service_role';
+
+export type FkEntity = 'projects' | 'academic_events';
+
+export type FieldKind =
+	| 'text'
+	| 'textarea'
+	| 'integer'
+	| 'real'
+	| 'date'
+	| 'boolean'
+	| 'url'
+	| 'vocab'
+	| 'fk';
+
+export interface FieldDef {
+	name: string;
+	label: string;
+	kind: FieldKind;
+	required?: boolean;
+	vocabDomain?: VocabDomain;
+	fkEntity?: FkEntity;
+	help?: string;
+	isPrivate?: boolean;
+}
+
+export interface EntityFormDef {
+	fields: FieldDef[];
+}
+
+const f = (
+	name: string,
+	label: string,
+	kind: FieldKind = 'text',
+	extra: Partial<FieldDef> = {}
+): FieldDef => ({ name, label, kind, ...extra });
+
+export const entityForms = {
+	publications: {
+		fields: [
+			f('title', 'Título', 'text', { required: true }),
+			f('publication_type', 'Tipo de publicación', 'vocab', {
+				required: true,
+				vocabDomain: 'publication_type'
+			}),
+			f('authors_text', 'Autores', 'text', { required: true, help: 'Tal como deben citarse' }),
+			f('editors_text', 'Editores', 'text'),
+			f('journal_title', 'Revista', 'text'),
+			f('book_title', 'Libro (para capítulos)', 'text'),
+			f('publisher', 'Editorial', 'text'),
+			f('year', 'Año', 'integer'),
+			f('volume', 'Volumen', 'text'),
+			f('issue', 'Número', 'text'),
+			f('pages', 'Páginas', 'text'),
+			f('doi', 'DOI', 'text'),
+			f('isbn', 'ISBN', 'text'),
+			f('issn', 'ISSN', 'text'),
+			f('abstract', 'Resumen', 'textarea'),
+			f('bibtex_override', 'BibTeX manual', 'textarea', { help: 'Solo si la cita automática no basta' }),
+			f('event_id', 'Evento de origen', 'fk', {
+				fkEntity: 'academic_events',
+				help: 'Comunicación de la que deriva esta publicación'
+			}),
+			f('project_id', 'Proyecto de investigación', 'fk', { fkEntity: 'projects' }),
+			f('url', 'URL', 'url')
+		]
+	},
+	academic_events: {
+		fields: [
+			f('title', 'Título de la contribución', 'text', { required: true }),
+			f('event_title', 'Nombre del evento', 'text', { required: true }),
+			f('contribution_type', 'Tipo de contribución', 'vocab', {
+				required: true,
+				vocabDomain: 'contribution_type'
+			}),
+			f('authors_text', 'Autores', 'text', { required: true }),
+			f('role', 'Rol', 'text'),
+			f('date_start', 'Fecha de inicio', 'date'),
+			f('date_end', 'Fecha de fin', 'date'),
+			f('year', 'Año', 'integer'),
+			f('institution', 'Institución', 'text'),
+			f('city', 'Ciudad', 'text'),
+			f('country', 'País', 'text'),
+			f('modality', 'Modalidad', 'text', { help: 'Presencial, en línea, híbrida…' }),
+			f('doi', 'DOI', 'text'),
+			f('project_id', 'Proyecto de investigación', 'fk', { fkEntity: 'projects' }),
+			f('url', 'URL', 'url')
+		]
+	},
+	teaching: {
+		fields: [
+			f('teaching_type', 'Tipo de docencia', 'vocab', {
+				required: true,
+				vocabDomain: 'teaching_type'
+			}),
+			f('title', 'Título', 'text', { required: true }),
+			f('institution', 'Institución', 'text', { required: true }),
+			f('course_code', 'Código de asignatura', 'text'),
+			f('degree_program', 'Titulación', 'text'),
+			f('ects', 'ECTS', 'real'),
+			f('academic_year', 'Curso académico', 'text', { help: 'Formato 2024-2025' }),
+			f('hours', 'Horas', 'integer'),
+			f('project_id', 'Proyecto de investigación', 'fk', { fkEntity: 'projects' }),
+			f('description', 'Descripción', 'textarea'),
+			f('date_start', 'Fecha de inicio', 'date'),
+			f('date_end', 'Fecha de fin', 'date'),
+			f('url', 'URL', 'url')
+		]
+	},
+	projects: {
+		fields: [
+			f('title', 'Título', 'text', { required: true }),
+			f('acronym', 'Acrónimo', 'text'),
+			f('project_code', 'Código del proyecto', 'text'),
+			f('project_type', 'Tipo de proyecto', 'vocab', { vocabDomain: 'project_type' }),
+			f('role', 'Mi rol en el proyecto', 'vocab', { vocabDomain: 'project_role' }),
+			f('institution', 'Institución', 'text'),
+			f('research_group', 'Grupo de investigación', 'text'),
+			f('funding_body', 'Entidad financiadora', 'text'),
+			f('principal_investigators_text', 'Investigadores principales', 'text'),
+			f('date_start', 'Fecha de inicio', 'date'),
+			f('date_end', 'Fecha de fin', 'date'),
+			f('amount', 'Importe', 'real'),
+			f('currency', 'Moneda', 'text', { help: 'EUR, USD…' }),
+			f('description_short_es', 'Descripción breve (ES)', 'textarea'),
+			f('description_short_en', 'Descripción breve (EN)', 'textarea'),
+			f('slug', 'Slug', 'text', { help: 'Identificador único en URL; sin espacios' }),
+			f('url', 'URL', 'url')
+		]
+	},
+	education: {
+		fields: [
+			f('degree_title', 'Titulación', 'text', { required: true }),
+			f('institution', 'Institución', 'text', { required: true }),
+			f('department', 'Departamento', 'text'),
+			f('country', 'País', 'text'),
+			f('thesis_directors_text', 'Dirección de tesis', 'text'),
+			f('date_start', 'Fecha de inicio', 'date'),
+			f('date_end', 'Fecha de fin', 'date'),
+			f('is_ongoing', 'En curso', 'boolean'),
+			f('url', 'URL', 'url'),
+			f('notes_private', 'Notas privadas', 'textarea', { isPrivate: true })
+		]
+	},
+	research_stays: {
+		fields: [
+			f('institution', 'Institución', 'text', { required: true }),
+			f('faculty_or_dept', 'Facultad o departamento', 'text'),
+			f('supervisor', 'Supervisión', 'text'),
+			f('city', 'Ciudad', 'text'),
+			f('country', 'País', 'text'),
+			f('date_start', 'Fecha de inicio', 'date'),
+			f('date_end', 'Fecha de fin', 'date'),
+			f('funding_text', 'Financiación', 'text'),
+			f('url', 'URL', 'url'),
+			f('notes_private', 'Notas privadas', 'textarea', { isPrivate: true })
+		]
+	},
+	funding_awards: {
+		fields: [
+			f('title', 'Título', 'text', { required: true }),
+			f('award_type', 'Tipo', 'vocab', { vocabDomain: 'award_type' }),
+			f('awarding_body', 'Entidad concedente', 'text'),
+			f('amount', 'Importe', 'real'),
+			f('currency', 'Moneda', 'text'),
+			f('year', 'Año', 'integer'),
+			f('related_context', 'Contexto', 'text'),
+			f('project_id', 'Proyecto de investigación', 'fk', { fkEntity: 'projects' }),
+			f('url', 'URL', 'url'),
+			f('notes_private', 'Notas privadas', 'textarea', { isPrivate: true })
+		]
+	},
+	service_activities: {
+		fields: [
+			f('activity_type', 'Tipo de actividad', 'vocab', {
+				required: true,
+				vocabDomain: 'activity_type'
+			}),
+			f('title', 'Título', 'text', { required: true }),
+			f('role', 'Mi rol', 'vocab', { vocabDomain: 'service_role' }),
+			f('venue_or_journal', 'Sede o revista', 'text'),
+			f('related_entity', 'Entidad relacionada', 'text'),
+			f('city', 'Ciudad', 'text'),
+			f('country', 'País', 'text'),
+			f('date_start', 'Fecha de inicio', 'date'),
+			f('date_end', 'Fecha de fin', 'date'),
+			f('year', 'Año', 'integer'),
+			f('description', 'Descripción', 'textarea'),
+			f('url', 'URL', 'url')
+		]
+	},
+	academic_works: {
+		fields: [
+			f('title', 'Título', 'text', { required: true }),
+			f('work_type', 'Tipo de trabajo', 'vocab', { required: true, vocabDomain: 'work_type' }),
+			f('institution', 'Institución', 'text', { required: true }),
+			f('program', 'Programa', 'text'),
+			f('year', 'Año', 'integer'),
+			f('url', 'URL', 'url')
+		]
+	},
+	courses: {
+		fields: [
+			f('title', 'Título', 'text', { required: true }),
+			f('institution', 'Institución', 'text', { required: true }),
+			f('program_context', 'Contexto del programa', 'text'),
+			f('date_start', 'Fecha de inicio', 'date'),
+			f('date_end', 'Fecha de fin', 'date'),
+			f('hours', 'Horas', 'integer'),
+			f('url', 'URL', 'url'),
+			f('notes_private', 'Notas privadas', 'textarea', { isPrivate: true })
+		]
+	},
+	memberships: {
+		fields: [
+			f('organization', 'Organización', 'text', { required: true }),
+			f('role', 'Rol', 'text', { help: 'Texto libre; admite matices y periodos' }),
+			f('date_start', 'Fecha de inicio', 'date'),
+			f('date_end', 'Fecha de fin', 'date'),
+			f('is_ongoing', 'En curso', 'boolean'),
+			f('notes_private', 'Notas privadas', 'textarea', { isPrivate: true })
+		]
+	},
+	skills: {
+		fields: [
+			f('category', 'Categoría', 'text', { required: true }),
+			f('items_text', 'Elementos', 'textarea', { required: true }),
+			f('sort_order', 'Orden en el CV', 'integer')
+		]
+	},
+	languages: {
+		fields: [
+			f('language', 'Idioma', 'text', { required: true }),
+			f('level', 'Nivel', 'text', { help: 'B2, C1, nativo…' }),
+			f('is_native', 'Lengua materna', 'boolean')
+		]
+	}
+} satisfies Partial<Record<EntityType, EntityFormDef>>;
+
+export type FormEntityType = keyof typeof entityForms;
+
+export const isFormEntityType = (value: string): value is FormEntityType =>
+	Object.hasOwn(entityForms, value);
+
+export const formEntityTypeOptions = (Object.keys(entityForms) as FormEntityType[]).map(
+	(value) => ({ value, label: entityDefinitions[value] })
+);
+

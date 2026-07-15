@@ -61,14 +61,27 @@
 	const sectionLabel = (key: string, fallback: string) =>
 		ui.sectionLabels[key as keyof typeof ui.sectionLabels] ?? fallback;
 
+	type CvItem = (typeof data.sections)[number]['items'][number];
+
+	// Etiquetas de tipo desde type_vocab (decisión 16); el código queda de fallback.
+	const typeLabel = (item: CvItem) =>
+		(locale === 'en' ? item.type_label_en : item.type_label_es) ??
+		item.type?.replaceAll('_', ' ') ??
+		null;
+
 	const types = $derived(
 		Array.from(
-			new Set(
-				data.sections
-					.flatMap((section) => section.items.map((item) => item.type))
-					.filter((type): type is string => Boolean(type))
-			)
-		).sort()
+			data.sections
+				.flatMap((section) => section.items)
+				.filter((item): item is CvItem & { type: string } => Boolean(item.type))
+				.reduce((map, item) => {
+					if (!map.has(item.type)) map.set(item.type, typeLabel(item) ?? item.type);
+					return map;
+				}, new Map<string, string>())
+				.entries()
+		)
+			.map(([value, label]) => ({ value, label }))
+			.sort((a, b) => a.label.localeCompare(b.label, locale))
 	);
 
 	const visibleSections = $derived(
@@ -120,8 +133,8 @@
 			<span class="meta">{ui.type}</span>
 			<select bind:value={selectedType}>
 				<option value="all">{ui.allMasc}</option>
-				{#each types as type (type)}
-					<option value={type}>{type}</option>
+				{#each types as type (type.value)}
+					<option value={type.value}>{type.label}</option>
 				{/each}
 			</select>
 		</label>
@@ -152,8 +165,8 @@
 									{/if}
 								</div>
 							</div>
-							{#if item.type}
-								<span class="type meta">{item.type}</span>
+							{#if typeLabel(item)}
+								<span class="type meta">{typeLabel(item)}</span>
 							{/if}
 						</li>
 					{/each}

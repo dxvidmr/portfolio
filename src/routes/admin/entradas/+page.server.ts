@@ -7,6 +7,7 @@ import {
 	parseEntryFilters
 } from '$lib/server/admin/entries';
 import { requireAdmin } from '$lib/server/admin/auth';
+import { formEntityTypeOptions } from '$lib/server/admin/entity-definitions';
 import {
 	parseControlName,
 	parseEnabled,
@@ -20,6 +21,7 @@ export const load: PageServerLoad = async ({ url, setHeaders }) => {
 	return {
 		filters,
 		entityTypes: entityTypeOptions,
+		editableTypes: formEntityTypeOptions.map((option) => option.value as string),
 		entries: await getAdminEntries(emptyEntryFilters)
 	};
 };
