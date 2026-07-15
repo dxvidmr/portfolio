@@ -1,7 +1,7 @@
 # Plan persistente: índice transversal automático y dashboard privado del CV
 
 > Última actualización: 2026-07-15  
-> Estado general: **Fases 0 y 1 completadas (migración `002` aplicada en producción; código actualizado, pendiente de commit/despliegue); Fase 2 pendiente de credenciales OAuth**  
+> Estado general: **Fases 0 y 1 completadas y desplegadas; Fase 2 implementada y verificada en local — pendiente prueba de login real y despliegue**  
 > Fuente de verdad: **Turso**. `db/cv-data.json` es histórico y no debe sincronizar contenido.  
 > Propósito: este documento debe permitir retomar el trabajo en sesiones distintas sin reconstruir decisiones ni contexto.
 
@@ -394,22 +394,16 @@ src/routes/admin/+layout.svelte
 
 Pasos:
 
-- [ ] Configurar el proveedor GitHub.
-- [ ] Rechazar el inicio de sesión si el ID no coincide con `ADMIN_GITHUB_ID`.
-- [ ] Añadir el handler de Auth.js a `sequence()` sin romper Paraglide.
-- [ ] Excluir `/admin` y `/auth` de la localización de Paraglide. El `urlPattern` actual de `vite.config.ts` (`/:path(.*)?`) localiza todas las rutas: sin exclusión, la estrategia `url` redirigiría `/admin` a `/es/admin` y rompería el callback OAuth. Añadir antes del patrón general:
-
-  ```js
-  { pattern: '/admin/:path(.*)?', localized: [['es', '/admin/:path(.*)?'], ['en', '/admin/:path(.*)?']] },
-  { pattern: '/auth/:path(.*)?', localized: [['es', '/auth/:path(.*)?'], ['en', '/auth/:path(.*)?']] }
-  ```
-
-- [ ] Tipar usuario y sesión en `App.Locals`.
-- [ ] Proteger todo `/admin` con una guardia por prefijo de ruta en `hooks.server.ts` (punto único de control) y mantener la comprobación de `+layout.server.ts` como defensa en profundidad: los `load` de layout no se ejecutan al despachar una acción POST, así que no bastan como única barrera.
-- [ ] Repetir la autorización dentro de cada acción de servidor sensible.
-- [ ] Añadir cierre de sesión.
-- [ ] Añadir `noindex` y evitar enlaces públicos al dashboard.
-- [ ] Configurar callback local y de producción en GitHub OAuth.
+- [x] Configurar el proveedor GitHub (`src/auth.ts`, credenciales desde `$env/static/private`, `trustHost: true`).
+- [x] Rechazar el inicio de sesión si el ID no coincide con `ADMIN_GITHUB_ID` (callback `signIn`; el ID numérico viaja al token JWT y a la sesión como `user.githubId`).
+- [x] Añadir el handler de Auth.js a `sequence()` sin romper Paraglide (orden: rootRedirect → noindex → auth → guardia admin → paraglide; `/`, `/es`, `/en`, `/es/cv` verificados).
+- [x] Excluir `/admin` y `/auth` de la localización de Paraglide (patrones añadidos a `vite.config.ts` antes del general; requiere reiniciar el dev server).
+- [x] Tipar usuario y sesión (`Session.user.githubId` en `app.d.ts`; `App.Locals.auth()` lo aporta el propio paquete).
+- [x] Proteger todo `/admin` con guardia por prefijo en `hooks.server.ts` + `+layout.server.ts` como defensa en profundidad. Verificado: GET y POST sin sesión → 303 a `/auth/signin`.
+- [ ] Repetir la autorización dentro de cada acción de servidor sensible (helper `isAdmin()` exportado en `src/auth.ts`; aplicarlo en cada acción de las fases 3–4).
+- [x] Añadir cierre de sesión (acción `salir` en `/admin/+page.server.ts` con el helper `signOut` de Auth.js).
+- [x] Añadir `noindex` (meta en el layout admin + `X-Robots-Tag` en handle previo a Auth.js — sus respuestas de `/auth/*` cortocircuitan `resolve()` y solo los handles anteriores pueden cabecearlas) y sin enlaces públicos al dashboard.
+- [x] Configurar callback local y de producción en GitHub OAuth (hecho por el autor; dominio `davidmerinorecalde.com`).
 
 ### Reglas de seguridad
 
@@ -830,13 +824,14 @@ Criterio de aceptación:
 
 ### Fase 2 — Autenticación y shell privado
 
-Estado: `pendiente`
+Estado: `en curso` — código completo y verificado en local (smoke test sin login real); falta la prueba de login del administrador y el despliegue
 
-- [ ] Instalar y configurar Auth.js.
-- [ ] Integrar GitHub OAuth y allowlist.
-- [ ] Proteger `/admin`.
-- [ ] Crear layout administrativo.
-- [ ] Añadir cierre de sesión y `noindex`.
+- [x] Instalar y configurar Auth.js (`@auth/sveltekit@1.11.2`).
+- [x] Integrar GitHub OAuth y allowlist (detalle en §8).
+- [x] Proteger `/admin` (hooks + layout; GET y POST sin sesión rechazados, verificado).
+- [x] Crear layout administrativo (`/admin`: shell mono con nav, sesión y zonas pendientes marcadas).
+- [x] Añadir cierre de sesión y `noindex` (meta + `X-Robots-Tag` verificada en `/auth/signin`).
+- [ ] Prueba de login real: entrar con `dxvidmr` en local y en producción; comprobar rechazo de terceros.
 
 Criterio de aceptación:
 
@@ -990,6 +985,7 @@ El proyecto se considera completado cuando:
 | 2026-07-15 | Planificación | Decisión 15 corregida: las etiquetas de las fichas del home se quedan en `projects.ts`; los tipos (`book_review`…) ya están clasificados por columnas `*_type` y traducidos en `labels.ts`; `tags`/`entity_tags` reservadas para clasificación temática (pregunta 7 abierta). Auditoría de tipos: valor sucio `conference_paper`+tab en `academic_events` y 3 tipos de `funding_awards` sin traducción en `labels.ts` (checkboxes añadidos a Fase 0) | Consultas de tipos documentadas en Fase 0 | Completar Fase 0 (respaldo, huérfanos y limpiezas menores) y arrancar Fase 1 con la migración `002` |
 | 2026-07-15 | Planificación | Decisión 16: los campos `*_type` pasan a FK contra vocabulario controlado `type_vocab` con traducciones en BD (nueva sección 5.5; migración prevista `004`; cierra la pregunta 7). Selectores y web pública leerán del vocabulario; `entitySubtypeLabels` se retirará de `labels.ts`; Fase 4 y `/admin/taxonomias` actualizadas | Solo documento | Completar Fase 0 (respaldo, huérfanos, valor sucio) y arrancar Fase 1 con la migración `002` |
 | 2026-07-15 | Fases 0 y 1 — ejecución | Fase 0 completada: respaldo verificado por restauración local (`backups/`, en gitignore), 0 huérfanos, 4 valores sucios corregidos (filas manuales #20 y #7). Fase 1 completada: runner `scripts/migrate.ts` + `npm run migrate`; migración `002` ensayada en local (23/23) y aplicada en producción (90 controles públicos, `home_order` 10–80, vista `entries` compatible, `entries_legacy` conservada); `/cv` con visibilidad vía vista y portada sin `LIMIT 5` | 10 comprobaciones en producción; `npm run check` 0 errores; `npm run build` OK; consultas reales de portada (8 en orden) y CV (todo visible) verificadas | Commit + push para desplegar a Vercel y verificar portada/CV/fichas desplegadas; después Fase 2: crear app OAuth de GitHub (callback local y producción) y pasar `AUTH_*`/`ADMIN_GITHUB_ID` |
+| 2026-07-15 | Fase 2 — implementación | Auth.js + GitHub OAuth con allowlist por ID numérico (`src/auth.ts`, helper `isAdmin`); guardia por prefijo en hooks + defensa en `+layout.server.ts`; `/admin` y `/auth` excluidos de Paraglide en `vite.config.ts`; `noindex` en handle previo a Auth.js (sus respuestas cortocircuitan `resolve()`); shell `/admin` con nav, sesión y acción `salir`; `.env.example` actualizado (fuera `ADMIN_USERNAME/PASSWORD` obsoletos); guía operativa en `docs/guia-fase2-oauth.md`; primer deploy a Vercel resuelto (las `TURSO_*` deben existir antes del build por `$env/static/private`); dominio `davidmerinorecalde.com` | `npm run check` y `build` en verde; smoke test local: `/admin` sin sesión → 303 signin, POST sin sesión rechazado, `/auth/signin` 200 + noindex, `/`, `/es`, `/en`, `/es/cv` intactos. Sin probar aún: login real (requiere navegador) | El autor: reiniciar su dev server (vite.config cambió), probar login en `localhost:5173/admin`, commit + push y probar `davidmerinorecalde.com/admin`. Después: Fase 3 (índice transversal y controles editoriales) |
 
 ## 24. Registro de migraciones en Turso
 

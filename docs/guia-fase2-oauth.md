@@ -7,7 +7,12 @@ Son cuatro tareas manuales tuyas (≈15 min). Los secretos no hace falta pasarlo
 
 ## 0. Antes de nada: desplegar la Fase 1
 
-La migración ya está aplicada en Turso y el código actualizado en local, pero sin commit. Confirma en el chat que haga commit + push (o hazlo tú), y comprueba tras el deploy de Vercel:
+**Orden importante**: las variables de entorno se guardan en Vercel *antes* del primer build, no después. Con `$env/static/private` los valores se incrustan al compilar: sin `TURSO_*` definidas, `vite build` falla (`"TURSO_DATABASE_URL" is not exported by 'virtual:$env/static/private'`). El proyecto de Vercel existe desde que lo importas, aunque su primer deploy haya fallado, así que:
+
+1. Vercel → proyecto → **Settings → Environment Variables**: añade `TURSO_DATABASE_URL` y `TURSO_AUTH_TOKEN` (los valores de tu `.env` local), para Production y Preview.
+2. **Deployments** → `⋯` del deploy fallido → **Redeploy**.
+
+Tras el deploy, comprueba:
 
 - La portada muestra **8** entradas en "actividad reciente curada" (antes 5).
 - `/es/cv` y `/en/cv` se ven completos (no debe faltar nada).
