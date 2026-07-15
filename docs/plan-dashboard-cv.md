@@ -1,7 +1,7 @@
 # Plan persistente: índice transversal automático y dashboard privado del CV
 
 > Última actualización: 2026-07-15  
-> Estado general: **Fases 0–3 en producción; Fase 4 completa en local (los 13 tipos editables + mejoras de la prueba editorial; migración `005` de roles aplicada) — pendiente commit, despliegue y segunda prueba del autor**
+> Estado general: **Fases 0–4 completadas y en producción; Fase 5A (curación de fichas del portfolio) implementada en local, pendiente de prueba editorial y despliegue**
 > Fuente de verdad: **Turso**. `db/cv-data.json` es histórico y no debe sincronizar contenido.  
 > Propósito: este documento debe permitir retomar el trabajo en sesiones distintas sin reconstruir decisiones ni contexto.
 
@@ -40,6 +40,7 @@ Estas decisiones se consideran aceptadas salvo que se documenten explícitamente
 15. Las etiquetas de las fichas del home («líneas de trabajo») son contenido de los componentes (`projects.ts`) y **no** se migran a la BD; la base de datos solo conoce la relación entrada↔ficha por slug (`portfolio_items`). `tags`/`entity_tags` quedan reservadas para clasificación temática transversal, sin consumidor actual (decisión 2026-07-15; corrige la redacción anterior de este punto).
 16. Los campos `*_type` dejan de ser TEXT libre: pasan a referenciar un vocabulario controlado en BD (`type_vocab`, con `label_es`/`label_en`), para impedir errores de escritura al rellenar y sacar las traducciones de subtipos de `labels.ts` (decisión 2026-07-15; ver sección 5.5, resuelve la pregunta 7). Extensión (mismo día): también los roles con datos y semántica clara — `projects.role` (dominio `project_role`) y `service_activities.role` (`service_role`), migración `005`. `academic_events.role` (sin datos) y `memberships.role` (valor descriptivo con matices y periodos) permanecen como texto libre hasta que haya vocabulario real que codificar.
 17. Una entrada privada **no es un borrador**: es un elemento completo del CV que el autor decide no publicar. La UI habla de «privada/pública», nunca de «borrador» (decisión 2026-07-15). El campo `url` de cada entidad es el enlace canónico público del ítem (DOI, web del evento, editorial…); los archivos y certificados (Drive) se gestionarán aparte en `documents` (Fase 5).
+18. `portfolio_items` se conserva como relación editorial entre las entradas del CV y las seis fichas narrativas definidas en `projects.ts`. `featured` será únicamente un énfasis visual contextual (símbolo/estilo), nunca un criterio de orden. Los trabajos relacionados se ordenan siempre por `sort_date DESC`; `sort_order` queda como columna heredada sin consumidor y se retirará en la limpieza posterior. La gestión debe priorizar búsqueda y alta rápida, sin reordenación manual (decisión 2026-07-15).
 
 ## 3. Estado actual del repositorio
 
@@ -865,7 +866,7 @@ Criterio de aceptación:
 
 ### Fase 4 — CRUD de tipos prioritarios
 
-Estado: `en curso` — implementación completa en local y verificada con smoke test; falta la prueba editorial real del autor (crear/editar/publicar/eliminar), commit y despliegue
+Estado: `completado` y desplegado en producción — dos pruebas editoriales del autor superadas (2026-07-15)
 
 - [x] Añadir allowlist y validación: definiciones de campo declarativas por tipo en `entity-definitions.ts` (nombres de tabla/columna nunca del navegador) y validador propio en `validation.ts` (zod descartado, ver §11).
 - [x] Migración `004`: `type_vocab` creado y sembrado (27 códigos, 7 dominios; incluye los 3 `award_type` con traducción nueva) y las 7 tablas reconstruidas con FK y sin los CHECK antiguos. Ensayo local 20/20; validación en producción 18/18. **Verificado que Turso aplica las FK**: un código inexistente se rechaza a nivel de BD.
@@ -880,22 +881,59 @@ Estado: `en curso` — implementación completa en local y verificada con smoke 
 - [x] Prueba editorial real del autor superada (2026-07-15); de ella salieron las mejoras siguientes.
 - [x] Formularios de la segunda tanda (`academic_works`, `courses`, `memberships`, `skills`, `languages`): los 13 tipos son editables.
 - [x] Mejoras tras la prueba editorial (2026-07-15): terminología «privada» en toda la UI (decisión 17); roles de `projects` y `service_activities` como vocabulario con FK (migración `005`, valores libres convertidos a códigos); toggle de portada en la propia ficha de edición junto a visibilidad; feedback como toasts temporales (mismo diseño que el índice); enlace «Volver» además del breadcrumb; orden del índice por fecha/nombre/actualización; retirado el aviso «Filtrado local»; ayuda del campo URL aclarando su semántica frente a los futuros Documentos.
-- [ ] Segunda prueba editorial del autor sobre las mejoras y despliegue.
+- [x] Segunda prueba editorial del autor sobre las mejoras y despliegue.
 
 Criterio de aceptación:
 
 - Se pueden mantener desde el dashboard todas las secciones que hoy aparecen en el CV público.
 
-### Fase 5 — Relaciones
+### Fase 5 — Relaciones y recursos
 
-Estado: `pendiente`
+Estado: `en curso` — 5A implementada en local; pendiente de prueba editorial y despliegue
 
-- [ ] Gestionar `portfolio_items`.
-- [ ] Gestionar etiquetas.
-- [ ] Gestionar enlaces.
-- [ ] Gestionar documentos públicos/privados.
-- [ ] Añadir vistas inversas: publicaciones derivadas de un evento; entradas asociadas a un proyecto de investigación.
-- [ ] Etiquetas temáticas (`tags`/`entity_tags`): solo si la pregunta 7 se cierra con un consumidor real; en otro caso, fuera del alcance.
+#### Fase 5A — Curación de fichas del portfolio
+
+- [x] Hacer visible `featured` mediante un énfasis discreto, sin separar listados ni alterar el orden.
+- [x] Ordenar los trabajos relacionados exclusivamente por fecha descendente, con título como desempate; retirar `featured` y `sort_order` de la ordenación pública.
+- [x] Completar los metadatos públicos para que los 13 tipos puedan relacionarse de forma coherente.
+- [x] Crear `/admin/portfolio`: selector de las seis fichas, búsqueda por título, filtro por tipo y alta rápida de entradas.
+- [x] Permitir retirar asociaciones y activar/desactivar `featured` sin recargar la página.
+- [x] Mostrar claramente si una entrada asociada es privada: puede prepararse editorialmente, pero no aparece en la ficha pública hasta publicarse.
+- [x] Validar `portfolio_slug` contra `projects.ts`, entidad contra la allowlist y existencia contra `entry_source` en cada mutación.
+- [x] Añadir desde la ficha de edición la vista inversa «Aparece en estas fichas del portfolio».
+- [x] Previsualizar o enlazar la ficha pública desde la pantalla de curación.
+- [ ] Completar la prueba editorial local, desplegar y verificar una ficha pública en producción.
+
+#### Fase 5B — Relaciones estructurales inversas
+
+- [ ] Desde un evento, listar las publicaciones derivadas mediante `publications.event_id`.
+- [ ] Desde un proyecto de investigación, listar publicaciones, eventos, docencia y financiación que lo referencian mediante `project_id`.
+- [ ] Mantener la edición de estas FK en los selectores ya implementados en Fase 4.
+
+#### Fase 5C — Enlaces adicionales
+
+- [ ] Definir la diferencia visible entre el `url` canónico de la entidad y sus enlaces adicionales.
+- [ ] Gestionar varios enlaces por entidad: tipo, etiqueta, URL, principal, público y orden.
+- [ ] Validar protocolo, URL y unicidad del enlace principal por entidad.
+- [ ] Definir y construir su consumidor público.
+
+#### Fase 5D — Documentos
+
+- [ ] Gestionar metadatos y URL de documentos, sin subida directa de archivos.
+- [ ] Aplicar reglas explícitas para documentos públicos, privados y certificados.
+- [ ] Garantizar que certificados y documentos privados nunca llegan a las cargas públicas.
+- [ ] Definir y construir el consumidor público de documentos autorizados.
+
+#### Fase 5E — Taxonomías
+
+- [ ] Crear `/admin/taxonomias` para mantener `type_vocab` sin SQL manual.
+- [ ] Añadir vocabularios de tipos de enlace y documento si 5C/5D los necesitan.
+- [ ] Mantener validación de código + dominio en todas las escrituras.
+
+#### Fase 5F — Etiquetas temáticas (condicional)
+
+- [ ] Definir primero un consumidor real: filtro, buscador o vista temática pública.
+- [ ] Solo entonces gestionar `tags`/`entity_tags`; si no existe consumidor, dejarlas fuera del alcance.
 
 Criterio de aceptación:
 
@@ -1011,6 +1049,7 @@ El proyecto se considera completado cuando:
 | 2026-07-15 | Fase 3 cierre + Fase 4 arranque | Fase 3 completada (prueba editorial del autor superada en local y producción; portada final: 8 filas con `research_stays#1` primera y `academic_events#6` incluida). Fase 4: script permanente `scripts/backup.ts` (`npm run backup`, verificación por restauración); migración `004` aplicada — `type_vocab` con 27 códigos en 7 dominios, 7 tablas reconstruidas con FK, CHECKs de tipos retirados, vistas recreadas; `portfolio-items.ts` + `ProjectModal` leen etiquetas del vocabulario por locale; `entitySubtypeLabels` eliminado de `labels.ts` | Ensayo local 20/20 (vista `entries` byte a byte idéntica); producción 18/18 incl. FK activas en Turso; `npm run check` 0 errores; `npm run build` OK | Continuar Fase 4: `/cv` con etiquetas del vocabulario (hoy muestra códigos crudos, preexistente); después allowlist + validación (zod) y formularios de la primera tanda con selectores desde `type_vocab`. Pendiente commit + push de todo esto |
 | 2026-07-15 | Fase 4 — CRUD primera tanda | `/cv` con etiquetas del vocabulario en chips y filtro (ES/EN, pseudotipos literales retirados). Infraestructura CRUD: campos declarativos por tipo en `entity-definitions.ts` (8 tipos), `validation.ts` propio (zod descartado, documentado en §11), `crud.ts` (crear con transacción contenido+control borrador; editar solo columnas allowlist con `updated_at`; eliminar en batch con limpieza de relaciones y `NULL` en FKs entrantes; opciones de selectores y revalidación código+dominio). Rutas `nueva`, `nueva/[type]` y `[type]/[id]` (Contenido / Visibilidad / Zona peligrosa con confirmación), componentes `EntityForm`/`FormField` (accesibles, errores junto al campo, aviso de cambios sin guardar). Índice con botón «Nueva entrada» y títulos enlazados a edición | `npm run check` 0 errores; `npm run build` OK; smoke test: GET y POST de `/admin/entradas/**` sin sesión → 303 signin (acción no ejecutada, verificado el sobre de redirección); `/es/cv` y `/en/cv` con etiquetas y cero códigos crudos | El autor: commit + push, y prueba editorial completa en producción — crear borrador, editar, publicar, verificar CV/portada, eliminar. Después: segunda tanda de formularios o Fase 5 (relaciones) |
 | 2026-07-15 | Fase 4 — mejoras tras prueba editorial | Decisión 17 (privada ≠ borrador, terminología cambiada en toda la UI). Migración `005`: dominios `project_role` y `service_role` en `type_vocab` (9 códigos, traducciones nuevas revisables), valores libres de `service_activities.role` convertidos a códigos, FK en `projects.role` y `service_activities.role`; `academic_events.role` y `memberships.role` quedan texto libre (sin datos / valor descriptivo). Formularios de la segunda tanda: los 13 tipos editables. Ficha de edición: toggle de portada junto a visibilidad (sin ir a otra pantalla), toasts temporales en vez de avisos fijos, «Volver» + chip «En portada». Índice: orden por fecha/nombre/actualización, sin aviso de filtrado. Ayuda del campo URL (enlace canónico; Drive → Documentos, Fase 5) | Ensayo local de `005` 9/9 y producción 6/6; `npm run check` 0 errores; `npm run build` OK; smoke: rutas de tanda 2 activas y protegidas (303 sin sesión), `/es/cv` 200 | El autor: commit + push, segunda prueba editorial (roles como selector, portada desde la ficha, toasts) y revisar las traducciones EN de los 9 roles nuevos. Después: Fase 5 (relaciones: `portfolio_items`, enlaces, documentos) |
+| 2026-07-15 | Fase 5A — curación de fichas del portfolio | Conservada `portfolio_items` como relación editorial con las seis fichas narrativas. Nueva pantalla `/admin/portfolio` con selector, búsqueda y filtro locales, alta/retirada y destacado mediante acciones mejoradas sin recarga, indicación de privacidad y enlace de previsualización. Vista inversa desde cada entrada. La salida pública admite los 13 tipos, se ordena por fecha descendente con título como desempate y representa `featured` con una estrella sin crear zonas separadas; `sort_order` permanece por compatibilidad, pero deja de tener consumidor. | Auditoría previa: 30 relaciones, 12 destacadas, 0 huérfanas, 0 privadas y 0 órdenes duplicados; `npm run check` 0 errores y 0 avisos; `npm run build` OK; smoke público local 200 con sección relacionada y marca de destacado; GET/POST administrativos sin sesión redirigen 303 sin ejecutar acciones | El autor: probar en local añadir, quitar y destacar varias relaciones; comprobar búsqueda, filtros y una entrada privada; revisar la ficha pública; después commit, push y verificación en producción. |
 
 ## 24. Registro de migraciones en Turso
 

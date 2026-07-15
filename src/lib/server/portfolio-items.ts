@@ -8,14 +8,15 @@ export async function getPortfolioItems(portfolioSlug?: string): Promise<Portfol
 	const result = await db.execute({
 		sql: `SELECT pi.portfolio_slug, pi.entity_type, pi.entity_id,
 		             pi.featured, pi.sort_order, e.title_cache AS title, e.sort_date,
-		             COALESCE(
-		               pub.publication_type,
-		               event.contribution_type,
-		               work.work_type,
-		               teaching.teaching_type,
-		               research_project.project_type,
-		               service.activity_type
-		             ) AS subtype,
+			             COALESCE(
+			               pub.publication_type,
+			               event.contribution_type,
+			               work.work_type,
+			               teaching.teaching_type,
+			               research_project.project_type,
+			               service.activity_type,
+			               award.award_type
+			             ) AS subtype,
 		             tv.label_es AS subtype_label_es,
 		             tv.label_en AS subtype_label_en,
 		             CASE
@@ -52,22 +53,34 @@ export async function getPortfolioItems(portfolioSlug?: string): Promise<Portfol
 		                       THEN ' · ' || event.country
 		                     ELSE ''
 		                   END
-		               ELSE COALESCE(
-		                 work.institution,
-		                 teaching.institution,
-		                 research_project.research_group,
-		                 research_project.institution,
-		                 service.venue_or_journal
-		               )
-		             END AS detail,
-		             COALESCE(
-		               pub.url,
-		               event.url,
-		               work.url,
-		               teaching.url,
-		               research_project.url,
-		               service.url
-		             ) AS url
+			               WHEN pi.entity_type = 'research_stays' THEN
+			                 COALESCE(stay.faculty_or_dept, stay.city, stay.country)
+			               ELSE COALESCE(
+			                 work.institution,
+			                 teaching.institution,
+			                 research_project.research_group,
+			                 research_project.institution,
+			                 service.venue_or_journal,
+			                 education.institution,
+			                 course.institution,
+			                 award.awarding_body,
+			                 membership.role,
+			                 skill.items_text,
+			                 language.level
+			               )
+			             END AS detail,
+			             COALESCE(
+			               pub.url,
+			               event.url,
+			               work.url,
+			               teaching.url,
+			               research_project.url,
+			               service.url,
+			               education.url,
+			               stay.url,
+			               course.url,
+			               award.url
+			             ) AS url
 		      FROM portfolio_items pi
 		      JOIN entries e
 		        ON e.entity_type = pi.entity_type AND e.entity_id = pi.entity_id
@@ -83,6 +96,20 @@ export async function getPortfolioItems(portfolioSlug?: string): Promise<Portfol
 		        ON pi.entity_type = 'projects' AND research_project.id = pi.entity_id
 		      LEFT JOIN service_activities service
 		        ON pi.entity_type = 'service_activities' AND service.id = pi.entity_id
+		      LEFT JOIN education
+		        ON pi.entity_type = 'education' AND education.id = pi.entity_id
+		      LEFT JOIN research_stays stay
+		        ON pi.entity_type = 'research_stays' AND stay.id = pi.entity_id
+		      LEFT JOIN courses course
+		        ON pi.entity_type = 'courses' AND course.id = pi.entity_id
+		      LEFT JOIN funding_awards award
+		        ON pi.entity_type = 'funding_awards' AND award.id = pi.entity_id
+		      LEFT JOIN memberships membership
+		        ON pi.entity_type = 'memberships' AND membership.id = pi.entity_id
+		      LEFT JOIN skills skill
+		        ON pi.entity_type = 'skills' AND skill.id = pi.entity_id
+		      LEFT JOIN languages language
+		        ON pi.entity_type = 'languages' AND language.id = pi.entity_id
 		      LEFT JOIN type_vocab tv
 		        ON tv.code = COALESCE(
 		          pub.publication_type,
@@ -90,10 +117,12 @@ export async function getPortfolioItems(portfolioSlug?: string): Promise<Portfol
 		          work.work_type,
 		          teaching.teaching_type,
 		          research_project.project_type,
-		          service.activity_type
+		          service.activity_type,
+		          award.award_type
 		        )
 		      ${where}
-		      ORDER BY pi.portfolio_slug, pi.featured DESC, pi.sort_order ASC, e.sort_date DESC`,
+		      ORDER BY pi.portfolio_slug, (e.sort_date IS NULL) ASC,
+		               e.sort_date DESC, e.title_cache COLLATE NOCASE ASC`,
 		args: portfolioSlug ? [portfolioSlug] : []
 	});
 

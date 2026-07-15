@@ -119,6 +119,28 @@
 	</div>
 </section>
 
+<section aria-labelledby="portfolio-title">
+	<h2 id="portfolio-title">Fichas del portfolio</h2>
+	{#if data.portfolioRelations.length > 0}
+		<p>Esta entrada aparece en:</p>
+		<ul class="portfolio-relations">
+			{#each data.portfolioRelations as relation (relation.slug)}
+				<li>
+					<a href={`/admin/portfolio?ficha=${relation.slug}&q=${encodeURIComponent(data.heading)}`}>
+						{relation.featured ? '★ ' : ''}{relation.title}
+					</a>
+					{#if relation.featured}<span>Destacada</span>{/if}
+				</li>
+			{/each}
+		</ul>
+	{:else}
+		<p>No está relacionada con ninguna ficha narrativa.</p>
+	{/if}
+	<a class="manage-portfolio" href={`/admin/portfolio?q=${encodeURIComponent(data.heading)}`}>
+		Gestionar relaciones del portfolio →
+	</a>
+</section>
+
 <details class="danger">
 	<summary>Zona peligrosa</summary>
 	<p>
@@ -269,6 +291,41 @@
 
 	.hint a {
 		color: #a3a3a3;
+	}
+
+	.portfolio-relations {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 0.6rem;
+		list-style: none;
+		padding: 0;
+		margin: 0.75rem 0 1rem;
+	}
+
+	.portfolio-relations li {
+		display: flex;
+		align-items: center;
+		gap: 0.5rem;
+		border: 1px solid #404040;
+		padding: 0.45rem 0.65rem;
+	}
+
+	.portfolio-relations a,
+	.manage-portfolio {
+		color: #d4d4d4;
+	}
+
+	.portfolio-relations span {
+		color: #d6a84b;
+		font-size: 0.65rem;
+		text-transform: uppercase;
+		letter-spacing: 0.06em;
+	}
+
+	.manage-portfolio {
+		display: inline-block;
+		margin-top: 0.5rem;
+		font-size: 0.78rem;
 	}
 
 	section p {

@@ -17,6 +17,7 @@ import {
 	validateReferences
 } from '$lib/server/admin/crud';
 import { updateEntryControl } from '$lib/server/admin/controls';
+import { getEntryPortfolioRelations } from '$lib/server/admin/portfolio';
 
 const HEADING_KEYS = ['title', 'degree_title', 'institution', 'organization'];
 
@@ -39,15 +40,22 @@ export const load: PageServerLoad = async ({ locals, params, setHeaders }) => {
 	setHeaders({ 'cache-control': 'private, no-store' });
 
 	const headingKey = HEADING_KEYS.find((key) => values[key]);
+	const [options, control, portfolioRelations] = await Promise.all([
+		getFieldOptions(entityType),
+		getControlState(entityType, entityId),
+		getEntryPortfolioRelations({ entityType, entityId })
+	]);
+
 	return {
 		entityType,
 		entityId,
 		typeLabel: entityDefinitions[entityType],
 		heading: headingKey ? values[headingKey] : `#${entityId}`,
 		fields: entityForms[entityType].fields,
-		options: await getFieldOptions(entityType),
+		options,
 		values,
-		control: await getControlState(entityType, entityId)
+		control,
+		portfolioRelations
 	};
 };
 

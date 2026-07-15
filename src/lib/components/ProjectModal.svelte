@@ -49,7 +49,8 @@
 					links: 'Enlaces',
 					sectionMenu: 'Menú del proyecto',
 					related: 'Resultados relacionados',
-					relatedIntro: 'Publicaciones, proyectos y otras actividades vinculadas.'
+					relatedIntro: 'Publicaciones, proyectos y otras actividades vinculadas.',
+					featured: 'Resultado destacado'
 				}
 			: {
 					close: 'Close project',
@@ -61,7 +62,8 @@
 					links: 'Links',
 					sectionMenu: 'Project menu',
 					related: 'Related outputs',
-					relatedIntro: 'Related publications, projects, and other activities.'
+					relatedIntro: 'Related publications, projects, and other activities.',
+					featured: 'Featured output'
 				}
 	);
 
@@ -225,7 +227,12 @@
 							{#each relatedItems as item, index (`${item.entity_type}-${item.entity_id}`)}
 								<li class:is-featured={item.featured}>
 									<div class="item-meta meta">
-										<span>{String(index + 1).padStart(2, '0')}</span>
+									<span class="item-index">
+										{String(index + 1).padStart(2, '0')}
+										{#if item.featured}
+											<span class="featured-mark" title={copy.featured} aria-label={copy.featured}>★</span>
+										{/if}
+									</span>
 										<span class="item-kind">
 											<span>{entityLabel(item.entity_type, locale)}</span>
 											{#if subtypeLabel(item)}
@@ -511,6 +518,8 @@
 		border-bottom: 1px solid var(--line);
 	}
 	.item-meta { display: grid; grid-template-columns: 28px 1fr 40px; gap: 12px; color: var(--fg-faint); }
+	.item-index { display: grid; gap: 7px; align-content: start; }
+	.featured-mark { color: var(--accent-strong); font-size: 0.72rem; line-height: 1; }
 	.item-meta > span:last-child { text-align: right; }
 	.item-kind { display: grid; gap: 5px; }
 	.item-kind > span:first-child { color: var(--accent-strong); }
