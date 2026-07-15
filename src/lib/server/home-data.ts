@@ -22,8 +22,7 @@ export async function getHomeData() {
 			 FROM entries
 			 WHERE public = 1
 			   AND show_home = 1
-			 ORDER BY sort_order ASC, (sort_date IS NULL) ASC, sort_date DESC
-			 LIMIT 5`
+			 ORDER BY sort_order ASC, (sort_date IS NULL) ASC, sort_date DESC`
 		),
 		getPortfolioItems()
 	]);

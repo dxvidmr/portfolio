@@ -1,66 +1,75 @@
 import type { PageServerLoad } from './$types';
 import { db } from '$lib/server/db';
 
+// La visibilidad la gobierna la vista `entries` (entry_controls): el CV solo
+// muestra filas con public = 1, igual que la portada.
 const sections = [
 	{
 		key: 'publications',
 		title: 'Publicaciones',
-		sql: `SELECT title, publication_type AS type, authors_text AS detail, year, url
-		      FROM publications
-		      ORDER BY year DESC, title ASC`
+		sql: `SELECT p.title, p.publication_type AS type, p.authors_text AS detail, p.year, p.url
+		      FROM publications p
+		      JOIN entries e ON e.entity_type = 'publications' AND e.entity_id = p.id AND e.public = 1
+		      ORDER BY p.year DESC, p.title ASC`
 	},
 	{
 		key: 'academic_events',
 		title: 'Eventos académicos',
-		sql: `SELECT title, contribution_type AS type, event_title AS detail, year, url
-		      FROM academic_events
-		      ORDER BY year DESC, date_start DESC, title ASC`
+		sql: `SELECT a.title, a.contribution_type AS type, a.event_title AS detail, a.year, a.url
+		      FROM academic_events a
+		      JOIN entries e ON e.entity_type = 'academic_events' AND e.entity_id = a.id AND e.public = 1
+		      ORDER BY a.year DESC, a.date_start DESC, a.title ASC`
 	},
 	{
 		key: 'teaching',
 		title: 'Docencia',
-		sql: `SELECT title, teaching_type AS type, institution AS detail,
-		             COALESCE(substr(date_start, 1, 4), substr(academic_year, 1, 4)) AS year, url
-		      FROM teaching
-		      ORDER BY year DESC, title ASC`
+		sql: `SELECT t.title, t.teaching_type AS type, t.institution AS detail,
+		             COALESCE(substr(t.date_start, 1, 4), substr(t.academic_year, 1, 4)) AS year, t.url
+		      FROM teaching t
+		      JOIN entries e ON e.entity_type = 'teaching' AND e.entity_id = t.id AND e.public = 1
+		      ORDER BY year DESC, t.title ASC`
 	},
 	{
 		key: 'projects',
 		title: 'Proyectos de investigación',
-		sql: `SELECT title, project_type AS type, institution AS detail, substr(date_start, 1, 4) AS year, url
-		      FROM projects
-		      WHERE public = 1
-		      ORDER BY year DESC, title ASC`
+		sql: `SELECT p.title, p.project_type AS type, p.institution AS detail, substr(p.date_start, 1, 4) AS year, p.url
+		      FROM projects p
+		      JOIN entries e ON e.entity_type = 'projects' AND e.entity_id = p.id AND e.public = 1
+		      ORDER BY year DESC, p.title ASC`
 	},
 	{
 		key: 'education',
 		title: 'Formación',
-		sql: `SELECT degree_title AS title, 'education' AS type, institution AS detail,
-		             COALESCE(substr(date_end, 1, 4), substr(date_start, 1, 4)) AS year, url
-		      FROM education
+		sql: `SELECT ed.degree_title AS title, 'education' AS type, ed.institution AS detail,
+		             COALESCE(substr(ed.date_end, 1, 4), substr(ed.date_start, 1, 4)) AS year, ed.url
+		      FROM education ed
+		      JOIN entries e ON e.entity_type = 'education' AND e.entity_id = ed.id AND e.public = 1
 		      ORDER BY year DESC, title ASC`
 	},
 	{
 		key: 'research_stays',
 		title: 'Estancias',
-		sql: `SELECT institution AS title, 'research_stay' AS type, faculty_or_dept AS detail,
-		             substr(date_start, 1, 4) AS year, url
-		      FROM research_stays
+		sql: `SELECT r.institution AS title, 'research_stay' AS type, r.faculty_or_dept AS detail,
+		             substr(r.date_start, 1, 4) AS year, r.url
+		      FROM research_stays r
+		      JOIN entries e ON e.entity_type = 'research_stays' AND e.entity_id = r.id AND e.public = 1
 		      ORDER BY year DESC, title ASC`
 	},
 	{
 		key: 'funding_awards',
 		title: 'Financiación y premios',
-		sql: `SELECT title, award_type AS type, awarding_body AS detail, year, url
-		      FROM funding_awards
-		      ORDER BY year DESC, title ASC`
+		sql: `SELECT f.title, f.award_type AS type, f.awarding_body AS detail, f.year, f.url
+		      FROM funding_awards f
+		      JOIN entries e ON e.entity_type = 'funding_awards' AND e.entity_id = f.id AND e.public = 1
+		      ORDER BY f.year DESC, f.title ASC`
 	},
 	{
 		key: 'service_activities',
 		title: 'Servicio académico',
-		sql: `SELECT title, activity_type AS type, venue_or_journal AS detail, year, url
-		      FROM service_activities
-		      ORDER BY year DESC, title ASC`
+		sql: `SELECT s.title, s.activity_type AS type, s.venue_or_journal AS detail, s.year, s.url
+		      FROM service_activities s
+		      JOIN entries e ON e.entity_type = 'service_activities' AND e.entity_id = s.id AND e.public = 1
+		      ORDER BY s.year DESC, s.title ASC`
 	}
 ] as const;
 

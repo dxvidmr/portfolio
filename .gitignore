@@ -27,3 +27,6 @@ project.inlang/cache/
 
 data
 tmp
+
+# Respaldo de Turso (datos personales, nunca al repo)
+backups/
