@@ -6,7 +6,7 @@
 	import MoveUpRight from '@lucide/svelte/icons/move-up-right';
 	import XIcon from '@lucide/svelte/icons/x';
 	import type { Locale } from '$lib/paraglide/runtime';
-	import { entityLabel, entitySubtypeLabel } from '$lib/content/labels';
+	import { entityLabel } from '$lib/content/labels';
 	import { projectText, type PortfolioProject } from '$lib/content/projects';
 	import type { PortfolioRelatedItem } from '$lib/types/portfolio';
 	import ProjectVisual from '$lib/components/ProjectVisual.svelte';
@@ -32,6 +32,11 @@
 	let viewport = $state<HTMLElement | null>(null);
 	let closeButton = $state<HTMLButtonElement | null>(null);
 	const itemYear = (value: string | null) => value?.slice(0, 4) ?? '—';
+	// Etiquetas de subtipo desde type_vocab (decisión 16); el código es el fallback.
+	const subtypeLabel = (item: PortfolioRelatedItem) =>
+		(locale === 'en' ? item.subtype_label_en : item.subtype_label_es) ??
+		item.subtype?.replaceAll('_', ' ') ??
+		null;
 	const copy = $derived(
 		locale === 'es'
 			? {
@@ -223,8 +228,8 @@
 										<span>{String(index + 1).padStart(2, '0')}</span>
 										<span class="item-kind">
 											<span>{entityLabel(item.entity_type, locale)}</span>
-											{#if entitySubtypeLabel(item.subtype, locale)}
-												<span class="item-subtype">{entitySubtypeLabel(item.subtype, locale)}</span>
+											{#if subtypeLabel(item)}
+												<span class="item-subtype">{subtypeLabel(item)}</span>
 											{/if}
 										</span>
 										<span>{itemYear(item.sort_date)}</span>

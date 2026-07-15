@@ -16,6 +16,8 @@ export async function getPortfolioItems(portfolioSlug?: string): Promise<Portfol
 		               research_project.project_type,
 		               service.activity_type
 		             ) AS subtype,
+		             tv.label_es AS subtype_label_es,
+		             tv.label_en AS subtype_label_en,
 		             CASE
 		               WHEN pi.entity_type = 'publications' THEN
 		                 CASE
@@ -81,6 +83,15 @@ export async function getPortfolioItems(portfolioSlug?: string): Promise<Portfol
 		        ON pi.entity_type = 'projects' AND research_project.id = pi.entity_id
 		      LEFT JOIN service_activities service
 		        ON pi.entity_type = 'service_activities' AND service.id = pi.entity_id
+		      LEFT JOIN type_vocab tv
+		        ON tv.code = COALESCE(
+		          pub.publication_type,
+		          event.contribution_type,
+		          work.work_type,
+		          teaching.teaching_type,
+		          research_project.project_type,
+		          service.activity_type
+		        )
 		      ${where}
 		      ORDER BY pi.portfolio_slug, pi.featured DESC, pi.sort_order ASC, e.sort_date DESC`,
 		args: portfolioSlug ? [portfolioSlug] : []
@@ -93,6 +104,8 @@ export async function getPortfolioItems(portfolioSlug?: string): Promise<Portfol
 		title: String(row.title),
 		sort_date: nullable(row.sort_date),
 		subtype: nullable(row.subtype),
+		subtype_label_es: nullable(row.subtype_label_es),
+		subtype_label_en: nullable(row.subtype_label_en),
 		detail: nullable(row.detail),
 		url: nullable(row.url),
 		featured: Number(row.featured) === 1,

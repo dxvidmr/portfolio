@@ -5,6 +5,8 @@ export type PortfolioRelatedItem = {
 	title: string;
 	sort_date: string | null;
 	subtype: string | null;
+	subtype_label_es: string | null;
+	subtype_label_en: string | null;
 	detail: string | null;
 	url: string | null;
 	featured: boolean;

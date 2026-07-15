@@ -1,7 +1,7 @@
 # Plan persistente: índice transversal automático y dashboard privado del CV
 
 > Última actualización: 2026-07-15  
-> Estado general: **Fases 0–2 completadas y verificadas en producción; Fase 3 implementada en local — pendiente prueba editorial real y despliegue**
+> Estado general: **Fases 0–3 completadas y en producción; Fase 4 en curso — migración `004` (type_vocab) aplicada y web pública leyendo etiquetas del vocabulario; faltan formularios CRUD**
 > Fuente de verdad: **Turso**. `db/cv-data.json` es histórico y no debe sincronizar contenido.  
 > Propósito: este documento debe permitir retomar el trabajo en sesiones distintas sin reconstruir decisiones ni contexto.
 
@@ -790,7 +790,7 @@ Estado: `completado` (2026-07-15)
 - [x] Auditar relaciones huérfanas existentes: ninguna (en `entries`, `portfolio_items`, tipos y slugs; `documents`, `links` y `entity_tags` están vacías).
 - [x] Crear respaldo verificable: `backups/curriculum-2026-07-15.sql` (script propio con `@libsql/client`; restauración local verificada tabla a tabla; carpeta en `.gitignore`).
 - [x] Corregir valores sucios: 4 corregidos y verificados, todos en las 2 filas creadas a mano — `academic_events` #20 (título con espacio final, `event_title` y `contribution_type` con tabulador) y `courses` #7 (título con tabulador).
-- [ ] Traducciones que faltan (`predoctoral_contract`, `prize`, `scholarship`): entran en la semilla de `type_vocab` (decisión 16); añadirlas a `labels.ts` solo si hace falta mostrarlas antes de la migración `004`.
+- [x] Traducciones que faltan (`predoctoral_contract`, `prize`, `scholarship`): incluidas en la semilla de `type_vocab` (migración `004`), con textos redactados nuevos revisables desde `/admin/taxonomias` cuando exista.
 - [x] Documentar resultados en este archivo.
 
 Resultados de la auditoría (2026-07-15, consultas de solo lectura vía `@libsql/client` con las credenciales de `.env`):
@@ -809,7 +809,7 @@ Criterio de aceptación:
 
 ### Fase 1 — Vista transversal y controles
 
-Estado: `completado` en BD y código local (2026-07-15); falta commit + despliegue a Vercel
+Estado: `completado` y desplegado en producción (2026-07-15)
 
 - [x] Crear migración `002` (aplicada con el nuevo runner `scripts/migrate.ts` / `npm run migrate`; ensayada antes en local contra el respaldo restaurado, 23/23 comprobaciones).
 - [x] Crear `entry_controls`.
@@ -843,7 +843,7 @@ Criterio de aceptación:
 
 ### Fase 3 — Índice y controles editoriales
 
-Estado: `en curso` — implementación completa y consultas de producción validadas en solo lectura; falta prueba visual y de mutaciones reales
+Estado: `completado` (2026-07-15) — prueba editorial del autor superada en local y en producción (ciclos de portada, reordenación, toasts). El criterio de aceptación se cumple: la portada se gestiona íntegramente desde `/admin` sin tocar Turso.
 
 - [x] Crear listado transversal.
 - [x] Añadir búsqueda y filtros.
@@ -862,12 +862,13 @@ Criterio de aceptación:
 
 ### Fase 4 — CRUD de tipos prioritarios
 
-Estado: `pendiente`
+Estado: `en curso` — vocabulario en producción y etiquetas públicas conectadas; faltan formularios
 
 - [ ] Añadir allowlist y validación.
-- [ ] Migración `004`: crear `type_vocab`, sembrarlo desde `labels.ts` más los tipos faltantes y reconstruir las tablas con FK (decisión 16, sección 5.5).
+- [x] Migración `004`: `type_vocab` creado y sembrado (27 códigos, 7 dominios; incluye los 3 `award_type` con traducción nueva) y las 7 tablas reconstruidas con FK y sin los CHECK antiguos. Ensayo local 20/20; validación en producción 18/18. **Verificado que Turso aplica las FK**: un código inexistente se rechaza a nivel de BD.
 - [ ] Alimentar los selectores de tipo desde `type_vocab` filtrado por dominio.
-- [ ] Sustituir `entitySubtypeLabels` de `labels.ts` por lecturas del vocabulario en la web pública.
+- [x] Sustituir `entitySubtypeLabels` de `labels.ts` por lecturas del vocabulario: `portfolio-items.ts` devuelve `subtype_label_es/en` vía JOIN y `ProjectModal` elige por locale con fallback al código. El diccionario se eliminó de `labels.ts` (solo queda `entityLabel`).
+- [ ] `/cv`: mostrar etiquetas del vocabulario en vez de códigos crudos (`book_review`…) en chips y filtro de tipo — deficiencia preexistente detectada al hacer el cambio anterior.
 - [ ] Implementar formularios de la primera tanda.
 - [ ] Incluir en los formularios los campos FK como selectores («evento de origen», «proyecto de investigación»), con lookup allowlistado.
 - [ ] Crear borradores privados.
@@ -999,6 +1000,8 @@ El proyecto se considera completado cuando:
 | 2026-07-15 | Fase 3 — interacción sin recargas | El índice carga una instantánea completa y aplica búsqueda/filtros en memoria; los controles público/portada usan acciones mejoradas con actualización optimista y rollback; la portada acumula los movimientos localmente y persiste el orden completo solo con «Guardar orden». Quitar de portada también conserva la navegación y el estado local. | `npm run check`: 0 errores y 0 avisos; `npm run build`: OK; revisión de mojibake limpia. | Prueba editorial local: conservar filtros al alternar controles, mover varias filas y comprobar que solo «Guardar orden» persiste; después desplegar. |
 | 2026-07-15 | Fase 3 — correcciones de controles | Corregido el callback de `use:enhance`, que retenía el primer valor sí/no porque la acción no actualiza su parámetro tras montarse: ahora calcula la orden desde el estado vivo en cada envío. Cada mutación devuelve una lectura autoritativa de Turso y la UI se reconcilia con ella. Despublicar limpia portada y CV; desactivar solo portada usa un `UPDATE` directo. El dashboard desactiva el precargado de datos en sus enlaces y `/admin/entradas` y `/admin/portada` responden `private, no-store`, de modo que cambiar de sección ejecuta una carga fresca. | Consulta Turso de solo lectura: el intento anterior dejó 9 entradas activas; `npm run check`: 0 errores y 0 avisos; `npm run build`: OK. | Confirmar varios ciclos «Portada: Sí ↔ No» sin navegar y después entrar en `/admin/portada` para verificar la misma selección. |
 | 2026-07-15 | Fase 3 — feedback temporal | Creado `AdminToast.svelte` y sustituido el feedback fijo de Entradas y Portada por notificaciones flotantes: éxito 3,5 s, error 6 s, cierre manual, animación breve y semántica accesible `status`/`alert` con `aria-live`. | `npm run check`: 0 errores y 0 avisos; `npm run build`: OK. | Revisar posición y duración del toast en escritorio y móvil durante la prueba editorial. |
+| 2026-07-15 | Revisión de estado entre sesiones | Contrastado el plan con repo, Turso y producción: todo commiteado y pusheado (`e4c2433`); deploy de producción verificado sirviendo la curación completa (título en posición 7 presente en la home, imposible con el antiguo `LIMIT 5`); dominio canónico = apex (`www` redirige 308). BD: 9 filas en portada (`home_order` 20–100), incluida `academic_events#6` añadida durante las pruebas de controles; 90 controles, todos públicos. Corregidas líneas de estado obsoletas de Fases 1 y 3 | Consultas Turso de solo lectura + curl a producción; sin cambios de código | El autor: prueba editorial visual en `davidmerinorecalde.com/admin` (ciclos portada, reordenar y guardar, toasts) y decidir si `academic_events#6` se queda en portada. Después: Fase 4 (migración `004` de `type_vocab` + allowlist/validación + formularios de la primera tanda) |
+| 2026-07-15 | Fase 3 cierre + Fase 4 arranque | Fase 3 completada (prueba editorial del autor superada en local y producción; portada final: 8 filas con `research_stays#1` primera y `academic_events#6` incluida). Fase 4: script permanente `scripts/backup.ts` (`npm run backup`, verificación por restauración); migración `004` aplicada — `type_vocab` con 27 códigos en 7 dominios, 7 tablas reconstruidas con FK, CHECKs de tipos retirados, vistas recreadas; `portfolio-items.ts` + `ProjectModal` leen etiquetas del vocabulario por locale; `entitySubtypeLabels` eliminado de `labels.ts` | Ensayo local 20/20 (vista `entries` byte a byte idéntica); producción 18/18 incl. FK activas en Turso; `npm run check` 0 errores; `npm run build` OK | Continuar Fase 4: `/cv` con etiquetas del vocabulario (hoy muestra códigos crudos, preexistente); después allowlist + validación (zod) y formularios de la primera tanda con selectores desde `type_vocab`. Pendiente commit + push de todo esto |
 
 ## 24. Registro de migraciones en Turso
 
@@ -1007,7 +1010,7 @@ El proyecto se considera completado cuando:
 | `001_portfolio_items.sql` | existente; registrada en `schema_migrations` | 2026-07-15 | producción | tabla actualmente consumida | no documentado |
 | `002_entry_controls_and_views.sql` | **aplicada** | 2026-07-15 | producción | ensayo local contra respaldo (23/23) + 10 comprobaciones en producción; edición de tabla base se refleja en la vista | `DROP VIEW entries; ALTER TABLE entries_legacy RENAME TO entries;` (documentado en el propio archivo) |
 | `003_drop_entries_legacy.sql` | pendiente | — | — | — | requerirá snapshot previo |
-| `004_type_vocabulary.sql` | pendiente | — | — | — | reconstrucción tabla a tabla; requiere respaldo previo y valor sucio corregido |
+| `004_type_vocabulary.sql` | **aplicada** | 2026-07-15 | producción | ensayo local contra respaldo (20/20: vista `entries` byte a byte idéntica, FK activas, CHECKs retirados) + 18 comprobaciones en producción (FK verificadas en Turso) | restaurar respaldo `backups/curriculum-2026-07-15-1313.sql` (la reconstrucción no es reversible por sentencias) |
 
 ## 25. Preguntas que deben resolverse durante la Fase 0
 
