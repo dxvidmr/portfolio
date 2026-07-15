@@ -54,6 +54,31 @@ async function getFkOptions(entity: FkEntity): Promise<SelectOption[]> {
 			label: row.acronym ? `${row.acronym} — ${row.title}` : String(row.title)
 		}));
 	}
+	if (entity === 'education') {
+		const res = await db.execute(
+			`SELECT id, degree_title, institution,
+			        COALESCE(date_end, date_start, '') AS y
+			 FROM education
+			 ORDER BY (date_end IS NULL AND date_start IS NULL) ASC,
+			          COALESCE(date_end, date_start) DESC, degree_title COLLATE NOCASE`
+		);
+		return res.rows.map((row) => ({
+			value: String(row.id),
+			label: `${row.degree_title} — ${row.institution}${row.y ? ` (${row.y})` : ''}`
+		}));
+	}
+	if (entity === 'events') {
+		const res = await db.execute(
+			`SELECT id, title, COALESCE(CAST(year AS TEXT), substr(date_start, 1, 4), '') AS y
+			 FROM events
+			 ORDER BY (year IS NULL AND date_start IS NULL) ASC,
+			          COALESCE(CAST(year AS TEXT), date_start) DESC, title COLLATE NOCASE`
+		);
+		return res.rows.map((row) => ({
+			value: String(row.id),
+			label: row.y ? `${row.y} — ${row.title}` : String(row.title)
+		}));
+	}
 	const res = await db.execute(
 		`SELECT id, title, COALESCE(substr(date_start, 1, 4), CAST(year AS TEXT), '') AS y
 		 FROM academic_events
@@ -83,7 +108,13 @@ export async function validateReferences(
 				parsed.errors[field.name] = 'Tipo no reconocido en el vocabulario';
 			}
 		} else if (field.kind === 'fk' && field.fkEntity) {
-			const table = field.fkEntity === 'projects' ? 'projects' : 'academic_events';
+			const tableByFk: Record<FkEntity, string> = {
+				projects: 'projects',
+				academic_events: 'academic_events',
+				education: 'education',
+				events: 'events'
+			};
+			const table = tableByFk[field.fkEntity];
 			const res = await db.execute({
 				sql: `SELECT 1 FROM ${table} WHERE id = ?`,
 				args: [value]
@@ -108,6 +139,21 @@ export async function createEntity(
 			args: cols.map((col) => values[col] ?? null)
 		});
 		const id = Number(inserted.lastInsertRowid);
+		if (type === 'academic_events') {
+			await tx.execute({
+				sql: `UPDATE academic_events SET
+					event_title = (SELECT title FROM events WHERE id = canonical_event_id),
+					date_start = (SELECT date_start FROM events WHERE id = canonical_event_id),
+					date_end = (SELECT date_end FROM events WHERE id = canonical_event_id),
+					year = (SELECT year FROM events WHERE id = canonical_event_id),
+					institution = (SELECT institution FROM events WHERE id = canonical_event_id),
+					city = (SELECT city FROM events WHERE id = canonical_event_id),
+					country = (SELECT country FROM events WHERE id = canonical_event_id),
+					modality = (SELECT modality FROM events WHERE id = canonical_event_id)
+				WHERE id = ? AND canonical_event_id IS NOT NULL`,
+				args: [id]
+			});
+		}
 		await tx.execute({
 			sql: 'INSERT INTO entry_controls (entity_type, entity_id, is_public) VALUES (?, ?, 0)',
 			args: [type, id]
@@ -127,8 +173,7 @@ export async function updateEntity(
 	values: Record<string, FieldValue>
 ): Promise<void> {
 	const cols = fieldNames(type);
-	await db.batch(
-		[
+	const statements = [
 			{
 				sql: `UPDATE ${type} SET ${cols.map((col) => `${col} = ?`).join(', ')} WHERE id = ?`,
 				args: [...cols.map((col) => values[col] ?? null), id]
@@ -139,9 +184,23 @@ export async function updateEntity(
 				      ON CONFLICT (entity_type, entity_id) DO UPDATE SET updated_at = datetime('now')`,
 				args: [type, id]
 			}
-		],
-		'write'
-	);
+		];
+	if (type === 'academic_events') {
+		statements.push({
+			sql: `UPDATE academic_events SET
+				event_title = (SELECT title FROM events WHERE id = canonical_event_id),
+				date_start = (SELECT date_start FROM events WHERE id = canonical_event_id),
+				date_end = (SELECT date_end FROM events WHERE id = canonical_event_id),
+				year = (SELECT year FROM events WHERE id = canonical_event_id),
+				institution = (SELECT institution FROM events WHERE id = canonical_event_id),
+				city = (SELECT city FROM events WHERE id = canonical_event_id),
+				country = (SELECT country FROM events WHERE id = canonical_event_id),
+				modality = (SELECT modality FROM events WHERE id = canonical_event_id)
+			WHERE id = ? AND canonical_event_id IS NOT NULL`,
+			args: [id]
+		});
+	}
+	await db.batch(statements, 'write');
 }
 
 // Eliminar (§12): relaciones → control → fila, en un batch transaccional.
@@ -157,6 +216,16 @@ export async function deleteEntity(type: FormEntityType, id: number): Promise<vo
 	if (type === 'academic_events') {
 		stmts.push({ sql: 'UPDATE publications SET event_id = NULL WHERE event_id = ?', args: [id] });
 	}
+	if (type === 'education') {
+		stmts.push({ sql: 'UPDATE academic_works SET education_id = NULL WHERE education_id = ?', args: [id] });
+	}
+	if (type === 'funding_awards') {
+		stmts.push({ sql: 'DELETE FROM funding_relations WHERE funding_award_id = ?', args: [id] });
+	}
+	stmts.push({
+		sql: 'DELETE FROM funding_relations WHERE entity_type = ? AND entity_id = ?',
+		args: [type, id]
+	});
 
 	for (const table of ['documents', 'links', 'entity_tags', 'portfolio_items', 'entry_controls']) {
 		stmts.push({

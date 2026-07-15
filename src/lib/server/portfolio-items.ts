@@ -34,25 +34,27 @@ export async function getPortfolioItems(portfolioSlug?: string): Promise<Portfol
 		                   ELSE NULLIF(TRIM(pub.publisher), '')
 		                 END
 		               WHEN pi.entity_type = 'academic_events' THEN
-		                 event.event_title ||
+		                 COALESCE(canonical_event.title, event.event_title) ||
 		                   CASE
-		                     WHEN NULLIF(TRIM(event.institution), '') IS NOT NULL
-		                       AND INSTR(LOWER(event.event_title), LOWER(event.institution)) = 0
-		                       THEN ' · ' || event.institution
+		                     WHEN NULLIF(TRIM(COALESCE(canonical_event.institution, event.institution)), '') IS NOT NULL
+		                       AND INSTR(LOWER(COALESCE(canonical_event.title, event.event_title)), LOWER(COALESCE(canonical_event.institution, event.institution))) = 0
+		                       THEN ' · ' || COALESCE(canonical_event.institution, event.institution)
 		                     ELSE ''
 		                   END ||
 		                   CASE
-		                     WHEN NULLIF(TRIM(event.city), '') IS NOT NULL
-		                       AND INSTR(LOWER(event.event_title), LOWER(event.city)) = 0
-		                       THEN ' · ' || event.city
+		                     WHEN NULLIF(TRIM(COALESCE(canonical_event.city, event.city)), '') IS NOT NULL
+		                       AND INSTR(LOWER(COALESCE(canonical_event.title, event.event_title)), LOWER(COALESCE(canonical_event.city, event.city))) = 0
+		                       THEN ' · ' || COALESCE(canonical_event.city, event.city)
 		                     ELSE ''
 		                   END ||
 		                   CASE
-		                     WHEN NULLIF(TRIM(event.country), '') IS NOT NULL
-		                       AND INSTR(LOWER(event.event_title), LOWER(event.country)) = 0
-		                       THEN ' · ' || event.country
+		                     WHEN NULLIF(TRIM(COALESCE(canonical_event.country, event.country)), '') IS NOT NULL
+		                       AND INSTR(LOWER(COALESCE(canonical_event.title, event.event_title)), LOWER(COALESCE(canonical_event.country, event.country))) = 0
+		                       THEN ' · ' || COALESCE(canonical_event.country, event.country)
 		                     ELSE ''
 		                   END
+		               WHEN pi.entity_type = 'service_activities' THEN
+		                 COALESCE(canonical_service_event.title, service.venue_or_journal)
 			               WHEN pi.entity_type = 'research_stays' THEN
 			                 COALESCE(stay.faculty_or_dept, stay.city, stay.country)
 			               ELSE COALESCE(
@@ -71,11 +73,13 @@ export async function getPortfolioItems(portfolioSlug?: string): Promise<Portfol
 			             END AS detail,
 			             COALESCE(
 			               pub.url,
-			               event.url,
+		               event.url,
+		               canonical_event.url,
 			               work.url,
 			               teaching.url,
 			               research_project.url,
-			               service.url,
+		               service.url,
+		               canonical_service_event.url,
 			               education.url,
 			               stay.url,
 			               course.url,
@@ -88,6 +92,8 @@ export async function getPortfolioItems(portfolioSlug?: string): Promise<Portfol
 		        ON pi.entity_type = 'publications' AND pub.id = pi.entity_id
 		      LEFT JOIN academic_events event
 		        ON pi.entity_type = 'academic_events' AND event.id = pi.entity_id
+		      LEFT JOIN events canonical_event
+		        ON canonical_event.id = event.canonical_event_id
 		      LEFT JOIN academic_works work
 		        ON pi.entity_type = 'academic_works' AND work.id = pi.entity_id
 		      LEFT JOIN teaching
@@ -96,6 +102,8 @@ export async function getPortfolioItems(portfolioSlug?: string): Promise<Portfol
 		        ON pi.entity_type = 'projects' AND research_project.id = pi.entity_id
 		      LEFT JOIN service_activities service
 		        ON pi.entity_type = 'service_activities' AND service.id = pi.entity_id
+		      LEFT JOIN events canonical_service_event
+		        ON canonical_service_event.id = service.canonical_event_id
 		      LEFT JOIN education
 		        ON pi.entity_type = 'education' AND education.id = pi.entity_id
 		      LEFT JOIN research_stays stay

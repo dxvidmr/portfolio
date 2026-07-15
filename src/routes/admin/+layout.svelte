@@ -9,7 +9,8 @@
 		{ href: '/admin', label: 'Resumen', ready: true },
 		{ href: '/admin/entradas', label: 'Entradas', ready: true },
 		{ href: '/admin/portada', label: 'Portada', ready: true },
-		{ href: '/admin/portfolio', label: 'Portfolio', ready: true }
+		{ href: '/admin/portfolio', label: 'Portfolio', ready: true },
+		{ href: '/admin/eventos', label: 'Eventos', ready: true }
 	];
 </script>
 

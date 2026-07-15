@@ -43,6 +43,7 @@
 		<a href="/admin/entradas">Gestionar entradas</a>
 		<a href="/admin/portada">Ordenar portada</a>
 		<a href="/admin/portfolio">Relacionar portfolio</a>
+		<a href="/admin/eventos">Gestionar eventos</a>
 		<a href="/es" class="secondary">Ver web pública</a>
 	</div>
 </section>

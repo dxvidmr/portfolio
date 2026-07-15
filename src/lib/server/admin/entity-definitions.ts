@@ -40,7 +40,7 @@ export type VocabDomain =
 	| 'project_role'
 	| 'service_role';
 
-export type FkEntity = 'projects' | 'academic_events';
+export type FkEntity = 'projects' | 'academic_events' | 'education' | 'events';
 
 export type FieldKind =
 	| 'text'
@@ -108,6 +108,11 @@ export const entityForms = {
 	academic_events: {
 		fields: [
 			f('title', 'Título de la contribución', 'text', { required: true }),
+			f('canonical_event_id', 'Evento', 'fk', {
+				required: true,
+				fkEntity: 'events',
+				help: 'Ficha canónica compartida con organización, evaluación y asistencia'
+			}),
 			f('event_title', 'Nombre del evento', 'text', { required: true }),
 			f('contribution_type', 'Tipo de contribución', 'vocab', {
 				required: true,
@@ -217,6 +222,10 @@ export const entityForms = {
 				vocabDomain: 'activity_type'
 			}),
 			f('title', 'Título', 'text', { required: true }),
+			f('canonical_event_id', 'Evento relacionado', 'fk', {
+				fkEntity: 'events',
+				help: 'Úsalo para organización o evaluación de un evento concreto'
+			}),
 			f('role', 'Mi rol', 'vocab', { vocabDomain: 'service_role' }),
 			f('venue_or_journal', 'Sede o revista', 'text'),
 			f('related_entity', 'Entidad relacionada', 'text'),
@@ -235,6 +244,10 @@ export const entityForms = {
 			f('work_type', 'Tipo de trabajo', 'vocab', { required: true, vocabDomain: 'work_type' }),
 			f('institution', 'Institución', 'text', { required: true }),
 			f('program', 'Programa', 'text'),
+			f('education_id', 'Titulación relacionada', 'fk', {
+				fkEntity: 'education',
+				help: 'Titulación del apartado Formación en la que se realizó este trabajo'
+			}),
 			f('year', 'Año', 'integer'),
 			f('url', 'URL', 'url')
 		]
@@ -285,4 +298,3 @@ export const isFormEntityType = (value: string): value is FormEntityType =>
 export const formEntityTypeOptions = (Object.keys(entityForms) as FormEntityType[]).map(
 	(value) => ({ value, label: entityDefinitions[value] })
 );
-

@@ -33,7 +33,7 @@
 	<EntityForm
 		fields={data.fields}
 		options={data.options}
-		values={form?.raw ?? {}}
+		values={form?.raw ?? data.initialValues}
 		errors={form?.errors ?? {}}
 	/>
 	<div class="actions">

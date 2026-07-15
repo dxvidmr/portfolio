@@ -58,7 +58,46 @@ const relationCountSql = `
 	+ (SELECT COUNT(*) FROM documents AS document
 	   WHERE document.entity_type = source.entity_type AND document.entity_id = source.entity_id)
 	+ (SELECT COUNT(*) FROM links AS link
-	   WHERE link.entity_type = source.entity_type AND link.entity_id = source.entity_id)`;
+	   WHERE link.entity_type = source.entity_type AND link.entity_id = source.entity_id)
+	+ (SELECT COUNT(*) FROM funding_relations AS funding_relation
+	   WHERE (funding_relation.entity_type = source.entity_type
+	          AND funding_relation.entity_id = source.entity_id)
+	      OR (source.entity_type = 'funding_awards'
+	          AND funding_relation.funding_award_id = source.entity_id))
+	+ CASE source.entity_type
+	    WHEN 'publications' THEN
+	      (SELECT (CASE WHEN publication.project_id IS NULL THEN 0 ELSE 1 END)
+	            + (CASE WHEN publication.event_id IS NULL THEN 0 ELSE 1 END)
+	       FROM publications AS publication WHERE publication.id = source.entity_id)
+	    WHEN 'academic_events' THEN
+	      (SELECT (CASE WHEN event.project_id IS NULL THEN 0 ELSE 1 END)
+	            + (CASE WHEN event.canonical_event_id IS NULL THEN 0 ELSE 1 END)
+	       FROM academic_events AS event WHERE event.id = source.entity_id)
+	    WHEN 'service_activities' THEN
+	      (SELECT CASE WHEN service.canonical_event_id IS NULL THEN 0 ELSE 1 END
+	       FROM service_activities AS service WHERE service.id = source.entity_id)
+	    WHEN 'teaching' THEN
+	      (SELECT CASE WHEN teaching.project_id IS NULL THEN 0 ELSE 1 END
+	       FROM teaching WHERE teaching.id = source.entity_id)
+	    WHEN 'funding_awards' THEN
+	      (SELECT CASE WHEN funding.project_id IS NULL THEN 0 ELSE 1 END
+	       FROM funding_awards AS funding WHERE funding.id = source.entity_id)
+	    WHEN 'academic_works' THEN
+	      (SELECT CASE WHEN work.education_id IS NULL THEN 0 ELSE 1 END
+	       FROM academic_works AS work WHERE work.id = source.entity_id)
+	    WHEN 'projects' THEN
+	      (SELECT COUNT(*) FROM publications WHERE project_id = source.entity_id)
+	      + (SELECT COUNT(*) FROM academic_events WHERE project_id = source.entity_id)
+	      + (SELECT COUNT(*) FROM teaching WHERE project_id = source.entity_id)
+	      + (SELECT COUNT(*) FROM funding_awards WHERE project_id = source.entity_id)
+	    WHEN 'education' THEN
+	      (SELECT COUNT(*) FROM academic_works WHERE education_id = source.entity_id)
+	    ELSE 0
+	  END
+	+ CASE WHEN source.entity_type = 'academic_events'
+	    THEN (SELECT COUNT(*) FROM publications WHERE event_id = source.entity_id)
+	    ELSE 0
+	  END`;
 
 const entrySelectSql = `
 	SELECT

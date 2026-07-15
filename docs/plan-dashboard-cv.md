@@ -1,7 +1,7 @@
 # Plan persistente: índice transversal automático y dashboard privado del CV
 
 > Última actualización: 2026-07-15  
-> Estado general: **Fases 0–4 completadas y en producción; Fase 5A (curación de fichas del portfolio) implementada en local, pendiente de prueba editorial y despliegue**
+> Estado general: **Fase 5A completada; Fase 5B implementada con financiación, titulaciones y eventos canónicos, migraciones aplicadas, pendiente de prueba editorial y despliegue**
 > Fuente de verdad: **Turso**. `db/cv-data.json` es histórico y no debe sincronizar contenido.  
 > Propósito: este documento debe permitir retomar el trabajo en sesiones distintas sin reconstruir decisiones ni contexto.
 
@@ -41,6 +41,9 @@ Estas decisiones se consideran aceptadas salvo que se documenten explícitamente
 16. Los campos `*_type` dejan de ser TEXT libre: pasan a referenciar un vocabulario controlado en BD (`type_vocab`, con `label_es`/`label_en`), para impedir errores de escritura al rellenar y sacar las traducciones de subtipos de `labels.ts` (decisión 2026-07-15; ver sección 5.5, resuelve la pregunta 7). Extensión (mismo día): también los roles con datos y semántica clara — `projects.role` (dominio `project_role`) y `service_activities.role` (`service_role`), migración `005`. `academic_events.role` (sin datos) y `memberships.role` (valor descriptivo con matices y periodos) permanecen como texto libre hasta que haya vocabulario real que codificar.
 17. Una entrada privada **no es un borrador**: es un elemento completo del CV que el autor decide no publicar. La UI habla de «privada/pública», nunca de «borrador» (decisión 2026-07-15). El campo `url` de cada entidad es el enlace canónico público del ítem (DOI, web del evento, editorial…); los archivos y certificados (Drive) se gestionarán aparte en `documents` (Fase 5).
 18. `portfolio_items` se conserva como relación editorial entre las entradas del CV y las seis fichas narrativas definidas en `projects.ts`. `featured` será únicamente un énfasis visual contextual (símbolo/estilo), nunca un criterio de orden. Los trabajos relacionados se ordenan siempre por `sort_date DESC`; `sort_order` queda como columna heredada sin consumidor y se retirará en la limpieza posterior. La gestión debe priorizar búsqueda y alta rápida, sin reordenación manual (decisión 2026-07-15).
+19. La financiación y los premios se relacionan de forma muchos-a-muchos con las actividades mediante `funding_relations`. El extremo de financiación tiene FK directa a `funding_awards`; el extremo polimórfico usa una FK compuesta a `entry_controls`, que actúa como registro transversal. La relación se tipa como `supports`, `recognizes` o `related`, se gestiona desde ambos extremos y no sustituye a `project_id` (decisión 2026-07-15).
+20. `academic_works.education_id` relaciona cada TFM/TFG con su titulación mediante FK real; el texto `program` se conserva como descripción/copia bibliográfica, pero la relación se edita con selector. Las tres filas actuales se enlazan por coincidencia exacta y única (decisión 2026-07-15).
+21. Los eventos tienen identidad canónica en `events`. Las contribuciones (`academic_events`) y las actividades de organización/evaluación (`service_activities`) conservan sus registros propios y apuntan al evento común mediante `canonical_event_id`, de modo que un mismo evento admite varios roles sin confundir el evento con la comunicación. La mera asistencia se registra aparte en `event_attendance`, con rol visible en el dashboard como «Oyente/asistente»: es siempre privada, no pertenece a `entry_source`, no tiene control de publicación y nunca llega a las consultas públicas. Será un propietario válido de certificados privados en Fase 5D (decisión 2026-07-15; sustituye el aplazamiento anterior de eventos canónicos).
 
 ## 3. Estado actual del repositorio
 
@@ -207,6 +210,7 @@ Estas tablas seguirán usando `(entity_type, entity_id)`:
 - `entity_tags`
 - `documents`
 - `links`
+- `funding_relations` (solo en el extremo de la actividad relacionada)
 
 SQLite no puede expresar una clave foránea que apunte condicionalmente a trece tablas. La integridad se garantizará mediante:
 
@@ -214,6 +218,8 @@ SQLite no puede expresar una clave foránea que apunte condicionalmente a trece 
 - Validación previa de existencia.
 - Limpieza explícita al eliminar.
 - Pruebas de integridad periódicas.
+
+Excepción incorporada en la Fase 5B: cuando una tabla relacional se crea después de `entry_controls`, puede usar esa clave compuesta como registro transversal. `funding_relations` lo hace y obtiene integridad referencial y borrado en cascada sin apuntar condicionalmente a trece tablas base. Las tablas polimórficas heredadas mantienen por ahora la validación y limpieza en aplicación descritas arriba.
 
 No se añadirán triggers de sincronización de título o fecha. Se pueden añadir triggers de limpieza después, pero no son necesarios para la primera entrega.
 
@@ -581,12 +587,13 @@ Orden recomendado dentro de una transacción:
 2. `links`
 3. `entity_tags`
 4. `portfolio_items`
-5. `entry_controls`
-6. Fila de la tabla específica
+5. `funding_relations` en ambos extremos
+6. `entry_controls`
+7. Fila de la tabla específica
 
 La primera versión puede implementar “archivar/despublicar” antes que borrado definitivo si se considera más seguro.
 
-Caso especial al eliminar un proyecto: `publications`, `academic_events`, `teaching` y `funding_awards` tienen `project_id REFERENCES projects(id)`. La transacción debe poner a `NULL` (o reasignar) esas referencias, o bloquear la eliminación mientras existan. Verificar además si la conexión aplica `PRAGMA foreign_keys`, porque SQLite no lo activa por defecto.
+Casos especiales de eliminación: al borrar un proyecto, `publications`, `academic_events`, `teaching` y `funding_awards` tienen `project_id REFERENCES projects(id)`; al borrar una titulación, `academic_works.education_id` la referencia. La transacción debe poner esas FK a `NULL` (o reasignarlas) antes de eliminar. Verificar además si la conexión aplica `PRAGMA foreign_keys`, porque SQLite no lo activa por defecto.
 
 ## 13. Pantallas y experiencia de uso
 
@@ -644,20 +651,30 @@ Separar visualmente:
 
 No forman parte del MVP inicial, pero el modelo debe prepararse para ellas.
 
-### Tres planos de relación (no confundirlos)
+### Cuatro planos de relación (no confundirlos)
 
-La UI debe nombrar sin ambigüedad tres tipos de vínculo distintos:
+La UI debe nombrar sin ambigüedad cuatro tipos de vínculo distintos:
 
-1. **Relaciones estructurales (FK reales en la fila de la entidad).** `publications.event_id` → `academic_events` (publicación derivada de una comunicación); `project_id` en `publications`, `academic_events`, `teaching` y `funding_awards` → `projects` (proyecto de investigación de la BD). Se editan como selectores dentro del formulario de la propia entidad (Fase 4), declarados en `entity-definitions.ts` como campos de tipo relación con consulta de lookup allowlistada.
+1. **Relaciones estructurales (FK reales en la fila de la entidad).** `publications.event_id` → `academic_events` (publicación derivada de una comunicación); `project_id` en `publications`, `academic_events`, `teaching` y `funding_awards` → `projects` (proyecto de investigación de la BD); `academic_works.education_id` → `education` (titulación en la que se realizó el TFM/TFG); `academic_events.canonical_event_id` y `service_activities.canonical_event_id` → `events` (identidad común del evento). Se editan como selectores dentro del formulario de la propia entidad, declarados en `entity-definitions.ts` como campos de tipo relación con consulta de lookup allowlistada.
 2. **Relación editorial con fichas del portfolio.** `portfolio_items.portfolio_slug` apunta a las fichas definidas en `projects.ts` — el “proyecto del home”. No es lo mismo que `project_id` y no deben compartir nombre en la interfaz: «Proyecto de investigación» frente a «Ficha del portfolio».
 3. **Etiquetas** (`entity_tags`).
+4. **Relaciones contextuales entre entradas.** `funding_relations` vincula una ayuda, contrato o premio con proyectos, formación, estancias, cursos, publicaciones, trabajos académicos, eventos, docencia o servicio. Es muchos-a-muchos y su tipo expresa «financia/sustenta», «premia/reconoce» o una relación contextual neutral.
 
 Conviene además una vista inversa en la edición: desde un evento, listar las publicaciones derivadas; desde un proyecto de investigación, listar todas las entradas que lo referencian.
+
+### Eventos canónicos y roles
+
+- `events` guarda una sola vez nombre, fechas, institución, lugar, modalidad y URL común.
+- `academic_events` representa una contribución concreta; mantiene su visibilidad editorial y puede seguir siendo origen de una publicación mediante `publications.event_id`.
+- `service_activities` representa organización, comité, evaluación u otro servicio y conserva su visibilidad propia.
+- `event_attendance` representa únicamente que el autor acudió como oyente/asistente. Su `role_label` es editable para conservar la denominación exacta del certificado, pero su tipo técnico es siempre `attendee` y el registro es privado por diseño.
+- Editar los datos comunes desde `/admin/eventos/[id]` sincroniza las copias heredadas necesarias para compatibilidad. Las consultas públicas leen preferentemente del evento canónico.
+- No se infiere asistencia a partir de contribuciones o servicio: cada rol se registra de forma explícita.
 
 ### `portfolio_items`
 
 - Seleccionar uno o varios proyectos del portfolio.
-- Orden independiente por proyecto.
+- Orden cronológico automático dentro de cada proyecto.
 - `featured` contextual, sin relación con `featured_cv`.
 - Previsualizar cómo aparecerá en la ficha.
 
@@ -889,7 +906,7 @@ Criterio de aceptación:
 
 ### Fase 5 — Relaciones y recursos
 
-Estado: `en curso` — 5A implementada en local; pendiente de prueba editorial y despliegue
+Estado: `en curso` — 5A completada; 5B implementada y con migraciones `006`, `007` y `008` aplicadas, pendiente de prueba editorial y despliegue
 
 #### Fase 5A — Curación de fichas del portfolio
 
@@ -902,13 +919,25 @@ Estado: `en curso` — 5A implementada en local; pendiente de prueba editorial y
 - [x] Validar `portfolio_slug` contra `projects.ts`, entidad contra la allowlist y existencia contra `entry_source` en cada mutación.
 - [x] Añadir desde la ficha de edición la vista inversa «Aparece en estas fichas del portfolio».
 - [x] Previsualizar o enlazar la ficha pública desde la pantalla de curación.
-- [ ] Completar la prueba editorial local, desplegar y verificar una ficha pública en producción.
+- [x] Completar la prueba editorial local y confirmar el funcionamiento de la curación.
+- [ ] Desplegar y verificar una ficha pública en producción.
 
-#### Fase 5B — Relaciones estructurales inversas
+#### Fase 5B — Relaciones estructurales e interentidad
 
-- [ ] Desde un evento, listar las publicaciones derivadas mediante `publications.event_id`.
-- [ ] Desde un proyecto de investigación, listar publicaciones, eventos, docencia y financiación que lo referencian mediante `project_id`.
-- [ ] Mantener la edición de estas FK en los selectores ya implementados en Fase 4.
+- [x] Desde un evento, listar las publicaciones derivadas mediante `publications.event_id`.
+- [x] Desde un proyecto de investigación, listar publicaciones, eventos, docencia y financiación que lo referencian mediante `project_id`.
+- [x] Mantener la edición de estas FK en los selectores ya implementados en Fase 4.
+- [x] Crear `funding_relations` como relación muchos-a-muchos con FK directa a financiación y FK compuesta al registro transversal de entradas.
+- [x] Gestionar desde ambos extremos ayudas, contratos y premios con búsqueda/filtro, alta, retirada y cambio de tipo sin recarga completa.
+- [x] Incluir relaciones estructurales y de financiación en el recuento/filtro transversal «con relaciones».
+- [x] Auditar otros vínculos posibles sobre los datos reales.
+- [x] Añadir `academic_works.education_id`, selector en el trabajo, vista inversa en Formación y backfill de las tres coincidencias exactas.
+- [x] Sustituir la coincidencia textual organización↔contribución por una entidad canónica `events` y FK desde ambos tipos de actividad.
+- [x] Migrar los 21 eventos de contribuciones y deduplicar las 10 actividades de servicio relacionadas: 26 identidades canónicas, sin asociaciones ambiguas.
+- [x] Crear `/admin/eventos` con búsqueda local, edición de datos comunes, agrupación de contribuciones/servicio y altas preseleccionadas desde el evento.
+- [x] Permitir registrar de forma explícita el rol privado «Oyente/asistente», con etiqueta y notas privadas editables y sin crear una entrada publicable.
+- [x] Hacer que CV y fichas del portfolio lean los metadatos del evento canónico; mantener sincronizadas las copias heredadas por compatibilidad.
+- [ ] Completar la prueba editorial local y desplegar la vista inversa.
 
 #### Fase 5C — Enlaces adicionales
 
@@ -922,6 +951,7 @@ Estado: `en curso` — 5A implementada en local; pendiente de prueba editorial y
 - [ ] Gestionar metadatos y URL de documentos, sin subida directa de archivos.
 - [ ] Aplicar reglas explícitas para documentos públicos, privados y certificados.
 - [ ] Garantizar que certificados y documentos privados nunca llegan a las cargas públicas.
+- [ ] Permitir que `event_attendance` sea propietario de certificados de asistencia enlazados desde Drive; estos documentos serán siempre privados aunque el evento tenga otras actividades públicas.
 - [ ] Definir y construir el consumidor público de documentos autorizados.
 
 #### Fase 5E — Taxonomías
@@ -1050,6 +1080,11 @@ El proyecto se considera completado cuando:
 | 2026-07-15 | Fase 4 — CRUD primera tanda | `/cv` con etiquetas del vocabulario en chips y filtro (ES/EN, pseudotipos literales retirados). Infraestructura CRUD: campos declarativos por tipo en `entity-definitions.ts` (8 tipos), `validation.ts` propio (zod descartado, documentado en §11), `crud.ts` (crear con transacción contenido+control borrador; editar solo columnas allowlist con `updated_at`; eliminar en batch con limpieza de relaciones y `NULL` en FKs entrantes; opciones de selectores y revalidación código+dominio). Rutas `nueva`, `nueva/[type]` y `[type]/[id]` (Contenido / Visibilidad / Zona peligrosa con confirmación), componentes `EntityForm`/`FormField` (accesibles, errores junto al campo, aviso de cambios sin guardar). Índice con botón «Nueva entrada» y títulos enlazados a edición | `npm run check` 0 errores; `npm run build` OK; smoke test: GET y POST de `/admin/entradas/**` sin sesión → 303 signin (acción no ejecutada, verificado el sobre de redirección); `/es/cv` y `/en/cv` con etiquetas y cero códigos crudos | El autor: commit + push, y prueba editorial completa en producción — crear borrador, editar, publicar, verificar CV/portada, eliminar. Después: segunda tanda de formularios o Fase 5 (relaciones) |
 | 2026-07-15 | Fase 4 — mejoras tras prueba editorial | Decisión 17 (privada ≠ borrador, terminología cambiada en toda la UI). Migración `005`: dominios `project_role` y `service_role` en `type_vocab` (9 códigos, traducciones nuevas revisables), valores libres de `service_activities.role` convertidos a códigos, FK en `projects.role` y `service_activities.role`; `academic_events.role` y `memberships.role` quedan texto libre (sin datos / valor descriptivo). Formularios de la segunda tanda: los 13 tipos editables. Ficha de edición: toggle de portada junto a visibilidad (sin ir a otra pantalla), toasts temporales en vez de avisos fijos, «Volver» + chip «En portada». Índice: orden por fecha/nombre/actualización, sin aviso de filtrado. Ayuda del campo URL (enlace canónico; Drive → Documentos, Fase 5) | Ensayo local de `005` 9/9 y producción 6/6; `npm run check` 0 errores; `npm run build` OK; smoke: rutas de tanda 2 activas y protegidas (303 sin sesión), `/es/cv` 200 | El autor: commit + push, segunda prueba editorial (roles como selector, portada desde la ficha, toasts) y revisar las traducciones EN de los 9 roles nuevos. Después: Fase 5 (relaciones: `portfolio_items`, enlaces, documentos) |
 | 2026-07-15 | Fase 5A — curación de fichas del portfolio | Conservada `portfolio_items` como relación editorial con las seis fichas narrativas. Nueva pantalla `/admin/portfolio` con selector, búsqueda y filtro locales, alta/retirada y destacado mediante acciones mejoradas sin recarga, indicación de privacidad y enlace de previsualización. Vista inversa desde cada entrada. La salida pública admite los 13 tipos, se ordena por fecha descendente con título como desempate y representa `featured` con una estrella sin crear zonas separadas; `sort_order` permanece por compatibilidad, pero deja de tener consumidor. | Auditoría previa: 30 relaciones, 12 destacadas, 0 huérfanas, 0 privadas y 0 órdenes duplicados; `npm run check` 0 errores y 0 avisos; `npm run build` OK; smoke público local 200 con sección relacionada y marca de destacado; GET/POST administrativos sin sesión redirigen 303 sin ejecutar acciones | El autor: probar en local añadir, quitar y destacar varias relaciones; comprobar búsqueda, filtros y una entrada privada; revisar la ficha pública; después commit, push y verificación en producción. |
+| 2026-07-15 | Fase 5B — relaciones estructurales inversas | Nueva lectura administrativa agrupada para las FK ya existentes, sin migración ni escrituras adicionales. La edición de un evento muestra sus publicaciones derivadas (`event_id`); la edición de un proyecto de investigación muestra publicaciones, eventos, docencia y financiación/premios que lo referencian (`project_id`). Cada resultado enlaza a su ficha, conserva el orden por fecha y señala si es público o privado; las FK siguen editándose mediante los selectores de contenido de la Fase 4. | Turso, solo lectura: 2 publicaciones, 5 eventos, 3 actividades docentes y 0 financiaciones con `project_id`; 3 publicaciones con `event_id`. Consultas exactas verificadas con un proyecto real (2 resultados) y un evento real (1 resultado). `npm run check` 0 errores y 0 avisos; `npm run build` OK | El autor: revisar en local una ficha de proyecto y una de evento, seguir los enlaces y cambiar/revertir una FK desde la entrada relacionada. Después: commit, despliegue y Fase 5C. |
+| 2026-07-15 | Fase 5B — ampliación de financiación | Migración `006`: `funding_relations`, muchos-a-muchos, tipos `supports`/`recognizes`/`related`, FK directa a `funding_awards` y FK compuesta a `entry_controls`, cascadas y allowlist de nueve tipos de destino. Componente de edición reutilizable desde financiación y desde la actividad: búsqueda y filtro locales, sugerencia automática (`prize` → reconoce; resto → financia), alta/retirada/cambio de tipo con acciones mejoradas y relectura autoritativa. Limpieza al eliminar e índice transversal actualizado para contar relaciones estructurales y financieras. Auditoría semántica: beca Oxford ↔ estancia; contrato predoctoral ↔ doctorado/docencia/resultados a curar; premio 2023 ↔ póster; 3 trabajos ↔ 3 titulaciones exactas; 4 organizaciones ↔ participaciones en el mismo evento. No se crean asociaciones por inferencia. | Respaldo restaurable `curriculum-2026-07-15-1626.sql` (22 tablas); ensayo local `006` 9/9 (FK, CHECK, índice y cascadas); migración aplicada y estructura remota verificada (2 FK, índice, 0 filas iniciales); `npm run check` 0 errores/avisos; `npm run build` OK | El autor: relacionar docencia con el contrato predoctoral y probar quitar/cambiar tipo desde ambos extremos. Decidir `academic_works.education_id` y organización↔evento; después commit y despliegue. |
+| 2026-07-15 | Fase 5B — trabajo académico y titulación | Decisión 20 y migración `007`: `academic_works.education_id REFERENCES education(id)`, índice y backfill únicamente por coincidencia exacta y única de `program = degree_title`. Selector «Titulación relacionada» en TFM/TFG, validación FK allowlistada, vista inversa «Trabajos académicos» desde Formación, relación incluida en el recuento transversal y limpieza a `NULL` al borrar una titulación. En ese momento se aplazó la entidad canónica de eventos; esa conclusión fue sustituida después por la decisión 21 al aparecer el consumidor real de roles y certificados. | Respaldo restaurable `curriculum-2026-07-15-1951.sql` (23 tablas); ensayo local `007` 9/9; Turso verificado: mappings `1→2`, `2→3`, `3→4`, índice y FK activas | El autor: revisar los tres trabajos y sus titulaciones desde ambos extremos; después commit y despliegue. |
+| 2026-07-15 | Fase 5B — eventos canónicos y asistencia privada | Decisión 21 y migración `008`: nueva identidad `events`; FK desde contribuciones y servicio; backfill auditable de 21 contribuciones y deduplicación de actividades coincidentes en 26 eventos. `/admin/eventos` permite buscar, editar datos comunes, consultar todos los roles y crear actividades ya vinculadas. `event_attendance` registra manualmente «Oyente/asistente» con etiqueta/notas privadas, fuera de `entry_source` y de cualquier consulta pública. CV y portfolio leen el evento canónico; las copias heredadas se sincronizan para compatibilidad. | Respaldo restaurable `curriculum-2026-07-15-2026.sql` (23 tablas); ensayo local `008` 13/13; Turso verificado: 26 eventos, 21 contribuciones enlazadas, 10 servicios enlazados, 0 asistencias inferidas, FKs e índices activos y `entry_source` intacta con 91 filas. `npm run check` 0 errores/avisos; `npm run build` OK | El autor: probar un evento con solo rol de oyente, confirmar que no aparece en `/cv`, y revisar un evento que reúna contribución y organización. Después commit y despliegue. |
+| 2026-07-15 | Fase 5B — carga de asistencias | Importados 12 eventos aportados por el autor y registrada asistencia privada «Oyente/asistente» en los 12 eventos sin participación activa. «Y sin embargo, amigos…» reutiliza el evento canónico #11, pero no conserva asistencia porque ya contiene la comunicación «Mil y una Fuenteovejuna»: una contribución prevalece sobre el rol genérico de oyente. Se normalizaron Unicode, comillas, una puntuación residual del PDF y «Universitat Autònoma de Barcelona»; no se inventaron ciudad, país, URL ni certificados ausentes. | Respaldo previo `curriculum-2026-07-15-2032.sql` (25 tablas); Turso final: 38 eventos, 12 asistencias privadas, 1 contribución en el evento #11 y `entry_source` intacta con 91 filas. | El autor: revisar las asistencias en `/admin/eventos` y completar certificados en Fase 5D. |
 
 ## 24. Registro de migraciones en Turso
 
@@ -1060,6 +1095,9 @@ El proyecto se considera completado cuando:
 | `003_drop_entries_legacy.sql` | pendiente | — | — | — | requerirá snapshot previo |
 | `004_type_vocabulary.sql` | **aplicada** | 2026-07-15 | producción | ensayo local contra respaldo (20/20: vista `entries` byte a byte idéntica, FK activas, CHECKs retirados) + 18 comprobaciones en producción (FK verificadas en Turso) | restaurar respaldo `backups/curriculum-2026-07-15-1313.sql` (la reconstrucción no es reversible por sentencias) |
 | `005_role_vocabulary.sql` | **aplicada** | 2026-07-15 | producción | ensayo local 9/9 (vista idéntica, conversión de valores libres a códigos verificada) + 6 comprobaciones en producción (12 roles codificados, FK activa) | restaurar respaldo `backups/curriculum-2026-07-15-1358.sql` |
+| `006_funding_relations.sql` | **aplicada** | 2026-07-15 | producción | respaldo restaurado; ensayo local 9/9; tabla, índice, dos FK compuestas/directas y 0 filas iniciales verificados en Turso | `DROP TABLE funding_relations;` o restaurar `backups/curriculum-2026-07-15-1626.sql` |
+| `007_academic_works_education.sql` | **aplicada** | 2026-07-15 | producción | respaldo restaurado; ensayo local 9/9; 3/3 coincidencias exactas, índice y FK verificados en Turso | restaurar `backups/curriculum-2026-07-15-1951.sql` (SQLite no permite retirar la columna con el mismo grado de compatibilidad en todas las versiones) |
+| `008_canonical_events.sql` | **aplicada** | 2026-07-15 | producción | respaldo restaurado; ensayo local 13/13; 26 eventos, 21 contribuciones, 10 servicios, 0 asistencias inferidas, mapeos exactos, FKs, índices, unicidad y cascada verificados en Turso | restaurar `backups/curriculum-2026-07-15-2026.sql` (retirar las columnas añadidas requiere reconstruir las tablas en SQLite) |
 
 ## 25. Preguntas que deben resolverse durante la Fase 0
 

@@ -2,6 +2,7 @@
 	import { page } from '$app/state';
 	import type { ActionData, PageData } from './$types';
 	import EntityForm from '$lib/components/admin/EntityForm.svelte';
+	import FundingRelations from '$lib/components/admin/FundingRelations.svelte';
 	import AdminToast from '$lib/components/AdminToast.svelte';
 
 	let { data, form }: { data: PageData; form: ActionData } = $props();
@@ -22,8 +23,10 @@
 		if (form.portada !== undefined)
 			return {
 				message: form.portada ? 'Añadida a la portada.' : 'Retirada de la portada.',
-				success: true
+				 success: true
 			};
+		if (form.relationMessage)
+			return { message: form.relationMessage, success: form.relationSuccess === true };
 		if (form.eliminarError) return { message: form.eliminarError, success: false };
 		if (form.errors)
 			return { message: 'Revisa los campos marcados; no se ha guardado.', success: false };
@@ -118,6 +121,63 @@
 		</div>
 	</div>
 </section>
+
+{#if data.hasStructuralRelations}
+	<section aria-labelledby="structural-title">
+		<h2 id="structural-title">Relaciones estructurales</h2>
+		<p class="section-intro">
+			Estas relaciones proceden de los campos del contenido relacionado. Para cambiarlas, edita
+			la entrada correspondiente y modifica su selector.
+		</p>
+		<div class="relation-groups">
+			{#each data.structuralRelations as group (group.entityType)}
+				<article class="relation-group">
+					<header>
+						<div>
+							<h3>{group.label}</h3>
+							<p>{group.description}</p>
+						</div>
+						<strong>{group.items.length}</strong>
+					</header>
+					{#if group.items.length > 0}
+						<ul class="structural-list">
+							{#each group.items as item (`${item.entityType}:${item.entityId}`)}
+								<li>
+									<a href={`/admin/entradas/${item.entityType}/${item.entityId}`}>
+										<span>{item.title}</span>
+										<small>{item.sortDate ?? 'Sin fecha'}</small>
+									</a>
+									<span class="relation-state" class:public={item.isPublic}>
+										{item.isPublic ? 'Pública' : 'Privada'}
+									</span>
+								</li>
+							{/each}
+						</ul>
+					{:else}
+						<p class="empty-relation">No hay entradas vinculadas.</p>
+					{/if}
+				</article>
+			{/each}
+		</div>
+	</section>
+{/if}
+
+{#if data.canonicalEvent}
+	<section aria-labelledby="canonical-event-title">
+		<h2 id="canonical-event-title">Evento compartido</h2>
+		<p>
+			Esta actividad pertenece a
+			<a class="canonical-event-link" href={`/admin/eventos/${data.canonicalEvent.id}`}>
+				{data.canonicalEvent.title}
+			</a>.
+			Desde su ficha puedes ver los demás roles, incluida la asistencia privada.
+		</p>
+	</section>
+{/if}
+
+{#if data.fundingRelations}
+	<FundingRelations editor={data.fundingRelations} />
+{/if}
 
 <section aria-labelledby="portfolio-title">
 	<h2 id="portfolio-title">Fichas del portfolio</h2>
@@ -315,6 +375,10 @@
 		color: #d4d4d4;
 	}
 
+	.canonical-event-link {
+		color: #00ff88;
+	}
+
 	.portfolio-relations span {
 		color: #d6a84b;
 		font-size: 0.65rem;
@@ -328,10 +392,115 @@
 		font-size: 0.78rem;
 	}
 
+	.section-intro {
+		margin: -0.5rem 0 1rem;
+	}
+
+	.relation-groups {
+		display: grid;
+		grid-template-columns: repeat(2, minmax(0, 1fr));
+		gap: 1rem;
+	}
+
+	.relation-group {
+		min-width: 0;
+		border: 1px solid #262626;
+		background: #0d0d0d;
+	}
+
+	.relation-group > header {
+		display: flex;
+		justify-content: space-between;
+		gap: 1rem;
+		padding: 1rem;
+		border-bottom: 1px solid #262626;
+	}
+
+	.relation-group h3 {
+		margin: 0;
+		color: #e5e5e5;
+		font-size: 0.82rem;
+	}
+
+	.relation-group header p {
+		margin: 0.35rem 0 0;
+		color: #737373;
+		font-size: 0.7rem;
+		line-height: 1.45;
+	}
+
+	.relation-group header strong {
+		color: #00ff88;
+		font-size: 0.8rem;
+		font-weight: 500;
+	}
+
+	.structural-list {
+		margin: 0;
+		padding: 0;
+		list-style: none;
+	}
+
+	.structural-list li {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		gap: 0.75rem;
+		padding: 0.75rem 1rem;
+		border-bottom: 1px solid #262626;
+	}
+
+	.structural-list li:last-child {
+		border-bottom: 0;
+	}
+
+	.structural-list a {
+		display: grid;
+		min-width: 0;
+		gap: 0.25rem;
+		color: #d4d4d4;
+		font-size: 0.76rem;
+		line-height: 1.35;
+	}
+
+	.structural-list a:hover {
+		color: #00ff88;
+	}
+
+	.structural-list small {
+		color: #737373;
+		font-size: 0.65rem;
+	}
+
+	.relation-state {
+		flex: 0 0 auto;
+		color: #a3a3a3;
+		font-size: 0.6rem;
+		letter-spacing: 0.05em;
+		text-transform: uppercase;
+	}
+
+	.relation-state.public {
+		color: #00ff88;
+	}
+
+	.empty-relation {
+		margin: 0;
+		padding: 1rem;
+		color: #737373;
+		font-size: 0.75rem;
+	}
+
 	section p {
 		color: #a3a3a3;
 		max-width: 60ch;
 		line-height: 1.6;
+	}
+
+	@media (max-width: 720px) {
+		.relation-groups {
+			grid-template-columns: 1fr;
+		}
 	}
 
 	.danger {

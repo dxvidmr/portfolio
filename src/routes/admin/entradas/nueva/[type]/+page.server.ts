@@ -8,16 +8,25 @@ import {
 } from '$lib/server/admin/entity-definitions';
 import { parseEntityForm } from '$lib/server/admin/validation';
 import { createEntity, getFieldOptions, validateReferences } from '$lib/server/admin/crud';
+import { getCanonicalEventDefaults } from '$lib/server/admin/events';
 
-export const load: PageServerLoad = async ({ locals, params }) => {
+export const load: PageServerLoad = async ({ locals, params, url }) => {
 	await requireAdmin(locals);
 	if (!isFormEntityType(params.type)) error(404, 'Tipo de entrada no soportado');
+
+	const eventId = Number(url.searchParams.get('eventId'));
+	const initialValues =
+		Number.isSafeInteger(eventId) && eventId > 0 &&
+		(params.type === 'academic_events' || params.type === 'service_activities')
+			? await getCanonicalEventDefaults(eventId, params.type)
+			: {};
 
 	return {
 		entityType: params.type,
 		typeLabel: entityDefinitions[params.type],
 		fields: entityForms[params.type].fields,
-		options: await getFieldOptions(params.type)
+		options: await getFieldOptions(params.type),
+		initialValues
 	};
 };
 
