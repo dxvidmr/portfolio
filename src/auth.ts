@@ -8,20 +8,27 @@ import {
 	ADMIN_GITHUB_ID
 } from '$env/static/private';
 
+// Vercel conserva literalmente los espacios de borde de las variables de
+// entorno. Normalizarlas aquí evita generar credenciales OAuth inválidas.
+const authSecret = AUTH_SECRET.trim();
+const githubClientId = AUTH_GITHUB_ID.trim();
+const githubClientSecret = AUTH_GITHUB_SECRET.trim();
+const adminGitHubId = ADMIN_GITHUB_ID.trim();
+
 // Autenticación del dashboard privado (plan §8): GitHub OAuth con sesión JWT en
 // cookie, sin adaptador de base de datos. Solo puede iniciar sesión el ID numérico
 // inmutable de ADMIN_GITHUB_ID; cualquier otra cuenta de GitHub se rechaza.
 export const { handle: authHandle, signIn, signOut } = SvelteKitAuth({
-	secret: AUTH_SECRET,
+	secret: authSecret,
 	trustHost: true,
 	providers: [
 		GitHub({
-			clientId: AUTH_GITHUB_ID,
-			clientSecret: AUTH_GITHUB_SECRET
+			clientId: githubClientId,
+			clientSecret: githubClientSecret
 		})
 	],
 	callbacks: {
-		signIn: ({ profile }) => String(profile?.id) === ADMIN_GITHUB_ID,
+		signIn: ({ profile }) => String(profile?.id) === adminGitHubId,
 		jwt({ token, profile }) {
 			if (profile?.id != null) token.githubId = String(profile.id);
 			return token;
@@ -38,4 +45,4 @@ export const { handle: authHandle, signIn, signOut } = SvelteKitAuth({
 // Comprobación única de autorización: usarla en la guardia de hooks, en los
 // layouts de /admin y dentro de cada acción de servidor sensible.
 export const isAdmin = (session: Session | null): boolean =>
-	session?.user?.githubId === ADMIN_GITHUB_ID;
+	session?.user?.githubId === adminGitHubId;
