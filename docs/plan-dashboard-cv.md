@@ -1,7 +1,7 @@
 # Plan persistente: índice transversal automático y dashboard privado del CV
 
 > Última actualización: 2026-07-15  
-> Estado general: **Fases 0 y 1 completadas y desplegadas; Fase 2 implementada y verificada en local — pendiente prueba de login real y despliegue**  
+> Estado general: **Fases 0–2 completadas y verificadas en producción; Fase 3 implementada en local — pendiente prueba editorial real y despliegue**
 > Fuente de verdad: **Turso**. `db/cv-data.json` es histórico y no debe sincronizar contenido.  
 > Propósito: este documento debe permitir retomar el trabajo en sesiones distintas sin reconstruir decisiones ni contexto.
 
@@ -451,7 +451,9 @@ El dashboard será español únicamente y no se incluirá en el selector de idio
   Vocabulario de tipos (`type_vocab`), etiquetas, enlaces y documentos; el vocabulario llega con la Fase 4, el resto en fase posterior
 ```
 
-No se crearán endpoints JSON públicos si una acción de formulario de SvelteKit resuelve el caso.
+No se crearán endpoints JSON públicos si una acción de formulario de SvelteKit resuelve el caso. Las
+acciones editoriales se mejoran progresivamente con `use:enhance`: escriben en la BD mediante `fetch`,
+pero no navegan ni recargan la página.
 
 ## 10. Organización interna del código
 
@@ -616,9 +618,11 @@ Filtros:
 ### Curación `/admin/portada`
 
 - Lista exclusiva de `show_home = 1`.
-- Reordenación mediante controles accesibles “subir/bajar”; arrastrar puede añadirse después.
+- Reordenación local mediante controles accesibles “subir/bajar”; arrastrar puede añadirse después.
+- Las flechas solo cambian el borrador visible. El orden completo se persiste en una única escritura al
+  pulsar «Guardar orden», sin recargar la página.
 - Vista previa de tipo, título y fecha.
-- Desactivar sin eliminar.
+- Desactivar sin eliminar y sin perder el contexto actual de la interfaz.
 - Sin límite editorial: la portada muestra todas las entradas activadas (decisión 13). La pantalla lista las ocho actuales completas, con su orden.
 - Advertencia si no hay entradas seleccionadas y se activará el fallback público.
 
@@ -824,14 +828,14 @@ Criterio de aceptación:
 
 ### Fase 2 — Autenticación y shell privado
 
-Estado: `en curso` — código completo y verificado en local (smoke test sin login real); falta la prueba de login del administrador y el despliegue
+Estado: `completado` — login real verificado en producción con el administrador permitido
 
 - [x] Instalar y configurar Auth.js (`@auth/sveltekit@1.11.2`).
 - [x] Integrar GitHub OAuth y allowlist (detalle en §8).
 - [x] Proteger `/admin` (hooks + layout; GET y POST sin sesión rechazados, verificado).
 - [x] Crear layout administrativo (`/admin`: shell mono con nav, sesión y zonas pendientes marcadas).
 - [x] Añadir cierre de sesión y `noindex` (meta + `X-Robots-Tag` verificada en `/auth/signin`).
-- [ ] Prueba de login real: entrar con `dxvidmr` en local y en producción; comprobar rechazo de terceros.
+- [x] Prueba de login real: entrada correcta con `dxvidmr` en producción; allowlist por ID confirmada mediante el rechazo previo cuando el ID de entorno no coincidía.
 
 Criterio de aceptación:
 
@@ -839,13 +843,18 @@ Criterio de aceptación:
 
 ### Fase 3 — Índice y controles editoriales
 
-Estado: `pendiente`
+Estado: `en curso` — implementación completa y consultas de producción validadas en solo lectura; falta prueba visual y de mutaciones reales
 
-- [ ] Crear listado transversal.
-- [ ] Añadir búsqueda y filtros.
-- [ ] Añadir interruptores público/portada.
-- [ ] Añadir orden accesible de portada.
-- [ ] Añadir feedback y manejo de errores.
+- [x] Crear listado transversal.
+- [x] Añadir búsqueda y filtros.
+- [x] Añadir interruptores público/portada.
+- [x] Añadir orden accesible de portada.
+- [x] Añadir feedback y manejo de errores.
+- [x] Ejecutar búsqueda y filtros en memoria, sin peticiones ni navegación por cada cambio.
+- [x] Mejorar interruptores y acciones de portada para persistir por `fetch` sin recargar la página.
+- [x] Acumular la reordenación en cliente y guardar el orden completo solo al confirmarlo.
+- [x] Mostrar el resultado de las acciones como toast flotante y temporal, no como aviso fijo en el flujo
+  de la página (3,5 s para éxito; 6 s para error; cierre manual y `aria-live`).
 
 Criterio de aceptación:
 
@@ -986,6 +995,10 @@ El proyecto se considera completado cuando:
 | 2026-07-15 | Planificación | Decisión 16: los campos `*_type` pasan a FK contra vocabulario controlado `type_vocab` con traducciones en BD (nueva sección 5.5; migración prevista `004`; cierra la pregunta 7). Selectores y web pública leerán del vocabulario; `entitySubtypeLabels` se retirará de `labels.ts`; Fase 4 y `/admin/taxonomias` actualizadas | Solo documento | Completar Fase 0 (respaldo, huérfanos, valor sucio) y arrancar Fase 1 con la migración `002` |
 | 2026-07-15 | Fases 0 y 1 — ejecución | Fase 0 completada: respaldo verificado por restauración local (`backups/`, en gitignore), 0 huérfanos, 4 valores sucios corregidos (filas manuales #20 y #7). Fase 1 completada: runner `scripts/migrate.ts` + `npm run migrate`; migración `002` ensayada en local (23/23) y aplicada en producción (90 controles públicos, `home_order` 10–80, vista `entries` compatible, `entries_legacy` conservada); `/cv` con visibilidad vía vista y portada sin `LIMIT 5` | 10 comprobaciones en producción; `npm run check` 0 errores; `npm run build` OK; consultas reales de portada (8 en orden) y CV (todo visible) verificadas | Commit + push para desplegar a Vercel y verificar portada/CV/fichas desplegadas; después Fase 2: crear app OAuth de GitHub (callback local y producción) y pasar `AUTH_*`/`ADMIN_GITHUB_ID` |
 | 2026-07-15 | Fase 2 — implementación | Auth.js + GitHub OAuth con allowlist por ID numérico (`src/auth.ts`, helper `isAdmin`); guardia por prefijo en hooks + defensa en `+layout.server.ts`; `/admin` y `/auth` excluidos de Paraglide en `vite.config.ts`; `noindex` en handle previo a Auth.js (sus respuestas cortocircuitan `resolve()`); shell `/admin` con nav, sesión y acción `salir`; `.env.example` actualizado (fuera `ADMIN_USERNAME/PASSWORD` obsoletos); guía operativa en `docs/guia-fase2-oauth.md`; primer deploy a Vercel resuelto (las `TURSO_*` deben existir antes del build por `$env/static/private`); dominio `davidmerinorecalde.com` | `npm run check` y `build` en verde; smoke test local: `/admin` sin sesión → 303 signin, POST sin sesión rechazado, `/auth/signin` 200 + noindex, `/`, `/es`, `/en`, `/es/cv` intactos. Sin probar aún: login real (requiere navegador) | El autor: reiniciar su dev server (vite.config cambió), probar login en `localhost:5173/admin`, commit + push y probar `davidmerinorecalde.com/admin`. Después: Fase 3 (índice transversal y controles editoriales) |
+| 2026-07-15 | Fase 2 — cierre + Fase 3 — implementación | Login real de GitHub completado en producción; credenciales normalizadas con `trim()` y `handleNoindex` adaptado a respuestas de redirección con cabeceras inmutables. Implementados resumen administrativo, índice transversal con filtros de texto/tipo/año/estado/portada/relaciones, controles público/portada, curación completa y orden accesible subir/bajar; acciones con allowlist, parámetros SQL y reautorización. | OAuth real confirmado por el autor; consulta Turso de solo lectura: 90 entradas, 90 públicas, 8 en portada y relaciones accesibles; `npm run check` 0 errores/avisos; `npm run build` OK; revisión UTF-8 sin mojibake. | Revisar visualmente `/admin`, probar una mutación reversible (quitar/añadir una entrada de portada y moverla), desplegar y confirmar que la portada pública refleja el orden. |
+| 2026-07-15 | Fase 3 — interacción sin recargas | El índice carga una instantánea completa y aplica búsqueda/filtros en memoria; los controles público/portada usan acciones mejoradas con actualización optimista y rollback; la portada acumula los movimientos localmente y persiste el orden completo solo con «Guardar orden». Quitar de portada también conserva la navegación y el estado local. | `npm run check`: 0 errores y 0 avisos; `npm run build`: OK; revisión de mojibake limpia. | Prueba editorial local: conservar filtros al alternar controles, mover varias filas y comprobar que solo «Guardar orden» persiste; después desplegar. |
+| 2026-07-15 | Fase 3 — correcciones de controles | Corregido el callback de `use:enhance`, que retenía el primer valor sí/no porque la acción no actualiza su parámetro tras montarse: ahora calcula la orden desde el estado vivo en cada envío. Cada mutación devuelve una lectura autoritativa de Turso y la UI se reconcilia con ella. Despublicar limpia portada y CV; desactivar solo portada usa un `UPDATE` directo. El dashboard desactiva el precargado de datos en sus enlaces y `/admin/entradas` y `/admin/portada` responden `private, no-store`, de modo que cambiar de sección ejecuta una carga fresca. | Consulta Turso de solo lectura: el intento anterior dejó 9 entradas activas; `npm run check`: 0 errores y 0 avisos; `npm run build`: OK. | Confirmar varios ciclos «Portada: Sí ↔ No» sin navegar y después entrar en `/admin/portada` para verificar la misma selección. |
+| 2026-07-15 | Fase 3 — feedback temporal | Creado `AdminToast.svelte` y sustituido el feedback fijo de Entradas y Portada por notificaciones flotantes: éxito 3,5 s, error 6 s, cierre manual, animación breve y semántica accesible `status`/`alert` con `aria-live`. | `npm run check`: 0 errores y 0 avisos; `npm run build`: OK. | Revisar posición y duración del toast en escritorio y móvil durante la prueba editorial. |
 
 ## 24. Registro de migraciones en Turso
 
@@ -1007,4 +1020,3 @@ Estas preguntas no bloquean la aprobación del plan, pero deben cerrarse antes d
 5. ¿`featured_cv` tendrá un efecto visible en el CV o se ocultará hasta una fase posterior? Recomendación: ocultarlo inicialmente.
 6. ¿Se mantiene el fallback automático de “Actividad reciente” cuando no hay `show_home`? Recomendación: sí, con aviso en el dashboard.
 7. ¿Deben las traducciones de los tipos (`book`, `book_review`, `predoctoral_contract`…) seguir en `labels.ts` o moverse a BD? **Resuelto 2026-07-15 (decisión 16)**: los campos `*_type` pasan a FK contra `type_vocab` con traducciones en BD (sección 5.5); `labels.ts` queda solo para los nombres de entidad. `tags`/`entity_tags` siguen reservadas para clasificación temática transversal, sin consumidor actual.
-

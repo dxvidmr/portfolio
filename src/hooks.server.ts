@@ -24,7 +24,16 @@ const handleNoindex: Handle = async ({ event, resolve }) => {
 	const response = await resolve(event);
 	const path = event.url.pathname;
 	if (path === '/admin' || path.startsWith('/admin/') || path === '/auth' || path.startsWith('/auth/')) {
-		response.headers.set('X-Robots-Tag', 'noindex, nofollow');
+		// Auth.js puede devolver Response.redirect(), cuyas cabeceras son
+		// inmutables. Crear una respuesta nueva conserva la redirección y permite
+		// añadir noindex sin provocar `TypeError: immutable`.
+		const headers = new Headers(response.headers);
+		headers.set('X-Robots-Tag', 'noindex, nofollow');
+		return new Response(response.body, {
+			status: response.status,
+			statusText: response.statusText,
+			headers
+		});
 	}
 	return response;
 };

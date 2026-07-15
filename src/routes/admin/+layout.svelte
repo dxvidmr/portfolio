@@ -7,8 +7,8 @@
 
 	const links = [
 		{ href: '/admin', label: 'Resumen', ready: true },
-		{ href: '/admin/entradas', label: 'Entradas', ready: false },
-		{ href: '/admin/portada', label: 'Portada', ready: false }
+		{ href: '/admin/entradas', label: 'Entradas', ready: true },
+		{ href: '/admin/portada', label: 'Portada', ready: true }
 	];
 </script>
 
@@ -22,7 +22,11 @@
 		<nav aria-label="Secciones del dashboard">
 			{#each links as link (link.href)}
 				{#if link.ready}
-					<a href={link.href} aria-current={page.url.pathname === link.href ? 'page' : undefined}>
+					<a
+						href={link.href}
+						data-sveltekit-preload-data="off"
+						aria-current={page.url.pathname === link.href ? 'page' : undefined}
+					>
 						{link.label}
 					</a>
 				{:else}
@@ -138,7 +142,23 @@
 
 	main {
 		padding: 2rem 1.5rem;
-		max-width: 72rem;
+		max-width: 88rem;
 		margin: 0 auto;
+	}
+
+	@media (max-width: 720px) {
+		header {
+			gap: 1rem;
+			padding-inline: 1rem;
+		}
+
+		.session {
+			width: 100%;
+			margin-left: 0;
+		}
+
+		main {
+			padding: 1.5rem 1rem;
+		}
 	}
 </style>
