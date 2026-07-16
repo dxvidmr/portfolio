@@ -5,6 +5,12 @@
 
 	let { locale }: { locale: Locale } = $props();
 	const reveal = createReveal();
+	const headingClass = 'tw:m-0 tw:font-[450] tw:tracking-[-0.04em]';
+	const bodyClass = 'tw:text-ink-dim tw:leading-[1.68]';
+	const labelClass = 'meta tw:mt-0 tw:mb-4 tw:text-accent-strong';
+	const sectionHeadingClass = `${headingClass} tw:text-[clamp(2.2rem,4.7vw,4.8rem)] tw:leading-[0.94]`;
+	const catalogueLineWidths = ['100%', '73%', '88%', '57%'];
+	const profileBarHeights = ['35%', '82%', '55%', '100%', '68%'];
 
 	const copy = $derived(locale === 'es' ? {
 		introLabel: 'Verso dramático · datos · comparación',
@@ -80,160 +86,109 @@
 
 </script>
 
-<section class="versologia-story">
-	<article class="opening" use:reveal>
-		<div class="opening-copy">
-			<p class="meta label">{copy.introLabel}</p>
-			<h3>{copy.introTitle}</h3>
-			<p>{copy.introBody}</p>
+<section class="tw:grid tw:gap-[clamp(90px,14vw,210px)] tw:border-t tw:border-rule-strong tw:py-[clamp(76px,11vw,150px)]">
+	<article class="tw:grid tw:grid-cols-[minmax(0,1.2fr)_minmax(280px,.8fr)] tw:items-end tw:gap-[clamp(50px,9vw,130px)] tw:max-[850px]:grid-cols-1" use:reveal>
+		<div class="tw:max-w-[780px]">
+			<p class={labelClass}>{copy.introLabel}</p>
+			<h3 class="{headingClass} tw:max-w-[12ch] tw:text-[clamp(2.8rem,6.5vw,6.5rem)] tw:leading-[0.9]">{copy.introTitle}</h3>
+			<p class="{bodyClass} tw:mt-7 tw:mb-0 tw:max-w-[66ch]">{copy.introBody}</p>
 		</div>
-		<ol class="data-levels">
+		<ol class="tw:m-0 tw:list-none tw:border-t tw:border-rule-strong tw:p-0">
 			{#each copy.levels as level, index (level)}
-				<li><span class="meta">0{index + 1}</span><strong>{level}</strong></li>
+				<li class="tw:grid tw:grid-cols-[42px_1fr] tw:gap-3.5 tw:border-b tw:border-rule tw:py-3.5">
+					<span class="meta tw:text-ink-faint">0{index + 1}</span>
+					<strong class="tw:font-title tw:text-[1.05rem] tw:font-[450]">{level}</strong>
+				</li>
 			{/each}
 		</ol>
 	</article>
 
-	<div class="cover" use:reveal>
+	<div class="tw:mx-auto tw:w-[min(94%,1500px)] tw:max-[600px]:w-full" use:reveal>
 		<ProjectFigure src="/images/projects/versologia/portada.webp" alt={copy.coverAlt} caption={copy.coverCaption} number="01" priority />
 	</div>
 
-	<article class="model" use:reveal>
-		<div class="model-copy">
-			<p class="meta label">{copy.modelLabel}</p>
-			<h3>{copy.modelTitle}</h3>
-			<p>{copy.modelBody}</p>
+	<article class="tw:grid tw:grid-cols-12 tw:items-end tw:gap-[clamp(30px,5vw,76px)] tw:max-[600px]:block tw:[&>figure]:col-span-full tw:[&>figure]:row-start-2 tw:max-[600px]:[&>figure]:mt-[38px]" use:reveal>
+		<div class="tw:col-start-7 tw:col-span-5 tw:row-start-1 tw:mb-2 tw:max-w-[610px] tw:max-[850px]:col-start-2 tw:max-[850px]:col-span-10">
+			<p class={labelClass}>{copy.modelLabel}</p>
+			<h3 class={sectionHeadingClass}>{copy.modelTitle}</h3>
+			<p class="{bodyClass} tw:mt-[23px] tw:mb-0">{copy.modelBody}</p>
 		</div>
 		<ProjectFigure src="/images/projects/versologia/dashboard.webp" alt={copy.dashboardAlt} caption={copy.dashboardCaption} number="02" />
 	</article>
 
-	<article class="public-view" use:reveal>
-		<div class="public-copy">
-			<p class="meta label">{copy.publicLabel}</p>
-			<h3>{copy.publicTitle}</h3>
-			<p>{copy.publicBody}</p>
+	<article class="tw:grid tw:grid-cols-[minmax(290px,.72fr)_minmax(0,1.28fr)] tw:items-center tw:gap-[clamp(44px,7vw,110px)] tw:max-[850px]:grid-cols-1" use:reveal>
+		<div class="tw:max-w-[570px]">
+			<p class={labelClass}>{copy.publicLabel}</p>
+			<h3 class={sectionHeadingClass}>{copy.publicTitle}</h3>
+			<p class="{bodyClass} tw:mt-[23px] tw:mb-0">{copy.publicBody}</p>
 		</div>
 		<ProjectFigure src="/images/projects/versologia/ficha-obra.webp" alt={copy.workAlt} caption={copy.workCaption} number="03" />
 	</article>
 
-	<article class="authorship" use:reveal>
-		<p class="meta label">{copy.authorshipLabel}</p>
+	<article class="tw:grid tw:grid-cols-[130px_minmax(0,.9fr)_minmax(360px,1.1fr)] tw:items-start tw:gap-[clamp(30px,6vw,90px)] tw:border-y tw:border-rule-strong tw:py-[clamp(54px,8vw,96px)] tw:max-[850px]:grid-cols-1" use:reveal>
+		<p class="meta tw:mt-[7px] tw:mb-0 tw:text-accent-strong">{copy.authorshipLabel}</p>
 		<div>
-			<h3>{copy.authorshipTitle}</h3>
-			<p>{copy.authorshipBody}</p>
+			<h3 class="{headingClass} tw:text-[clamp(2rem,4vw,4rem)] tw:leading-[0.95]">{copy.authorshipTitle}</h3>
+			<p class="{bodyClass} tw:mt-[22px] tw:mb-0 tw:max-w-[62ch]">{copy.authorshipBody}</p>
 		</div>
-		<div class="attribution-flow meta" aria-hidden="true">
-			<span>OBRA / JORNADA</span><i></i><span>PROPUESTA</span><i></i><span>EVIDENCIAS</span><i></i><b>PERFIL</b>
+		<div class="meta tw:grid tw:grid-cols-[auto_1fr] tw:items-center tw:gap-x-3.5 tw:gap-y-[9px] tw:text-ink-faint tw:max-[850px]:max-w-[560px] tw:max-[600px]:text-[0.5rem]" aria-hidden="true">
+			<span>OBRA / JORNADA</span><i class="tw:h-px tw:bg-rule-strong"></i>
+			<span>PROPUESTA</span><i class="tw:h-px tw:bg-rule-strong"></i>
+			<span>EVIDENCIAS</span><i class="tw:h-px tw:bg-rule-strong"></i>
+			<b class="tw:font-semibold tw:text-accent-strong">PERFIL</b>
 		</div>
 	</article>
 
-	<section class="future" use:reveal>
-		<div class="future-copy">
-			<p class="meta label">{copy.futureLabel}</p>
-			<h3>{copy.futureTitle}</h3>
-			<p>{copy.futureBody}</p>
+	<section class="tw:grid tw:gap-[clamp(54px,8vw,110px)]" use:reveal>
+		<div class="tw:ml-[9%] tw:w-[min(720px,80%)] tw:max-[600px]:ml-0 tw:max-[600px]:w-full">
+			<p class={labelClass}>{copy.futureLabel}</p>
+			<h3 class={sectionHeadingClass}>{copy.futureTitle}</h3>
+			<p class="{bodyClass} tw:mt-[23px] tw:mb-0">{copy.futureBody}</p>
 		</div>
-		<div class="future-slots">
-			<div class="future-slot catalogue-slot">
-				<span class="meta">04 / {copy.catalogue}</span>
-				<div class="catalogue-lines" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
-				<p>{copy.catalogueNote}</p>
+		<div class="tw:grid tw:grid-cols-[1.12fr_.88fr] tw:items-start tw:gap-[clamp(26px,5vw,74px)] tw:max-[600px]:grid-cols-1">
+			<div class="tw:relative tw:grid tw:min-h-[clamp(260px,34vw,500px)] tw:overflow-hidden tw:border-y tw:border-t-rule-strong tw:border-b-rule tw:bg-[color-mix(in_srgb,var(--accent)_5%,transparent)] tw:p-[clamp(20px,3vw,38px)] tw:max-[600px]:min-h-[300px]">
+				<span class="meta tw:text-ink-faint">04 / {copy.catalogue}</span>
+				<div class="tw:absolute tw:top-[28%] tw:right-[8%] tw:left-[8%] tw:grid tw:gap-4" aria-hidden="true">
+					{#each catalogueLineWidths as width (width)}<i class="tw:h-px tw:bg-rule-strong" style={`width: ${width}`}></i>{/each}
+				</div>
+				<p class="tw:m-0 tw:self-end tw:font-title tw:text-[clamp(1.3rem,2.4vw,2.2rem)] tw:text-ink-dim tw:leading-[1.68]">{copy.catalogueNote}</p>
 			</div>
-			<div class="future-slot author-slot">
-				<span class="meta">05 / {copy.author}</span>
-				<div class="profile-bars" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></div>
-				<p>{copy.authorNote}</p>
+			<div class="tw:relative tw:mt-[clamp(70px,10vw,145px)] tw:grid tw:min-h-[clamp(260px,34vw,500px)] tw:overflow-hidden tw:border-y tw:border-t-rule-strong tw:border-b-rule tw:bg-[color-mix(in_srgb,var(--accent)_5%,transparent)] tw:p-[clamp(20px,3vw,38px)] tw:max-[600px]:mt-[10px] tw:max-[600px]:min-h-[300px]">
+				<span class="meta tw:text-ink-faint">05 / {copy.author}</span>
+				<div class="tw:absolute tw:top-[28%] tw:right-[12%] tw:left-[12%] tw:flex tw:h-[32%] tw:items-end tw:gap-[5%]" aria-hidden="true">
+					{#each profileBarHeights as height (height)}<i class="tw:flex-1 tw:rounded-t-ui-sm tw:bg-accent tw:opacity-[0.18]" style={`height: ${height}`}></i>{/each}
+				</div>
+				<p class="tw:m-0 tw:self-end tw:font-title tw:text-[clamp(1.3rem,2.4vw,2.2rem)] tw:text-ink-dim tw:leading-[1.68]">{copy.authorNote}</p>
 			</div>
 		</div>
 	</section>
 
-	<article class="laboratory" use:reveal>
-		<div class="lab-visual" aria-hidden="true">
-			{#each Array(25) as _, index}<i style={`--cell: ${((index * 37) % 82) + 12}%`}></i>{/each}
+	<article class="tw:grid tw:grid-cols-[minmax(300px,.85fr)_minmax(0,1.15fr)] tw:items-center tw:gap-[clamp(48px,9vw,140px)] tw:max-[850px]:grid-cols-1" use:reveal>
+		<div class="tw:grid tw:aspect-square tw:grid-cols-5 tw:gap-1 tw:rounded-ui tw:bg-[color-mix(in_srgb,var(--accent)_6%,var(--visual-bg))] tw:p-[8%]" aria-hidden="true">
+			{#each Array(25) as _, index}
+				<i class="tw:rounded-[2px] tw:bg-[color-mix(in_srgb,var(--accent-strong)_var(--cell),var(--visual-bg))]" style={`--cell: ${((index * 37) % 82) + 12}%`}></i>
+			{/each}
 		</div>
-		<div class="lab-copy">
-			<p class="meta label">{copy.labLabel}</p>
-			<h3>{copy.labTitle}</h3>
-			<p>{copy.labBody}</p>
-			<ul>{#each copy.methods as method (method)}<li>{method}</li>{/each}</ul>
+		<div class="tw:max-w-[650px]">
+			<p class={labelClass}>{copy.labLabel}</p>
+			<h3 class={sectionHeadingClass}>{copy.labTitle}</h3>
+			<p class="{bodyClass} tw:mt-[23px] tw:mb-0">{copy.labBody}</p>
+			<ul class="tw:mt-7 tw:mb-0 tw:flex tw:list-none tw:flex-wrap tw:gap-[7px] tw:p-0">
+				{#each copy.methods as method (method)}
+					<li class="tw:rounded-full tw:border tw:border-rule tw:px-[10px] tw:py-[7px] tw:font-mono tw:text-[0.58rem] tw:text-ink-faint">{method}</li>
+				{/each}
+			</ul>
 		</div>
 	</article>
 
-	<article class="role" use:reveal>
-		<p class="meta label">{copy.roleLabel}</p>
-		<h3>{copy.roleTitle}</h3>
-		<p>{copy.roleBody}</p>
-		<div class="stack meta">{#each copy.stack as item (item)}<span>{item}</span>{/each}</div>
+	<article class="tw:ml-auto tw:w-[min(76%,900px)] tw:border-t tw:border-rule-strong tw:pt-[clamp(52px,8vw,100px)] tw:max-[850px]:w-full" use:reveal>
+		<p class={labelClass}>{copy.roleLabel}</p>
+		<h3 class="{headingClass} tw:text-[clamp(2.4rem,5vw,5rem)] tw:leading-[0.92]">{copy.roleTitle}</h3>
+		<p class="{bodyClass} tw:mt-[25px] tw:mb-0 tw:max-w-[70ch]">{copy.roleBody}</p>
+		<div class="meta tw:mt-[30px] tw:flex tw:flex-wrap tw:gap-x-5 tw:gap-y-2 tw:text-ink-faint">
+			{#each copy.stack as item, index (item)}
+				<span class={index < copy.stack.length - 1 ? "tw:after:pl-5 tw:after:text-accent-strong tw:after:content-['/']" : ''}>{item}</span>
+			{/each}
+		</div>
 	</article>
 </section>
-
-<style>
-	.versologia-story { display: grid; gap: clamp(90px, 14vw, 210px); padding-block: clamp(76px, 11vw, 150px); border-top: 1px solid var(--line-strong); }
-	.versologia-story h3 { margin: 0; font-weight: 450; letter-spacing: -0.04em; }
-	.versologia-story p:not(.label) { color: var(--fg-dim); line-height: 1.68; }
-	.label { margin: 0 0 16px; color: var(--accent-strong); }
-	.opening { display: grid; grid-template-columns: minmax(0, 1.2fr) minmax(280px, .8fr); gap: clamp(50px, 9vw, 130px); align-items: end; }
-	.opening-copy { max-width: 780px; }
-	.opening h3 { max-width: 12ch; font-size: clamp(2.8rem, 6.5vw, 6.5rem); line-height: .9; }
-	.opening-copy > p:last-child { max-width: 66ch; margin: 28px 0 0; }
-	.data-levels { margin: 0; padding: 0; border-top: 1px solid var(--line-strong); list-style: none; }
-	.data-levels li { display: grid; grid-template-columns: 42px 1fr; gap: 14px; padding: 14px 0; border-bottom: 1px solid var(--line); }
-	.data-levels span { color: var(--fg-faint); }
-	.data-levels strong { font-family: var(--font-title); font-size: 1.05rem; font-weight: 450; }
-	.cover { width: min(94%, 1500px); margin-inline: auto; }
-	.model { display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); gap: clamp(30px, 5vw, 76px); align-items: end; }
-	.model-copy { grid-column: 7 / span 5; grid-row: 1; max-width: 610px; margin-bottom: 8px; }
-	.model > :global(figure) { grid-column: 1 / -1; grid-row: 2; }
-	.model h3, .public-view h3, .future h3, .laboratory h3 { font-size: clamp(2.2rem, 4.7vw, 4.8rem); line-height: .94; }
-	.model-copy > p:last-child, .public-copy > p:last-child, .future-copy > p:last-child, .lab-copy > p:not(.label) { margin: 23px 0 0; }
-	.public-view { display: grid; grid-template-columns: minmax(290px, .72fr) minmax(0, 1.28fr); gap: clamp(44px, 7vw, 110px); align-items: center; }
-	.public-copy { max-width: 570px; }
-	.authorship { display: grid; grid-template-columns: 130px minmax(0, .9fr) minmax(360px, 1.1fr); gap: clamp(30px, 6vw, 90px); align-items: start; padding-block: clamp(54px, 8vw, 96px); border-block: 1px solid var(--line-strong); }
-	.authorship .label { margin: 7px 0 0; }
-	.authorship h3 { font-size: clamp(2rem, 4vw, 4rem); line-height: .95; }
-	.authorship p:not(.label) { max-width: 62ch; margin: 22px 0 0; }
-	.attribution-flow { display: grid; grid-template-columns: auto 1fr; align-items: center; gap: 9px 14px; color: var(--fg-faint); }
-	.attribution-flow i { height: 1px; background: var(--line-strong); }
-	.attribution-flow b { color: var(--accent-strong); font-weight: 600; }
-	.future { display: grid; gap: clamp(54px, 8vw, 110px); }
-	.future-copy { width: min(720px, 80%); margin-left: 9%; }
-	.future-slots { display: grid; grid-template-columns: 1.12fr .88fr; gap: clamp(26px, 5vw, 74px); align-items: start; }
-	.future-slot { position: relative; display: grid; min-height: clamp(260px, 34vw, 500px); padding: clamp(20px, 3vw, 38px); overflow: hidden; border-top: 1px solid var(--line-strong); border-bottom: 1px solid var(--line); background: color-mix(in srgb, var(--accent) 5%, transparent); }
-	.future-slot > span { color: var(--fg-faint); }
-	.future-slot > p { align-self: end; margin: 0; font-family: var(--font-title); font-size: clamp(1.3rem, 2.4vw, 2.2rem); }
-	.author-slot { margin-top: clamp(70px, 10vw, 145px); }
-	.catalogue-lines { position: absolute; top: 28%; right: 8%; left: 8%; display: grid; gap: 16px; }
-	.catalogue-lines i { height: 1px; background: var(--line-strong); }
-	.catalogue-lines i:nth-child(2) { width: 73%; }.catalogue-lines i:nth-child(3) { width: 88%; }.catalogue-lines i:nth-child(4) { width: 57%; }
-	.profile-bars { position: absolute; top: 28%; right: 12%; left: 12%; display: flex; height: 32%; align-items: end; gap: 5%; }
-	.profile-bars i { flex: 1; height: 35%; border-radius: var(--radius-sm) var(--radius-sm) 0 0; background: var(--accent); opacity: .18; }
-	.profile-bars i:nth-child(2) { height: 82%; }.profile-bars i:nth-child(3) { height: 55%; }.profile-bars i:nth-child(4) { height: 100%; }.profile-bars i:nth-child(5) { height: 68%; }
-	.laboratory { display: grid; grid-template-columns: minmax(300px, .85fr) minmax(0, 1.15fr); gap: clamp(48px, 9vw, 140px); align-items: center; }
-	.lab-visual { display: grid; grid-template-columns: repeat(5, 1fr); gap: 4px; aspect-ratio: 1; padding: 8%; border-radius: var(--radius); background: color-mix(in srgb, var(--accent) 6%, var(--visual-bg)); }
-	.lab-visual i { border-radius: 2px; background: color-mix(in srgb, var(--accent-strong) var(--cell), var(--visual-bg)); }
-	.lab-copy { max-width: 650px; }
-	.lab-copy ul { display: flex; flex-wrap: wrap; gap: 7px; margin: 28px 0 0; padding: 0; list-style: none; }
-	.lab-copy li { padding: 7px 10px; border: 1px solid var(--line); border-radius: 999px; color: var(--fg-faint); font-family: var(--font-mono); font-size: .58rem; }
-	.role { width: min(76%, 900px); margin-left: auto; padding-top: clamp(52px, 8vw, 100px); border-top: 1px solid var(--line-strong); }
-	.role h3 { font-size: clamp(2.4rem, 5vw, 5rem); line-height: .92; }
-	.role > p:not(.label) { max-width: 70ch; margin: 25px 0 0; }
-	.stack { display: flex; flex-wrap: wrap; gap: 8px 20px; margin-top: 30px; color: var(--fg-faint); }
-	.stack span:not(:last-child)::after { padding-left: 20px; color: var(--accent-strong); content: '/'; }
-	@media (max-width: 850px) {
-		.opening, .public-view, .laboratory { grid-template-columns: 1fr; }
-		.model-copy { grid-column: 2 / span 10; }
-		.authorship { grid-template-columns: 1fr; }
-		.attribution-flow { max-width: 560px; }
-		.role { width: 100%; }
-	}
-	@media (max-width: 600px) {
-		.cover { width: 100%; }
-		.model { display: block; }
-		.model > :global(figure) { margin-top: 38px; }
-		.future-copy { width: 100%; margin-left: 0; }
-		.future-slots { grid-template-columns: 1fr; }
-		.author-slot { margin-top: 10px; }
-		.future-slot { min-height: 300px; }
-		.attribution-flow { font-size: .5rem; }
-	}
-</style>
