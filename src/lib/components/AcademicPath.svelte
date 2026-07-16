@@ -56,248 +56,82 @@
 	});
 </script>
 
-<section class="academic-path" bind:this={root}>
-	<div class="path-sticky">
-		<header>
-			<span class="meta tag">{copy.label}</span>
-			<h3>{copy.title}</h3>
+<section
+	class="tw:min-h-[max(680px,125vh)] tw:border-t tw:border-rule-strong tw:pt-[clamp(24px,4vw,44px)]"
+	bind:this={root}
+>
+	<div class="tw:sticky tw:top-[clamp(88px,13vh,126px)]">
+		<header
+			class="tw:flex tw:items-baseline tw:justify-between tw:gap-[18px] tw:max-[520px]:flex-col tw:max-[520px]:items-start"
+		>
+			<span class="meta">{copy.label}</span>
+			<h3
+				class="tw:font-title tw:text-[clamp(1.25rem,2.2vw,1.8rem)] tw:font-normal tw:leading-none tw:text-right tw:max-[520px]:text-left"
+			>
+				{copy.title}
+			</h3>
 		</header>
 
-		<div class="path-layout">
-			<ol class="steps">
+		<div
+			class="tw:grid tw:grid-cols-[minmax(210px,.9fr)_minmax(0,1.1fr)] tw:gap-[clamp(26px,4vw,54px)] tw:pt-[clamp(26px,4vw,42px)] tw:max-[940px]:grid-cols-1"
+		>
+			<ol
+				class="tw:relative tw:m-0 tw:grid tw:list-none tw:gap-[3px] tw:pt-0 tw:pr-0 tw:pb-0 tw:pl-[14px] tw:before:absolute tw:before:top-[11px] tw:before:bottom-[11px] tw:before:left-[3px] tw:before:w-px tw:before:bg-rule tw:before:content-['']"
+			>
 				{#each entries as entry, index (entry.period)}
-					<li class:is-active={selected === index}>
-						<button type="button" aria-pressed={selected === index} onclick={() => selectEntry(index)}>
-							<span class="period">{entry.period}</span>
-							<span class="degree">{entry.degree}</span>
+					<li
+						class={`tw:relative tw:before:absolute tw:before:top-[13px] tw:before:left-[-14px] tw:before:h-[7px] tw:before:w-[7px] tw:before:rounded-full tw:before:border tw:before:bg-canvas tw:before:content-[''] tw:before:[transition:background-color_180ms_ease,transform_180ms_ease] ${selected === index ? 'tw:before:scale-[1.45] tw:before:border-accent-strong tw:before:bg-accent' : 'tw:before:border-rule-strong'}`}
+					>
+						<button
+							class="tw:group tw:grid tw:w-full tw:cursor-pointer tw:grid-cols-[82px_minmax(0,1fr)] tw:gap-2.5 tw:rounded-ui-sm tw:border-0 tw:bg-transparent tw:py-2 tw:pr-0 tw:pl-2.5 tw:text-left tw:[transition:color_160ms_ease] tw:max-[520px]:grid-cols-[76px_minmax(0,1fr)]"
+							type="button"
+							aria-pressed={selected === index}
+							onclick={() => selectEntry(index)}
+						>
+							<span
+								class="tw:text-[0.68rem] tw:text-ink-faint tw:uppercase tw:[font-variant-numeric:tabular-nums]"
+							>
+								{entry.period}
+							</span>
+							<span
+								class={`tw:text-[0.76rem] tw:leading-[1.35] tw:group-hover:text-accent-strong ${selected === index ? 'tw:text-accent-strong' : 'tw:text-ink-dim'}`}
+							>
+								{entry.degree}
+							</span>
 						</button>
 					</li>
 				{/each}
 			</ol>
 
-			<div class="detail-stage">
-				<span class="detail-rail" aria-hidden="true"></span>
+			<div
+				class="tw:relative tw:min-h-[138px] tw:overflow-hidden tw:pl-6 tw:[perspective:760px]"
+			>
+				<span
+					class="tw:pointer-events-none tw:absolute tw:top-0.5 tw:bottom-0.5 tw:left-0 tw:z-[2] tw:w-0.5 tw:rounded-[2px] tw:bg-accent"
+					aria-hidden="true"
+				></span>
 				{#key active.period}
-					<article class="path-detail" class:is-reverse={direction < 0}>
-						<p class="meta">{active.period}</p>
-						<h4>{active.degree}</h4>
-						<p>{active.institution}</p>
-						<small>{active.detail}</small>
+					<article
+						class={`tw:relative tw:z-[1] tw:min-h-[138px] tw:py-0.5 tw:[backface-visibility:hidden] tw:motion-reduce:animate-none ${direction < 0 ? 'tw:origin-[50%_0] tw:[animation:academic-cube-previous_900ms_cubic-bezier(.16,1,.3,1)_both]' : 'tw:origin-[50%_100%] tw:[animation:academic-cube-next_900ms_cubic-bezier(.16,1,.3,1)_both]'}`}
+					>
+						<p class="meta tw:m-0 tw:block tw:text-[0.74rem] tw:leading-[1.45] tw:text-ink-dim">
+							{active.period}
+						</p>
+						<h4
+							class="tw:mt-[5px] tw:mb-2 tw:font-title tw:text-[clamp(1.1rem,1.7vw,1.35rem)] tw:font-medium tw:leading-[1.2]"
+						>
+							{active.degree}
+						</h4>
+						<p class="tw:m-0 tw:block tw:text-[0.74rem] tw:leading-[1.45] tw:text-ink-dim">
+							{active.institution}
+						</p>
+						<small
+							class="tw:mt-[7px] tw:block tw:text-[0.74rem] tw:leading-[1.45] tw:text-ink-faint"
+							>{active.detail}</small
+						>
 					</article>
 				{/key}
 			</div>
 		</div>
 	</div>
 </section>
-
-<style>
-	.academic-path {
-		min-height: max(680px, 125vh);
-		padding-top: clamp(24px, 4vw, 44px);
-		border-top: 1px solid var(--line-strong);
-	}
-
-	.path-sticky {
-		position: sticky;
-		top: clamp(88px, 13vh, 126px);
-	}
-
-	header {
-		display: flex;
-		align-items: baseline;
-		justify-content: space-between;
-		gap: 18px;
-	}
-
-	header h3 {
-		font-family: var(--font-title);
-		font-size: clamp(1.25rem, 2.2vw, 1.8rem);
-		font-weight: 400;
-		line-height: 1;
-		text-align: right;
-	}
-
-	.path-layout {
-		display: grid;
-		grid-template-columns: minmax(210px, 0.9fr) minmax(0, 1.1fr);
-		gap: clamp(26px, 4vw, 54px);
-		padding-top: clamp(26px, 4vw, 42px);
-	}
-
-	.steps {
-		position: relative;
-		display: grid;
-		gap: 3px;
-		margin: 0;
-		padding: 0 0 0 14px;
-		list-style: none;
-	}
-
-	.steps::before {
-		position: absolute;
-		top: 11px;
-		bottom: 11px;
-		left: 3px;
-		width: 1px;
-		background: var(--line);
-		content: '';
-	}
-
-	.steps li {
-		position: relative;
-	}
-
-	.steps li::before {
-		position: absolute;
-		top: 13px;
-		left: -14px;
-		width: 7px;
-		height: 7px;
-		border: 1px solid var(--line-strong);
-		border-radius: 50%;
-		background: var(--bg);
-		content: '';
-		transition:
-			background-color 180ms ease,
-			transform 180ms ease;
-	}
-
-	.steps li.is-active::before {
-		border-color: var(--accent-strong);
-		background: var(--accent);
-		transform: scale(1.45);
-	}
-
-	button {
-		display: grid;
-		grid-template-columns: 82px minmax(0, 1fr);
-		gap: 10px;
-		width: 100%;
-		padding: 8px 0 8px 10px;
-		border: 0;
-		border-radius: var(--radius-sm);
-		background: transparent;
-		text-align: left;
-		cursor: pointer;
-		transition: color 160ms ease;
-	}
-
-	button:hover .degree,
-	.is-active .degree {
-		color: var(--accent-strong);
-	}
-
-	.period {
-		color: var(--fg-faint);
-		font-size: 0.68rem;
-		font-variant-numeric: tabular-nums;
-		text-transform: uppercase;
-	}
-
-	.degree {
-		color: var(--fg-dim);
-		font-size: 0.76rem;
-		line-height: 1.35;
-	}
-
-	.detail-stage {
-		position: relative;
-		min-height: 138px;
-		padding-left: 24px;
-		overflow: hidden;
-		perspective: 760px;
-	}
-
-	.detail-rail {
-		position: absolute;
-		top: 2px;
-		bottom: 2px;
-		left: 0;
-		z-index: 2;
-		width: 2px;
-		border-radius: 2px;
-		background: var(--accent);
-		pointer-events: none;
-	}
-
-	.path-detail {
-		position: relative;
-		z-index: 1;
-		min-height: 138px;
-		padding: 2px 0;
-		backface-visibility: hidden;
-		transform-origin: 50% 100%;
-		animation: cube-next 900ms cubic-bezier(0.16, 1, 0.3, 1) both;
-	}
-
-	.path-detail.is-reverse {
-		transform-origin: 50% 0;
-		animation-name: cube-previous;
-	}
-
-	.path-detail h4 {
-		margin: 5px 0 8px;
-		font-family: var(--font-title);
-		font-size: clamp(1.1rem, 1.7vw, 1.35rem);
-		font-weight: 500;
-		line-height: 1.2;
-	}
-
-	.path-detail p,
-	.path-detail small {
-		display: block;
-		margin: 0;
-		color: var(--fg-dim);
-		font-size: 0.74rem;
-		line-height: 1.45;
-	}
-
-	.path-detail small {
-		margin-top: 7px;
-		color: var(--fg-faint);
-	}
-
-	@keyframes cube-next {
-		from {
-			opacity: 0;
-			filter: blur(4px);
-			transform: translate3d(0, 32px, 0) rotateX(-72deg);
-		}
-	}
-
-	@keyframes cube-previous {
-		from {
-			opacity: 0;
-			filter: blur(4px);
-			transform: translate3d(0, -32px, 0) rotateX(72deg);
-		}
-	}
-
-	@media (max-width: 940px) {
-		.path-layout {
-			grid-template-columns: 1fr;
-		}
-	}
-
-	@media (max-width: 520px) {
-		header {
-			align-items: flex-start;
-			flex-direction: column;
-		}
-
-		header h3 {
-			text-align: left;
-		}
-
-		button {
-			grid-template-columns: 76px minmax(0, 1fr);
-		}
-
-	}
-
-	@media (prefers-reduced-motion: reduce) {
-		.path-detail {
-			animation: none;
-		}
-	}
-</style>

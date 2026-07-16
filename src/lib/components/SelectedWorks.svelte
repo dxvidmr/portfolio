@@ -98,40 +98,61 @@
 	};
 </script>
 
-<div class="works-index-explorer">
-	<ol class="typographic-index" aria-label={copy.contents}>
+<div
+	class="tw:grid tw:grid-cols-[minmax(0,1.08fr)_minmax(360px,.92fr)] tw:items-start tw:gap-[clamp(48px,8vw,120px)] tw:max-[900px]:grid-cols-[minmax(0,1.08fr)_minmax(290px,.92fr)] tw:max-[900px]:gap-[30px] tw:max-[700px]:flex tw:max-[700px]:flex-col"
+>
+	<ol
+		class="tw:m-0 tw:list-none tw:border-t tw:border-rule-strong tw:p-0 tw:max-[700px]:w-full"
+		aria-label={copy.contents}
+	>
 		{#each projects as project, index (project.slug)}
-			<li class:is-active={activeIndex === index}>
+			<li class="tw:border-b tw:border-rule">
 				<a
+					class="tw:grid tw:grid-cols-[36px_minmax(0,1fr)_auto] tw:items-center tw:gap-[clamp(12px,2vw,24px)] tw:py-[clamp(18px,2.5vw,31px)] tw:text-inherit tw:no-underline tw:max-[900px]:grid-cols-[30px_minmax(0,1fr)]"
 					href={localizedPath(`/proyectos/${project.slug}`, locale)}
 					aria-current={activeIndex === index ? 'true' : undefined}
 					onmouseenter={() => (activeIndex = index)}
 					onfocus={() => (activeIndex = index)}
 					onclick={(event) => openProject(event, index)}
 				>
-					<span class="meta entry-number">{String(index + 1).padStart(2, '0')}</span>
-					<span class="entry-main">
-						<span class="meta entry-kind">{projectText(project.kind, locale)}</span>
-						<span class="entry-title">{projectText(project.title, locale)}</span>
+					<span class="meta tw:text-ink-faint">{String(index + 1).padStart(2, '0')}</span>
+					<span class="tw:grid tw:min-w-0 tw:gap-2">
+						<span
+							class={`meta tw:[transition:color_180ms_ease] ${activeIndex === index ? 'tw:text-ink-dim' : 'tw:text-ink-faint'}`}
+						>
+							{projectText(project.kind, locale)}
+						</span>
+						<span
+							class={`tw:font-title tw:text-[clamp(1.9rem,3.9vw,4.4rem)] tw:font-[450] tw:leading-[0.9] tw:tracking-[-0.04em] tw:[transition:color_180ms_ease,transform_320ms_cubic-bezier(.16,1,.3,1)] tw:motion-reduce:transition-none tw:max-[700px]:text-[clamp(2rem,10vw,3.6rem)] ${activeIndex === index ? 'tw:translate-x-[9px] tw:text-accent-strong' : ''}`}
+						>
+							{projectText(project.title, locale)}
+						</span>
 					</span>
-					<span class="entry-end">
-						<span class="meta entry-year">{project.year}</span>
+					<span
+						class="tw:justify-self-end tw:max-[900px]:col-start-2 tw:max-[900px]:row-start-2 tw:max-[900px]:flex tw:max-[900px]:justify-between tw:max-[900px]:justify-items-[initial]"
+					>
+						<span class="meta tw:text-ink-faint">{project.year}</span>
 					</span>
 				</a>
 			</li>
 		{/each}
 	</ol>
 
-	<aside class="project-preview" aria-live="polite">
-		<div class="preview-sticky">
+	<aside
+		class="tw:relative tw:h-full tw:max-[700px]:order-[-1] tw:max-[700px]:w-full"
+		aria-live="polite"
+	>
+		<div class="tw:sticky tw:top-[clamp(82px,11vh,118px)] tw:max-[700px]:static">
 			<a
-				class="preview-link"
+				class="tw:group tw:block tw:text-inherit tw:no-underline"
 				href={localizedPath(`/proyectos/${activeProject.slug}`, locale)}
 				onclick={(event) => openProject(event, activeIndex)}
 			>
 				{#key activeProject.slug}
-					<div class="preview-change">
-						<div class="preview-meta meta">
+					<div
+						class="tw:[animation:editorial-preview-in_600ms_cubic-bezier(.16,1,.3,1)_both] tw:motion-reduce:animate-none"
+					>
+						<div class="meta tw:mb-[11px] tw:flex tw:justify-between tw:gap-[18px] tw:text-ink-faint">
 							<span>{copy.preview}</span>
 							<span>{String(activeIndex + 1).padStart(2, '0')} / {String(projects.length).padStart(2, '0')}</span>
 						</div>
@@ -140,15 +161,33 @@
 							label={projectText(activeProject.kind, locale)}
 							period={activeProject.year}
 						/>
-						<p class="preview-summary">{projectText(activeProject.summary, locale)}</p>
-						<ul class="preview-tags" aria-label={locale === 'es' ? 'Temas' : 'Topics'}>
-							{#each activeProject.tags.slice(0, 4) as tag (tag)}<li class="meta">{tag}</li>{/each}
+						<p
+							class="tw:mt-[18px] tw:mb-0 tw:max-w-[58ch] tw:text-[clamp(.78rem,1.1vw,.9rem)] tw:leading-[1.6] tw:text-ink-dim"
+						>
+							{projectText(activeProject.summary, locale)}
+						</p>
+						<ul
+							class="tw:mt-4 tw:mb-0 tw:flex tw:list-none tw:flex-wrap tw:gap-x-[14px] tw:gap-y-1.5 tw:p-0 tw:text-ink-faint"
+							aria-label={locale === 'es' ? 'Temas' : 'Topics'}
+						>
+							{#each activeProject.tags.slice(0, 4) as tag (tag)}
+								<li
+									class="meta tw:after:pl-[14px] tw:after:text-accent-strong tw:after:content-['/'] tw:last:after:content-none"
+								>
+									{tag}
+								</li>
+							{/each}
 						</ul>
 					</div>
 				{/key}
-				<div class="preview-cta meta">
+				<div
+					class="meta tw:mt-[22px] tw:flex tw:items-center tw:justify-between tw:gap-[18px] tw:border-y tw:border-rule-strong tw:py-[13px] tw:text-ink"
+				>
 					<span>{copy.open}</span>
-					<span aria-hidden="true"><MoveUpRight size={19} strokeWidth={1.7} /></span>
+					<span
+						class="tw:inline-grid tw:place-items-center tw:text-accent-strong tw:[transition:transform_180ms_ease] tw:motion-reduce:transition-none tw:group-hover:translate-x-[3px] tw:group-hover:translate-y-[-3px] tw:group-focus-visible:translate-x-[3px] tw:group-focus-visible:translate-y-[-3px]"
+						aria-hidden="true"><MoveUpRight size={19} strokeWidth={1.7} /></span
+					>
 				</div>
 			</a>
 		</div>
@@ -165,47 +204,3 @@
 		onnext={nextProject}
 	/>
 {/if}
-
-<style>
-	.works-index-explorer { display: grid; grid-template-columns: minmax(0, 1.08fr) minmax(360px, .92fr); gap: clamp(48px, 8vw, 120px); align-items: start; }
-	.typographic-index { margin: 0; padding: 0; border-top: 1px solid var(--line-strong); list-style: none; }
-	.typographic-index li { border-bottom: 1px solid var(--line); }
-	.typographic-index a { display: grid; grid-template-columns: 36px minmax(0, 1fr) auto; gap: clamp(12px, 2vw, 24px); align-items: center; padding: clamp(18px, 2.5vw, 31px) 0; color: inherit; text-decoration: none; }
-	.entry-number, .entry-kind, .entry-year { color: var(--fg-faint); }
-	.entry-main { display: grid; gap: 8px; min-width: 0; }
-	.entry-kind { transition: color 180ms ease; }
-	.entry-title { font-family: var(--font-title); font-size: clamp(1.9rem, 3.9vw, 4.4rem); font-weight: 450; line-height: .9; letter-spacing: -.04em; transition: color 180ms ease, transform 320ms cubic-bezier(.16, 1, .3, 1); }
-	.entry-end { justify-self: end; }
-	.typographic-index li.is-active .entry-title { color: var(--accent-strong); transform: translateX(9px); }
-	.typographic-index li.is-active .entry-kind { color: var(--fg-dim); }
-
-	.project-preview { position: relative; height: 100%; }
-	.preview-sticky { position: sticky; top: clamp(82px, 11vh, 118px); }
-	.preview-link { display: block; color: inherit; text-decoration: none; }
-	.preview-change { animation: preview-in 600ms cubic-bezier(.16, 1, .3, 1) both; }
-	.preview-meta { display: flex; justify-content: space-between; gap: 18px; margin-bottom: 11px; color: var(--fg-faint); }
-	.preview-summary { max-width: 58ch; margin: 18px 0 0; color: var(--fg-dim); font-size: clamp(.78rem, 1.1vw, .9rem); line-height: 1.6; }
-	.preview-tags { display: flex; flex-wrap: wrap; gap: 6px 14px; margin: 16px 0 0; padding: 0; color: var(--fg-faint); list-style: none; }
-	.preview-tags li:not(:last-child)::after { padding-left: 14px; color: var(--accent-strong); content: '/'; }
-	.preview-cta { display: flex; justify-content: space-between; gap: 18px; align-items: center; margin-top: 22px; padding: 13px 0; border-block: 1px solid var(--line-strong); color: var(--fg); }
-	.preview-cta > span:last-child { display: inline-grid; place-items: center; color: var(--accent-strong); transition: transform 180ms ease; }
-	.preview-link:hover .preview-cta > span:last-child, .preview-link:focus-visible .preview-cta > span:last-child { transform: translate(3px, -3px); }
-	@keyframes preview-in { from { opacity: 0; filter: blur(5px); transform: translate3d(0, 18px, 0) scale(.985); } }
-
-	@media (max-width: 900px) {
-		.works-index-explorer { grid-template-columns: minmax(0, 1.08fr) minmax(290px, .92fr); gap: 30px; }
-		.typographic-index a { grid-template-columns: 30px minmax(0, 1fr); }
-		.entry-end { grid-column: 2; grid-row: 2; display: flex; justify-content: space-between; justify-items: initial; }
-	}
-	@media (max-width: 700px) {
-		.works-index-explorer { display: flex; flex-direction: column; }
-		.project-preview { order: -1; width: 100%; }
-		.preview-sticky { position: static; }
-		.typographic-index { width: 100%; }
-		.entry-title { font-size: clamp(2rem, 10vw, 3.6rem); }
-	}
-	@media (prefers-reduced-motion: reduce) {
-		.preview-change { animation: none; }
-		.entry-title, .preview-cta > span:last-child { transition: none; }
-	}
-</style>

@@ -40,3 +40,27 @@
 	--text-body: var(--fs-body);
 	--tracking-meta: var(--tracking-meta);
 }
+
+@keyframes editorial-preview-in {
+	from {
+		opacity: 0;
+		filter: blur(5px);
+		transform: translate3d(0, 18px, 0) scale(0.985);
+	}
+}
+
+@keyframes academic-cube-next {
+	from {
+		opacity: 0;
+		filter: blur(4px);
+		transform: translate3d(0, 32px, 0) rotateX(-72deg);
+	}
+}
+
+@keyframes academic-cube-previous {
+	from {
+		opacity: 0;
+		filter: blur(4px);
+		transform: translate3d(0, -32px, 0) rotateX(72deg);
+	}
+}
