@@ -16,12 +16,18 @@
 		wide?: boolean;
 		placeholder?: string;
 		type?: 'url';
+		help?: string;
 	}
 
 	const fields: EventField[] = [
 		{ name: 'title', label: 'Nombre del evento', required: true, wide: true },
-		{ name: 'date_start', label: 'Fecha de inicio', placeholder: 'AAAA-MM-DD' },
-		{ name: 'date_end', label: 'Fecha de fin', placeholder: 'AAAA-MM-DD' },
+		{
+			name: 'date_start',
+			label: 'Inicio del evento',
+			placeholder: 'AAAA-MM-DD',
+			help: 'Duración general; cada contribución o servicio conserva sus propias fechas'
+		},
+		{ name: 'date_end', label: 'Fin del evento', placeholder: 'AAAA-MM-DD' },
 		{ name: 'year', label: 'Año', placeholder: 'AAAA' },
 		{ name: 'institution', label: 'Institución o entidad organizadora' },
 		{ name: 'city', label: 'Ciudad' },
@@ -44,6 +50,7 @@
 				aria-invalid={errors[field.name] ? 'true' : undefined}
 			/>
 			{#if errors[field.name]}<small class="error">{errors[field.name]}</small>{/if}
+			{#if field.help}<small class="help">{field.help}</small>{/if}
 		</label>
 	{/each}
 	<label class="wide private">
@@ -62,6 +69,7 @@
 	input:focus-visible, textarea:focus-visible { outline: 2px solid #00ff88; outline-offset: 2px; }
 	input[aria-invalid='true'] { border-color: #f87171; }
 	.error { color: #f87171; }
+	.help { color: #737373; line-height: 1.4; }
 	.private { padding: 0.8rem; border: 1px dashed #404040; }
 	.private small { color: #737373; }
 	@media (max-width: 700px) { .grid { grid-template-columns: 1fr; } .wide { grid-column: auto; } }

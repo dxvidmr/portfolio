@@ -1,5 +1,6 @@
 import { db } from '$lib/server/db';
 import type { EntryKey } from './controls';
+import { isValidPartialDate } from './date-validation';
 
 export type DocumentOwner =
 	| { kind: 'entry'; entry: EntryKey }
@@ -95,7 +96,7 @@ export function parseDocumentValues(formData: FormData, ownerKind: DocumentOwner
 	const issuedBy = String(formData.get('issuedBy') ?? '').trim().slice(0, 300);
 	const issuedDate = String(formData.get('issuedDate') ?? '').trim().slice(0, 10);
 	const notesPrivate = String(formData.get('notesPrivate') ?? '').trim().slice(0, 5000);
-	if (!documentType || !validUrl(url) || (issuedDate && !/^\d{4}(?:-\d{2}(?:-\d{2})?)?$/.test(issuedDate))) return null;
+	if (!documentType || !validUrl(url) || (issuedDate && !isValidPartialDate(issuedDate))) return null;
 	if (!driveFileId) driveFileId = driveIdFromUrl(url).slice(0, 300);
 	const requestedCertificate = formData.get('isCertificate') === '1';
 	const isCertificate = ownerKind === 'attendance' || requestedCertificate;

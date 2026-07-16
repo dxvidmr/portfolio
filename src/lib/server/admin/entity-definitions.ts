@@ -107,8 +107,8 @@ export const entityForms = {
 	},
 	talks: {
 		// Los datos del evento (nombre, fechas, lugar, modalidad) viven en la
-		// ficha canónica `events`; las columnas-copia heredadas de `talks` se
-		// hidratan en servidor (crud.ts) y no se piden en el formulario.
+		// ficha canónica `events`; las fechas de abajo pertenecen a la
+		// contribución concreta y pueden diferir de la duración del evento.
 		fields: [
 			f('title', 'Título de la contribución', 'text', { required: true }),
 			f('canonical_event_id', 'Evento', 'fk', {
@@ -121,6 +121,12 @@ export const entityForms = {
 				vocabDomain: 'contribution_type'
 			}),
 			f('authors_text', 'Autores', 'text', { required: true }),
+			f('date_start', 'Fecha de la contribución', 'date', {
+				help: 'Puede ser un día exacto aunque el evento dure varios días'
+			}),
+			f('date_end', 'Fin de la contribución', 'date', {
+				help: 'Déjala vacía si tuvo lugar en un solo día'
+			}),
 			f('role', 'Rol', 'text', {
 				help: 'Solo si tu papel no es el implícito del tipo (p. ej. conferencia invitada)'
 			}),
@@ -178,8 +184,9 @@ export const entityForms = {
 			f('country', 'País', 'text'),
 			f('thesis_directors_text', 'Dirección de tesis', 'text'),
 			f('date_start', 'Fecha de inicio', 'date'),
-			f('date_end', 'Fecha de fin', 'date'),
-			f('is_ongoing', 'En curso', 'boolean'),
+			f('date_end', 'Fecha de fin', 'date', {
+				help: 'Déjala vacía si la formación continúa'
+			}),
 			f('url', 'URL', 'url'),
 			f('notes_private', 'Notas privadas', 'textarea', { isPrivate: true })
 		]
@@ -232,9 +239,10 @@ export const entityForms = {
 			}),
 			f('city', 'Ciudad', 'text'),
 			f('country', 'País', 'text'),
-			f('date_start', 'Fecha de inicio', 'date'),
-			f('date_end', 'Fecha de fin', 'date'),
-			f('year', 'Año', 'integer'),
+			f('date_start', 'Fecha de inicio de la actividad', 'date'),
+			f('date_end', 'Fecha de fin de la actividad', 'date', {
+				help: 'Déjala vacía si la actividad continúa'
+			}),
 			f('description', 'Descripción', 'textarea'),
 			f('url', 'URL', 'url')
 		]
@@ -272,8 +280,9 @@ export const entityForms = {
 			f('organization', 'Organización', 'text', { required: true }),
 			f('role', 'Rol', 'text', { help: 'Texto libre; admite matices y periodos' }),
 			f('date_start', 'Fecha de inicio', 'date'),
-			f('date_end', 'Fecha de fin', 'date'),
-			f('is_ongoing', 'En curso', 'boolean'),
+			f('date_end', 'Fecha de fin', 'date', {
+				help: 'Déjala vacía si la pertenencia continúa'
+			}),
 			f('notes_private', 'Notas privadas', 'textarea', { isPrivate: true })
 		]
 	},

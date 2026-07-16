@@ -152,20 +152,15 @@ await expectZero(
 );
 
 await expectZero(
-	'las copias de talks están sincronizadas con su evento',
-	`SELECT COUNT(*) FROM talks t JOIN events e ON e.id = t.canonical_event_id
-	 WHERE t.event_title IS NOT e.title
-	    OR t.date_start IS NOT e.date_start OR t.date_end IS NOT e.date_end
-	    OR t.year IS NOT e.year OR t.institution IS NOT e.institution
-	    OR t.city IS NOT e.city OR t.country IS NOT e.country
-	    OR t.modality IS NOT e.modality`
+	'los intervalos de contribuciones no terminan antes de empezar',
+	`SELECT COUNT(*) FROM talks
+	 WHERE date_start IS NOT NULL AND date_end IS NOT NULL AND date_end < date_start`
 );
 
 await expectZero(
-	'las copias de service_activities con evento están sincronizadas',
-	`SELECT COUNT(*) FROM service_activities s JOIN events e ON e.id = s.canonical_event_id
-	 WHERE s.date_start IS NOT e.date_start OR s.date_end IS NOT e.date_end
-	    OR s.year IS NOT e.year OR s.city IS NOT e.city OR s.country IS NOT e.country`
+	'los intervalos de servicio no terminan antes de empezar',
+	`SELECT COUNT(*) FROM service_activities
+	 WHERE date_start IS NOT NULL AND date_end IS NOT NULL AND date_end < date_start`
 );
 
 await expectZero(

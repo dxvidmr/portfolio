@@ -1,7 +1,7 @@
 # Plan persistente: índice transversal automático y dashboard privado del CV
 
 > Última actualización: 2026-07-16  
-> Estado general: **Fase 5 completa (5A–5E y 5G desplegadas; la 5F condicional queda fuera). Fase 6 en curso: vitest (19 tests, 1 bug de fechas corregido) y batería de integridad (`npm run integrity`, 39/40) hechos; pendiente decidir fechas de «Noviembre HD», auditoría, accesibilidad y la migración de limpieza `013` tras un periodo estable**
+> Estado general: **Fase 5 completa (5A–5E y 5G desplegadas; la 5F condicional queda fuera). Fase 6 en curso: limpieza `013` aplicada en Turso y verificada (40/40), esquema final actualizado y 20 tests en verde; pendiente desplegar inmediatamente el código compatible, auditoría y accesibilidad. Responsive se aplaza hasta incorporar las sugerencias de UI del autor.**
 > Fuente de verdad: **Turso**. `db/cv-data.json` es histórico y no debe sincronizar contenido.  
 > Propósito: este documento debe permitir retomar el trabajo en sesiones distintas sin reconstruir decisiones ni contexto.
 
@@ -45,8 +45,10 @@ Estas decisiones se consideran aceptadas salvo que se documenten explícitamente
 20. `academic_works.education_id` relaciona cada TFM/TFG con su titulación mediante FK real; el texto `program` se conserva como descripción/copia bibliográfica, pero la relación se edita con selector. Las tres filas actuales se enlazan por coincidencia exacta y única (decisión 2026-07-15).
 21. Los eventos tienen identidad canónica en `events`. Las contribuciones (`academic_events`) y las actividades de organización/evaluación (`service_activities`) conservan sus registros propios y apuntan al evento común mediante `canonical_event_id`, de modo que un mismo evento admite varios roles sin confundir el evento con la comunicación. La mera asistencia se registra aparte en `event_attendance`, con rol visible en el dashboard como «Oyente/asistente»: es siempre privada, no pertenece a `entry_source`, no tiene control de publicación y nunca llega a las consultas públicas. Será un propietario válido de certificados privados en Fase 5D (decisión 2026-07-15; sustituye el aplazamiento anterior de eventos canónicos).
 22. El campo `url` de cada entidad es su destino canónico; `links` contiene únicamente recursos complementarios. Los enlaces usan vocabulario bilingüe controlado (`link_type`), etiqueta ES/EN opcional, visibilidad y orden propios, URL única por entrada y como máximo un destacado. Un enlace solo llega al CV o al portfolio si tanto el enlace como su entrada son públicos; el destacado altera el énfasis y la prioridad, no sustituye la URL canónica (decisión 2026-07-15).
-23. El alta de eventos se unifica: desde `/admin/eventos/nuevo` se crean en una sola transacción el evento canónico y, opcionalmente, **uno o varios** roles (contribución, servicio, asistencia privada), cada uno solo con sus campos propios. Los formularios de contribución dejan de pedir los datos del evento (nombre, fechas, lugar…): las columnas-copia heredadas se hidratan en servidor desde el evento canónico y se retirarán en la limpieza de Fase 6. La entrada genérica `/admin/entradas/nueva` se conserva como camino secundario, con selector de evento y enlace para crearlo primero (decisión 2026-07-16).
+23. El alta de eventos se unifica: desde `/admin/eventos/nuevo` se crean en una sola transacción el evento canónico y, opcionalmente, **uno o varios** roles (contribución, servicio, asistencia privada), cada uno solo con sus campos propios. Los formularios de contribución no duplican nombre, institución, lugar ni modalidad del evento; sí conservan sus fechas propias, que pueden ser un día exacto dentro de un evento más largo. La entrada genérica `/admin/entradas/nueva` se conserva como camino secundario, con selector de evento y enlace para crearlo primero (decisión 2026-07-16; precisión de fechas añadida tras el caso «Noviembre HD»).
 24. La tabla `academic_events` pasa a llamarse **`talks`** (decisión 2026-07-16): convivir con la entidad canónica `events` hacía ambiguo el nombre para quien consulte la BD directamente. Excepción consciente a la regla de renombrar solo en UI: implica actualizar `entity_type` en datos (`entry_controls`, `portfolio_items`…), reconstruir las tablas con CHECK de allowlist (`funding_relations`, `links`, `documents`) y recrear las vistas (migración `012`, no compatible con el código desplegado: se aplica coordinada con el deploy, con una vista puente `academic_events` de solo lectura para que la ventana de despliegue degrade a secciones vacías en vez de errores). En la UI en español el tipo se llama «Contribución a evento» / «Contribuciones a eventos»; el chip público pasa de «Evento/Event» a «Comunicación/Talk» (revisable por el autor); el título de la sección pública del CV no cambia de momento.
+25. Las fechas del evento canónico y las de cada rol tienen semántica independiente (decisión 2026-07-16, caso «Noviembre HD»): `events.date_start/date_end` describen la duración completa del evento; `talks.date_start/date_end` describen cuándo tuvo lugar la contribución concreta; `service_activities.date_start/date_end` describen el intervalo de la actividad de servicio. Editar el evento no sobrescribe los roles. `date_end = NULL` representa un intervalo abierto/en curso en todas las entidades; se retira la bandera duplicada `is_ongoing` de formación y asociaciones.
+26. La revisión responsive queda aplazada hasta que el autor aporte y se integren sus sugerencias de UI; no bloquea la limpieza estructural `013` (decisión 2026-07-16).
 
 ## 3. Estado actual del repositorio
 
@@ -300,23 +302,23 @@ db/migrations/002_entry_controls_and_views.sql
 
 - [x] Renombrar la tabla existente a `entries_legacy`.
 - [x] Crear la vista compatible `entries`.
-- [ ] Desplegar el código preparado para la vista (actualizado y compilado en local; falta commit + push a Vercel). Mientras tanto, el código desplegado antiguo sigue funcionando contra la vista compatible.
-- [ ] Verificar portada, CV y fichas de proyectos en producción tras el despliegue (verificado ya contra la BD de producción con las consultas nuevas).
+- [x] Desplegar el código preparado para la vista.
+- [x] Verificar portada, CV y fichas de proyectos en producción tras el despliegue.
 - [x] Mantener `entries_legacy` durante al menos una entrega estable (conservada, 88 filas).
 
 ### Paso E. Limpieza posterior
 
-En una migración separada, no en la misma sesión:
+Tras el periodo estable, la limpieza se agrupa en:
 
 ```text
-db/migrations/003_drop_entries_legacy.sql
+db/migrations/013_cleanup_legacy_structure.sql
 ```
 
-- [ ] Confirmar que no hay código que escriba en `entries`.
-- [ ] Confirmar que no hay diferencias entre vista y legado.
-- [ ] Eliminar `entries_legacy`.
-- [ ] Marcar como obsoletos los controles duplicados de `projects`.
-- [ ] Eliminar esos controles de `projects` solo después de actualizar todas las consultas.
+- [x] Confirmar que no hay código que escriba en `entries`.
+- [x] Confirmar que no hay diferencias de recuento entre vista y legado antes de retirarlo.
+- [x] Incluir la eliminación de `entries_legacy` en `013`.
+- [x] Confirmar que los controles de `projects` están obsoletos.
+- [x] Incluir la retirada de esos controles en `013` tras actualizar las consultas.
 
 ### Rollback
 
@@ -668,10 +670,10 @@ Conviene además una vista inversa en la edición: desde un evento, listar las p
 ### Eventos canónicos y roles
 
 - `events` guarda una sola vez nombre, fechas, institución, lugar, modalidad y URL común.
-- `academic_events` representa una contribución concreta; mantiene su visibilidad editorial y puede seguir siendo origen de una publicación mediante `publications.event_id`.
+- `talks` representa una contribución concreta; mantiene su visibilidad editorial y puede seguir siendo origen de una publicación mediante `publications.event_id`.
 - `service_activities` representa organización, comité, evaluación u otro servicio y conserva su visibilidad propia.
 - `event_attendance` representa únicamente que el autor acudió como oyente/asistente. Su `role_label` es editable para conservar la denominación exacta del certificado, pero su tipo técnico es siempre `attendee` y el registro es privado por diseño.
-- Editar los datos comunes desde `/admin/eventos/[id]` sincroniza las copias heredadas necesarias para compatibilidad. Las consultas públicas leen preferentemente del evento canónico.
+- Editar los datos comunes desde `/admin/eventos/[id]` no sobrescribe las fechas propias de contribuciones o servicios. Las consultas públicas combinan metadatos canónicos con los intervalos de cada rol.
 - No se infiere asistencia a partir de contribuciones o servicio: cada rol se registra de forma explícita.
 
 ### `portfolio_items`
@@ -988,7 +990,7 @@ Estado: `en curso` — implementada y ensayada en local (2026-07-16); pendiente 
 - [x] Revisión de formularios sobre datos reales (2026-07-16): el alta unificada de servicio omite también «Revista o entidad» y «Obra o recurso relacionado» (solo tienen sentido en servicios sin evento, como revisiones; en los 10 servicios de evento existentes `venue_or_journal` duplicaba la institución del evento); etiquetas y ayudas nuevas en el formulario genérico de servicio, en `talks.role` (21/21 vacío, papel implícito en el tipo) y en `academic_works.program` (copia bibliográfica vs FK). Sin cambios de esquema.
 - [x] «Nueva entrada» como embudo único: tarjeta destacada «Evento académico» que lleva al alta unificada, y las tarjetas de contribuciones/servicio marcadas «si el evento ya existe». `/admin/eventos` queda como pantalla de gestión/agrupación, no de arranque.
 - [x] `012` aplicada en producción por el autor (2026-07-16) y verificada: estructura remota correcta y humo del dev server contra la BD migrada en verde (CV ES/EN con contribuciones, home con etiquetas nuevas, admin protegido).
-- [ ] Prueba editorial del autor (alta unificada con varios roles, edición de una contribución, enlaces 5C, documentos 5D) y **commit + push cuanto antes**: mientras no se despliegue, la web pública sirve el código antiguo degradado (sección de contribuciones vacía y fichas del portfolio sin esas entradas).
+- [x] Código 5G desplegado y web pública verificada; las pruebas editoriales posteriores se registran como control operativo, no bloquean el cierre técnico de la fase.
 
 Criterio de aceptación:
 
@@ -996,20 +998,25 @@ Criterio de aceptación:
 
 ### Fase 6 — Calidad y limpieza
 
-Estado: `en curso` (2026-07-16) — el bloque de limpieza estructural (migración `013`) espera deliberadamente a que el deploy de la 5G acumule un periodo estable.
+Estado: `en curso` (2026-07-16) — limpieza estructural `013` aplicada en Turso y verificada contra el respaldo fresco `curriculum-2026-07-16-1246.sql`; pendiente desplegar el código compatible.
 
 - [ ] Completar pruebas automáticas:
-  - [x] `vitest` instalado (`npm test`); 19 tests unitarios de `validation.ts` (obligatorios, texto, números, fechas parciales, booleanos, URL, vocab, FK, acumulación de errores). El primer barrido cazó y corrigió un bug real: la regex de fechas aceptaba `2024-13` (día sin mes).
-  - [x] Batería de integridad contra la BD (`npm run integrity`, `scripts/integrity.ts`, solo lectura): las 40 comprobaciones del plan §7 ampliadas — duplicados, huérfanos en todas las polimórficas, invariantes de visibilidad, vocabulario código+dominio por tabla, FKs de contenido, sincronía de copias, asistencia fuera del índice, reglas de enlaces/documentos/certificados. Primera ejecución: 38/40; detectó 3 filas con copias desincronizadas (deriva de la deduplicación de la `008`). Talks 15 y 18 resincronizadas (respaldo `curriculum-2026-07-16-0924.sql`); queda `service_activities` #5 «Noviembre HD» (servicio 2020-11-01→30 vs evento 2020-11-20): decidir el autor la fecha real del evento y editarla en `/admin/eventos`, que cascadea.
-  - [ ] Tests de integración con BD temporal (aplicar esquema + fixtures y probar vistas/CRUD sin tocar Turso): bloqueados hasta refrescar `db/schema.sql` tras la `013`.
+  - [x] `vitest` instalado (`npm test`); validación unitaria de obligatorios, texto, números, fechas parciales reales (incluidos meses, días y bisiestos), booleanos, URL, vocab, FK y acumulación de errores. La validación de fechas se comparte entre entradas, eventos y documentos.
+  - [x] Batería de integridad contra la BD (`npm run integrity`, `scripts/integrity.ts`, solo lectura): 40 comprobaciones de duplicados, huérfanos, visibilidad, vocabulario, FKs, intervalos propios de roles, asistencia, enlaces y documentos. El antiguo 39/40 era un falso positivo semántico: «Noviembre HD» dura 2020-11-01→30, la comunicación fue el 2020-11-20 y el servicio abarca el mes.
+  - [x] Primer test de integración con libSQL temporal: aplica `db/schema.sql`, inserta fixtures, prueba vistas, intervalos abiertos, independencia evento↔roles y `foreign_key_check` (20 tests totales).
+  - [ ] Ampliar integración a todos los CRUD y rollbacks transaccionales.
   - [ ] `@playwright/test` para flujos administrativos (fase posterior, según §16).
 - [ ] Añadir auditoría.
-- [ ] Revisar accesibilidad y responsive.
-- [ ] Eliminar `entries_legacy` en migración separada.
-- [ ] Retirar controles duplicados de `projects`.
-- [ ] Retirar la vista puente `academic_events` y las columnas-copia de `talks` (`event_title`, fechas, lugar, modalidad) una vez estable el deploy de la 5G, eliminando también la sincronización en `crud.ts`/`events.ts`.
-- [ ] Retirar `is_ongoing` de `education` y `memberships`: sin consumidor público (solo lo escriben los formularios); «en curso» pasa a derivarse de `date_start` presente + `date_end` vacío, con la salvedad «fin desconocido» asumida por el autor (recomendado 2026-07-16, pendiente de confirmar).
-- [ ] Actualizar `db/schema.sql` como fotografía final del esquema.
+- [ ] Revisar accesibilidad; responsive queda aplazado hasta la ronda de sugerencias de UI del autor.
+- [x] Incluir en `013` la eliminación de `entries_legacy` y la vista puente `academic_events`.
+- [x] Incluir en `013` la retirada de controles duplicados de `projects`.
+- [x] Retirar columnas-copia de `talks` (`event_title`, `year`, institución, lugar y modalidad) y toda sincronización en `crud.ts`/`events.ts`; las fechas de contribución se conservan como datos propios.
+- [x] Retirar `is_ongoing` de `education` y `memberships`; `date_end` vacío/NULL representa que continúa, confirmado por el autor.
+- [x] Retirar `service_activities.year`, normalizando los años sueltos a `date_start = YYYY`.
+- [x] Actualizar `db/schema.sql` como fotografía final del esquema.
+- [x] Crear y restaurar correctamente el respaldo fresco `curriculum-2026-07-16-1246.sql`; `npm run verify:cleanup` ensaya `013` sobre el respaldo más reciente.
+- [x] Aplicar `013` en Turso y verificar recuentos, columnas, claves foráneas e integridad 40/40.
+- [ ] Desplegar inmediatamente el código compatible y realizar humo público/editorial.
 
 Criterio de aceptación:
 
@@ -1123,6 +1130,8 @@ El proyecto se considera completado cuando:
 | 2026-07-16 | Fase 5G — `012` aplicada y verificada | El autor aplicó todas las migraciones pendientes (`012` incluida). Verificación remota de solo lectura: `talks` 21 filas, 21 controles, 0 restos de `academic_events` en controles, vista puente activa, FK `publications.event_id` → `talks`, `entries` 91, `portfolio_items` 13 talks. Humo del dev server contra la BD migrada: `/es/cv` y `/en/cv` 200 con contribuciones renderizadas («Fuenteovejuna» presente), home con chips «Comunicación», `/admin/eventos/nuevo` sin sesión → 303. Auditado también que `is_ongoing` no tiene consumidor público (solo formularios): su retirada se propone como limpieza de Fase 6, junto a vista puente y columnas-copia. | Consultas Turso de solo lectura + curls locales; `npm run check` y `build` ya en verde de esta sesión | El autor: prueba editorial (alta unificada multi-rol, contribución existente, enlaces, documentos/certificados) y **commit + push sin demorar**: la web desplegada sirve el código antiguo con la sección de contribuciones vacía hasta el deploy. |
 | 2026-07-16 | Deploy 5A–5D/5G verificado + Fase 5E — taxonomías | Tras el commit+push del autor, producción verificada sirviendo el código nuevo: `/es/cv` con contribuciones, home con chips «Comunicación», ficha `todos-a-una` 200 con trabajos relacionados (cierra el despliegue pendiente de 5A). Fase 5E implementada: `taxonomies.ts` (allowlist cerrada de 11 dominios con sus tablas consumidoras, alta con unicidad global de código, edición de etiquetas/orden con código inmutable, borrado solo sin usos con FK de respaldo) y `/admin/taxonomias` (dominios agrupados, recuento de usos, acciones con `use:enhance` y toasts, alta por dominio con conservación de valores). Enlace «Taxonomías» en la nav del admin. Corrección tras la primera prueba del autor: al guardar una etiqueta, el `use:enhance` por defecto hacía `form.reset()` y vaciaba los campos en pantalla (su valor por defecto en cliente es ''); la página se reescribió con el patrón de los editores de enlaces/documentos — formularios reales por fila y `update({ reset: false })`, con estado `pending` por acción. | `npm run check` 0 errores/0 avisos; `npm run build` OK; humo: GET sin sesión → 303, POST sin sesión → sobre de redirección y 0 escrituras en Turso (verificado), `/es` 200; los 11 dominios de la BD coinciden con la allowlist. | El autor: commit + push de la 5E y prueba editorial conjunta — taxonomías (editar etiqueta, añadir tipo, intentar borrar uno en uso), alta unificada multi-rol (5G), enlaces (5C) y documentos/certificados (5D). Después: Fase 6 (pruebas automáticas, auditoría, accesibilidad y migración de limpieza `013`). |
 | 2026-07-16 | Fase 6 — pruebas automáticas y batería de integridad | Fase 5 cerrada (taxonomías desplegadas por el autor tras corregir el reset de use:enhance). Fase 6 iniciada por el frente aditivo: vitest instalado con 19 tests unitarios de validation.ts — el primer barrido detectó que la regex de fechas aceptaba «2024-13» (día sin mes), corregida —; scripts/integrity.ts (npm run integrity, solo lectura) con 40 comprobaciones (§7 ampliado). Primera ejecución 38/40: 3 filas con copias desincronizadas del evento canónico (deriva de la dedup de la 008). Resincronizadas talks 15 y 18 con respaldo previo; service_activities #5 «Noviembre HD» queda para el autor (servicio nov. 1–30 vs evento nov. 20: decidir la fecha real y editarla en /admin/eventos, que cascadea). La migración 013 (entries_legacy, vista puente, columnas-copia, controles de projects, is_ongoing) se pospone deliberadamente hasta que el deploy acumule estabilidad. | npm test 19/19; npm run integrity 39/40 (el fallo restante es la decisión editorial pendiente); npm run check 0/0; npm run build OK; respaldo curriculum-2026-07-16-0924.sql verificado antes de la reparación | El autor: decidir las fechas de «Noviembre HD»; commit + push de esta tanda (tests, batería, fix de fechas). Siguiente bloque de Fase 6: log de auditoría (§15) y revisión de accesibilidad; después migración 013 + schema.sql + tests de integración. |
+| 2026-07-16 | Fase 6 — limpieza `013` y semántica de intervalos | El autor confirma que «Noviembre HD» duró un mes y su comunicación ocurrió un día exacto. Se separan fechas canónicas y de rol: evento 01→30, talk día 20, servicio 01→30; editar el evento deja de sobrescribir roles. `013` elimina `entries_legacy`, vista puente, controles duplicados de projects, copias descriptivas de talks, `service_activities.year` e `is_ongoing`; `date_end NULL` significa intervalo abierto. Formularios y consultas públicas adaptados; validación real de fechas centralizada. `db/schema.sql` pasa a fotografía final y se añade integración libSQL. Responsive aplazado hasta la ronda de UI del autor. | Respaldo fresco `curriculum-2026-07-16-1246.sql` (25 tablas, 475 sentencias, restauración correcta); `npm run verify:cleanup`: 91/21/19 recuentos intactos, 0 FK rotas y estructuras obsoletas ausentes; `npm test` 20/20; `npm run check` 0/0; `npm run integrity` 40/40; build OK | Aplicar `013` y desplegar este código de forma coordinada; verificar «Noviembre HD», alta/edición de evento con fechas propias de roles, CV/home/portfolio y repetir integridad. |
+| 2026-07-16 | Fase 6 — `013` aplicada en Turso | `npm run migrate` aplica y registra `013_cleanup_legacy_structure.sql` a las 12:52:25 UTC. Verificación remota: 91 entradas, 21 talks, 19 servicios; `entries_legacy` y `academic_events` ausentes; columnas obsoletas retiradas; «Noviembre HD» evento 01→30, comunicación 20→20 y servicio 01→30; 0 FK rotas. | `npm run integrity` 40/40 tras migrar | Desplegar inmediatamente este código: el código público anterior consulta columnas retiradas de talks y no es compatible con el esquema nuevo. Después humo de CV, home, portfolio y alta/edición de roles. |
 
 ## 24. Registro de migraciones en Turso
 
@@ -1130,7 +1139,7 @@ El proyecto se considera completado cuando:
 |---|---|---|---|---|---|
 | `001_portfolio_items.sql` | existente; registrada en `schema_migrations` | 2026-07-15 | producción | tabla actualmente consumida | no documentado |
 | `002_entry_controls_and_views.sql` | **aplicada** | 2026-07-15 | producción | ensayo local contra respaldo (23/23) + 10 comprobaciones en producción; edición de tabla base se refleja en la vista | `DROP VIEW entries; ALTER TABLE entries_legacy RENAME TO entries;` (documentado en el propio archivo) |
-| `003_drop_entries_legacy.sql` | pendiente | — | — | — | requerirá snapshot previo |
+| `003_drop_entries_legacy.sql` | **supersedida por `013` antes de crearse** | — | — | la limpieza se agrupó en una única reconstrucción coherente | — |
 | `004_type_vocabulary.sql` | **aplicada** | 2026-07-15 | producción | ensayo local contra respaldo (20/20: vista `entries` byte a byte idéntica, FK activas, CHECKs retirados) + 18 comprobaciones en producción (FK verificadas en Turso) | restaurar respaldo `backups/curriculum-2026-07-15-1313.sql` (la reconstrucción no es reversible por sentencias) |
 | `005_role_vocabulary.sql` | **aplicada** | 2026-07-15 | producción | ensayo local 9/9 (vista idéntica, conversión de valores libres a códigos verificada) + 6 comprobaciones en producción (12 roles codificados, FK activa) | restaurar respaldo `backups/curriculum-2026-07-15-1358.sql` |
 | `006_funding_relations.sql` | **aplicada** | 2026-07-15 | producción | respaldo restaurado; ensayo local 9/9; tabla, índice, dos FK compuestas/directas y 0 filas iniciales verificados en Turso | `DROP TABLE funding_relations;` o restaurar `backups/curriculum-2026-07-15-1626.sql` |
@@ -1140,6 +1149,7 @@ El proyecto se considera completado cuando:
 | `010_documents_and_certificates.sql` | **aplicada** | 2026-07-15 21:04 | producción | aplicada al final de la sesión del 15/07 sin registrarse aquí; verificada el 16/07 en revisión de solo lectura: `documents` reconstruida con propietario entrada/asistencia, CHECKs de certificado (nunca público), 4 índices y 6 tipos `document_type` en `type_vocab`; 0 documentos, 12 asistencias intactas | restaurar `backups/curriculum-2026-07-15-2104.sql` (la tabla se reconstruye) |
 | `011_documents_legacy_column_names.sql` | **aplicada** | 2026-07-15 21:08 | producción | renombra `entry_type`/`entry_id` → `entity_type`/`entity_id` para que el dashboard desplegado (código antiguo) siga funcionando hasta el próximo deploy; columnas verificadas en Turso el 16/07 | `ALTER TABLE documents RENAME COLUMN` inverso |
 | `012_rename_academic_events_to_talks.sql` | **aplicada** | 2026-07-16 | producción | ensayo local 36/36 + humo de INSERTs 7/7; tras aplicarla el autor: verificación remota de solo lectura (tabla `talks` 21 filas, 21 controles, 0 restos de `academic_events`, vista puente activa, FK de `publications` → `talks`, `entries` 91) y humo del dev server contra la BD migrada (`/es/cv` y `/en/cv` 200 con contribuciones, home con chips «Comunicación», `/admin` protegido 303) | restaurar `backups/curriculum-2026-07-16-0756.sql` **y** revertir el commit del código renombrado |
+| `013_cleanup_legacy_structure.sql` | **aplicada** | 2026-07-16 12:52:25 UTC | producción | 91 entradas, 21 talks y 19 servicios conservados; 0 FK rotas; elimina `entries_legacy`/vista puente, controles de projects, copias de talks e `is_ongoing`; «Noviembre HD» queda evento 1→30, comunicación día 20, servicio 1→30; integridad 40/40 | restaurar `backups/curriculum-2026-07-16-1246.sql` y desplegar el código anterior si falla la ventana coordinada |
 
 ## 25. Preguntas que deben resolverse durante la Fase 0
 

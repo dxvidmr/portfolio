@@ -1,4 +1,5 @@
 import type { EntityFormDef, FieldDef } from './entity-definitions';
+import { isValidPartialDate } from './date-validation';
 
 // Validación de formularios (plan §11). Se evaluó zod y se descartó: con las
 // definiciones de campo declarativas, un validador por tipo de campo es menos
@@ -13,9 +14,6 @@ export interface ParsedForm {
 	errors: Record<string, string>;
 }
 
-// El día solo puede aparecer si hay mes: con los grupos independientes,
-// «2024-13» colaba como año + día sin mes (detectado por los tests, 2026-07-16).
-const DATE_RE = /^\d{4}(-(0[1-9]|1[0-2])(-(0[1-9]|[12]\d|3[01]))?)?$/;
 const MAX_TEXT = 500;
 const MAX_TEXTAREA = 10_000;
 
@@ -44,7 +42,7 @@ function parseField(field: FieldDef, raw: string): { value?: FieldValue; error?:
 			return { value: n };
 		}
 		case 'date':
-			if (!DATE_RE.test(raw)) return { error: 'Formato: AAAA, AAAA-MM o AAAA-MM-DD' };
+			if (!isValidPartialDate(raw)) return { error: 'Formato: AAAA, AAAA-MM o AAAA-MM-DD' };
 			return { value: raw };
 		case 'boolean':
 			// Los checkbox llegan como '1' (marcado) o '' (tratado arriba como null→0).

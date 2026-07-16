@@ -32,27 +32,27 @@ export async function getPortfolioItems(portfolioSlug?: string): Promise<Portfol
 		                         WHEN NULLIF(TRIM(pub.publisher), '') IS NOT NULL
 		                           THEN ' · ' || pub.publisher
 		                         ELSE ''
-		                       END
-		                   ELSE NULLIF(TRIM(pub.publisher), '')
-		                 END
-		               WHEN pi.entity_type = 'talks' THEN
-		                 COALESCE(canonical_event.title, event.event_title) ||
-		                   CASE
-		                     WHEN NULLIF(TRIM(COALESCE(canonical_event.institution, event.institution)), '') IS NOT NULL
-		                       AND INSTR(LOWER(COALESCE(canonical_event.title, event.event_title)), LOWER(COALESCE(canonical_event.institution, event.institution))) = 0
-		                       THEN ' · ' || COALESCE(canonical_event.institution, event.institution)
-		                     ELSE ''
-		                   END ||
-		                   CASE
-		                     WHEN NULLIF(TRIM(COALESCE(canonical_event.city, event.city)), '') IS NOT NULL
-		                       AND INSTR(LOWER(COALESCE(canonical_event.title, event.event_title)), LOWER(COALESCE(canonical_event.city, event.city))) = 0
-		                       THEN ' · ' || COALESCE(canonical_event.city, event.city)
-		                     ELSE ''
-		                   END ||
-		                   CASE
-		                     WHEN NULLIF(TRIM(COALESCE(canonical_event.country, event.country)), '') IS NOT NULL
-		                       AND INSTR(LOWER(COALESCE(canonical_event.title, event.event_title)), LOWER(COALESCE(canonical_event.country, event.country))) = 0
-		                       THEN ' · ' || COALESCE(canonical_event.country, event.country)
+			             END
+			           ELSE NULLIF(TRIM(pub.publisher), '')
+			         END
+			       WHEN pi.entity_type = 'talks' THEN
+			         canonical_event.title ||
+			           CASE
+			             WHEN NULLIF(TRIM(canonical_event.institution), '') IS NOT NULL
+			               AND INSTR(LOWER(canonical_event.title), LOWER(canonical_event.institution)) = 0
+			               THEN ' · ' || canonical_event.institution
+			             ELSE ''
+			           END ||
+			           CASE
+			             WHEN NULLIF(TRIM(canonical_event.city), '') IS NOT NULL
+			               AND INSTR(LOWER(canonical_event.title), LOWER(canonical_event.city)) = 0
+			               THEN ' · ' || canonical_event.city
+			             ELSE ''
+			           END ||
+			           CASE
+			             WHEN NULLIF(TRIM(canonical_event.country), '') IS NOT NULL
+			               AND INSTR(LOWER(canonical_event.title), LOWER(canonical_event.country)) = 0
+			               THEN ' · ' || canonical_event.country
 		                     ELSE ''
 		                   END
 		               WHEN pi.entity_type = 'service_activities' THEN

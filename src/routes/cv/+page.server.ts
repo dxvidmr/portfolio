@@ -20,15 +20,15 @@ const sections = [
 		key: 'talks',
 		title: 'Eventos académicos',
 		sql: `SELECT a.id AS entity_id, a.title, a.contribution_type AS type, tv.label_es AS type_label_es, tv.label_en AS type_label_en,
-		             COALESCE(canonical.title, a.event_title) AS detail,
-		             COALESCE(canonical.year, a.year) AS year,
+		             canonical.title AS detail,
+		             substr(COALESCE(a.date_start, canonical.date_start, CAST(canonical.year AS TEXT)), 1, 4) AS year,
 		             COALESCE(a.url, canonical.url) AS url
 		      FROM talks a
 		      JOIN entries e ON e.entity_type = 'talks' AND e.entity_id = a.id AND e.public = 1
 		      LEFT JOIN type_vocab tv ON tv.code = a.contribution_type
 		      LEFT JOIN events canonical ON canonical.id = a.canonical_event_id
-		      ORDER BY COALESCE(canonical.year, a.year) DESC,
-		               COALESCE(canonical.date_start, a.date_start) DESC, a.title ASC`
+		      ORDER BY COALESCE(a.date_start, canonical.date_start, CAST(canonical.year AS TEXT)) DESC,
+		               a.title ASC`
 	},
 	{
 		key: 'teaching',
@@ -86,14 +86,14 @@ const sections = [
 		title: 'Servicio académico',
 		sql: `SELECT s.id AS entity_id, s.title, s.activity_type AS type, tv.label_es AS type_label_es, tv.label_en AS type_label_en,
 		             COALESCE(canonical.title, s.venue_or_journal) AS detail,
-		             COALESCE(canonical.year, s.year) AS year,
+		             substr(COALESCE(s.date_start, canonical.date_start, CAST(canonical.year AS TEXT)), 1, 4) AS year,
 		             COALESCE(s.url, canonical.url) AS url
 		      FROM service_activities s
 		      JOIN entries e ON e.entity_type = 'service_activities' AND e.entity_id = s.id AND e.public = 1
 		      LEFT JOIN type_vocab tv ON tv.code = s.activity_type
 		      LEFT JOIN events canonical ON canonical.id = s.canonical_event_id
-		      ORDER BY COALESCE(canonical.year, s.year) DESC,
-		               COALESCE(canonical.date_start, s.date_start) DESC, s.title ASC`
+		      ORDER BY COALESCE(s.date_start, canonical.date_start, CAST(canonical.year AS TEXT)) DESC,
+		               s.title ASC`
 	}
 ] as const;
 

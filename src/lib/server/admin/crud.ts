@@ -132,41 +132,13 @@ export async function createEntity(
 	values: Record<string, FieldValue>
 ): Promise<number> {
 	const cols = fieldNames(type);
-	// El formulario de talks ya no pide los datos del evento: `event_title`
-	// (NOT NULL) se hidrata en el propio INSERT desde la ficha canónica y el
-	// resto de columnas-copia las rellena la sincronización posterior.
-	const insertCols =
-		type === 'talks' ? [...cols, 'event_title'] : cols;
-	const placeholders =
-		type === 'talks'
-			? [...cols.map(() => '?'), "COALESCE((SELECT title FROM events WHERE id = ?), '')"]
-			: cols.map(() => '?');
-	const insertArgs =
-		type === 'talks'
-			? [...cols.map((col) => values[col] ?? null), values.canonical_event_id ?? null]
-			: cols.map((col) => values[col] ?? null);
 	const tx = await db.transaction('write');
 	try {
 		const inserted = await tx.execute({
-			sql: `INSERT INTO ${type} (${insertCols.join(', ')}) VALUES (${placeholders.join(', ')})`,
-			args: insertArgs
+			sql: `INSERT INTO ${type} (${cols.join(', ')}) VALUES (${cols.map(() => '?').join(', ')})`,
+			args: cols.map((col) => values[col] ?? null)
 		});
 		const id = Number(inserted.lastInsertRowid);
-		if (type === 'talks') {
-			await tx.execute({
-				sql: `UPDATE talks SET
-					event_title = (SELECT title FROM events WHERE id = canonical_event_id),
-					date_start = (SELECT date_start FROM events WHERE id = canonical_event_id),
-					date_end = (SELECT date_end FROM events WHERE id = canonical_event_id),
-					year = (SELECT year FROM events WHERE id = canonical_event_id),
-					institution = (SELECT institution FROM events WHERE id = canonical_event_id),
-					city = (SELECT city FROM events WHERE id = canonical_event_id),
-					country = (SELECT country FROM events WHERE id = canonical_event_id),
-					modality = (SELECT modality FROM events WHERE id = canonical_event_id)
-				WHERE id = ? AND canonical_event_id IS NOT NULL`,
-				args: [id]
-			});
-		}
 		await tx.execute({
 			sql: 'INSERT INTO entry_controls (entity_type, entity_id, is_public) VALUES (?, ?, 0)',
 			args: [type, id]
@@ -198,21 +170,6 @@ export async function updateEntity(
 				args: [type, id]
 			}
 		];
-	if (type === 'talks') {
-		statements.push({
-			sql: `UPDATE talks SET
-				event_title = (SELECT title FROM events WHERE id = canonical_event_id),
-				date_start = (SELECT date_start FROM events WHERE id = canonical_event_id),
-				date_end = (SELECT date_end FROM events WHERE id = canonical_event_id),
-				year = (SELECT year FROM events WHERE id = canonical_event_id),
-				institution = (SELECT institution FROM events WHERE id = canonical_event_id),
-				city = (SELECT city FROM events WHERE id = canonical_event_id),
-				country = (SELECT country FROM events WHERE id = canonical_event_id),
-				modality = (SELECT modality FROM events WHERE id = canonical_event_id)
-			WHERE id = ? AND canonical_event_id IS NOT NULL`,
-			args: [id]
-		});
-	}
 	await db.batch(statements, 'write');
 }
 

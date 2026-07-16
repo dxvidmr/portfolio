@@ -87,7 +87,7 @@ describe('números', () => {
 
 describe('fechas parciales (formato canónico §5.2)', () => {
 	it('acepta AAAA, AAAA-MM y AAAA-MM-DD', () => {
-		for (const raw of ['2024', '2024-06', '2024-06-30']) {
+		for (const raw of ['2024', '2024-06', '2024-06-30', '2024-02-29']) {
 			const parsed = parseEntityForm(def(field('date_start', 'date')), formData({ date_start: raw }));
 			expect(parsed.errors.date_start, raw).toBeUndefined();
 			expect(parsed.values.date_start).toBe(raw);
@@ -95,7 +95,16 @@ describe('fechas parciales (formato canónico §5.2)', () => {
 	});
 
 	it('rechaza meses y días imposibles y otros formatos', () => {
-		for (const raw of ['2024-13', '2024-00', '2024-06-32', '2024-06-00', '30/06/2024', 'junio']) {
+		for (const raw of [
+			'2024-13',
+			'2024-00',
+			'2024-06-31',
+			'2023-02-29',
+			'2024-06-32',
+			'2024-06-00',
+			'30/06/2024',
+			'junio'
+		]) {
 			const parsed = parseEntityForm(def(field('date_start', 'date')), formData({ date_start: raw }));
 			expect(parsed.errors.date_start, raw).toBeTruthy();
 		}
@@ -104,14 +113,14 @@ describe('fechas parciales (formato canónico §5.2)', () => {
 
 describe('booleanos (checkbox)', () => {
 	it('marcado persiste 1', () => {
-		const parsed = parseEntityForm(def(field('is_ongoing', 'boolean')), formData({ is_ongoing: '1' }));
-		expect(parsed.values.is_ongoing).toBe(1);
+		const parsed = parseEntityForm(def(field('is_native', 'boolean')), formData({ is_native: '1' }));
+		expect(parsed.values.is_native).toBe(1);
 	});
 
 	it('sin marcar persiste 0, nunca null', () => {
-		const parsed = parseEntityForm(def(field('is_ongoing', 'boolean')), formData({}));
-		expect(parsed.values.is_ongoing).toBe(0);
-		expect(parsed.errors.is_ongoing).toBeUndefined();
+		const parsed = parseEntityForm(def(field('is_native', 'boolean')), formData({}));
+		expect(parsed.values.is_native).toBe(0);
+		expect(parsed.errors.is_native).toBeUndefined();
 	});
 });
 

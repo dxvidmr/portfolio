@@ -1,5 +1,6 @@
 import { db } from '$lib/server/db';
 import type { EntryKey } from './controls';
+import { isValidPartialDate } from './date-validation';
 import { entityForms, type FieldDef } from './entity-definitions';
 import type { FieldValue } from './validation';
 
@@ -61,7 +62,7 @@ const text = (value: FormDataEntryValue | null, max: number) =>
 const nullable = (value: unknown) => (value == null ? null : String(value));
 
 function validDate(value: string): boolean {
-	return value === '' || /^\d{4}(?:-\d{2}(?:-\d{2})?)?$/.test(value);
+	return value === '' || isValidPartialDate(value);
 }
 
 function validUrl(value: string): boolean {
@@ -244,14 +245,10 @@ export interface UnifiedRoles {
 }
 
 // Campos propios de cada rol en el alta unificada: los del formulario del tipo
-// sin el selector de evento (implícito), sin las columnas que se sincronizan
-// desde el evento canónico y sin los campos que solo tienen sentido en
+// sin el selector de evento (implícito) y sin los campos que solo tienen sentido en
 // servicios ajenos a eventos (revista/entidad y obra relacionada, propios de
 // revisiones de artículos o volúmenes).
 const SERVICE_EVENT_OMITTED = new Set([
-	'date_start',
-	'date_end',
-	'year',
 	'city',
 	'country',
 	'venue_or_journal',
@@ -270,14 +267,6 @@ export async function createEventWithRoles(
 	eventValues: CanonicalEventValues,
 	roles: UnifiedRoles
 ): Promise<number> {
-	const copies = {
-		date_start: eventValues.date_start || null,
-		date_end: eventValues.date_end || null,
-		year: eventValues.year ? Number(eventValues.year) : null,
-		city: eventValues.city || null,
-		country: eventValues.country || null
-	};
-
 	const tx = await db.transaction('write');
 	try {
 		const insertedEvent = await tx.execute({
@@ -291,31 +280,12 @@ export async function createEventWithRoles(
 
 		if (roles.talk) {
 			const cols = unifiedTalkFields.map((field) => field.name);
-			const allCols = [
-				...cols,
-				'canonical_event_id',
-				'event_title',
-				'date_start',
-				'date_end',
-				'year',
-				'institution',
-				'city',
-				'country',
-				'modality'
-			];
+			const allCols = [...cols, 'canonical_event_id'];
 			const inserted = await tx.execute({
 				sql: `INSERT INTO talks (${allCols.join(', ')}) VALUES (${allCols.map(() => '?').join(', ')})`,
 				args: [
 					...cols.map((col) => roles.talk?.[col] ?? null),
-					eventId,
-					eventValues.title,
-					copies.date_start,
-					copies.date_end,
-					copies.year,
-					eventValues.institution || null,
-					copies.city,
-					copies.country,
-					eventValues.modality || null
+					eventId
 				]
 			});
 			await tx.execute({
@@ -326,25 +296,12 @@ export async function createEventWithRoles(
 
 		if (roles.service) {
 			const cols = unifiedServiceFields.map((field) => field.name);
-			const allCols = [
-				...cols,
-				'canonical_event_id',
-				'date_start',
-				'date_end',
-				'year',
-				'city',
-				'country'
-			];
+			const allCols = [...cols, 'canonical_event_id'];
 			const inserted = await tx.execute({
 				sql: `INSERT INTO service_activities (${allCols.join(', ')}) VALUES (${allCols.map(() => '?').join(', ')})`,
 				args: [
 					...cols.map((col) => roles.service?.[col] ?? null),
-					eventId,
-					copies.date_start,
-					copies.date_end,
-					copies.year,
-					copies.city,
-					copies.country
+					eventId
 				]
 			});
 			await tx.execute({
@@ -373,47 +330,15 @@ export async function createEventWithRoles(
 }
 
 export async function updateCanonicalEvent(id: number, values: CanonicalEventValues): Promise<void> {
-	const results = await db.batch([
-		{
-			sql: `UPDATE events SET
-				title = ?, date_start = ?, date_end = ?, year = ?, institution = ?,
-				city = ?, country = ?, modality = ?, url = ?, notes_private = ?,
-				updated_at = datetime('now')
-			WHERE id = ?`,
-			args: [...dbValues(values), id]
-		},
-		{
-			sql: `UPDATE talks SET
-				event_title = ?, date_start = ?, date_end = ?, year = ?, institution = ?,
-				city = ?, country = ?, modality = ?
-			WHERE canonical_event_id = ?`,
-			args: [
-				values.title,
-				values.date_start || null,
-				values.date_end || null,
-				values.year ? Number(values.year) : null,
-				values.institution || null,
-				values.city || null,
-				values.country || null,
-				values.modality || null,
-				id
-			]
-		},
-		{
-			sql: `UPDATE service_activities SET
-				date_start = ?, date_end = ?, year = ?, city = ?, country = ?
-			WHERE canonical_event_id = ?`,
-			args: [
-				values.date_start || null,
-				values.date_end || null,
-				values.year ? Number(values.year) : null,
-				values.city || null,
-				values.country || null,
-				id
-			]
-		}
-	], 'write');
-	if (results[0].rowsAffected === 0) throw new Error('El evento no existe');
+	const result = await db.execute({
+		sql: `UPDATE events SET
+			title = ?, date_start = ?, date_end = ?, year = ?, institution = ?,
+			city = ?, country = ?, modality = ?, url = ?, notes_private = ?,
+			updated_at = datetime('now')
+		WHERE id = ?`,
+		args: [...dbValues(values), id]
+	});
+	if (result.rowsAffected === 0) throw new Error('El evento no existe');
 }
 
 export async function saveEventAttendance(
