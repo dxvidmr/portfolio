@@ -1,11 +1,27 @@
 <script lang="ts">
-	import MoveUpRight from '@lucide/svelte/icons/move-up-right';
 	import type { Locale } from '$lib/paraglide/runtime';
 	import { createReveal } from '$lib/actions/reveal';
+	import EditorialCaseLinks from './EditorialCaseLinks.svelte';
 	import ProjectFigure from './ProjectFigure.svelte';
 
 	let { locale }: { locale: Locale } = $props();
 	const reveal = createReveal({ threshold: 0.14, rootMargin: '0px 0px -8% 0px' });
+	const headingClass = 'tw:m-0 tw:font-[450] tw:tracking-[-0.04em]';
+	const bodyClass = 'tw:text-ink-dim tw:leading-[1.68]';
+	const storySectionClass =
+		'tw:grid tw:scroll-mt-[110px] tw:gap-[clamp(44px,7vw,90px)]';
+	const sectionCopyClass =
+		'tw:grid tw:grid-cols-[minmax(280px,.7fr)_minmax(0,1.3fr)] tw:items-end tw:gap-[clamp(32px,7vw,100px)] tw:max-[900px]:grid-cols-1';
+	const labelClass =
+		'meta tw:col-span-full tw:mt-0 tw:mb-[-8px] tw:text-accent-strong tw:max-[900px]:col-auto';
+	const sectionHeadingClass = `${headingClass} tw:col-start-1 tw:text-[clamp(2.35rem,5vw,5.4rem)] tw:leading-[0.93] tw:max-[900px]:col-auto`;
+	const sectionBodyClass = `${bodyClass} tw:col-start-2 tw:m-0 tw:max-w-[72ch] tw:max-[900px]:col-auto`;
+	const caseCopyClass =
+		'tw:grid tw:grid-cols-[minmax(220px,.38fr)_minmax(0,.62fr)] tw:items-start tw:gap-[clamp(24px,5vw,70px)] tw:border-t tw:border-rule tw:pt-[18px] tw:max-[900px]:grid-cols-1';
+	const caseHeadingClass = `${headingClass} tw:text-[clamp(1.55rem,2.8vw,3rem)] tw:leading-[0.96]`;
+	const caseBodyClass = `${bodyClass} tw:m-0 tw:max-w-[66ch]`;
+	const figureGridClass =
+		'tw:grid tw:grid-cols-12 tw:items-start tw:gap-[clamp(22px,3vw,40px)] tw:max-[900px]:block';
 
 	const copy = $derived(locale === 'es' ? {
 		label: 'XML-TEI · herramientas · corpus',
@@ -223,379 +239,140 @@
 
 </script>
 
-<section class="digital-story">
-	<article id="herramientas" class="tools" use:reveal>
-		<div class="section-copy">
-			<p class="meta label">{copy.toolsLabel}</p>
-			<h3>{copy.toolsTitle}</h3>
-			<p>{copy.toolsBody}</p>
+<section
+	class="tw:grid tw:gap-[clamp(90px,13vw,190px)] tw:border-t tw:border-rule tw:py-[clamp(76px,11vw,150px)]"
+>
+	<article id="herramientas" class={storySectionClass} use:reveal>
+		<div class={sectionCopyClass}>
+			<p class={labelClass}>{copy.toolsLabel}</p>
+			<h3 class={sectionHeadingClass}>{copy.toolsTitle}</h3>
+			<p class={sectionBodyClass}>{copy.toolsBody}</p>
 			<div>
-				<p class="note">{copy.toolsNote}</p>
-				<div class="case-links">
-					{#each copy.toolsLinks as link (link.href)}
-						<a class="meta" href={link.href} target="_blank" rel="noreferrer">
-							{link.label}
-							<MoveUpRight size={16} strokeWidth={1.8} aria-hidden="true" />
-						</a>
-					{/each}
-				</div>
+				<p
+					class="tw:m-0 tw:border-t tw:border-rule tw:pt-[18px] tw:text-[0.78rem] tw:leading-[1.68] tw:text-ink-faint"
+				>
+					{copy.toolsNote}
+				</p>
+				<EditorialCaseLinks links={copy.toolsLinks} />
 			</div>
 		</div>
-		<div class="fenix-grid">
-			<ProjectFigure {...copy.toolsFigures[0]} number="01" priority />
-			<ProjectFigure {...copy.toolsFigures[1]} number="02" />
-			<ProjectFigure {...copy.toolsFigures[2]} number="03" />
+		<div class={figureGridClass}>
+			<div class="tw:col-span-7 tw:col-start-1 tw:max-[900px]:mt-[34px]">
+				<ProjectFigure {...copy.toolsFigures[0]} number="01" priority />
+			</div>
+			<div
+				class="tw:col-span-5 tw:col-start-8 tw:mt-[clamp(30px,7vw,90px)] tw:max-[900px]:mt-[34px]"
+			>
+				<ProjectFigure {...copy.toolsFigures[1]} number="02" />
+			</div>
+			<div class="tw:col-span-8 tw:col-start-3 tw:max-[900px]:mt-[34px]">
+				<ProjectFigure {...copy.toolsFigures[2]} number="03" />
+			</div>
 		</div>
 	</article>
 
-	<article id="ediciones-web" class="editions" use:reveal>
-		<div class="section-copy">
-			<p class="meta label">{copy.editionsLabel}</p>
-			<h3>{copy.editionsTitle}</h3>
-			<p>{copy.editionsBody}</p>
+	<article
+		id="ediciones-web"
+		class={`${storySectionClass} tw:border-y tw:border-rule tw:py-[clamp(62px,9vw,110px)]`}
+		use:reveal
+	>
+		<div class={sectionCopyClass}>
+			<p class={labelClass}>{copy.editionsLabel}</p>
+			<h3 class={sectionHeadingClass}>{copy.editionsTitle}</h3>
+			<p class={sectionBodyClass}>{copy.editionsBody}</p>
 		</div>
-		<div class="edition-projects">
-			<section class="edition-project">
-				<div class="case-copy">
-					<h4>{copy.frayTitle}</h4>
+		<div class="tw:grid tw:gap-[clamp(70px,11vw,150px)]">
+			<section class="tw:grid tw:gap-[clamp(34px,6vw,80px)]">
+				<div class={caseCopyClass}>
+					<h4 class={caseHeadingClass}>{copy.frayTitle}</h4>
 					<div>
-						<p>{copy.frayBody}</p>
-						<div class="case-links">
-							{#each copy.frayLinks as link (link.href)}
-								<a class="meta" href={link.href} target="_blank" rel="noreferrer">
-									{link.label}
-									<MoveUpRight size={16} strokeWidth={1.8} aria-hidden="true" />
-								</a>
-							{/each}
-						</div>
+						<p class={caseBodyClass}>{copy.frayBody}</p>
+						<EditorialCaseLinks links={copy.frayLinks} />
 					</div>
 				</div>
-				<div class="fray-grid">
-					<ProjectFigure {...copy.frayFigures[0]} number="04" />
-					<ProjectFigure {...copy.frayFigures[1]} number="05" />
-					<ProjectFigure {...copy.frayFigures[2]} number="06" />
+				<div class={figureGridClass}>
+					<div class="tw:col-span-6 tw:col-start-1 tw:max-[900px]:mt-[34px]">
+						<ProjectFigure {...copy.frayFigures[0]} number="04" />
+					</div>
+					<div
+						class="tw:col-span-6 tw:col-start-7 tw:mt-[clamp(36px,8vw,112px)] tw:max-[900px]:mt-[34px]"
+					>
+						<ProjectFigure {...copy.frayFigures[1]} number="05" />
+					</div>
+					<div class="tw:col-span-9 tw:col-start-2 tw:max-[900px]:mt-[34px]">
+						<ProjectFigure {...copy.frayFigures[2]} number="06" />
+					</div>
 				</div>
 			</section>
 
-			<section class="edition-project">
-				<div class="case-copy">
-					<h4>{copy.fuenteTitle}</h4>
+			<section class="tw:grid tw:gap-[clamp(34px,6vw,80px)]">
+				<div class={caseCopyClass}>
+					<h4 class={caseHeadingClass}>{copy.fuenteTitle}</h4>
 					<div>
-						<p>{copy.fuenteBody}</p>
-						<div class="case-links">
-							{#each copy.fuenteLinks as link (link.href)}
-								<a class="meta" href={link.href} target="_blank" rel="noreferrer">
-									{link.label}
-									<MoveUpRight size={16} strokeWidth={1.8} aria-hidden="true" />
-								</a>
-							{/each}
-						</div>
+						<p class={caseBodyClass}>{copy.fuenteBody}</p>
+						<EditorialCaseLinks links={copy.fuenteLinks} />
 					</div>
 				</div>
-				<div class="fuente-grid">
-					<ProjectFigure {...copy.fuenteFigures[0]} number="07" />
-					<ProjectFigure {...copy.fuenteFigures[1]} number="08" />
-					<ProjectFigure {...copy.fuenteFigures[2]} number="09" />
+				<div class={figureGridClass}>
+					<div class="tw:col-span-8 tw:col-start-1 tw:max-[900px]:mt-[34px]">
+						<ProjectFigure {...copy.fuenteFigures[0]} number="07" />
+					</div>
+					<div
+						class="tw:col-span-7 tw:col-start-6 tw:mt-[clamp(36px,8vw,108px)] tw:max-[900px]:mt-[34px]"
+					>
+						<ProjectFigure {...copy.fuenteFigures[1]} number="08" />
+					</div>
+					<div class="tw:col-span-7 tw:col-start-2 tw:max-[900px]:mt-[34px]">
+						<ProjectFigure {...copy.fuenteFigures[2]} number="09" />
+					</div>
 				</div>
 			</section>
 		</div>
 	</article>
 
-	<article id="corpus-digitales" class="corpus" use:reveal>
-		<div class="section-copy">
-			<p class="meta label">{copy.corpusLabel}</p>
-			<h3>{copy.corpusTitle}</h3>
-			<p>{copy.corpusBody}</p>
+	<article id="corpus-digitales" class={storySectionClass} use:reveal>
+		<div class={sectionCopyClass}>
+			<p class={labelClass}>{copy.corpusLabel}</p>
+			<h3 class={sectionHeadingClass}>{copy.corpusTitle}</h3>
+			<p class={sectionBodyClass}>{copy.corpusBody}</p>
 		</div>
-		<div class="corpus-projects">
-			<section class="corpus-project">
-				<div class="case-copy tbso-copy">
-					<h4>{copy.tbsoTitle}</h4>
+		<div class="tw:grid tw:gap-[clamp(70px,11vw,150px)]">
+			<section class="tw:grid tw:gap-[clamp(34px,6vw,80px)]">
+				<div
+					class="tw:grid tw:grid-cols-[minmax(200px,.28fr)_minmax(0,.42fr)_minmax(240px,.3fr)] tw:items-start tw:gap-[clamp(22px,4vw,56px)] tw:border-t tw:border-rule tw:pt-[18px] tw:max-[900px]:grid-cols-1"
+				>
+					<h4 class={caseHeadingClass}>{copy.tbsoTitle}</h4>
 					<div>
-						<p>{copy.tbsoBody}</p>
-						<div class="case-links">
-							{#each copy.tbsoLinks as link (link.href)}
-								<a class="meta" href={link.href} target="_blank" rel="noreferrer">
-									{link.label}
-									<MoveUpRight size={16} strokeWidth={1.8} aria-hidden="true" />
-								</a>
-							{/each}
-						</div>
+						<p class={caseBodyClass}>{copy.tbsoBody}</p>
+						<EditorialCaseLinks links={copy.tbsoLinks} />
 					</div>
-					<div class="tbso-inline-figure">
+					<div
+						class="tw:mt-[-8px] tw:[&_figcaption]:max-w-[34ch] tw:max-[900px]:mt-[30px]"
+					>
 						<ProjectFigure {...copy.tbsoFigures[0]} number="10" />
 					</div>
 				</div>
 			</section>
 
-			<section class="corpus-project">
-				<div class="case-copy">
-					<h4>{copy.dracorTitle}</h4>
+			<section class="tw:grid tw:gap-[clamp(34px,6vw,80px)]">
+				<div class={caseCopyClass}>
+					<h4 class={caseHeadingClass}>{copy.dracorTitle}</h4>
 					<div>
-						<p>{copy.dracorBody}</p>
-						<div class="case-links">
-							{#each copy.dracorLinks as link (link.href)}
-								<a class="meta" href={link.href} target="_blank" rel="noreferrer">
-									{link.label}
-									<MoveUpRight size={16} strokeWidth={1.8} aria-hidden="true" />
-								</a>
-							{/each}
-						</div>
+						<p class={caseBodyClass}>{copy.dracorBody}</p>
+						<EditorialCaseLinks links={copy.dracorLinks} />
 					</div>
 				</div>
-				<div class="dracor-grid">
-					<ProjectFigure {...copy.dracorFigures[0]} number="11" />
-					<ProjectFigure {...copy.dracorFigures[1]} number="12" />
+				<div class={figureGridClass}>
+					<div class="tw:col-span-6 tw:col-start-1 tw:max-[900px]:mt-[34px]">
+						<ProjectFigure {...copy.dracorFigures[0]} number="11" />
+					</div>
+					<div
+						class="tw:col-span-6 tw:col-start-7 tw:mt-[clamp(28px,5vw,64px)] tw:max-[900px]:mt-[34px]"
+					>
+						<ProjectFigure {...copy.dracorFigures[1]} number="12" />
+					</div>
 				</div>
 			</section>
 		</div>
 	</article>
 </section>
-
-<style>
-	.digital-story {
-		display: grid;
-		gap: clamp(90px, 13vw, 190px);
-		padding-block: clamp(76px, 11vw, 150px);
-		border-top: 1px solid var(--line-strong);
-	}
-
-	.digital-story h3,
-	.digital-story h4 {
-		margin: 0;
-		font-weight: 450;
-		letter-spacing: -0.04em;
-	}
-
-	.digital-story p:not(.label) {
-		color: var(--fg-dim);
-		line-height: 1.68;
-	}
-
-	.label {
-		margin: 0 0 16px;
-		color: var(--accent-strong);
-	}
-
-	.tools,
-	.editions,
-	.corpus {
-		display: grid;
-		gap: clamp(44px, 7vw, 90px);
-		scroll-margin-top: 110px;
-	}
-
-	.section-copy {
-		display: grid;
-		grid-template-columns: minmax(280px, 0.7fr) minmax(0, 1.3fr);
-		gap: clamp(32px, 7vw, 100px);
-		align-items: end;
-	}
-
-	.section-copy h3 {
-		grid-column: 1;
-		font-size: clamp(2.35rem, 5vw, 5.4rem);
-		line-height: 0.93;
-	}
-
-	.section-copy > p:not(.label) {
-		grid-column: 2;
-		max-width: 72ch;
-		margin: 0;
-	}
-
-	.section-copy .label {
-		grid-column: 1 / -1;
-		margin-bottom: -8px;
-	}
-
-	.note {
-		margin: 0;
-		padding-top: 18px;
-		border-top: 1px solid var(--line);
-		color: var(--fg-faint) !important;
-		font-size: 0.78rem;
-	}
-
-	.case-links {
-		display: flex;
-		flex-wrap: wrap;
-		gap: 8px 18px;
-		margin-top: 18px;
-	}
-
-	.case-links a {
-		display: inline-flex;
-		gap: 6px;
-		align-items: center;
-		color: var(--fg);
-		text-decoration: none;
-		transition: color 180ms ease;
-	}
-
-	.case-links a :global(svg) {
-		color: var(--accent-strong);
-		transition: transform 180ms ease;
-	}
-
-	.case-links a:hover,
-	.case-links a:focus-visible {
-		color: var(--accent-strong);
-	}
-
-	.case-links a:hover :global(svg),
-	.case-links a:focus-visible :global(svg) {
-		transform: translate(3px, -3px);
-	}
-
-	.fenix-grid,
-	.fray-grid,
-	.fuente-grid,
-	.dracor-grid {
-		display: grid;
-		grid-template-columns: repeat(12, minmax(0, 1fr));
-		gap: clamp(22px, 3vw, 40px);
-		align-items: start;
-	}
-
-	.fenix-grid > :global(figure:first-child) {
-		grid-column: 1 / span 7;
-	}
-
-	.fenix-grid > :global(figure:nth-child(2)) {
-		grid-column: 8 / span 5;
-		margin-top: clamp(30px, 7vw, 90px);
-	}
-
-	.fenix-grid > :global(figure:nth-child(3)) {
-		grid-column: 3 / span 8;
-	}
-
-	.editions {
-		padding-block: clamp(62px, 9vw, 110px);
-		border-block: 1px solid var(--line-strong);
-	}
-
-	.edition-projects,
-	.corpus-projects {
-		display: grid;
-	}
-
-	.edition-projects,
-	.corpus-projects {
-		gap: clamp(70px, 11vw, 150px);
-	}
-
-	.edition-project,
-	.corpus-project {
-		display: grid;
-		gap: clamp(34px, 6vw, 80px);
-	}
-
-	.case-copy {
-		padding-top: 18px;
-		border-top: 1px solid var(--line);
-	}
-
-	.case-copy {
-		display: grid;
-		grid-template-columns: minmax(220px, 0.38fr) minmax(0, 0.62fr);
-		gap: clamp(24px, 5vw, 70px);
-		align-items: start;
-	}
-
-	.tbso-copy {
-		grid-template-columns: minmax(200px, 0.28fr) minmax(0, 0.42fr) minmax(240px, 0.3fr);
-		gap: clamp(22px, 4vw, 56px);
-		align-items: start;
-	}
-
-	.tbso-inline-figure {
-		margin-top: -8px;
-	}
-
-	.tbso-inline-figure :global(figcaption) {
-		max-width: 34ch;
-	}
-
-	.case-copy h4,
-	.corpus-project h4 {
-		font-size: clamp(1.55rem, 2.8vw, 3rem);
-		line-height: 0.96;
-	}
-
-	.case-copy p {
-		max-width: 66ch;
-	}
-
-	.case-copy p {
-		margin: 0;
-	}
-
-	.fray-grid > :global(figure:first-child) {
-		grid-column: 1 / span 6;
-	}
-
-	.fray-grid > :global(figure:nth-child(2)) {
-		grid-column: 7 / span 6;
-		margin-top: clamp(36px, 8vw, 112px);
-	}
-
-	.fray-grid > :global(figure:nth-child(3)) {
-		grid-column: 2 / span 9;
-	}
-
-	.fuente-grid > :global(figure:first-child) {
-		grid-column: 1 / span 8;
-	}
-
-	.fuente-grid > :global(figure:nth-child(2)) {
-		grid-column: 6 / span 7;
-		margin-top: clamp(36px, 8vw, 108px);
-	}
-
-	.fuente-grid > :global(figure:nth-child(3)) {
-		grid-column: 2 / span 7;
-	}
-
-	.dracor-grid > :global(figure:first-child) {
-		grid-column: 1 / span 6;
-	}
-
-	.dracor-grid > :global(figure:nth-child(2)) {
-		grid-column: 7 / span 6;
-		margin-top: clamp(28px, 5vw, 64px);
-	}
-
-	@media (max-width: 900px) {
-		.section-copy,
-		.case-copy {
-			grid-template-columns: 1fr;
-		}
-
-		.section-copy h3,
-		.section-copy > p:not(.label),
-		.section-copy .label {
-			grid-column: auto;
-		}
-
-		.fenix-grid,
-		.fray-grid,
-		.fuente-grid,
-		.dracor-grid {
-			display: block;
-		}
-
-		.fenix-grid > :global(figure),
-		.fray-grid > :global(figure),
-		.fuente-grid > :global(figure),
-		.dracor-grid > :global(figure) {
-			margin-top: 34px;
-		}
-
-		.tbso-inline-figure {
-			margin-top: 30px;
-		}
-	}
-
-</style>
