@@ -224,6 +224,26 @@
 			]
 		}
 	];
+	const placementClasses: Record<string, string> = {
+		'arenga-inicio':
+			'tw:top-[8vh] tw:left-[-7.5rem] tw:[--scene-x:-24vw] tw:[--scene-y:-20vh] tw:[--scene-rotation:-5deg] tw:max-[780px]:top-[7vh] tw:max-[780px]:left-[-17rem]',
+		'arenga-centro':
+			'tw:top-[7vh] tw:right-[-8rem] tw:[--scene-x:24vw] tw:[--scene-y:-18vh] tw:[--scene-rotation:5deg] tw:max-[780px]:top-[5vh] tw:max-[780px]:right-[-17rem]',
+		'arenga-final':
+			'tw:bottom-[-3.5vh] tw:left-[-6rem] tw:[--scene-x:-22vw] tw:[--scene-y:23vh] tw:[--scene-rotation:-4deg] tw:max-[780px]:bottom-[-3vh] tw:max-[780px]:left-[-17rem]',
+		frondoso:
+			'tw:bottom-[7vh] tw:left-[4vw] tw:w-[min(29rem,35vw)] tw:[--scene-x:-28vw] tw:[--scene-y:22vh] tw:[--scene-rotation:-5deg] tw:max-[780px]:bottom-[5vh] tw:max-[780px]:left-[-15rem] tw:max-[780px]:w-[25rem]',
+		voces:
+			'tw:top-[45vh] tw:right-[8vw] tw:w-[min(25rem,31vw)] tw:[--scene-x:28vw] tw:[--scene-y:22vh] tw:[--scene-rotation:6deg] tw:max-[780px]:top-[48vh] tw:max-[780px]:right-[-14rem] tw:max-[780px]:w-[23rem]',
+		flores:
+			'tw:top-[14vh] tw:left-[18vw] tw:w-[min(27rem,33vw)] tw:[--scene-x:-28vw] tw:[--scene-y:-22vh] tw:[--scene-rotation:-6deg] tw:max-[780px]:top-[17vh] tw:max-[780px]:left-[-9rem] tw:max-[780px]:w-[24rem]',
+		mujeres:
+			'tw:top-[27vh] tw:right-[10vw] tw:w-[min(28rem,34vw)] tw:[--scene-x:28vw] tw:[--scene-y:-18vh] tw:[--scene-rotation:5deg] tw:max-[780px]:top-[29vh] tw:max-[780px]:right-[-12rem] tw:max-[780px]:w-[24rem]',
+		pesquisidor:
+			'tw:bottom-[11vh] tw:left-[25vw] tw:w-[min(26rem,32vw)] tw:[--scene-x:-26vw] tw:[--scene-y:24vh] tw:[--scene-rotation:-5deg] tw:max-[780px]:bottom-[16vh] tw:max-[780px]:left-[-8rem] tw:max-[780px]:w-[23rem]',
+		mengo:
+			'tw:top-[18vh] tw:right-[16vw] tw:w-[min(25rem,31vw)] tw:[--scene-x:26vw] tw:[--scene-y:-22vh] tw:[--scene-rotation:5deg] tw:max-[780px]:top-[20vh] tw:max-[780px]:right-[-10rem] tw:max-[780px]:w-[23rem]'
+	};
 
 	let root = $state<HTMLDivElement | null>(null);
 
@@ -446,307 +466,51 @@
 	});
 </script>
 
-<div class="editorial-background" bind:this={root} aria-hidden="true">
-	<div class="editorial-background__wash"></div>
+<div
+	class="editorial-background tw:pointer-events-none tw:fixed tw:inset-0 tw:z-0 tw:overflow-hidden tw:[contain:strict] tw:[&.is-ready_.passage.is-scene-active]:opacity-[.78] tw:[&.is-ready_.passage.is-scene-active]:[filter:blur(0)] tw:[&.is-ready_.passage.is-scene-active]:[transform:translate3d(0,0,0)] tw:max-[780px]:[&.is-ready_.passage.is-scene-active]:opacity-[.64]"
+	bind:this={root}
+	aria-hidden="true"
+>
+	<div
+		class="tw:absolute tw:inset-0 tw:bg-[radial-gradient(ellipse_at_49%_46%,var(--bg)_0_22%,transparent_65%)] tw:opacity-[.92] tw:max-[780px]:bg-[radial-gradient(ellipse_at_46%_42%,var(--bg)_0_30%,transparent_76%)]"
+	></div>
 
 	{#each passages as passage (passage.id)}
-		<article class="passage passage--{passage.id}" data-scene={passage.scene}>
-			<header>
+		<article
+			class={`passage tw:absolute tw:w-[min(32rem,39vw)] tw:font-mono tw:text-[clamp(.56rem,.61vw,.68rem)] tw:leading-[1.18] tw:text-[var(--text-background)] tw:opacity-0 tw:[filter:blur(4px)] tw:[transform:translate3d(var(--scene-x),var(--scene-y),0)_scale(.84)_rotate(var(--scene-rotation))] tw:[transition:opacity_760ms_ease,filter_900ms_ease,transform_1150ms_cubic-bezier(.22,1,.36,1)] tw:will-change-[opacity,filter,transform] tw:[--scene-x:0vw] tw:[--scene-y:18vh] tw:[--scene-rotation:0deg] tw:motion-reduce:[filter:none] tw:motion-reduce:[transform:none] tw:motion-reduce:duration-[1ms] tw:max-[780px]:w-[25rem] tw:max-[780px]:text-[.55rem] ${placementClasses[passage.id]}`}
+			data-scene={passage.scene}
+		>
+			<header class="tw:flex tw:justify-between tw:gap-4 tw:text-[.82em] tw:tracking-[.045em] tw:text-[var(--text-background-strong)]">
 				<span>{passage.label}</span>
 				<span>{passage.range}</span>
 			</header>
-			<strong>{passage.speaker}</strong>
-			<div class="verses">
+			<strong class="tw:mt-[.48rem] tw:mr-0 tw:mb-[.32rem] tw:ml-[3.2rem] tw:block tw:font-medium tw:tracking-[.15em] tw:text-[var(--text-background-strong)]">{passage.speaker}</strong>
+			<div class="tw:grid tw:gap-[.12rem]">
 				{#each passage.lines as line (line.n)}
-					<div>
-						<span class="verse-number">{line.n}</span>
-						<p>
+					<div class="tw:grid tw:grid-cols-[2.65rem_minmax(0,1fr)_auto] tw:items-baseline tw:gap-[.55rem]">
+						<span class="tw:text-right tw:text-[var(--text-background-faint)] tw:[font-variant-numeric:tabular-nums]">{line.n}</span>
+						<p class="tw:m-0 tw:whitespace-nowrap">
 							{#each line.parts as part}
 								{#if part.marked}
-									<mark>
+									<mark class="tw:bg-accent-wash tw:px-[.12em] tw:text-[var(--accent-background-text)]">
 										{#each [...part.text] as character}
-											<span class="glyph">{character}</span>
+											<span class="glyph tw:inline-block tw:whitespace-pre">{character}</span>
 										{/each}
 									</mark>
 								{:else}
 									{#each [...part.text] as character}
-										<span class="glyph">{character}</span>
+									<span class="glyph tw:inline-block tw:whitespace-pre">{character}</span>
 									{/each}
 								{/if}
 							{/each}
 						</p>
 						{#if line.segmentIds.length}
-							<small>{line.segmentIds.join(' · ')}</small>
+							<small class="tw:text-[.69em] tw:tracking-[.025em] tw:text-[var(--accent-background-text)] tw:max-[780px]:hidden">{line.segmentIds.join(' · ')}</small>
 						{/if}
 					</div>
 				{/each}
 			</div>
-			<footer>&lt;/sp&gt;</footer>
+			<footer class="tw:mt-[.38rem] tw:flex tw:justify-end tw:gap-4 tw:text-[.82em] tw:tracking-[.045em] tw:text-[var(--text-background-strong)]">&lt;/sp&gt;</footer>
 		</article>
 	{/each}
 </div>
-
-<style>
-	.editorial-background {
-		position: fixed;
-		inset: 0;
-		z-index: 0;
-		overflow: hidden;
-		pointer-events: none;
-		contain: strict;
-	}
-
-	.editorial-background__wash {
-		position: absolute;
-		inset: 0;
-		background: radial-gradient(ellipse at 49% 46%, var(--bg) 0 22%, transparent 65%);
-		opacity: 0.92;
-	}
-
-	.passage {
-		--scene-x: 0vw;
-		--scene-y: 18vh;
-		--scene-rotation: 0deg;
-		position: absolute;
-		width: min(32rem, 39vw);
-		color: var(--text-background);
-		font-family: var(--font-mono);
-		font-size: clamp(0.56rem, 0.61vw, 0.68rem);
-		line-height: 1.18;
-		opacity: 0;
-		filter: blur(4px);
-		transform: translate3d(var(--scene-x), var(--scene-y), 0) scale(0.84)
-			rotate(var(--scene-rotation));
-		transition:
-			opacity 760ms ease,
-			filter 900ms ease,
-			transform 1150ms cubic-bezier(0.22, 1, 0.36, 1);
-		will-change: opacity, filter, transform;
-	}
-
-	.editorial-background:global(.is-ready) .passage:global(.is-scene-active) {
-		opacity: 0.78;
-		filter: blur(0);
-		transform: translate3d(0, 0, 0);
-	}
-
-	.passage header,
-	.passage footer {
-		display: flex;
-		justify-content: space-between;
-		gap: 1rem;
-		color: var(--text-background-strong);
-		font-size: 0.82em;
-		letter-spacing: 0.045em;
-	}
-
-	.passage strong {
-		display: block;
-		margin: 0.48rem 0 0.32rem 3.2rem;
-		color: var(--text-background-strong);
-		font-weight: 500;
-		letter-spacing: 0.15em;
-	}
-
-	.verses {
-		display: grid;
-		gap: 0.12rem;
-	}
-
-	.verses > div {
-		display: grid;
-		grid-template-columns: 2.65rem minmax(0, 1fr) auto;
-		gap: 0.55rem;
-		align-items: baseline;
-	}
-
-	.verse-number {
-		color: var(--text-background-faint);
-		text-align: right;
-		font-variant-numeric: tabular-nums;
-	}
-
-	.verses p {
-		margin: 0;
-		white-space: nowrap;
-	}
-
-	.verses small {
-		color: var(--accent-background-text);
-		font-size: 0.69em;
-		letter-spacing: 0.025em;
-	}
-
-	mark {
-		padding: 0 0.12em;
-		background: var(--accent-wash);
-		color: var(--accent-background-text);
-	}
-
-	.glyph {
-		display: inline-block;
-		white-space: pre;
-	}
-
-	.passage footer {
-		justify-content: flex-end;
-		margin-top: 0.38rem;
-	}
-
-	.passage--arenga-inicio {
-		--scene-x: -24vw;
-		--scene-y: -20vh;
-		--scene-rotation: -5deg;
-		left: -7.5rem;
-		top: 8vh;
-	}
-
-	.passage--arenga-centro {
-		--scene-x: 24vw;
-		--scene-y: -18vh;
-		--scene-rotation: 5deg;
-		right: -8rem;
-		top: 7vh;
-	}
-
-	.passage--arenga-final {
-		--scene-x: -22vw;
-		--scene-y: 23vh;
-		--scene-rotation: -4deg;
-		left: -6rem;
-		bottom: -3.5vh;
-	}
-
-	.passage--frondoso {
-		--scene-x: -28vw;
-		--scene-y: 22vh;
-		--scene-rotation: -5deg;
-		left: 4vw;
-		bottom: 7vh;
-		width: min(29rem, 35vw);
-	}
-
-	.passage--voces {
-		--scene-x: 28vw;
-		--scene-y: 22vh;
-		--scene-rotation: 6deg;
-		right: 8vw;
-		top: 45vh;
-		width: min(25rem, 31vw);
-	}
-
-	.passage--flores {
-		--scene-x: -28vw;
-		--scene-y: -22vh;
-		--scene-rotation: -6deg;
-		left: 18vw;
-		top: 14vh;
-		width: min(27rem, 33vw);
-	}
-
-	.passage--mujeres {
-		--scene-x: 28vw;
-		--scene-y: -18vh;
-		--scene-rotation: 5deg;
-		right: 10vw;
-		top: 27vh;
-		width: min(28rem, 34vw);
-	}
-
-	.passage--pesquisidor {
-		--scene-x: -26vw;
-		--scene-y: 24vh;
-		--scene-rotation: -5deg;
-		left: 25vw;
-		bottom: 11vh;
-		width: min(26rem, 32vw);
-	}
-
-	.passage--mengo {
-		--scene-x: 26vw;
-		--scene-y: -22vh;
-		--scene-rotation: 5deg;
-		right: 16vw;
-		top: 18vh;
-		width: min(25rem, 31vw);
-	}
-
-	@media (max-width: 780px) {
-		.editorial-background__wash {
-			background: radial-gradient(ellipse at 46% 42%, var(--bg) 0 30%, transparent 76%);
-		}
-
-		.passage {
-			width: 25rem;
-			font-size: 0.55rem;
-		}
-
-		.editorial-background:global(.is-ready) .passage:global(.is-scene-active) {
-			opacity: 0.64;
-		}
-
-		.verses small {
-			display: none;
-		}
-
-		.passage--arenga-inicio {
-			left: -17rem;
-			top: 7vh;
-		}
-
-		.passage--arenga-centro {
-			right: -17rem;
-			top: 5vh;
-		}
-
-		.passage--arenga-final {
-			left: -17rem;
-			bottom: -3vh;
-		}
-
-		.passage--frondoso {
-			left: -15rem;
-			bottom: 5vh;
-			width: 25rem;
-		}
-
-		.passage--voces {
-			right: -14rem;
-			top: 48vh;
-			width: 23rem;
-		}
-
-		.passage--flores {
-			left: -9rem;
-			top: 17vh;
-			width: 24rem;
-		}
-
-		.passage--mujeres {
-			right: -12rem;
-			top: 29vh;
-			width: 24rem;
-		}
-
-		.passage--pesquisidor {
-			left: -8rem;
-			bottom: 16vh;
-			width: 23rem;
-		}
-
-		.passage--mengo {
-			right: -10rem;
-			top: 20vh;
-			width: 23rem;
-		}
-	}
-
-	@media (prefers-reduced-motion: reduce) {
-		.passage {
-			filter: none;
-			transform: none;
-			transition-duration: 1ms;
-		}
-	}
-
-</style>
