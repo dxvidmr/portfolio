@@ -7,6 +7,10 @@
 	import AdminToast from '$lib/components/AdminToast.svelte';
 	import AdminPageHeader from '$lib/components/admin/AdminPageHeader.svelte';
 	import ButtonLink from '$lib/components/ui/ButtonLink.svelte';
+	import AdminField from '$lib/components/admin/AdminField.svelte';
+	import Button from '$lib/components/ui/Button.svelte';
+	import Input from '$lib/components/ui/Input.svelte';
+	import Select from '$lib/components/ui/Select.svelte';
 	import type { ActionData, PageData } from './$types';
 
 	let { data, form }: { data: PageData; form: ActionData } = $props();
@@ -115,6 +119,9 @@
 
 	const isPending = (entry: Entry, control: Control) =>
 		pending.includes(`${entry.entityType}:${entry.entityId}:${control}`);
+	const tableHeadingClass =
+		'tw:border-b tw:border-rule tw:bg-[var(--admin-surface)] tw:p-3 tw:text-left tw:align-top tw:text-[0.68rem] tw:tracking-[0.08em] tw:text-ink-faint tw:uppercase';
+	const tableCellClass = 'tw:border-b tw:border-rule tw:p-3 tw:text-left tw:align-top';
 </script>
 
 <svelte:head>
@@ -139,146 +146,141 @@
 	<AdminToast message="Entrada eliminada." success={true} />
 {/if}
 
-<section class="filters" aria-label="Filtros de entradas">
-	<div class="filter-search">
-		<label>
-			<span>Buscar entradas</span>
-			<input type="search" bind:value={query} placeholder="Título de la entrada…" />
-		</label>
-		<div class="filter-summary" aria-live="polite">
-			<strong>{filteredEntries.length}</strong>
-			<span>resultados</span>
+<section class="tw:mb-6 tw:grid tw:gap-4 tw:rounded-ui tw:border tw:border-rule tw:bg-[var(--admin-surface)] tw:p-[clamp(0.8rem,2vw,1.15rem)]" aria-label="Filtros de entradas">
+	<div class="tw:grid tw:grid-cols-[minmax(0,1fr)_auto] tw:items-end tw:gap-4 tw:max-[640px]:grid-cols-1">
+		<AdminField class="tw:max-w-3xl" label="Buscar entradas">
+			<Input type="search" bind:value={query} placeholder="Título de la entrada…" />
+		</AdminField>
+		<div class="tw:grid tw:min-w-24 tw:text-right tw:text-ink-dim tw:max-[640px]:hidden" aria-live="polite">
+			<strong class="tw:font-title tw:text-[1.35rem] tw:font-medium tw:leading-none tw:text-ink">{filteredEntries.length}</strong>
+			<span class="tw:text-[0.65rem] tw:text-ink-faint">resultados</span>
 		</div>
 	</div>
 
-	<div class="filter-primary">
-		<label>
-			<span>Tipo</span>
-			<select bind:value={type}>
+	<div class="tw:grid tw:grid-cols-3 tw:gap-3 tw:max-[1100px]:grid-cols-2 tw:max-[640px]:grid-cols-1">
+		<AdminField label="Tipo">
+			<Select bind:value={type}>
 				<option value="">Todos los tipos</option>
 				{#each data.entityTypes as type (type.value)}
 					<option value={type.value}>{type.label}</option>
 				{/each}
-			</select>
-		</label>
-		<label>
-			<span>Visibilidad</span>
-			<select bind:value={visibility}>
+			</Select>
+		</AdminField>
+		<AdminField label="Visibilidad">
+			<Select bind:value={visibility}>
 				<option value="all">Públicas y privadas</option>
 				<option value="public">Solo públicas</option>
 				<option value="draft">Solo privadas</option>
-			</select>
-		</label>
-		<label>
-			<span>Orden</span>
-			<select bind:value={sortBy}>
+			</Select>
+		</AdminField>
+		<AdminField label="Orden">
+			<Select bind:value={sortBy}>
 				<option value="fecha">Más recientes primero</option>
 				<option value="nombre">Nombre A–Z</option>
 				<option value="actualizacion">Última modificación</option>
-			</select>
-		</label>
+			</Select>
+		</AdminField>
 	</div>
 
-	<details class="filter-advanced" open={Boolean(year || home !== 'all' || relations !== 'all')}>
-		<summary><ListFilter size={14} strokeWidth={1.8} aria-hidden="true" /> Más filtros</summary>
-		<div>
-			<label>
-				<span>Año</span>
-				<input bind:value={year} inputmode="numeric" pattern="[0-9]{4}" maxlength="4" placeholder="AAAA" />
-			</label>
-			<label>
-				<span>Portada</span>
-				<select bind:value={home}>
+	<details class="tw:rounded-ui tw:border tw:border-rule tw:bg-[color-mix(in_srgb,var(--bg)_45%,transparent)] tw:p-3 tw:[&[open]>summary]:mb-3" open={Boolean(year || home !== 'all' || relations !== 'all')}>
+		<summary class="tw:inline-flex tw:cursor-pointer tw:items-center tw:gap-1.5 tw:text-[0.7rem] tw:text-ink-dim"><ListFilter size={14} strokeWidth={1.8} aria-hidden="true" /> Más filtros</summary>
+		<div class="tw:grid tw:grid-cols-3 tw:gap-3 tw:max-[1100px]:grid-cols-2 tw:max-[640px]:grid-cols-1">
+			<AdminField label="Año">
+				<Input bind:value={year} inputmode="numeric" pattern="[0-9]{4}" maxlength={4} placeholder="AAAA" />
+			</AdminField>
+			<AdminField label="Portada">
+				<Select bind:value={home}>
 					<option value="all">En cualquier estado</option>
 					<option value="yes">En portada</option>
 					<option value="no">Fuera de portada</option>
-				</select>
-			</label>
-			<label>
-				<span>Relaciones</span>
-				<select bind:value={relations}>
+				</Select>
+			</AdminField>
+			<AdminField label="Relaciones">
+				<Select bind:value={relations}>
 					<option value="all">Con o sin relaciones</option>
 					<option value="with">Con relaciones</option>
 					<option value="without">Sin relaciones</option>
-				</select>
-			</label>
+				</Select>
+			</AdminField>
 		</div>
 	</details>
 
-	<div class="filter-actions">
-		<span>{activeFilterCount === 0 ? 'Sin filtros activos' : `${activeFilterCount} filtros activos`}</span>
-		<button type="button" onclick={resetFilters} disabled={activeFilterCount === 0 && sortBy === 'fecha'}>
-			Limpiar
-		</button>
+	<div class="tw:flex tw:items-center tw:justify-end tw:gap-3">
+		<span class="tw:text-[0.65rem] tw:text-ink-faint">{activeFilterCount === 0 ? 'Sin filtros activos' : `${activeFilterCount} filtros activos`}</span>
+		<Button onclick={resetFilters} disabled={activeFilterCount === 0 && sortBy === 'fecha'}>Limpiar</Button>
 	</div>
 </section>
 
-<div class="table-wrap">
-	<table>
+<div class="tw:overflow-x-auto tw:rounded-ui tw:border tw:border-rule">
+	<table class="tw:w-full tw:border-collapse tw:text-[0.78rem]">
 		<thead>
 			<tr>
-				<th>Entrada</th>
-				<th>Fecha</th>
-				<th>Rel.</th>
-				<th>Pública</th>
-				<th>Portada</th>
-				<th>Actualización</th>
+				<th class={tableHeadingClass}>Entrada</th>
+				<th class={tableHeadingClass}>Fecha</th>
+				<th class={tableHeadingClass}>Rel.</th>
+				<th class={tableHeadingClass}>Pública</th>
+				<th class={tableHeadingClass}>Portada</th>
+				<th class={tableHeadingClass}>Actualización</th>
 			</tr>
 		</thead>
 		<tbody>
 			{#each filteredEntries as entry (`${entry.entityType}:${entry.entityId}`)}
 				<tr>
-					<td>
+					<td class="{tableCellClass} tw:min-w-[22rem] tw:max-[640px]:min-w-[16rem]">
 						{#if data.editableTypes.includes(entry.entityType)}
 							<a
-								class="title-link"
+								class="tw:group tw:text-inherit tw:focus-visible:outline-2 tw:focus-visible:outline-offset-3 tw:focus-visible:outline-accent-strong"
 								href={`/admin/entradas/${entry.entityType}/${entry.entityId}`}
 								data-sveltekit-preload-data="off"
 							>
-								<strong>{entry.title}</strong>
+								<strong class="tw:mb-1 tw:block tw:font-medium tw:text-ink tw:group-hover:text-accent-strong">{entry.title}</strong>
 							</a>
 						{:else}
-							<strong>{entry.title}</strong>
+							<strong class="tw:mb-1 tw:block tw:font-medium tw:text-ink">{entry.title}</strong>
 						{/if}
-						<span>{entry.typeLabel} · #{entry.entityId}</span>
+						<span class="tw:block tw:text-[0.7rem] tw:text-ink-faint">{entry.typeLabel} · #{entry.entityId}</span>
 					</td>
-					<td>{entry.sortDate ?? '—'}</td>
-					<td>{entry.relationCount}</td>
-					<td>
+					<td class={tableCellClass}>{entry.sortDate ?? '—'}</td>
+					<td class={tableCellClass}>{entry.relationCount}</td>
+					<td class={tableCellClass}>
 						<form method="POST" action="?/control" use:enhance={controlSubmit(entry, 'public')}>
 							<input type="hidden" name="entityType" value={entry.entityType} />
 							<input type="hidden" name="entityId" value={entry.entityId} />
 							<input type="hidden" name="control" value="public" />
-							<button
+							<Button
+								variant={entry.isPublic ? 'primary' : 'secondary'}
+								size="sm"
+								class="tw:min-w-12"
 								type="submit"
 								name="enabled"
 								value={entry.isPublic ? '0' : '1'}
-								class:active={entry.isPublic}
 								disabled={isPending(entry, 'public')}
 								aria-label={`${entry.isPublic ? 'Despublicar' : 'Publicar'} ${entry.title}`}
 							>
 								{entry.isPublic ? 'Sí' : 'No'}
-							</button>
+							</Button>
 						</form>
 					</td>
-					<td>
+					<td class={tableCellClass}>
 						<form method="POST" action="?/control" use:enhance={controlSubmit(entry, 'home')}>
 							<input type="hidden" name="entityType" value={entry.entityType} />
 							<input type="hidden" name="entityId" value={entry.entityId} />
 							<input type="hidden" name="control" value="home" />
-							<button
+							<Button
+								variant={entry.showHome ? 'primary' : 'secondary'}
+								size="sm"
+								class="tw:min-w-12"
 								type="submit"
 								name="enabled"
 								value={entry.showHome ? '0' : '1'}
-								class:active={entry.showHome}
 								disabled={isPending(entry, 'home')}
 								aria-label={`${entry.showHome ? 'Eliminar de' : 'Añadir a'} portada: ${entry.title}`}
 							>
 								{entry.showHome ? 'Sí' : 'No'}
-							</button>
+							</Button>
 						</form>
 					</td>
-					<td class="updated">{entry.updatedAt ?? '—'}</td>
+					<td class="{tableCellClass} tw:text-[0.7rem] tw:text-ink-faint">{entry.updatedAt ?? '—'}</td>
 				</tr>
 			{/each}
 		</tbody>
@@ -286,211 +288,5 @@
 </div>
 
 {#if filteredEntries.length === 0}
-	<p class="empty">No hay entradas que coincidan con estos filtros.</p>
+	<p class="tw:p-8 tw:text-center tw:text-ink-faint">No hay entradas que coincidan con estos filtros.</p>
 {/if}
-
-<style>
-	.filters label span {
-		font-size: 0.7rem;
-		letter-spacing: 0.1em;
-		text-transform: uppercase;
-		color: var(--fg-faint);
-	}
-
-	.title-link {
-		color: inherit;
-		text-decoration: none;
-	}
-
-	.title-link:hover strong {
-		color: var(--accent-strong);
-	}
-
-	.title-link:focus-visible {
-		outline: 2px solid var(--accent-strong);
-		outline-offset: 3px;
-	}
-
-	.filters {
-		display: grid;
-		gap: 1rem;
-		padding: clamp(0.8rem, 2vw, 1.15rem);
-		border: 1px solid var(--line);
-		background: var(--admin-surface);
-		margin-bottom: 1.5rem;
-	}
-
-	.filters label,
-	.filter-search {
-		display: grid;
-		gap: 0.35rem;
-	}
-
-	.filter-search {
-		grid-template-columns: minmax(0, 1fr) auto;
-		align-items: end;
-	}
-
-	.filter-search label {
-		max-width: 48rem;
-	}
-
-	.filter-summary {
-		display: grid;
-		min-width: 6rem;
-		color: var(--fg-dim);
-		text-align: right;
-	}
-
-	.filter-summary strong {
-		color: var(--fg);
-		font-family: var(--font-title);
-		font-size: 1.35rem;
-		font-weight: 500;
-		line-height: 1;
-	}
-
-	.filter-summary span,
-	.filter-actions > span {
-		color: var(--fg-faint);
-		font-size: 0.65rem;
-	}
-
-	.filter-primary,
-	.filter-advanced > div {
-		display: grid;
-		grid-template-columns: repeat(3, minmax(0, 1fr));
-		gap: 0.75rem;
-	}
-
-	.filter-advanced {
-		padding: 0.75rem;
-		border: 1px solid var(--line);
-		background: color-mix(in srgb, var(--bg) 45%, transparent);
-	}
-
-	.filter-advanced summary {
-		display: inline-flex;
-		align-items: center;
-		gap: 0.4rem;
-		color: var(--fg-dim);
-		font-size: 0.7rem;
-		cursor: pointer;
-	}
-
-	.filter-advanced[open] summary {
-		margin-bottom: 0.75rem;
-	}
-
-	input,
-	select {
-		min-width: 0;
-		background: var(--bg);
-		border: 1px solid var(--line);
-		padding: 0.5rem;
-		color: var(--fg);
-	}
-
-	.filter-actions {
-		display: flex;
-		align-items: center;
-		justify-content: flex-end;
-		gap: 0.75rem;
-	}
-
-	.filter-actions button {
-		border: 1px solid var(--line-strong);
-		background: transparent;
-		padding: 0.45rem 0.75rem;
-		color: var(--fg);
-		cursor: pointer;
-	}
-
-	.table-wrap {
-		overflow-x: auto;
-		border: 1px solid var(--line);
-	}
-
-	table {
-		width: 100%;
-		border-collapse: collapse;
-		font-size: 0.78rem;
-	}
-
-	th,
-	td {
-		padding: 0.75rem;
-		border-bottom: 1px solid var(--line);
-		text-align: left;
-		vertical-align: top;
-	}
-
-	th {
-		font-size: 0.68rem;
-		letter-spacing: 0.08em;
-		text-transform: uppercase;
-		color: var(--fg-faint);
-		background: var(--admin-surface);
-	}
-
-	td:first-child {
-		min-width: 22rem;
-	}
-
-	td strong,
-	td span {
-		display: block;
-	}
-
-	td strong {
-		font-weight: 500;
-		color: var(--fg);
-		margin-bottom: 0.25rem;
-	}
-
-	td span,
-	.updated {
-		font-size: 0.7rem;
-		color: var(--fg-faint);
-	}
-
-	td form { margin: 0; }
-
-	td button {
-		min-width: 3rem;
-		border: 1px solid var(--line);
-		background: transparent;
-		color: var(--fg-faint);
-		padding: 0.3rem 0.55rem;
-		cursor: pointer;
-	}
-
-	td button.active {
-		border-color: var(--accent);
-		color: var(--accent-strong);
-	}
-
-	td button:disabled {
-		opacity: 0.5;
-		cursor: wait;
-	}
-
-	.empty {
-		padding: 2rem;
-		text-align: center;
-		color: var(--fg-faint);
-	}
-
-	@media (max-width: 1100px) {
-		.filter-primary,
-		.filter-advanced > div { grid-template-columns: repeat(2, 1fr); }
-	}
-
-	@media (max-width: 640px) {
-		.filter-search,
-		.filter-primary,
-		.filter-advanced > div { grid-template-columns: 1fr; }
-		.filter-summary { display: none; }
-		td:first-child { min-width: 16rem; }
-	}
-</style>

@@ -5,11 +5,18 @@
 	import FundingRelations from '$lib/components/admin/FundingRelations.svelte';
 	import AdditionalLinks from '$lib/components/admin/AdditionalLinks.svelte';
 	import DocumentsEditor from '$lib/components/admin/DocumentsEditor.svelte';
+	import AdminPageHeader from '$lib/components/admin/AdminPageHeader.svelte';
 	import AdminToast from '$lib/components/AdminToast.svelte';
+	import Button from '$lib/components/ui/Button.svelte';
+	import ButtonLink from '$lib/components/ui/ButtonLink.svelte';
+	import Checkbox from '$lib/components/ui/Checkbox.svelte';
 
 	let { data, form }: { data: PageData; form: ActionData } = $props();
 
 	const created = $derived(page.url.searchParams.get('creada') === '1');
+	const sectionClass = 'tw:mt-10 tw:border-t tw:border-rule tw:pt-6';
+	const sectionTitleClass =
+		'tw:mt-0 tw:mb-5 tw:text-sm tw:font-medium tw:uppercase tw:tracking-[0.08em] tw:text-ink-dim';
 
 	const toast = $derived.by(() => {
 		if (!form) return null;
@@ -44,25 +51,38 @@
 	<title>{data.heading} · cv/admin</title>
 </svelte:head>
 
-<a class="back" href="/admin/entradas" data-sveltekit-preload-data="off">← Volver</a>
+<ButtonLink
+	variant="ghost"
+	size="sm"
+	href="/admin/entradas"
+	class="tw:mb-4 tw:px-0"
+	data-sveltekit-preload-data="off">← Volver</ButtonLink
+>
 
-<nav class="breadcrumb" aria-label="Ruta">
-	<a href="/admin/entradas">Entradas</a>
+<nav class="tw:mb-6 tw:flex tw:gap-2 tw:text-[0.8rem] tw:text-ink-faint" aria-label="Ruta">
+	<a class="tw:text-ink-dim tw:hover:text-accent" href="/admin/entradas">Entradas</a>
 	<span aria-hidden="true">/</span>
 	<span>{data.typeLabel}</span>
 	<span aria-hidden="true">/</span>
 	<span>#{data.entityId}</span>
 </nav>
 
-<div class="head">
-	<h1>{data.heading}</h1>
-	<span class="state" class:public={data.control.isPublic}>
-		{data.control.isPublic ? 'Pública' : 'Privada'}
-	</span>
-	{#if data.control.showHome}
-		<span class="state public">En portada</span>
-	{/if}
-</div>
+<AdminPageHeader title={data.heading} eyebrow={data.typeLabel}>
+	{#snippet actions()}
+		<span
+			class={`tw:border tw:px-2 tw:py-1 tw:text-[0.7rem] tw:uppercase tw:tracking-[0.08em] ${
+				data.control.isPublic ? 'tw:border-accent tw:text-accent' : 'tw:border-rule-strong tw:text-ink-dim'
+			}`}
+		>
+			{data.control.isPublic ? 'Pública' : 'Privada'}
+		</span>
+		{#if data.control.showHome}
+			<span class="tw:border tw:border-accent tw:px-2 tw:py-1 tw:text-[0.7rem] tw:uppercase tw:tracking-[0.08em] tw:text-accent">
+				En portada
+			</span>
+		{/if}
+	{/snippet}
+</AdminPageHeader>
 
 {#if created}
 	<AdminToast message="Entrada creada como privada. Publícala cuando esté lista." success={true} />
@@ -73,8 +93,8 @@
 	{/key}
 {/if}
 
-<section aria-labelledby="contenido-title">
-	<h2 id="contenido-title">Contenido</h2>
+<section class={sectionClass} aria-labelledby="contenido-title">
+	<h2 class={sectionTitleClass} id="contenido-title">Contenido</h2>
 	<form method="POST" action="?/guardar">
 		<EntityForm
 			fields={data.fields}
@@ -82,85 +102,99 @@
 			values={form?.raw ?? data.values}
 			errors={form?.errors ?? {}}
 		/>
-		<div class="actions">
-			<button type="submit">Guardar cambios</button>
+		<div class="tw:mt-8">
+			<Button type="submit">Guardar cambios</Button>
 		</div>
 	</form>
 </section>
 
-<section aria-labelledby="visibilidad-title">
-	<h2 id="visibilidad-title">Visibilidad y portada</h2>
-	<div class="controls-row">
-		<div class="control-block">
+<section class={sectionClass} aria-labelledby="visibilidad-title">
+	<h2 class={sectionTitleClass} id="visibilidad-title">Visibilidad y portada</h2>
+	<div class="tw:grid tw:gap-6 md:tw:grid-cols-2">
+		<div class="tw:grid tw:content-start tw:gap-3 tw:border tw:border-rule tw:p-5">
 			{#if data.control.isPublic}
-				<p>Visible en la web pública. Al pasarla a privada también se retira de la portada.</p>
+				<p class="tw:m-0 tw:max-w-[60ch] tw:leading-relaxed tw:text-ink-dim">
+					Visible en la web pública. Al pasarla a privada también se retira de la portada.
+				</p>
 				<form method="POST" action="?/despublicar">
-					<button type="submit" class="secondary">Hacer privada</button>
+					<Button type="submit" variant="secondary">Hacer privada</Button>
 				</form>
 			{:else}
-				<p>Entrada privada: no aparece en el CV ni en la portada.</p>
+				<p class="tw:m-0 tw:max-w-[60ch] tw:leading-relaxed tw:text-ink-dim">
+					Entrada privada: no aparece en el CV ni en la portada.
+				</p>
 				<form method="POST" action="?/publicar">
-					<button type="submit">Publicar</button>
+					<Button type="submit">Publicar</Button>
 				</form>
 			{/if}
 		</div>
-		<div class="control-block">
+		<div class="tw:grid tw:content-start tw:gap-3 tw:border tw:border-rule tw:p-5">
 			{#if data.control.showHome}
-				<p>Seleccionada en la portada.</p>
+				<p class="tw:m-0 tw:text-ink-dim">Seleccionada en la portada.</p>
 				<form method="POST" action="?/portada">
 					<input type="hidden" name="enabled" value="0" />
-					<button type="submit" class="remove">Eliminar de portada</button>
+					<Button type="submit" variant="danger">Eliminar de portada</Button>
 				</form>
 			{:else}
-				<p>
+				<p class="tw:m-0 tw:max-w-[60ch] tw:leading-relaxed tw:text-ink-dim">
 					No aparece en la portada.
 					{#if !data.control.isPublic}Mostrarla en portada también la hará pública.{/if}
 				</p>
 				<form method="POST" action="?/portada">
 					<input type="hidden" name="enabled" value="1" />
-					<button type="submit">Mostrar en portada</button>
+					<Button type="submit">Mostrar en portada</Button>
 				</form>
 			{/if}
-			<p class="hint">
-				El orden de la portada se gestiona en <a href="/admin/portada">Portada</a>.
+			<p class="tw:m-0 tw:text-xs tw:text-ink-faint">
+				El orden de la portada se gestiona en
+				<a class="tw:text-ink-dim tw:hover:text-accent" href="/admin/portada">Portada</a>.
 			</p>
 		</div>
 	</div>
 </section>
 
 {#if data.hasStructuralRelations}
-	<section aria-labelledby="structural-title">
-		<h2 id="structural-title">Relaciones estructurales</h2>
-		<p class="section-intro">
+	<section class={sectionClass} aria-labelledby="structural-title">
+		<h2 class={sectionTitleClass} id="structural-title">Relaciones estructurales</h2>
+		<p class="tw:-mt-2 tw:mb-4 tw:max-w-[60ch] tw:leading-relaxed tw:text-ink-dim">
 			Estas relaciones proceden de los campos del contenido relacionado. Para cambiarlas, edita
 			la entrada correspondiente y modifica su selector.
 		</p>
-		<div class="relation-groups">
+		<div class="tw:grid tw:gap-4 md:tw:grid-cols-2">
 			{#each data.structuralRelations as group (group.entityType)}
-				<article class="relation-group">
-					<header>
+				<article class="tw:min-w-0 tw:border tw:border-rule tw:bg-admin-surface">
+					<header class="tw:flex tw:justify-between tw:gap-4 tw:border-b tw:border-rule tw:p-4">
 						<div>
-							<h3>{group.label}</h3>
-							<p>{group.description}</p>
+							<h3 class="tw:m-0 tw:text-sm tw:text-ink">{group.label}</h3>
+							<p class="tw:mt-1 tw:mb-0 tw:text-xs tw:leading-relaxed tw:text-ink-faint">
+								{group.description}
+							</p>
 						</div>
-						<strong>{group.items.length}</strong>
+						<strong class="tw:text-sm tw:font-medium tw:text-accent">{group.items.length}</strong>
 					</header>
 					{#if group.items.length > 0}
-						<ul class="structural-list">
+						<ul class="tw:m-0 tw:list-none tw:p-0">
 							{#each group.items as item (`${item.entityType}:${item.entityId}`)}
-								<li>
-									<a href={`/admin/entradas/${item.entityType}/${item.entityId}`}>
+								<li class="tw:flex tw:items-center tw:justify-between tw:gap-3 tw:border-b tw:border-rule tw:px-4 tw:py-3 last:tw:border-b-0">
+									<a
+										class="tw:grid tw:min-w-0 tw:gap-1 tw:text-xs tw:leading-snug tw:text-ink tw:hover:text-accent"
+										href={`/admin/entradas/${item.entityType}/${item.entityId}`}
+									>
 										<span>{item.title}</span>
-										<small>{item.sortDate ?? 'Sin fecha'}</small>
+										<small class="tw:text-[0.65rem] tw:text-ink-faint">{item.sortDate ?? 'Sin fecha'}</small>
 									</a>
-									<span class="relation-state" class:public={item.isPublic}>
+									<span
+										class={`tw:shrink-0 tw:text-[0.6rem] tw:uppercase tw:tracking-[0.05em] ${
+											item.isPublic ? 'tw:text-accent' : 'tw:text-ink-dim'
+										}`}
+									>
 										{item.isPublic ? 'Pública' : 'Privada'}
 									</span>
 								</li>
 							{/each}
 						</ul>
 					{:else}
-						<p class="empty-relation">No hay entradas vinculadas.</p>
+						<p class="tw:m-0 tw:p-4 tw:text-xs tw:text-ink-faint">No hay entradas vinculadas.</p>
 					{/if}
 				</article>
 			{/each}
@@ -169,11 +203,11 @@
 {/if}
 
 {#if data.canonicalEvent}
-	<section aria-labelledby="canonical-event-title">
-		<h2 id="canonical-event-title">Evento compartido</h2>
-		<p>
+	<section class={sectionClass} aria-labelledby="canonical-event-title">
+		<h2 class={sectionTitleClass} id="canonical-event-title">Evento compartido</h2>
+		<p class="tw:max-w-[60ch] tw:leading-relaxed tw:text-ink-dim">
 			Esta actividad pertenece a
-			<a class="canonical-event-link" href={`/admin/eventos/${data.canonicalEvent.id}`}>
+			<a class="tw:text-accent tw:hover:underline" href={`/admin/eventos/${data.canonicalEvent.id}`}>
 				{data.canonicalEvent.title}
 			</a>.
 			Desde su ficha puedes ver los demás roles, incluida la asistencia privada.
@@ -189,369 +223,51 @@
 
 <DocumentsEditor editor={data.documents} />
 
-<section aria-labelledby="portfolio-title">
-	<h2 id="portfolio-title">Fichas del portfolio</h2>
+<section class={sectionClass} aria-labelledby="portfolio-title">
+	<h2 class={sectionTitleClass} id="portfolio-title">Fichas del portfolio</h2>
 	{#if data.portfolioRelations.length > 0}
-		<p>Esta entrada aparece en:</p>
-		<ul class="portfolio-relations">
+		<p class="tw:max-w-[60ch] tw:leading-relaxed tw:text-ink-dim">Esta entrada aparece en:</p>
+		<ul class="tw:my-3 tw:flex tw:list-none tw:flex-wrap tw:gap-2 tw:p-0">
 			{#each data.portfolioRelations as relation (relation.slug)}
-				<li>
-					<a href={`/admin/portfolio?ficha=${relation.slug}&q=${encodeURIComponent(data.heading)}`}>
+				<li class="tw:flex tw:items-center tw:gap-2 tw:border tw:border-rule tw:px-3 tw:py-2">
+					<a
+						class="tw:text-ink tw:hover:text-accent"
+						href={`/admin/portfolio?ficha=${relation.slug}&q=${encodeURIComponent(data.heading)}`}
+					>
 						{relation.featured ? '★ ' : ''}{relation.title}
 					</a>
-					{#if relation.featured}<span>Destacada</span>{/if}
+					{#if relation.featured}
+						<span class="tw:text-[0.65rem] tw:uppercase tw:tracking-[0.06em] tw:text-amber">Destacada</span>
+					{/if}
 				</li>
 			{/each}
 		</ul>
 	{:else}
-		<p>No está relacionada con ninguna ficha narrativa.</p>
+		<p class="tw:max-w-[60ch] tw:leading-relaxed tw:text-ink-dim">
+			No está relacionada con ninguna ficha narrativa.
+		</p>
 	{/if}
-	<a class="manage-portfolio" href={`/admin/portfolio?q=${encodeURIComponent(data.heading)}`}>
+	<a
+		class="tw:mt-2 tw:inline-block tw:text-xs tw:text-ink tw:hover:text-accent"
+		href={`/admin/portfolio?q=${encodeURIComponent(data.heading)}`}
+	>
 		Gestionar relaciones del portfolio →
 	</a>
 </section>
 
-<details class="danger">
-	<summary>Zona peligrosa</summary>
-	<p>
+<details class="tw:mt-12 tw:border tw:border-danger tw:p-5 tw:[&[open]>summary]:mb-3">
+	<summary class="tw:cursor-pointer tw:text-sm tw:uppercase tw:tracking-[0.08em] tw:text-danger">
+		Zona peligrosa
+	</summary>
+	<p class="tw:max-w-[60ch] tw:leading-relaxed tw:text-ink-dim">
 		Eliminar borra la entrada y sus relaciones (portfolio, etiquetas, enlaces y documentos). No se
 		puede deshacer desde el dashboard.
 	</p>
 	<form method="POST" action="?/eliminar">
-		<label class="confirm">
-			<input type="checkbox" name="confirmar" value="1" />
+		<label class="tw:mb-4 tw:flex tw:items-center tw:gap-2 tw:text-ink">
+			<Checkbox name="confirmar" value="1" class="tw:accent-danger" />
 			<span>Entiendo que la eliminación es definitiva</span>
 		</label>
-		<button type="submit" class="delete">Eliminar entrada</button>
+		<Button type="submit" variant="danger">Eliminar entrada</Button>
 	</form>
 </details>
-
-<style>
-	.breadcrumb {
-		display: flex;
-		gap: 0.5rem;
-		font-size: 0.8rem;
-		color: var(--fg-faint);
-		margin-bottom: 1.5rem;
-	}
-
-	.breadcrumb a {
-		color: var(--fg-dim);
-	}
-
-	.head {
-		display: flex;
-		align-items: baseline;
-		gap: 1rem;
-		flex-wrap: wrap;
-		margin-bottom: 1.25rem;
-	}
-
-	h1 {
-		font-size: 1.25rem;
-		font-weight: 700;
-		color: var(--fg);
-		margin: 0;
-		max-width: 60ch;
-	}
-
-	.state {
-		font-size: 0.7rem;
-		text-transform: uppercase;
-		letter-spacing: 0.08em;
-		border: 1px solid var(--line-strong);
-		color: var(--fg-dim);
-		padding: 0.15rem 0.5rem;
-	}
-
-	.state.public {
-		border-color: var(--accent-strong);
-		color: var(--accent-strong);
-	}
-
-	h2 {
-		font-size: 0.85rem;
-		letter-spacing: 0.08em;
-		text-transform: uppercase;
-		color: var(--fg-dim);
-		margin: 0 0 1.25rem;
-	}
-
-	section {
-		margin-top: 2.5rem;
-		padding-top: 1.5rem;
-		border-top: 1px solid var(--line);
-	}
-
-	.back {
-		display: inline-block;
-		color: var(--fg-dim);
-		text-decoration: none;
-		margin-bottom: 1rem;
-	}
-
-	.back:hover {
-		color: var(--accent-strong);
-	}
-
-	.back:focus-visible {
-		outline: 2px solid var(--accent-strong);
-		outline-offset: 3px;
-	}
-
-	.controls-row {
-		display: grid;
-		grid-template-columns: repeat(2, minmax(0, 1fr));
-		gap: 1.5rem;
-	}
-
-	.control-block {
-		border: 1px solid var(--line);
-		padding: 1rem 1.25rem;
-		display: grid;
-		gap: 0.75rem;
-		align-content: start;
-	}
-
-	.control-block p {
-		margin: 0;
-	}
-
-	@media (max-width: 720px) {
-		.controls-row {
-			grid-template-columns: 1fr;
-		}
-	}
-
-	.actions {
-		margin-top: 2rem;
-	}
-
-	button {
-		font: inherit;
-		background: none;
-		border: 1px solid var(--accent-strong);
-		color: var(--accent-strong);
-		padding: 0.55rem 1rem;
-		cursor: pointer;
-	}
-
-	button:hover {
-		background: var(--accent-wash);
-	}
-
-	button:focus-visible {
-		outline: 2px solid var(--accent-strong);
-		outline-offset: 3px;
-	}
-
-	button.secondary {
-		border-color: var(--line-strong);
-		color: var(--fg);
-	}
-
-	button.secondary:hover {
-		background: var(--surface-tint);
-	}
-
-	.hint {
-		color: var(--fg-faint);
-		font-size: 0.8rem;
-	}
-
-	.hint a {
-		color: var(--fg-dim);
-	}
-
-	.portfolio-relations {
-		display: flex;
-		flex-wrap: wrap;
-		gap: 0.6rem;
-		list-style: none;
-		padding: 0;
-		margin: 0.75rem 0 1rem;
-	}
-
-	.portfolio-relations li {
-		display: flex;
-		align-items: center;
-		gap: 0.5rem;
-		border: 1px solid var(--line);
-		padding: 0.45rem 0.65rem;
-	}
-
-	.portfolio-relations a,
-	.manage-portfolio {
-		color: var(--fg);
-	}
-
-	.canonical-event-link {
-		color: var(--accent-strong);
-	}
-
-	.portfolio-relations span {
-		color: var(--tone-amber);
-		font-size: 0.65rem;
-		text-transform: uppercase;
-		letter-spacing: 0.06em;
-	}
-
-	.manage-portfolio {
-		display: inline-block;
-		margin-top: 0.5rem;
-		font-size: 0.78rem;
-	}
-
-	.section-intro {
-		margin: -0.5rem 0 1rem;
-	}
-
-	.relation-groups {
-		display: grid;
-		grid-template-columns: repeat(2, minmax(0, 1fr));
-		gap: 1rem;
-	}
-
-	.relation-group {
-		min-width: 0;
-		border: 1px solid var(--line);
-		background: var(--admin-surface);
-	}
-
-	.relation-group > header {
-		display: flex;
-		justify-content: space-between;
-		gap: 1rem;
-		padding: 1rem;
-		border-bottom: 1px solid var(--line);
-	}
-
-	.relation-group h3 {
-		margin: 0;
-		color: var(--fg);
-		font-size: 0.82rem;
-	}
-
-	.relation-group header p {
-		margin: 0.35rem 0 0;
-		color: var(--fg-faint);
-		font-size: 0.7rem;
-		line-height: 1.45;
-	}
-
-	.relation-group header strong {
-		color: var(--accent-strong);
-		font-size: 0.8rem;
-		font-weight: 500;
-	}
-
-	.structural-list {
-		margin: 0;
-		padding: 0;
-		list-style: none;
-	}
-
-	.structural-list li {
-		display: flex;
-		align-items: center;
-		justify-content: space-between;
-		gap: 0.75rem;
-		padding: 0.75rem 1rem;
-		border-bottom: 1px solid var(--line);
-	}
-
-	.structural-list li:last-child {
-		border-bottom: 0;
-	}
-
-	.structural-list a {
-		display: grid;
-		min-width: 0;
-		gap: 0.25rem;
-		color: var(--fg);
-		font-size: 0.76rem;
-		line-height: 1.35;
-	}
-
-	.structural-list a:hover {
-		color: var(--accent-strong);
-	}
-
-	.structural-list small {
-		color: var(--fg-faint);
-		font-size: 0.65rem;
-	}
-
-	.relation-state {
-		flex: 0 0 auto;
-		color: var(--fg-dim);
-		font-size: 0.6rem;
-		letter-spacing: 0.05em;
-		text-transform: uppercase;
-	}
-
-	.relation-state.public {
-		color: var(--accent-strong);
-	}
-
-	.empty-relation {
-		margin: 0;
-		padding: 1rem;
-		color: var(--fg-faint);
-		font-size: 0.75rem;
-	}
-
-	section p {
-		color: var(--fg-dim);
-		max-width: 60ch;
-		line-height: 1.6;
-	}
-
-	@media (max-width: 720px) {
-		.relation-groups {
-			grid-template-columns: 1fr;
-		}
-	}
-
-	.danger {
-		margin-top: 3rem;
-		border: 1px solid var(--admin-danger);
-		padding: 1rem 1.25rem;
-	}
-
-	.danger summary {
-		cursor: pointer;
-		color: var(--admin-danger);
-		font-size: 0.85rem;
-		text-transform: uppercase;
-		letter-spacing: 0.08em;
-	}
-
-	.danger p {
-		color: var(--fg-dim);
-		max-width: 60ch;
-	}
-
-	.confirm {
-		display: flex;
-		align-items: center;
-		gap: 0.6rem;
-		color: var(--fg);
-		margin-bottom: 1rem;
-	}
-
-	.confirm input {
-		width: 1.05rem;
-		height: 1.05rem;
-		accent-color: var(--admin-danger);
-	}
-
-	button.delete {
-		border-color: var(--admin-danger);
-		color: var(--admin-danger);
-	}
-
-	button.delete:hover {
-		background: var(--admin-danger-soft);
-	}
-</style>

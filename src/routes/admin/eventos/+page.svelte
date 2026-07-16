@@ -91,7 +91,7 @@
 		</AdminField>
 	</div>
 
-	<details class="tw:rounded-ui tw:border tw:border-rule tw:bg-[color-mix(in_srgb,var(--bg)_45%,transparent)] tw:p-3 tw:open:[&>summary]:mb-3" open={Boolean(year)}>
+	<details class="tw:rounded-ui tw:border tw:border-rule tw:bg-[color-mix(in_srgb,var(--bg)_45%,transparent)] tw:p-3 tw:[&[open]>summary]:mb-3" open={Boolean(year)}>
 		<summary class="tw:inline-flex tw:cursor-pointer tw:items-center tw:gap-1.5 tw:text-[0.7rem] tw:text-ink-dim"><ListFilter size={14} strokeWidth={1.8} aria-hidden="true" /> Más filtros</summary>
 		<div class="tw:grid tw:grid-cols-[minmax(8rem,12rem)]">
 			<AdminField label="Año">

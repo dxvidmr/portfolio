@@ -1,5 +1,7 @@
 <script lang="ts">
 	import type { PageData } from './$types';
+	import AdminPageHeader from '$lib/components/admin/AdminPageHeader.svelte';
+	import ButtonLink from '$lib/components/ui/ButtonLink.svelte';
 
 	let { data }: { data: PageData } = $props();
 </script>
@@ -8,144 +10,37 @@
 	<title>Nueva entrada · cv/admin</title>
 </svelte:head>
 
-<a class="back" href="/admin/entradas" data-sveltekit-preload-data="off">← Volver</a>
+<ButtonLink variant="ghost" size="sm" href="/admin/entradas" data-sveltekit-preload-data="off" class="tw:mb-4 tw:px-0">← Volver</ButtonLink>
 
-<nav class="breadcrumb" aria-label="Ruta">
-	<a href="/admin/entradas">Entradas</a>
+<nav class="tw:mb-6 tw:flex tw:gap-2 tw:text-[0.8rem] tw:text-ink-faint" aria-label="Ruta">
+	<a class="tw:text-ink-dim" href="/admin/entradas">Entradas</a>
 	<span aria-hidden="true">/</span>
 	<span>Nueva</span>
 </nav>
 
-<h1>Nueva entrada</h1>
-<p class="intro">
-	Elige el tipo. La entrada se creará como <strong>privada</strong>: no aparecerá en la web
-	pública hasta que la publiques.
-</p>
+<AdminPageHeader
+	title="Nueva entrada"
+	eyebrow="Índice transversal"
+	description="Elige el tipo. La entrada se creará como privada: no aparecerá en la web pública hasta que la publiques."
+/>
 
-<a class="event-card" href="/admin/eventos/nuevo">
-	<strong>Evento académico</strong>
-	<span>
+<a class="tw:mt-8 tw:grid tw:gap-1.5 tw:rounded-ui tw:border tw:border-accent-strong tw:px-[1.1rem] tw:py-4 tw:text-ink tw:hover:bg-accent-wash tw:focus-visible:outline-2 tw:focus-visible:outline-offset-3 tw:focus-visible:outline-accent-strong" href="/admin/eventos/nuevo">
+	<strong class="tw:text-accent-strong">Evento académico</strong>
+	<span class="tw:max-w-[70ch] tw:text-[0.82rem] tw:leading-[1.5] tw:text-ink-dim">
 		Congreso, seminario, jornada… Crea el evento y, en el mismo paso, tu contribución,
 		servicio o asistencia. Es el camino recomendado para comunicaciones y organización.
 	</span>
 </a>
 
-<ul class="types">
+<ul class="tw:mt-6 tw:mb-0 tw:grid tw:list-none tw:grid-cols-[repeat(auto-fill,minmax(15rem,1fr))] tw:gap-3 tw:p-0">
 	{#each data.typeOptions as option (option.value)}
 		<li>
-			<a href={`/admin/entradas/nueva/${option.value}`}>
+			<a class="tw:block tw:rounded-ui tw:border tw:border-rule tw:px-4 tw:py-[0.9rem] tw:text-ink tw:hover:border-accent-strong tw:hover:text-accent-strong tw:focus-visible:outline-2 tw:focus-visible:outline-offset-3 tw:focus-visible:outline-accent-strong" href={`/admin/entradas/nueva/${option.value}`}>
 				{option.label}
 				{#if option.value === 'talks' || option.value === 'service_activities'}
-					<small>si el evento ya existe</small>
+					<small class="tw:mt-1 tw:block tw:text-[0.7rem] tw:text-ink-faint">si el evento ya existe</small>
 				{/if}
 			</a>
 		</li>
 	{/each}
 </ul>
-
-<style>
-	.back {
-		display: inline-block;
-		color: var(--fg-dim);
-		text-decoration: none;
-		margin-bottom: 1rem;
-	}
-
-	.back:hover {
-		color: var(--accent-strong);
-	}
-
-	.back:focus-visible {
-		outline: 2px solid var(--accent-strong);
-		outline-offset: 3px;
-	}
-
-	.breadcrumb {
-		display: flex;
-		gap: 0.5rem;
-		font-size: 0.8rem;
-		color: var(--fg-faint);
-		margin-bottom: 1.5rem;
-	}
-
-	.breadcrumb a {
-		color: var(--fg-dim);
-	}
-
-	h1 {
-		font-size: 1.25rem;
-		font-weight: 700;
-		color: var(--fg);
-		margin: 0 0 1rem;
-	}
-
-	.intro {
-		max-width: 60ch;
-		color: var(--fg-dim);
-		line-height: 1.6;
-	}
-
-	.event-card {
-		display: grid;
-		gap: 0.4rem;
-		margin-top: 2rem;
-		border: 1px solid var(--accent-strong);
-		padding: 1rem 1.1rem;
-		color: var(--fg);
-		text-decoration: none;
-	}
-
-	.event-card strong {
-		color: var(--accent-strong);
-	}
-
-	.event-card span {
-		font-size: 0.82rem;
-		color: var(--fg-dim);
-		line-height: 1.5;
-		max-width: 70ch;
-	}
-
-	.event-card:hover {
-		background: var(--accent-wash);
-	}
-
-	.event-card:focus-visible {
-		outline: 2px solid var(--accent-strong);
-		outline-offset: 3px;
-	}
-
-	.types {
-		list-style: none;
-		margin: 1.5rem 0 0;
-		padding: 0;
-		display: grid;
-		grid-template-columns: repeat(auto-fill, minmax(15rem, 1fr));
-		gap: 0.75rem;
-	}
-
-	.types a {
-		display: block;
-		border: 1px solid var(--line);
-		padding: 0.9rem 1rem;
-		color: var(--fg);
-		text-decoration: none;
-	}
-
-	.types small {
-		display: block;
-		margin-top: 0.25rem;
-		font-size: 0.7rem;
-		color: var(--fg-faint);
-	}
-
-	.types a:hover {
-		border-color: var(--accent-strong);
-		color: var(--accent-strong);
-	}
-
-	.types a:focus-visible {
-		outline: 2px solid var(--accent-strong);
-		outline-offset: 3px;
-	}
-</style>
