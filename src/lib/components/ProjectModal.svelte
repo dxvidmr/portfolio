@@ -37,6 +37,10 @@
 		(locale === 'en' ? item.subtype_label_en : item.subtype_label_es) ??
 		item.subtype?.replaceAll('_', ' ') ??
 		null;
+	const additionalLinkLabel = (link: PortfolioRelatedItem['links'][number]) =>
+		locale === 'en' ? link.label_en : link.label_es;
+	const documentLabel = (document: PortfolioRelatedItem['documents'][number]) =>
+		document.title ?? (locale === 'en' ? document.label_en : document.label_es);
 	const copy = $derived(
 		locale === 'es'
 			? {
@@ -251,6 +255,22 @@
 											<p class="item-title">{item.title}</p>
 										{/if}
 										{#if item.detail}<p class="item-detail">{item.detail}</p>{/if}
+										{#if item.links.length}
+											<div class="item-links">
+												{#each item.links as link (link.url)}
+													<a href={link.url} target="_blank" rel="noreferrer" class:primary={link.is_primary}>
+														{additionalLinkLabel(link)}
+													</a>
+												{/each}
+											</div>
+										{/if}
+										{#if item.documents.length}
+											<div class="item-documents">
+												{#each item.documents as document (document.url)}
+													<a href={document.url} target="_blank" rel="noreferrer">↓ {documentLabel(document)}</a>
+												{/each}
+											</div>
+										{/if}
 									</div>
 								</li>
 							{/each}
@@ -545,6 +565,12 @@
 	}
 	.item-title:hover .external-icon { transform: translate(2px, -2px); }
 	.item-detail { max-width: 72ch; margin: 9px 0 0; color: var(--fg-faint); font-size: 0.72rem; line-height: 1.45; }
+	.item-links { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
+	.item-links a { border: 1px solid var(--line); padding: 4px 7px; color: var(--fg-faint); font-size: 0.64rem; text-decoration: none; }
+	.item-links a:hover, .item-links a:focus-visible, .item-links a.primary { border-color: var(--accent-strong); color: var(--accent-strong); }
+	.item-documents { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 8px; }
+	.item-documents a { color: var(--fg-faint); font-size: 0.64rem; }
+	.item-documents a:hover, .item-documents a:focus-visible { color: var(--accent-strong); }
 
 	@keyframes layer-in { from { opacity: 0; } }
 	@keyframes modal-in { from { opacity: 0; transform: translate3d(0, 20px, 0) scale(0.985); } }

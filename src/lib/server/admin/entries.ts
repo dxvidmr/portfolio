@@ -69,10 +69,10 @@ const relationCountSql = `
 	      (SELECT (CASE WHEN publication.project_id IS NULL THEN 0 ELSE 1 END)
 	            + (CASE WHEN publication.event_id IS NULL THEN 0 ELSE 1 END)
 	       FROM publications AS publication WHERE publication.id = source.entity_id)
-	    WHEN 'academic_events' THEN
+	    WHEN 'talks' THEN
 	      (SELECT (CASE WHEN event.project_id IS NULL THEN 0 ELSE 1 END)
 	            + (CASE WHEN event.canonical_event_id IS NULL THEN 0 ELSE 1 END)
-	       FROM academic_events AS event WHERE event.id = source.entity_id)
+	       FROM talks AS event WHERE event.id = source.entity_id)
 	    WHEN 'service_activities' THEN
 	      (SELECT CASE WHEN service.canonical_event_id IS NULL THEN 0 ELSE 1 END
 	       FROM service_activities AS service WHERE service.id = source.entity_id)
@@ -87,14 +87,14 @@ const relationCountSql = `
 	       FROM academic_works AS work WHERE work.id = source.entity_id)
 	    WHEN 'projects' THEN
 	      (SELECT COUNT(*) FROM publications WHERE project_id = source.entity_id)
-	      + (SELECT COUNT(*) FROM academic_events WHERE project_id = source.entity_id)
+	      + (SELECT COUNT(*) FROM talks WHERE project_id = source.entity_id)
 	      + (SELECT COUNT(*) FROM teaching WHERE project_id = source.entity_id)
 	      + (SELECT COUNT(*) FROM funding_awards WHERE project_id = source.entity_id)
 	    WHEN 'education' THEN
 	      (SELECT COUNT(*) FROM academic_works WHERE education_id = source.entity_id)
 	    ELSE 0
 	  END
-	+ CASE WHEN source.entity_type = 'academic_events'
+	+ CASE WHEN source.entity_type = 'talks'
 	    THEN (SELECT COUNT(*) FROM publications WHERE event_id = source.entity_id)
 	    ELSE 0
 	  END`;

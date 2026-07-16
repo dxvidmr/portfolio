@@ -1,7 +1,7 @@
 # Plan persistente: índice transversal automático y dashboard privado del CV
 
-> Última actualización: 2026-07-15  
-> Estado general: **Fase 5A completada; Fase 5B implementada con financiación, titulaciones y eventos canónicos, migraciones aplicadas, pendiente de prueba editorial y despliegue**
+> Última actualización: 2026-07-16  
+> Estado general: **Fases 5A–5D y 5G implementadas; migraciones hasta `012` aplicadas y verificadas; URGE commit + push (la web desplegada sirve código antiguo degradado: contribuciones vacías) tras la prueba editorial conjunta (5C, 5D, 5G)**
 > Fuente de verdad: **Turso**. `db/cv-data.json` es histórico y no debe sincronizar contenido.  
 > Propósito: este documento debe permitir retomar el trabajo en sesiones distintas sin reconstruir decisiones ni contexto.
 
@@ -44,6 +44,9 @@ Estas decisiones se consideran aceptadas salvo que se documenten explícitamente
 19. La financiación y los premios se relacionan de forma muchos-a-muchos con las actividades mediante `funding_relations`. El extremo de financiación tiene FK directa a `funding_awards`; el extremo polimórfico usa una FK compuesta a `entry_controls`, que actúa como registro transversal. La relación se tipa como `supports`, `recognizes` o `related`, se gestiona desde ambos extremos y no sustituye a `project_id` (decisión 2026-07-15).
 20. `academic_works.education_id` relaciona cada TFM/TFG con su titulación mediante FK real; el texto `program` se conserva como descripción/copia bibliográfica, pero la relación se edita con selector. Las tres filas actuales se enlazan por coincidencia exacta y única (decisión 2026-07-15).
 21. Los eventos tienen identidad canónica en `events`. Las contribuciones (`academic_events`) y las actividades de organización/evaluación (`service_activities`) conservan sus registros propios y apuntan al evento común mediante `canonical_event_id`, de modo que un mismo evento admite varios roles sin confundir el evento con la comunicación. La mera asistencia se registra aparte en `event_attendance`, con rol visible en el dashboard como «Oyente/asistente»: es siempre privada, no pertenece a `entry_source`, no tiene control de publicación y nunca llega a las consultas públicas. Será un propietario válido de certificados privados en Fase 5D (decisión 2026-07-15; sustituye el aplazamiento anterior de eventos canónicos).
+22. El campo `url` de cada entidad es su destino canónico; `links` contiene únicamente recursos complementarios. Los enlaces usan vocabulario bilingüe controlado (`link_type`), etiqueta ES/EN opcional, visibilidad y orden propios, URL única por entrada y como máximo un destacado. Un enlace solo llega al CV o al portfolio si tanto el enlace como su entrada son públicos; el destacado altera el énfasis y la prioridad, no sustituye la URL canónica (decisión 2026-07-15).
+23. El alta de eventos se unifica: desde `/admin/eventos/nuevo` se crean en una sola transacción el evento canónico y, opcionalmente, **uno o varios** roles (contribución, servicio, asistencia privada), cada uno solo con sus campos propios. Los formularios de contribución dejan de pedir los datos del evento (nombre, fechas, lugar…): las columnas-copia heredadas se hidratan en servidor desde el evento canónico y se retirarán en la limpieza de Fase 6. La entrada genérica `/admin/entradas/nueva` se conserva como camino secundario, con selector de evento y enlace para crearlo primero (decisión 2026-07-16).
+24. La tabla `academic_events` pasa a llamarse **`talks`** (decisión 2026-07-16): convivir con la entidad canónica `events` hacía ambiguo el nombre para quien consulte la BD directamente. Excepción consciente a la regla de renombrar solo en UI: implica actualizar `entity_type` en datos (`entry_controls`, `portfolio_items`…), reconstruir las tablas con CHECK de allowlist (`funding_relations`, `links`, `documents`) y recrear las vistas (migración `012`, no compatible con el código desplegado: se aplica coordinada con el deploy, con una vista puente `academic_events` de solo lectura para que la ventana de despliegue degrade a secciones vacías en vez de errores). En la UI en español el tipo se llama «Contribución a evento» / «Contribuciones a eventos»; el chip público pasa de «Evento/Event» a «Comunicación/Talk» (revisable por el autor); el título de la sección pública del CV no cambia de momento.
 
 ## 3. Estado actual del repositorio
 
@@ -691,9 +694,11 @@ No confundir con la clasificación por tipo: `book`, `book_review`, `conference_
 
 ### Enlaces
 
-- Tipo, etiqueta, URL, principal y público.
-- Validar protocolo y URL.
-- Permitir varios enlaces por entidad.
+- El `url` de la tabla académica sigue siendo canónico; `links` no debe duplicarlo y representa texto completo, repositorio/código, dataset, vídeo, diapositivas, prensa u otro recurso.
+- Tipo controlado y bilingüe mediante `type_vocab`; etiqueta ES/EN opcional con fallback a la traducción del tipo.
+- Varios enlaces por entidad, orden explícito, URL única y como máximo uno destacado.
+- Validar `http`/`https`, propietario transversal y tipo+dominio en servidor y BD.
+- Solo los enlaces públicos de entradas públicas se entregan al CV y a las fichas del portfolio.
 
 ### Documentos
 
@@ -906,7 +911,7 @@ Criterio de aceptación:
 
 ### Fase 5 — Relaciones y recursos
 
-Estado: `en curso` — 5A completada; 5B implementada y con migraciones `006`, `007` y `008` aplicadas, pendiente de prueba editorial y despliegue
+Estado: `en curso` — 5A completada; 5B–5D implementadas con migraciones `006`–`011` aplicadas; pendientes de prueba editorial, commit y despliegue
 
 #### Fase 5A — Curación de fichas del portfolio
 
@@ -941,29 +946,46 @@ Estado: `en curso` — 5A completada; 5B implementada y con migraciones `006`, `
 
 #### Fase 5C — Enlaces adicionales
 
-- [ ] Definir la diferencia visible entre el `url` canónico de la entidad y sus enlaces adicionales.
-- [ ] Gestionar varios enlaces por entidad: tipo, etiqueta, URL, principal, público y orden.
-- [ ] Validar protocolo, URL y unicidad del enlace principal por entidad.
-- [ ] Definir y construir su consumidor público.
+- [x] Definir la diferencia visible entre el `url` canónico de la entidad y sus enlaces adicionales.
+- [x] Gestionar varios enlaces por entidad: tipo, etiquetas ES/EN, URL, destacado, público y orden, con acciones mejoradas sin navegación completa.
+- [x] Validar protocolo, propietario, vocabulario, URL única por entrada y un solo destacado mediante servidor, FKs, CHECK e índices únicos.
+- [x] Crear vocabulario bilingüe de siete tipos de enlace.
+- [x] Construir consumidores públicos en `/cv` y en los trabajos relacionados de las fichas del portfolio, excluyendo entradas/enlaces privados y duplicados de la URL canónica.
+- [ ] Completar prueba editorial con un enlace público, uno privado y reordenación; desplegar y verificar ES/EN.
 
 #### Fase 5D — Documentos
 
-- [ ] Gestionar metadatos y URL de documentos, sin subida directa de archivos.
-- [ ] Aplicar reglas explícitas para documentos públicos, privados y certificados.
-- [ ] Garantizar que certificados y documentos privados nunca llegan a las cargas públicas.
-- [ ] Permitir que `event_attendance` sea propietario de certificados de asistencia enlazados desde Drive; estos documentos serán siempre privados aunque el evento tenga otras actividades públicas.
-- [ ] Definir y construir el consumidor público de documentos autorizados.
+- [x] Gestionar metadatos y URL de documentos, sin subida directa de archivos (migración `010`; editor `DocumentsEditor` en la ficha de cada entrada).
+- [x] Aplicar reglas explícitas para documentos públicos, privados y certificados (CHECKs en BD: un certificado nunca puede ser público; propietario = entrada transversal **o** asistencia, nunca ambos).
+- [x] Garantizar que certificados y documentos privados nunca llegan a las cargas públicas (`public-documents.ts` filtra entrada pública + documento público + no certificado).
+- [x] Permitir que `event_attendance` sea propietario de certificados de asistencia enlazados desde Drive; estos documentos serán siempre privados aunque el evento tenga otras actividades públicas (gestionado desde `/admin/eventos/[id]`).
+- [x] Definir y construir el consumidor público de documentos autorizados (`/cv` y trabajos relacionados de las fichas del portfolio).
+- [ ] Completar prueba editorial (documento público, privado y certificado de asistencia) y desplegar.
 
 #### Fase 5E — Taxonomías
 
 - [ ] Crear `/admin/taxonomias` para mantener `type_vocab` sin SQL manual.
-- [ ] Añadir vocabularios de tipos de enlace y documento si 5C/5D los necesitan.
+- [x] Añadir vocabularios de tipos de enlace (`009`, 7 tipos) y de documento (`010`, 6 tipos).
 - [ ] Mantener validación de código + dominio en todas las escrituras.
 
 #### Fase 5F — Etiquetas temáticas (condicional)
 
 - [ ] Definir primero un consumidor real: filtro, buscador o vista temática pública.
 - [ ] Solo entonces gestionar `tags`/`entity_tags`; si no existe consumidor, dejarlas fuera del alcance.
+
+#### Fase 5G — Flujo de eventos unificado y renombrado `talks`
+
+Estado: `en curso` — implementada y ensayada en local (2026-07-16); pendiente aplicar `012`, prueba editorial y despliegue. Motivación: registrar una comunicación exigía tres pantallas y re-teclear datos del evento que después se sobrescribían con los del evento canónico.
+
+- [x] Migración `012` escrita y ensayada (36/36 contra el respaldo restaurado): renombra `academic_events` → `talks` (ALTER RENAME reescribe la FK de `publications.event_id`, verificado); actualiza `entity_type` en `entry_controls`, `portfolio_items` y `entity_tags`; reconstruye `funding_relations`, `links` y `documents` (CHECK de allowlist); recrea `entry_source`/`entries`; índices `idx_talks_*`; vista puente `academic_events`. **Sin aplicar aún en producción.**
+- [x] Renombrado `academic_events` → `talks` en todo el código (0 referencias restantes): allowlists, consultas, rutas `/admin/entradas/talks/…`; UI «Contribuciones a eventos»; chip público `entityLabel` pasa a «Comunicación/Talk» (revisable); el título de la sección del CV sigue siendo «Eventos académicos/Academic events»; en publicaciones el selector pasa a llamarse «Comunicación de origen».
+- [x] Formulario de contribución sin campos duplicados: quedan título, evento (selector), tipo, autores, rol, DOI, proyecto y URL; `event_title` (NOT NULL) se hidrata en el propio INSERT con subconsulta y la sincronización rellena el resto de copias; la ficha muestra el bloque «Evento compartido» con enlace. El formulario de servicio conserva fechas/ciudad/país porque un servicio puede no tener evento (si lo tiene, la sincronización los sobrescribe).
+- [x] Alta unificada en `/admin/eventos/nuevo` (`createEventWithRoles`): datos del evento + roles marcables **combinables** (contribución, servicio, asistencia privada) con campos prefijados, validación por sección, título del servicio con fallback al del evento, todo en una transacción interactiva.
+- [x] Aviso con enlace «créalo primero desde Eventos» en la entrada genérica de contribuciones y servicios.
+- [x] Revisión de formularios sobre datos reales (2026-07-16): el alta unificada de servicio omite también «Revista o entidad» y «Obra o recurso relacionado» (solo tienen sentido en servicios sin evento, como revisiones; en los 10 servicios de evento existentes `venue_or_journal` duplicaba la institución del evento); etiquetas y ayudas nuevas en el formulario genérico de servicio, en `talks.role` (21/21 vacío, papel implícito en el tipo) y en `academic_works.program` (copia bibliográfica vs FK). Sin cambios de esquema.
+- [x] «Nueva entrada» como embudo único: tarjeta destacada «Evento académico» que lleva al alta unificada, y las tarjetas de contribuciones/servicio marcadas «si el evento ya existe». `/admin/eventos` queda como pantalla de gestión/agrupación, no de arranque.
+- [x] `012` aplicada en producción por el autor (2026-07-16) y verificada: estructura remota correcta y humo del dev server contra la BD migrada en verde (CV ES/EN con contribuciones, home con etiquetas nuevas, admin protegido).
+- [ ] Prueba editorial del autor (alta unificada con varios roles, edición de una contribución, enlaces 5C, documentos 5D) y **commit + push cuanto antes**: mientras no se despliegue, la web pública sirve el código antiguo degradado (sección de contribuciones vacía y fichas del portfolio sin esas entradas).
 
 Criterio de aceptación:
 
@@ -978,6 +1000,8 @@ Estado: `pendiente`
 - [ ] Revisar accesibilidad y responsive.
 - [ ] Eliminar `entries_legacy` en migración separada.
 - [ ] Retirar controles duplicados de `projects`.
+- [ ] Retirar la vista puente `academic_events` y las columnas-copia de `talks` (`event_title`, fechas, lugar, modalidad) una vez estable el deploy de la 5G, eliminando también la sincronización en `crud.ts`/`events.ts`.
+- [ ] Retirar `is_ongoing` de `education` y `memberships`: sin consumidor público (solo lo escriben los formularios); «en curso» pasa a derivarse de `date_start` presente + `date_end` vacío, con la salvedad «fin desconocido» asumida por el autor (recomendado 2026-07-16, pendiente de confirmar).
 - [ ] Actualizar `db/schema.sql` como fotografía final del esquema.
 
 Criterio de aceptación:
@@ -1085,6 +1109,10 @@ El proyecto se considera completado cuando:
 | 2026-07-15 | Fase 5B — trabajo académico y titulación | Decisión 20 y migración `007`: `academic_works.education_id REFERENCES education(id)`, índice y backfill únicamente por coincidencia exacta y única de `program = degree_title`. Selector «Titulación relacionada» en TFM/TFG, validación FK allowlistada, vista inversa «Trabajos académicos» desde Formación, relación incluida en el recuento transversal y limpieza a `NULL` al borrar una titulación. En ese momento se aplazó la entidad canónica de eventos; esa conclusión fue sustituida después por la decisión 21 al aparecer el consumidor real de roles y certificados. | Respaldo restaurable `curriculum-2026-07-15-1951.sql` (23 tablas); ensayo local `007` 9/9; Turso verificado: mappings `1→2`, `2→3`, `3→4`, índice y FK activas | El autor: revisar los tres trabajos y sus titulaciones desde ambos extremos; después commit y despliegue. |
 | 2026-07-15 | Fase 5B — eventos canónicos y asistencia privada | Decisión 21 y migración `008`: nueva identidad `events`; FK desde contribuciones y servicio; backfill auditable de 21 contribuciones y deduplicación de actividades coincidentes en 26 eventos. `/admin/eventos` permite buscar, editar datos comunes, consultar todos los roles y crear actividades ya vinculadas. `event_attendance` registra manualmente «Oyente/asistente» con etiqueta/notas privadas, fuera de `entry_source` y de cualquier consulta pública. CV y portfolio leen el evento canónico; las copias heredadas se sincronizan para compatibilidad. | Respaldo restaurable `curriculum-2026-07-15-2026.sql` (23 tablas); ensayo local `008` 13/13; Turso verificado: 26 eventos, 21 contribuciones enlazadas, 10 servicios enlazados, 0 asistencias inferidas, FKs e índices activos y `entry_source` intacta con 91 filas. `npm run check` 0 errores/avisos; `npm run build` OK | El autor: probar un evento con solo rol de oyente, confirmar que no aparece en `/cv`, y revisar un evento que reúna contribución y organización. Después commit y despliegue. |
 | 2026-07-15 | Fase 5B — carga de asistencias | Importados 12 eventos aportados por el autor y registrada asistencia privada «Oyente/asistente» en los 12 eventos sin participación activa. «Y sin embargo, amigos…» reutiliza el evento canónico #11, pero no conserva asistencia porque ya contiene la comunicación «Mil y una Fuenteovejuna»: una contribución prevalece sobre el rol genérico de oyente. Se normalizaron Unicode, comillas, una puntuación residual del PDF y «Universitat Autònoma de Barcelona»; no se inventaron ciudad, país, URL ni certificados ausentes. | Respaldo previo `curriculum-2026-07-15-2032.sql` (25 tablas); Turso final: 38 eventos, 12 asistencias privadas, 1 contribución en el evento #11 y `entry_source` intacta con 91 filas. | El autor: revisar las asistencias en `/admin/eventos` y completar certificados en Fase 5D. |
+| 2026-07-15 | Fase 5C — enlaces adicionales | Decisión 22 y migración `009`: `links` reconstruida con FK compuesta a `entry_controls`, FK a siete `link_type` bilingües, CHECK de tipo de entidad/booleanos, URL única y un solo destacado por entrada. Gestión completa desde cada ficha: alta, edición, privacidad, destacado, retirada y orden sin navegación completa. Consumidores en CV y portfolio con etiquetas localizadas, solo para entrada+enlace públicos y sin repetir la URL canónica. | Auditoría inicial: 0 enlaces. Respaldo `curriculum-2026-07-15-2053.sql` (25 tablas); ensayo local `009` 11/11; Turso: 7 tipos, 3 índices y FKs verificadas, 0 enlaces iniciales, 91 entradas y 12 asistencias intactas. Prueba transaccional: visible `1→0` al hacer privado y rollback deja 0 filas. `npm run check` 0 errores/avisos; `npm run build` OK; `/es` y `/es/cv` 200. | El autor: añadir desde una entrada un enlace público y otro privado, cambiar el orden/destacado y revisar CV/portfolio en ES/EN; después commit y despliegue. Siguiente: Fase 5D. |
+| 2026-07-16 | Revisión entre sesiones + documentación retroactiva de Fase 5D | Al contrastar plan, repo y Turso se detectó que la sesión del 15/07 implementó la Fase 5D completa sin documentarla: migraciones `010` (documentos con propietario entrada/asistencia, certificados nunca públicos, 6 tipos en vocabulario) y `011` (nombres de columna compatibles con el código desplegado) aplicadas a las 21:04/21:08; código sin commitear: `admin/documents.ts`, `DocumentsEditor.svelte`, acciones en la ficha de edición y en `/admin/eventos/[id]` (certificados de asistencia), consumidores públicos `public-documents.ts` y `public-links.ts` en `/cv` y portfolio. Plan actualizado (checkboxes 5D, registro de migraciones, estados). | Turso solo lectura el 16/07: `schema_migrations` hasta `011`, columnas de `documents` correctas, 0 documentos, 0 enlaces, 12 asistencias, 6+7 tipos en vocabulario. `npm run check` 0 errores/0 avisos; `npm run build` OK. | El autor: prueba editorial conjunta 5C+5D (enlace público/privado con reordenación; documento público, privado y certificado de asistencia; nada privado visible en ES/EN), después commit y despliegue. En discusión: simplificar el flujo de registro de eventos (formulario unificado evento+rol y retirada de campos duplicados en la contribución). |
+| 2026-07-16 | Fase 5G — flujo de eventos unificado y renombrado `talks` | Decisiones 23 y 24. Migración `012` escrita y ensayada (36/36): rename con reescritura automática de la FK de `publications`, `entity_type` actualizado en datos, reconstrucción de `funding_relations`/`links`/`documents`, vistas recreadas y vista puente `academic_events`; **sin aplicar en producción**. Renombrado completo en código (0 referencias a `academic_events` en `src/`); UI «Contribuciones a eventos», chip público «Comunicación/Talk», selector «Comunicación de origen» en publicaciones. Formulario de contribución reducido a sus campos propios (`event_title` hidratado por subconsulta en el INSERT; sincronización de copias intacta). Alta unificada `/admin/eventos/nuevo` con roles combinables (contribución+servicio+asistencia) en una transacción, campos prefijados y validación por sección. Aviso «créalo primero desde Eventos» en la entrada genérica. | Respaldo fresco `curriculum-2026-07-16-0756.sql` (verificado por restauración); ensayo `012` 36/36; humo de INSERTs nuevos y consulta pública de talks 7/7 sobre la BD ensayada; `npm run check` 0 errores/0 avisos; `npm run build` OK. Sin probar contra Turso real: requiere aplicar la `012`. | El autor, en este orden: (1) `npm run backup`, (2) `npm run migrate` (aplica la `012`; desde ese momento la web desplegada antigua muestra vacías las contribuciones), (3) prueba editorial local — alta unificada con varios roles, edición de una contribución existente, enlaces 5C y documentos/certificados 5D —, (4) commit + push y verificación en producción ES/EN. Revisar las etiquetas públicas nuevas («Comunicación/Talk»). |
+| 2026-07-16 | Fase 5G — revisión de formularios e integración del alta | Auditoría columnas-vs-formularios de los 13 tipos sobre la BD ensayada: cobertura completa, sin columnas huérfanas en formularios. Correcciones: el servicio del alta unificada pierde «Revista o entidad» y «Obra o recurso relacionado» (campos de servicios sin evento, p. ej. revisiones de artículos); etiquetas/ayudas nuevas en servicio genérico, `talks.role` y `academic_works.program`. «Nueva entrada» pasa a ser el embudo único con tarjeta destacada de evento; contribuciones/servicio marcadas «si el evento ya existe». Observaciones sin acción: `description_short_es/en` de proyectos casi vacías (1/8 y 0/8, tarea de contenido); pregunta 2 de §25 sigue abierta (cursos, trabajos, asociaciones, competencias e idiomas no aparecen en `/cv` aunque ya son editables); `is_ongoing` solo existe en formación/asociaciones (el resto usa `date_end` NULL). | `npm run check` 0 errores/0 avisos; `npm run build` OK. | El mismo siguiente paso exacto de la fila anterior (aplicar `012` + prueba editorial + deploy), que ahora incluye probar el alta unificada sin los campos retirados y la tarjeta de evento en «Nueva entrada». |
 
 ## 24. Registro de migraciones en Turso
 
@@ -1098,6 +1126,10 @@ El proyecto se considera completado cuando:
 | `006_funding_relations.sql` | **aplicada** | 2026-07-15 | producción | respaldo restaurado; ensayo local 9/9; tabla, índice, dos FK compuestas/directas y 0 filas iniciales verificados en Turso | `DROP TABLE funding_relations;` o restaurar `backups/curriculum-2026-07-15-1626.sql` |
 | `007_academic_works_education.sql` | **aplicada** | 2026-07-15 | producción | respaldo restaurado; ensayo local 9/9; 3/3 coincidencias exactas, índice y FK verificados en Turso | restaurar `backups/curriculum-2026-07-15-1951.sql` (SQLite no permite retirar la columna con el mismo grado de compatibilidad en todas las versiones) |
 | `008_canonical_events.sql` | **aplicada** | 2026-07-15 | producción | respaldo restaurado; ensayo local 13/13; 26 eventos, 21 contribuciones, 10 servicios, 0 asistencias inferidas, mapeos exactos, FKs, índices, unicidad y cascada verificados en Turso | restaurar `backups/curriculum-2026-07-15-2026.sql` (retirar las columnas añadidas requiere reconstruir las tablas en SQLite) |
+| `009_additional_links.sql` | **aplicada** | 2026-07-15 | producción | respaldo restaurado; ensayo local 11/11; 7 tipos bilingües, FKs, CHECK, 3 índices, unicidad, destacado único y cascada verificados en Turso; prueba transaccional pública/privada revertida | restaurar `backups/curriculum-2026-07-15-2053.sql` (la tabla se reconstruye) |
+| `010_documents_and_certificates.sql` | **aplicada** | 2026-07-15 21:04 | producción | aplicada al final de la sesión del 15/07 sin registrarse aquí; verificada el 16/07 en revisión de solo lectura: `documents` reconstruida con propietario entrada/asistencia, CHECKs de certificado (nunca público), 4 índices y 6 tipos `document_type` en `type_vocab`; 0 documentos, 12 asistencias intactas | restaurar `backups/curriculum-2026-07-15-2104.sql` (la tabla se reconstruye) |
+| `011_documents_legacy_column_names.sql` | **aplicada** | 2026-07-15 21:08 | producción | renombra `entry_type`/`entry_id` → `entity_type`/`entity_id` para que el dashboard desplegado (código antiguo) siga funcionando hasta el próximo deploy; columnas verificadas en Turso el 16/07 | `ALTER TABLE documents RENAME COLUMN` inverso |
+| `012_rename_academic_events_to_talks.sql` | **aplicada** | 2026-07-16 | producción | ensayo local 36/36 + humo de INSERTs 7/7; tras aplicarla el autor: verificación remota de solo lectura (tabla `talks` 21 filas, 21 controles, 0 restos de `academic_events`, vista puente activa, FK de `publications` → `talks`, `entries` 91) y humo del dev server contra la BD migrada (`/es/cv` y `/en/cv` 200 con contribuciones, home con chips «Comunicación», `/admin` protegido 303) | restaurar `backups/curriculum-2026-07-16-0756.sql` **y** revertir el commit del código renombrado |
 
 ## 25. Preguntas que deben resolverse durante la Fase 0
 

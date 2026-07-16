@@ -17,7 +17,7 @@ const targetTypes = [
 	'courses',
 	'publications',
 	'academic_works',
-	'academic_events',
+	'talks',
 	'teaching',
 	'service_activities'
 ] as const satisfies readonly EntityType[];
@@ -188,7 +188,7 @@ async function getTargetCandidates(fundingAwardId: number): Promise<FundingRelat
 		  ON control.entity_type = source.entity_type AND control.entity_id = source.entity_id
 		WHERE source.entity_type IN (
 		  'projects', 'education', 'research_stays', 'courses', 'publications',
-		  'academic_works', 'academic_events', 'teaching', 'service_activities'
+		  'academic_works', 'talks', 'teaching', 'service_activities'
 		)
 		ORDER BY (source.sort_date IS NULL) ASC, source.sort_date DESC,
 		         source.title COLLATE NOCASE ASC`);

@@ -1,5 +1,7 @@
 import { db } from '$lib/server/db';
 import type { EntryKey } from './controls';
+import { entityForms, type FieldDef } from './entity-definitions';
+import type { FieldValue } from './validation';
 
 export interface CanonicalEventSummary {
 	id: number;
@@ -26,7 +28,7 @@ export interface CanonicalEventValues {
 }
 
 export interface EventActivity {
-	entityType: 'academic_events' | 'service_activities';
+	entityType: 'talks' | 'service_activities';
 	entityId: number;
 	title: string;
 	typeCode: string;
@@ -100,7 +102,7 @@ export async function getCanonicalEvents(): Promise<CanonicalEventSummary[]> {
 	const result = await db.execute(`
 		SELECT event.id, event.title, event.date_start, event.year,
 		       COALESCE(event.city, event.institution, event.country) AS place,
-		       (SELECT COUNT(*) FROM academic_events contribution
+		       (SELECT COUNT(*) FROM talks contribution
 		        WHERE contribution.canonical_event_id = event.id) AS contribution_count,
 		       (SELECT COUNT(*) FROM service_activities service
 		        WHERE service.canonical_event_id = event.id) AS service_count,
@@ -159,10 +161,10 @@ export async function getCanonicalEvent(id: number): Promise<CanonicalEventDetai
 			             contribution.contribution_type AS type_code,
 			             vocab.label_es AS type_label,
 			             COALESCE(control.is_public, 0) AS is_public
-			      FROM academic_events contribution
+			      FROM talks contribution
 			      LEFT JOIN type_vocab vocab ON vocab.code = contribution.contribution_type
 			      LEFT JOIN entry_controls control
-			        ON control.entity_type = 'academic_events' AND control.entity_id = contribution.id
+			        ON control.entity_type = 'talks' AND control.entity_id = contribution.id
 			      WHERE contribution.canonical_event_id = ?
 			      ORDER BY contribution.title COLLATE NOCASE`,
 			args: [id]
@@ -192,7 +194,7 @@ export async function getCanonicalEvent(id: number): Promise<CanonicalEventDetai
 		values: eventValues(event.rows[0] as unknown as Record<string, unknown>),
 		contributions: activityRows(
 			contributions.rows as unknown as Array<Record<string, unknown>>,
-			'academic_events'
+			'talks'
 		),
 		serviceActivities: activityRows(
 			services.rows as unknown as Array<Record<string, unknown>>,
@@ -233,6 +235,143 @@ export async function createCanonicalEvent(values: CanonicalEventValues): Promis
 	return Number(result.lastInsertRowid);
 }
 
+// ── Alta unificada (decisión 23): evento + roles en una sola transacción ─────
+
+export interface UnifiedRoles {
+	talk?: Record<string, FieldValue>;
+	service?: Record<string, FieldValue>;
+	attendance?: { roleLabel: string; notesPrivate: string };
+}
+
+// Campos propios de cada rol en el alta unificada: los del formulario del tipo
+// sin el selector de evento (implícito), sin las columnas que se sincronizan
+// desde el evento canónico y sin los campos que solo tienen sentido en
+// servicios ajenos a eventos (revista/entidad y obra relacionada, propios de
+// revisiones de artículos o volúmenes).
+const SERVICE_EVENT_OMITTED = new Set([
+	'date_start',
+	'date_end',
+	'year',
+	'city',
+	'country',
+	'venue_or_journal',
+	'related_entity'
+]);
+
+export const unifiedTalkFields: FieldDef[] = entityForms.talks.fields.filter(
+	(field) => field.name !== 'canonical_event_id'
+);
+
+export const unifiedServiceFields: FieldDef[] = entityForms.service_activities.fields.filter(
+	(field) => field.name !== 'canonical_event_id' && !SERVICE_EVENT_OMITTED.has(field.name)
+);
+
+export async function createEventWithRoles(
+	eventValues: CanonicalEventValues,
+	roles: UnifiedRoles
+): Promise<number> {
+	const copies = {
+		date_start: eventValues.date_start || null,
+		date_end: eventValues.date_end || null,
+		year: eventValues.year ? Number(eventValues.year) : null,
+		city: eventValues.city || null,
+		country: eventValues.country || null
+	};
+
+	const tx = await db.transaction('write');
+	try {
+		const insertedEvent = await tx.execute({
+			sql: `INSERT INTO events
+					(title, date_start, date_end, year, institution, city, country,
+					 modality, url, notes_private)
+				VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+			args: dbValues(eventValues)
+		});
+		const eventId = Number(insertedEvent.lastInsertRowid);
+
+		if (roles.talk) {
+			const cols = unifiedTalkFields.map((field) => field.name);
+			const allCols = [
+				...cols,
+				'canonical_event_id',
+				'event_title',
+				'date_start',
+				'date_end',
+				'year',
+				'institution',
+				'city',
+				'country',
+				'modality'
+			];
+			const inserted = await tx.execute({
+				sql: `INSERT INTO talks (${allCols.join(', ')}) VALUES (${allCols.map(() => '?').join(', ')})`,
+				args: [
+					...cols.map((col) => roles.talk?.[col] ?? null),
+					eventId,
+					eventValues.title,
+					copies.date_start,
+					copies.date_end,
+					copies.year,
+					eventValues.institution || null,
+					copies.city,
+					copies.country,
+					eventValues.modality || null
+				]
+			});
+			await tx.execute({
+				sql: 'INSERT INTO entry_controls (entity_type, entity_id, is_public) VALUES (?, ?, 0)',
+				args: ['talks', Number(inserted.lastInsertRowid)]
+			});
+		}
+
+		if (roles.service) {
+			const cols = unifiedServiceFields.map((field) => field.name);
+			const allCols = [
+				...cols,
+				'canonical_event_id',
+				'date_start',
+				'date_end',
+				'year',
+				'city',
+				'country'
+			];
+			const inserted = await tx.execute({
+				sql: `INSERT INTO service_activities (${allCols.join(', ')}) VALUES (${allCols.map(() => '?').join(', ')})`,
+				args: [
+					...cols.map((col) => roles.service?.[col] ?? null),
+					eventId,
+					copies.date_start,
+					copies.date_end,
+					copies.year,
+					copies.city,
+					copies.country
+				]
+			});
+			await tx.execute({
+				sql: 'INSERT INTO entry_controls (entity_type, entity_id, is_public) VALUES (?, ?, 0)',
+				args: ['service_activities', Number(inserted.lastInsertRowid)]
+			});
+		}
+
+		if (roles.attendance) {
+			await tx.execute({
+				sql: `INSERT INTO event_attendance (event_id, role_type, role_label, notes_private)
+					VALUES (?, 'attendee', ?, ?)`,
+				args: [
+					eventId,
+					roles.attendance.roleLabel.trim() || 'Oyente/asistente',
+					roles.attendance.notesPrivate.trim() || null
+				]
+			});
+		}
+
+		await tx.commit();
+		return eventId;
+	} finally {
+		tx.close();
+	}
+}
+
 export async function updateCanonicalEvent(id: number, values: CanonicalEventValues): Promise<void> {
 	const results = await db.batch([
 		{
@@ -244,7 +383,7 @@ export async function updateCanonicalEvent(id: number, values: CanonicalEventVal
 			args: [...dbValues(values), id]
 		},
 		{
-			sql: `UPDATE academic_events SET
+			sql: `UPDATE talks SET
 				event_title = ?, date_start = ?, date_end = ?, year = ?, institution = ?,
 				city = ?, country = ?, modality = ?
 			WHERE canonical_event_id = ?`,
@@ -301,7 +440,7 @@ export async function removeEventAttendance(eventId: number): Promise<void> {
 export async function deleteCanonicalEvent(id: number): Promise<void> {
 	const usage = await db.execute({
 		sql: `SELECT
-			(SELECT COUNT(*) FROM academic_events WHERE canonical_event_id = ?) +
+			(SELECT COUNT(*) FROM talks WHERE canonical_event_id = ?) +
 			(SELECT COUNT(*) FROM service_activities WHERE canonical_event_id = ?) +
 			(SELECT COUNT(*) FROM event_attendance WHERE event_id = ?) AS total`,
 		args: [id, id, id]
@@ -313,7 +452,7 @@ export async function deleteCanonicalEvent(id: number): Promise<void> {
 }
 
 export async function getCanonicalEventForEntry(entry: EntryKey): Promise<{ id: number; title: string } | null> {
-	if (entry.entityType !== 'academic_events' && entry.entityType !== 'service_activities') return null;
+	if (entry.entityType !== 'talks' && entry.entityType !== 'service_activities') return null;
 	const result = await db.execute({
 		sql: `SELECT event.id, event.title
 		      FROM ${entry.entityType} source
@@ -328,30 +467,22 @@ export async function getCanonicalEventForEntry(entry: EntryKey): Promise<{ id: 
 
 export async function getCanonicalEventDefaults(
 	eventId: number,
-	entityType: 'academic_events' | 'service_activities'
+	entityType: 'talks' | 'service_activities'
 ): Promise<Record<string, string>> {
 	const result = await db.execute({ sql: 'SELECT * FROM events WHERE id = ?', args: [eventId] });
 	if (result.rows.length === 0) return {};
 	const row = result.rows[0];
-	const common = {
+	// El formulario de talks ya no pide datos del evento: basta preseleccionarlo.
+	if (entityType === 'talks') return { canonical_event_id: String(eventId) };
+	return {
 		canonical_event_id: String(eventId),
 		date_start: nullable(row.date_start) ?? '',
 		date_end: nullable(row.date_end) ?? '',
 		year: nullable(row.year) ?? '',
 		city: nullable(row.city) ?? '',
 		country: nullable(row.country) ?? '',
-		url: nullable(row.url) ?? ''
+		url: nullable(row.url) ?? '',
+		title: String(row.title),
+		venue_or_journal: nullable(row.institution) ?? ''
 	};
-	return entityType === 'academic_events'
-		? {
-				...common,
-				event_title: String(row.title),
-				institution: nullable(row.institution) ?? '',
-				modality: nullable(row.modality) ?? ''
-			}
-		: {
-				...common,
-				title: String(row.title),
-				venue_or_journal: nullable(row.institution) ?? ''
-			};
 }

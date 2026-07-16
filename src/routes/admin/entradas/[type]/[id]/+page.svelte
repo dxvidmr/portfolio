@@ -3,6 +3,8 @@
 	import type { ActionData, PageData } from './$types';
 	import EntityForm from '$lib/components/admin/EntityForm.svelte';
 	import FundingRelations from '$lib/components/admin/FundingRelations.svelte';
+	import AdditionalLinks from '$lib/components/admin/AdditionalLinks.svelte';
+	import DocumentsEditor from '$lib/components/admin/DocumentsEditor.svelte';
 	import AdminToast from '$lib/components/AdminToast.svelte';
 
 	let { data, form }: { data: PageData; form: ActionData } = $props();
@@ -27,6 +29,10 @@
 			};
 		if (form.relationMessage)
 			return { message: form.relationMessage, success: form.relationSuccess === true };
+		if (form.linkMessage)
+			return { message: form.linkMessage, success: form.linkSuccess === true };
+		if (form.documentMessage)
+			return { message: form.documentMessage, success: form.documentSuccess === true };
 		if (form.eliminarError) return { message: form.eliminarError, success: false };
 		if (form.errors)
 			return { message: 'Revisa los campos marcados; no se ha guardado.', success: false };
@@ -178,6 +184,10 @@
 {#if data.fundingRelations}
 	<FundingRelations editor={data.fundingRelations} />
 {/if}
+
+<AdditionalLinks editor={data.links} />
+
+<DocumentsEditor editor={data.documents} />
 
 <section aria-labelledby="portfolio-title">
 	<h2 id="portfolio-title">Fichas del portfolio</h2>

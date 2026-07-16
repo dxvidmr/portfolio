@@ -24,7 +24,7 @@
 			empty: 'No hay resultados para esos filtros.',
 			sectionLabels: {
 				publications: 'Publicaciones',
-				academic_events: 'Eventos académicos',
+				talks: 'Eventos académicos',
 				teaching: 'Docencia',
 				projects: 'Proyectos de investigación',
 				education: 'Formación',
@@ -47,7 +47,7 @@
 			empty: 'No results for those filters.',
 			sectionLabels: {
 				publications: 'Publications',
-				academic_events: 'Academic events',
+				talks: 'Academic events',
 				teaching: 'Teaching',
 				projects: 'Research projects',
 				education: 'Education',
@@ -68,6 +68,10 @@
 		(locale === 'en' ? item.type_label_en : item.type_label_es) ??
 		item.type?.replaceAll('_', ' ') ??
 		null;
+	const linkLabel = (link: CvItem['links'][number]) =>
+		locale === 'en' ? link.label_en : link.label_es;
+	const documentLabel = (document: CvItem['documents'][number]) =>
+		document.title ?? (locale === 'en' ? document.label_en : document.label_es);
 
 	const types = $derived(
 		Array.from(
@@ -162,6 +166,22 @@
 									</h3>
 									{#if item.detail}
 										<p>{item.detail}</p>
+									{/if}
+									{#if item.links.length}
+										<div class="additional-links">
+											{#each item.links as link (link.url)}
+												<a href={link.url} target="_blank" rel="noreferrer" class:primary={link.is_primary}>
+													{linkLabel(link)}
+												</a>
+											{/each}
+										</div>
+									{/if}
+									{#if item.documents.length}
+										<div class="document-links">
+											{#each item.documents as document (document.url)}
+												<a href={document.url} target="_blank" rel="noreferrer">↓ {documentLabel(document)}</a>
+											{/each}
+										</div>
 									{/if}
 								</div>
 							</div>
@@ -288,6 +308,12 @@
 	.empty {
 		color: var(--fg-dim);
 	}
+	.additional-links { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
+	.additional-links a { border: 1px solid var(--line); padding: 3px 6px; color: var(--fg-dim); font-size: 0.68rem; text-decoration: none; }
+	.additional-links a:hover, .additional-links a:focus-visible, .additional-links a.primary { border-color: var(--accent); color: var(--accent); }
+	.document-links { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
+	.document-links a { color: var(--fg-dim); font-size: 0.68rem; }
+	.document-links a:hover, .document-links a:focus-visible { color: var(--accent); }
 	@media (max-width: 840px) {
 		.filters,
 		.cv-section,

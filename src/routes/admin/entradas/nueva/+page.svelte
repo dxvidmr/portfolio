@@ -22,10 +22,23 @@
 	pública hasta que la publiques.
 </p>
 
+<a class="event-card" href="/admin/eventos/nuevo">
+	<strong>Evento académico</strong>
+	<span>
+		Congreso, seminario, jornada… Crea el evento y, en el mismo paso, tu contribución,
+		servicio o asistencia. Es el camino recomendado para comunicaciones y organización.
+	</span>
+</a>
+
 <ul class="types">
 	{#each data.typeOptions as option (option.value)}
 		<li>
-			<a href={`/admin/entradas/nueva/${option.value}`}>{option.label}</a>
+			<a href={`/admin/entradas/nueva/${option.value}`}>
+				{option.label}
+				{#if option.value === 'talks' || option.value === 'service_activities'}
+					<small>si el evento ya existe</small>
+				{/if}
+			</a>
 		</li>
 	{/each}
 </ul>
@@ -72,9 +85,39 @@
 		line-height: 1.6;
 	}
 
+	.event-card {
+		display: grid;
+		gap: 0.4rem;
+		margin-top: 2rem;
+		border: 1px solid #00ff88;
+		padding: 1rem 1.1rem;
+		color: #fafafa;
+		text-decoration: none;
+	}
+
+	.event-card strong {
+		color: #00ff88;
+	}
+
+	.event-card span {
+		font-size: 0.82rem;
+		color: #a3a3a3;
+		line-height: 1.5;
+		max-width: 70ch;
+	}
+
+	.event-card:hover {
+		background: rgba(0, 255, 136, 0.06);
+	}
+
+	.event-card:focus-visible {
+		outline: 2px solid #00ff88;
+		outline-offset: 3px;
+	}
+
 	.types {
 		list-style: none;
-		margin: 2rem 0 0;
+		margin: 1.5rem 0 0;
 		padding: 0;
 		display: grid;
 		grid-template-columns: repeat(auto-fill, minmax(15rem, 1fr));
@@ -87,6 +130,13 @@
 		padding: 0.9rem 1rem;
 		color: #fafafa;
 		text-decoration: none;
+	}
+
+	.types small {
+		display: block;
+		margin-top: 0.25rem;
+		font-size: 0.7rem;
+		color: #737373;
 	}
 
 	.types a:hover {

@@ -17,7 +17,7 @@ export const load: PageServerLoad = async ({ locals, params, url }) => {
 	const eventId = Number(url.searchParams.get('eventId'));
 	const initialValues =
 		Number.isSafeInteger(eventId) && eventId > 0 &&
-		(params.type === 'academic_events' || params.type === 'service_activities')
+		(params.type === 'talks' || params.type === 'service_activities')
 			? await getCanonicalEventDefaults(eventId, params.type)
 			: {};
 

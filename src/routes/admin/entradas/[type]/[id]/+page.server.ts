@@ -32,6 +32,26 @@ import {
 } from '$lib/server/admin/funding-relations';
 import { parseEntryKey } from '$lib/server/admin/controls';
 import { getCanonicalEventForEntry } from '$lib/server/admin/events';
+import {
+	addLink,
+	moveLink,
+	parseLinkDirection,
+	parseLinkId,
+	parseLinkValues,
+	getLinkEditor,
+	removeLink,
+	updateLink
+} from '$lib/server/admin/links';
+import {
+	addDocument,
+	getDocumentEditor,
+	moveDocument,
+	parseDocumentDirection,
+	parseDocumentId,
+	parseDocumentValues,
+	removeDocument,
+	updateDocument
+} from '$lib/server/admin/documents';
 
 const HEADING_KEYS = ['title', 'degree_title', 'institution', 'organization'];
 
@@ -54,13 +74,16 @@ export const load: PageServerLoad = async ({ locals, params, setHeaders }) => {
 	setHeaders({ 'cache-control': 'private, no-store' });
 
 	const headingKey = HEADING_KEYS.find((key) => values[key]);
-	const [options, control, portfolioRelations, structuralRelations, fundingRelations, canonicalEvent] = await Promise.all([
+	const entry = { entityType, entityId };
+	const [options, control, portfolioRelations, structuralRelations, fundingRelations, canonicalEvent, links, documents] = await Promise.all([
 		getFieldOptions(entityType),
 		getControlState(entityType, entityId),
 		getEntryPortfolioRelations({ entityType, entityId }),
 		getStructuralRelations({ entityType, entityId }),
 		getFundingRelationEditor({ entityType, entityId }),
-		getCanonicalEventForEntry({ entityType, entityId })
+		getCanonicalEventForEntry(entry),
+		getLinkEditor(entry),
+		getDocumentEditor({ kind: 'entry', entry })
 	]);
 
 	return {
@@ -76,7 +99,9 @@ export const load: PageServerLoad = async ({ locals, params, setHeaders }) => {
 		structuralRelations,
 		hasStructuralRelations: supportsStructuralRelations(entityType),
 		fundingRelations,
-		canonicalEvent
+		canonicalEvent,
+		links,
+		documents
 	};
 };
 
@@ -188,6 +213,124 @@ export const actions: Actions = {
 				message: cause instanceof Error ? cause.message : 'Error desconocido'
 			});
 			return fail(500, { relationMessage: 'No se pudo actualizar la relación.', relationSuccess: false });
+		}
+	},
+
+	crearEnlace: async ({ locals, params, request }) => {
+		await requireAdmin(locals);
+		const entry = parseParams(params);
+		const values = parseLinkValues(await request.formData());
+		if (!values) return fail(400, { linkMessage: 'Revisa el tipo y la URL del enlace.', linkSuccess: false });
+		try {
+			await addLink(entry, values);
+			return { linkMessage: 'Enlace añadido.', linkSuccess: true };
+		} catch (cause) {
+			console.error('[admin] Error al añadir enlace', { message: cause instanceof Error ? cause.message : 'Error desconocido' });
+			return fail(409, { linkMessage: 'No se pudo añadir; comprueba que la URL no esté repetida.', linkSuccess: false });
+		}
+	},
+
+	guardarEnlace: async ({ locals, params, request }) => {
+		await requireAdmin(locals);
+		const entry = parseParams(params);
+		const formData = await request.formData();
+		const id = parseLinkId(formData);
+		const values = parseLinkValues(formData);
+		if (!id || !values) return fail(400, { linkMessage: 'Datos de enlace no válidos.', linkSuccess: false });
+		try {
+			await updateLink(entry, id, values);
+			return { linkMessage: 'Enlace actualizado.', linkSuccess: true };
+		} catch (cause) {
+			console.error('[admin] Error al actualizar enlace', { message: cause instanceof Error ? cause.message : 'Error desconocido' });
+			return fail(409, { linkMessage: 'No se pudo guardar; comprueba que la URL no esté repetida.', linkSuccess: false });
+		}
+	},
+
+	eliminarEnlace: async ({ locals, params, request }) => {
+		await requireAdmin(locals);
+		const entry = parseParams(params);
+		const id = parseLinkId(await request.formData());
+		if (!id) return fail(400, { linkMessage: 'Enlace no válido.', linkSuccess: false });
+		try {
+			await removeLink(entry, id);
+			return { linkMessage: 'Enlace eliminado.', linkSuccess: true };
+		} catch {
+			return fail(404, { linkMessage: 'El enlace ya no existe.', linkSuccess: false });
+		}
+	},
+
+	moverEnlace: async ({ locals, params, request }) => {
+		await requireAdmin(locals);
+		const entry = parseParams(params);
+		const formData = await request.formData();
+		const id = parseLinkId(formData);
+		const direction = parseLinkDirection(formData.get('direction'));
+		if (!id || !direction) return fail(400, { linkMessage: 'Movimiento no válido.', linkSuccess: false });
+		try {
+			await moveLink(entry, id, direction);
+			return { linkMessage: 'Orden de enlaces actualizado.', linkSuccess: true };
+		} catch {
+			return fail(404, { linkMessage: 'El enlace ya no existe.', linkSuccess: false });
+		}
+	},
+
+	crearDocumento: async ({ locals, params, request }) => {
+		await requireAdmin(locals);
+		const entry = parseParams(params);
+		const owner = { kind: 'entry' as const, entry };
+		const values = parseDocumentValues(await request.formData(), owner.kind);
+		if (!values) return fail(400, { documentMessage: 'Revisa el tipo, la URL y la fecha del documento.', documentSuccess: false });
+		try {
+			await addDocument(owner, values);
+			return { documentMessage: 'Documento añadido.', documentSuccess: true };
+		} catch (cause) {
+			console.error('[admin] Error al añadir documento', { message: cause instanceof Error ? cause.message : 'Error desconocido' });
+			return fail(409, { documentMessage: 'No se pudo añadir; comprueba que la URL no esté repetida.', documentSuccess: false });
+		}
+	},
+
+	guardarDocumento: async ({ locals, params, request }) => {
+		await requireAdmin(locals);
+		const entry = parseParams(params);
+		const owner = { kind: 'entry' as const, entry };
+		const formData = await request.formData();
+		const id = parseDocumentId(formData);
+		const values = parseDocumentValues(formData, owner.kind);
+		if (!id || !values) return fail(400, { documentMessage: 'Datos de documento no válidos.', documentSuccess: false });
+		try {
+			await updateDocument(owner, id, values);
+			return { documentMessage: 'Documento actualizado.', documentSuccess: true };
+		} catch (cause) {
+			console.error('[admin] Error al actualizar documento', { message: cause instanceof Error ? cause.message : 'Error desconocido' });
+			return fail(409, { documentMessage: 'No se pudo guardar; comprueba que la URL no esté repetida.', documentSuccess: false });
+		}
+	},
+
+	eliminarDocumento: async ({ locals, params, request }) => {
+		await requireAdmin(locals);
+		const entry = parseParams(params);
+		const id = parseDocumentId(await request.formData());
+		if (!id) return fail(400, { documentMessage: 'Documento no válido.', documentSuccess: false });
+		try {
+			await removeDocument({ kind: 'entry', entry }, id);
+			return { documentMessage: 'Documento eliminado.', documentSuccess: true };
+		} catch {
+			return fail(404, { documentMessage: 'El documento ya no existe.', documentSuccess: false });
+		}
+	},
+
+	moverDocumento: async ({ locals, params, request }) => {
+		await requireAdmin(locals);
+		const entry = parseParams(params);
+		const formData = await request.formData();
+		const id = parseDocumentId(formData);
+		const direction = parseDocumentDirection(formData.get('direction'));
+		if (!id || !direction) return fail(400, { documentMessage: 'Movimiento no válido.', documentSuccess: false });
+		try {
+			await moveDocument({ kind: 'entry', entry }, id, direction);
+			return { documentMessage: 'Orden de documentos actualizado.', documentSuccess: true };
+		} catch {
+			return fail(404, { documentMessage: 'El documento ya no existe.', documentSuccess: false });
 		}
 	},
 

@@ -81,7 +81,7 @@ async function getFkOptions(entity: FkEntity): Promise<SelectOption[]> {
 	}
 	const res = await db.execute(
 		`SELECT id, title, COALESCE(substr(date_start, 1, 4), CAST(year AS TEXT), '') AS y
-		 FROM academic_events
+		 FROM talks
 		 ORDER BY (date_start IS NULL) ASC, date_start DESC, title COLLATE NOCASE`
 	);
 	return res.rows.map((row) => ({
@@ -110,7 +110,7 @@ export async function validateReferences(
 		} else if (field.kind === 'fk' && field.fkEntity) {
 			const tableByFk: Record<FkEntity, string> = {
 				projects: 'projects',
-				academic_events: 'academic_events',
+				talks: 'talks',
 				education: 'education',
 				events: 'events'
 			};
@@ -132,16 +132,29 @@ export async function createEntity(
 	values: Record<string, FieldValue>
 ): Promise<number> {
 	const cols = fieldNames(type);
+	// El formulario de talks ya no pide los datos del evento: `event_title`
+	// (NOT NULL) se hidrata en el propio INSERT desde la ficha canónica y el
+	// resto de columnas-copia las rellena la sincronización posterior.
+	const insertCols =
+		type === 'talks' ? [...cols, 'event_title'] : cols;
+	const placeholders =
+		type === 'talks'
+			? [...cols.map(() => '?'), "COALESCE((SELECT title FROM events WHERE id = ?), '')"]
+			: cols.map(() => '?');
+	const insertArgs =
+		type === 'talks'
+			? [...cols.map((col) => values[col] ?? null), values.canonical_event_id ?? null]
+			: cols.map((col) => values[col] ?? null);
 	const tx = await db.transaction('write');
 	try {
 		const inserted = await tx.execute({
-			sql: `INSERT INTO ${type} (${cols.join(', ')}) VALUES (${cols.map(() => '?').join(', ')})`,
-			args: cols.map((col) => values[col] ?? null)
+			sql: `INSERT INTO ${type} (${insertCols.join(', ')}) VALUES (${placeholders.join(', ')})`,
+			args: insertArgs
 		});
 		const id = Number(inserted.lastInsertRowid);
-		if (type === 'academic_events') {
+		if (type === 'talks') {
 			await tx.execute({
-				sql: `UPDATE academic_events SET
+				sql: `UPDATE talks SET
 					event_title = (SELECT title FROM events WHERE id = canonical_event_id),
 					date_start = (SELECT date_start FROM events WHERE id = canonical_event_id),
 					date_end = (SELECT date_end FROM events WHERE id = canonical_event_id),
@@ -185,9 +198,9 @@ export async function updateEntity(
 				args: [type, id]
 			}
 		];
-	if (type === 'academic_events') {
+	if (type === 'talks') {
 		statements.push({
-			sql: `UPDATE academic_events SET
+			sql: `UPDATE talks SET
 				event_title = (SELECT title FROM events WHERE id = canonical_event_id),
 				date_start = (SELECT date_start FROM events WHERE id = canonical_event_id),
 				date_end = (SELECT date_end FROM events WHERE id = canonical_event_id),
@@ -209,11 +222,11 @@ export async function deleteEntity(type: FormEntityType, id: number): Promise<vo
 	const stmts: Array<{ sql: string; args: Array<string | number> }> = [];
 
 	if (type === 'projects') {
-		for (const table of ['publications', 'academic_events', 'teaching', 'funding_awards']) {
+		for (const table of ['publications', 'talks', 'teaching', 'funding_awards']) {
 			stmts.push({ sql: `UPDATE ${table} SET project_id = NULL WHERE project_id = ?`, args: [id] });
 		}
 	}
-	if (type === 'academic_events') {
+	if (type === 'talks') {
 		stmts.push({ sql: 'UPDATE publications SET event_id = NULL WHERE event_id = ?', args: [id] });
 	}
 	if (type === 'education') {
@@ -227,7 +240,11 @@ export async function deleteEntity(type: FormEntityType, id: number): Promise<vo
 		args: [type, id]
 	});
 
-	for (const table of ['documents', 'links', 'entity_tags', 'portfolio_items', 'entry_controls']) {
+	stmts.push({
+		sql: 'DELETE FROM documents WHERE entity_type = ? AND entity_id = ?',
+		args: [type, id]
+	});
+	for (const table of ['links', 'entity_tags', 'portfolio_items', 'entry_controls']) {
 		stmts.push({
 			sql: `DELETE FROM ${table} WHERE entity_type = ? AND entity_id = ?`,
 			args: [type, id]

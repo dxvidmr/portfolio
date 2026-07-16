@@ -5,7 +5,7 @@ import type { EntryKey } from './controls';
 type StructuralEntityType =
 	| 'publications'
 	| 'academic_works'
-	| 'academic_events'
+	| 'talks'
 	| 'teaching'
 	| 'funding_awards';
 
@@ -32,9 +32,9 @@ const projectGroups: Array<Omit<StructuralRelationGroup, 'items'>> = [
 		description: 'Publicaciones cuyo campo «Proyecto de investigación» apunta a esta entrada.'
 	},
 	{
-		entityType: 'academic_events',
-		label: 'Eventos académicos',
-		description: 'Eventos vinculados a este proyecto de investigación.'
+		entityType: 'talks',
+		label: 'Contribuciones a eventos',
+		description: 'Comunicaciones y ponencias vinculadas a este proyecto de investigación.'
 	},
 	{
 		entityType: 'teaching',
@@ -67,20 +67,20 @@ const educationGroups: Array<Omit<StructuralRelationGroup, 'items'>> = [
 const nullable = (value: unknown) => (value == null ? null : String(value));
 
 export function supportsStructuralRelations(entityType: FormEntityType): boolean {
-	return entityType === 'projects' || entityType === 'academic_events' || entityType === 'education';
+	return entityType === 'projects' || entityType === 'talks' || entityType === 'education';
 }
 
 export async function getStructuralRelations(entry: EntryKey): Promise<StructuralRelationGroup[]> {
 	if (!supportsStructuralRelations(entry.entityType as FormEntityType)) return [];
 
 	const isProject = entry.entityType === 'projects';
-	const isEvent = entry.entityType === 'academic_events';
+	const isEvent = entry.entityType === 'talks';
 	const relationSql = isProject
 		? `SELECT 'publications' AS entity_type, id AS entity_id, 1 AS group_order
 			FROM publications WHERE project_id = ?
 			UNION ALL
-			SELECT 'academic_events', id, 2
-			FROM academic_events WHERE project_id = ?
+			SELECT 'talks', id, 2
+			FROM talks WHERE project_id = ?
 			UNION ALL
 			SELECT 'teaching', id, 3
 			FROM teaching WHERE project_id = ?

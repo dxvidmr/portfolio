@@ -2,7 +2,7 @@ export const entityDefinitions = {
 	projects: 'Proyectos',
 	publications: 'Publicaciones',
 	academic_works: 'Trabajos académicos',
-	academic_events: 'Eventos académicos',
+	talks: 'Contribuciones a eventos',
 	teaching: 'Docencia',
 	service_activities: 'Actividades de servicio',
 	funding_awards: 'Financiación y premios',
@@ -40,7 +40,7 @@ export type VocabDomain =
 	| 'project_role'
 	| 'service_role';
 
-export type FkEntity = 'projects' | 'academic_events' | 'education' | 'events';
+export type FkEntity = 'projects' | 'talks' | 'education' | 'events';
 
 export type FieldKind =
 	| 'text'
@@ -97,36 +97,33 @@ export const entityForms = {
 			f('issn', 'ISSN', 'text'),
 			f('abstract', 'Resumen', 'textarea'),
 			f('bibtex_override', 'BibTeX manual', 'textarea', { help: 'Solo si la cita automática no basta' }),
-			f('event_id', 'Evento de origen', 'fk', {
-				fkEntity: 'academic_events',
-				help: 'Comunicación de la que deriva esta publicación'
+			f('event_id', 'Comunicación de origen', 'fk', {
+				fkEntity: 'talks',
+				help: 'Contribución a evento de la que deriva esta publicación'
 			}),
 			f('project_id', 'Proyecto de investigación', 'fk', { fkEntity: 'projects' }),
 			f('url', 'URL', 'url')
 		]
 	},
-	academic_events: {
+	talks: {
+		// Los datos del evento (nombre, fechas, lugar, modalidad) viven en la
+		// ficha canónica `events`; las columnas-copia heredadas de `talks` se
+		// hidratan en servidor (crud.ts) y no se piden en el formulario.
 		fields: [
 			f('title', 'Título de la contribución', 'text', { required: true }),
 			f('canonical_event_id', 'Evento', 'fk', {
 				required: true,
 				fkEntity: 'events',
-				help: 'Ficha canónica compartida con organización, evaluación y asistencia'
+				help: 'Nombre, fechas y lugar se toman de la ficha del evento'
 			}),
-			f('event_title', 'Nombre del evento', 'text', { required: true }),
 			f('contribution_type', 'Tipo de contribución', 'vocab', {
 				required: true,
 				vocabDomain: 'contribution_type'
 			}),
 			f('authors_text', 'Autores', 'text', { required: true }),
-			f('role', 'Rol', 'text'),
-			f('date_start', 'Fecha de inicio', 'date'),
-			f('date_end', 'Fecha de fin', 'date'),
-			f('year', 'Año', 'integer'),
-			f('institution', 'Institución', 'text'),
-			f('city', 'Ciudad', 'text'),
-			f('country', 'País', 'text'),
-			f('modality', 'Modalidad', 'text', { help: 'Presencial, en línea, híbrida…' }),
+			f('role', 'Rol', 'text', {
+				help: 'Solo si tu papel no es el implícito del tipo (p. ej. conferencia invitada)'
+			}),
 			f('doi', 'DOI', 'text'),
 			f('project_id', 'Proyecto de investigación', 'fk', { fkEntity: 'projects' }),
 			f('url', 'URL', 'url')
@@ -227,8 +224,12 @@ export const entityForms = {
 				help: 'Úsalo para organización o evaluación de un evento concreto'
 			}),
 			f('role', 'Mi rol', 'vocab', { vocabDomain: 'service_role' }),
-			f('venue_or_journal', 'Sede o revista', 'text'),
-			f('related_entity', 'Entidad relacionada', 'text'),
+			f('venue_or_journal', 'Revista o entidad', 'text', {
+				help: 'Para servicios sin evento: revista, editorial u organización para la que se hace el servicio'
+			}),
+			f('related_entity', 'Obra o recurso relacionado', 'text', {
+				help: 'Volumen, artículo o recurso concreto al que se refiere el servicio (p. ej. una revisión)'
+			}),
 			f('city', 'Ciudad', 'text'),
 			f('country', 'País', 'text'),
 			f('date_start', 'Fecha de inicio', 'date'),
@@ -243,7 +244,9 @@ export const entityForms = {
 			f('title', 'Título', 'text', { required: true }),
 			f('work_type', 'Tipo de trabajo', 'vocab', { required: true, vocabDomain: 'work_type' }),
 			f('institution', 'Institución', 'text', { required: true }),
-			f('program', 'Programa', 'text'),
+			f('program', 'Programa', 'text', {
+				help: 'Texto tal como debe citarse; la relación real con Formación es el selector de abajo'
+			}),
 			f('education_id', 'Titulación relacionada', 'fk', {
 				fkEntity: 'education',
 				help: 'Titulación del apartado Formación en la que se realizó este trabajo'

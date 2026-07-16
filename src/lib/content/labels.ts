@@ -6,7 +6,7 @@ const entityTypeLabels: Record<string, { es: string; en: string }> = {
 	projects: { es: 'Proyecto', en: 'Project' },
 	publications: { es: 'Publicación', en: 'Publication' },
 	academic_works: { es: 'Trabajo académico', en: 'Academic work' },
-	academic_events: { es: 'Evento', en: 'Event' },
+	talks: { es: 'Comunicación', en: 'Talk' },
 	teaching: { es: 'Docencia', en: 'Teaching' },
 	service_activities: { es: 'Actividad', en: 'Service' },
 	funding_awards: { es: 'Financiación', en: 'Funding' },

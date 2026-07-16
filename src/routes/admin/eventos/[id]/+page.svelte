@@ -4,6 +4,7 @@
 	import type { ActionData, PageData } from './$types';
 	import CanonicalEventForm from '$lib/components/admin/CanonicalEventForm.svelte';
 	import AdminToast from '$lib/components/AdminToast.svelte';
+	import DocumentsEditor from '$lib/components/admin/DocumentsEditor.svelte';
 
 	let { data, form }: { data: PageData; form: ActionData } = $props();
 	let pendingAttendance = $state(false);
@@ -40,7 +41,7 @@
 	<div class="section-heading">
 		<div><h2>Roles y actividades</h2><p>Un mismo evento puede reunir varios roles independientes.</p></div>
 		<div class="new-links">
-			<a href={`/admin/entradas/nueva/academic_events?eventId=${data.event.id}`}>+ Contribución</a>
+			<a href={`/admin/entradas/nueva/talks?eventId=${data.event.id}`}>+ Contribución</a>
 			<a href={`/admin/entradas/nueva/service_activities?eventId=${data.event.id}`}>+ Servicio</a>
 		</div>
 	</div>
@@ -83,10 +84,14 @@
 	</form>
 	{#if data.event.attendance}
 		<form method="POST" action="?/quitarAsistencia" use:enhance={enhanceAttendance}>
-			<button type="submit" class="secondary" disabled={pendingAttendance}>Quitar rol de oyente</button>
+			<button type="submit" class="secondary" disabled={pendingAttendance}>Quitar rol de oyente y sus certificados</button>
 		</form>
 	{/if}
 </section>
+
+{#if data.attendanceDocuments}
+	<DocumentsEditor editor={data.attendanceDocuments} />
+{/if}
 
 <details class="danger">
 	<summary>Eliminar evento</summary>

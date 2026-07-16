@@ -23,6 +23,13 @@
 <h1>Nueva entrada: {data.typeLabel}</h1>
 <p class="intro">Se creará como privada; podrás publicarla desde su ficha.</p>
 
+{#if data.entityType === 'talks' || data.entityType === 'service_activities'}
+	<p class="event-hint">
+		¿El evento aún no existe? <a href="/admin/eventos/nuevo">Créalo primero con su rol desde Eventos</a>:
+		allí registras evento y contribución/servicio en un solo paso.
+	</p>
+{/if}
+
 {#if form?.errors}
 	{#key form}
 		<AdminToast message="Revisa los campos marcados; la entrada no se ha creado." success={false} />
@@ -82,6 +89,18 @@
 		color: #737373;
 		font-size: 0.85rem;
 		margin: 0 0 1.5rem;
+	}
+
+	.event-hint {
+		font-size: 0.8rem;
+		color: #a3a3a3;
+		border: 1px dashed #404040;
+		padding: 0.6rem 0.8rem;
+		margin: -0.5rem 0 1.5rem;
+	}
+
+	.event-hint a {
+		color: #00ff88;
 	}
 
 	.actions {
