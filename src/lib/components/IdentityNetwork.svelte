@@ -19,6 +19,10 @@
 		...(positions.find((position) => position.id === item.id) ?? { x: 50, y: 50 })
 	}));
 	const active = $derived(nodes.find((node) => node.id === activeId) ?? nodes[0]);
+	const nodeCodeClass =
+		'tw:inline-grid tw:h-6 tw:min-w-6 tw:place-content-center tw:rounded-ui-sm tw:bg-accent tw:text-[0.62rem] tw:font-bold tw:leading-none tw:text-[var(--on-accent)]';
+	const profileNodeClass =
+		'tw:absolute tw:top-[var(--y,50%)] tw:left-[var(--x,50%)] tw:inline-flex tw:min-h-9 tw:items-center tw:gap-2 tw:whitespace-nowrap tw:rounded-ui tw:border tw:px-2.5 tw:py-[7px] tw:text-[0.68rem] tw:[backdrop-filter:blur(7px)] tw:[transform:translate(-50%,-50%)] tw:[transition:background-color_180ms_ease,border-color_180ms_ease,color_180ms_ease,transform_240ms_cubic-bezier(.22,1,.36,1)] tw:motion-reduce:duration-[1ms] tw:hover:border-accent-strong tw:hover:bg-accent-wash tw:hover:text-ink tw:hover:[transform:translate(-50%,-50%)_scale(1.08)] tw:max-[720px]:relative tw:max-[720px]:top-auto tw:max-[720px]:left-auto tw:max-[720px]:justify-start tw:max-[720px]:whitespace-normal tw:max-[720px]:[transform:none] tw:max-[720px]:hover:[transform:translateY(-2px)]';
 	const copy = $derived(
 		locale === 'es'
 			? {
@@ -36,23 +40,36 @@
 	);
 </script>
 
-<section class="identity-network">
-	<header>
+<section class="tw:overflow-hidden tw:rounded-ui tw:border tw:border-rule tw:bg-panel">
+	<header
+		class="tw:flex tw:items-end tw:justify-between tw:gap-5 tw:border-b tw:border-rule tw:p-[clamp(18px,2.4vw,28px)] tw:max-[720px]:flex-col tw:max-[720px]:items-start"
+	>
 		<div>
-			<span class="meta tag">{copy.label}</span>
-			<h3>{copy.title}</h3>
+			<span class="meta">{copy.label}</span>
+			<h3
+				class="tw:mt-2 tw:font-title tw:text-[clamp(1.55rem,3vw,2.4rem)] tw:font-normal tw:leading-none"
+			>
+				{copy.title}
+			</h3>
 		</div>
-		<span class="meta hint">
+		<span class="meta tw:inline-flex tw:items-center tw:gap-1.5 tw:text-ink-faint">
 			{copy.hint}
 			<MoveUpRight size={16} strokeWidth={1.8} aria-hidden="true" />
 		</span>
 	</header>
 
-	<div class="graph">
-		<svg viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">
+	<div
+		class="tw:relative tw:min-h-[clamp(310px,35vw,410px)] tw:[background-image:linear-gradient(to_right,var(--visual-grid)_1px,transparent_1px),linear-gradient(to_bottom,var(--visual-grid)_1px,transparent_1px)] tw:[background-size:36px_36px] tw:max-[720px]:grid tw:max-[720px]:min-h-0 tw:max-[720px]:grid-cols-2 tw:max-[720px]:gap-2 tw:max-[720px]:p-5 tw:max-[420px]:grid-cols-1"
+	>
+		<svg
+			class="tw:absolute tw:inset-0 tw:h-full tw:w-full tw:overflow-visible tw:max-[720px]:hidden"
+			viewBox="0 0 100 100"
+			preserveAspectRatio="none"
+			aria-hidden="true"
+		>
 			{#each nodes as node (node.id)}
 				<line
-					class:is-active={node.id === activeId}
+					class={`tw:[vector-effect:non-scaling-stroke] tw:[transition:opacity_180ms_ease,stroke_180ms_ease,stroke-width_180ms_ease] tw:motion-reduce:duration-[1ms] ${node.id === activeId ? 'tw:stroke-accent-strong tw:stroke-2 tw:opacity-100 tw:[stroke-dasharray:none]' : 'tw:stroke-rule-strong tw:stroke-1 tw:opacity-[.55] tw:[stroke-dasharray:2_5]'}`}
 					x1="50"
 					y1="48"
 					x2={node.x}
@@ -61,15 +78,17 @@
 			{/each}
 		</svg>
 
-		<div class="identity-node" aria-hidden="true">
-			<strong>DMR</strong>
-			<span>network_id</span>
+		<div
+			class="tw:absolute tw:top-[48%] tw:left-1/2 tw:grid tw:h-[106px] tw:w-[106px] tw:place-content-center tw:rounded-full tw:border tw:border-accent-strong tw:bg-accent tw:[background-image:var(--accent-grain)] tw:[background-blend-mode:soft-light] tw:[background-size:180px_180px] tw:text-center tw:text-[var(--on-accent)] tw:shadow-[0_0_0_10px_color-mix(in_srgb,var(--accent)_12%,transparent)] tw:[transform:translate(-50%,-50%)] tw:max-[720px]:relative tw:max-[720px]:top-auto tw:max-[720px]:left-auto tw:max-[720px]:col-span-full tw:max-[720px]:mx-0 tw:max-[720px]:mt-1.5 tw:max-[720px]:mb-[18px] tw:max-[720px]:justify-self-center tw:max-[720px]:[transform:none]"
+			aria-hidden="true"
+		>
+			<strong class="tw:font-title tw:text-[1.85rem] tw:leading-none">DMR</strong>
+			<span class="tw:mt-[5px] tw:text-[0.54rem] tw:tracking-[0.08em]">network_id</span>
 		</div>
 
 		{#each nodes as node (node.id)}
 			<a
-				class="profile-node"
-				class:is-active={node.id === activeId}
+				class={`${profileNodeClass} ${node.id === activeId ? 'tw:border-accent-strong tw:bg-accent-wash tw:text-ink tw:[transform:translate(-50%,-50%)_scale(1.08)] tw:max-[720px]:[transform:translateY(-2px)]' : 'tw:border-rule-strong tw:bg-[color-mix(in_srgb,var(--bg-panel)_91%,transparent)] tw:text-ink-dim'}`}
 				href={node.url}
 				target="_blank"
 				rel="noreferrer"
@@ -78,293 +97,36 @@
 				onpointerenter={() => (activeId = node.id)}
 				onfocus={() => (activeId = node.id)}
 			>
-				<span class="node-code">{node.code}</span>
+				<span class={nodeCodeClass}>{node.code}</span>
 				<span>{node.label}</span>
 			</a>
 		{/each}
 	</div>
 
-	<div class="network-footer" aria-live="polite">
-		<div class="active-profile">
-			<span class="node-code">{active.code}</span>
-			<div>
-				<strong>{active.label}</strong>
-				<span>{active.handle}</span>
+	<div
+		class="tw:grid tw:min-h-[84px] tw:grid-cols-[minmax(0,.8fr)_minmax(0,1.2fr)] tw:items-center tw:gap-6 tw:border-t tw:border-rule tw:py-3.5 tw:px-[clamp(18px,2.4vw,28px)] tw:max-[720px]:grid-cols-1"
+		aria-live="polite"
+	>
+		<div class="tw:flex tw:min-w-0 tw:items-center tw:gap-2.5">
+			<span class={nodeCodeClass}>{active.code}</span>
+			<div class="tw:grid tw:min-w-0">
+				<strong class="tw:font-title tw:text-base tw:font-medium">{active.label}</strong>
+				<span class="tw:overflow-hidden tw:text-[0.66rem] tw:text-ellipsis tw:whitespace-nowrap tw:text-ink-faint">
+					{active.handle}
+				</span>
 			</div>
 		</div>
-		<div class="mail-links">
+		<div
+			class="tw:flex tw:min-w-0 tw:items-center tw:justify-end tw:gap-3.5 tw:text-[0.7rem] tw:max-[720px]:flex-col tw:max-[720px]:items-start tw:max-[720px]:justify-start tw:max-[720px]:gap-[5px]"
+		>
 			<span class="meta">{copy.contact}</span>
-			<a href={'mailto:' + profile.contact.mail}>{profile.contact.mail}</a>
-			<a href={'mailto:' + profile.contact.mailAlt}>{profile.contact.mailAlt}</a>
+			<a class="tw:text-ink-dim tw:hover:text-accent-strong" href={'mailto:' + profile.contact.mail}
+				>{profile.contact.mail}</a
+			>
+			<a
+				class="tw:text-ink-dim tw:hover:text-accent-strong"
+				href={'mailto:' + profile.contact.mailAlt}>{profile.contact.mailAlt}</a
+			>
 		</div>
 	</div>
 </section>
-
-<style>
-	.identity-network {
-		border: 1px solid var(--line);
-		border-radius: var(--radius);
-		background: var(--bg-panel);
-		overflow: hidden;
-	}
-
-	header {
-		display: flex;
-		align-items: end;
-		justify-content: space-between;
-		gap: 20px;
-		padding: clamp(18px, 2.4vw, 28px);
-		border-bottom: 1px solid var(--line);
-	}
-
-	header h3 {
-		margin-top: 8px;
-		font-family: var(--font-title);
-		font-size: clamp(1.55rem, 3vw, 2.4rem);
-		font-weight: 400;
-		line-height: 1;
-	}
-
-	.hint {
-		display: inline-flex;
-		gap: 6px;
-		align-items: center;
-		color: var(--fg-faint);
-	}
-
-	.graph {
-		position: relative;
-		min-height: clamp(310px, 35vw, 410px);
-		background-image:
-			linear-gradient(to right, var(--visual-grid) 1px, transparent 1px),
-			linear-gradient(to bottom, var(--visual-grid) 1px, transparent 1px);
-		background-size: 36px 36px;
-	}
-
-	svg {
-		position: absolute;
-		inset: 0;
-		width: 100%;
-		height: 100%;
-		overflow: visible;
-	}
-
-	line {
-		vector-effect: non-scaling-stroke;
-		stroke: var(--line-strong);
-		stroke-dasharray: 2 5;
-		stroke-width: 1;
-		opacity: 0.55;
-		transition:
-			opacity 180ms ease,
-			stroke 180ms ease,
-			stroke-width 180ms ease;
-	}
-
-	line.is-active {
-		stroke: var(--accent-strong);
-		stroke-dasharray: none;
-		stroke-width: 2;
-		opacity: 1;
-	}
-
-	.identity-node,
-	.profile-node {
-		position: absolute;
-		left: var(--x, 50%);
-		top: var(--y, 50%);
-		transform: translate(-50%, -50%);
-	}
-
-	.identity-node {
-		left: 50%;
-		top: 48%;
-		display: grid;
-		place-content: center;
-		width: 106px;
-		height: 106px;
-		border: 1px solid var(--accent-strong);
-		border-radius: 50%;
-		background-color: var(--accent);
-		background-image: var(--accent-grain);
-		background-size: 180px 180px;
-		background-blend-mode: soft-light;
-		color: var(--on-accent);
-		text-align: center;
-		box-shadow: 0 0 0 10px color-mix(in srgb, var(--accent) 12%, transparent);
-	}
-
-	.identity-node strong {
-		font-family: var(--font-title);
-		font-size: 1.85rem;
-		line-height: 1;
-	}
-
-	.identity-node span {
-		margin-top: 5px;
-		font-size: 0.54rem;
-		letter-spacing: 0.08em;
-	}
-
-	.profile-node {
-		display: inline-flex;
-		align-items: center;
-		gap: 8px;
-		min-height: 36px;
-		padding: 7px 10px;
-		border: 1px solid var(--line-strong);
-		border-radius: var(--radius);
-		background: color-mix(in srgb, var(--bg-panel) 91%, transparent);
-		color: var(--fg-dim);
-		font-size: 0.68rem;
-		white-space: nowrap;
-		-webkit-backdrop-filter: blur(7px);
-		backdrop-filter: blur(7px);
-		transition:
-			background-color 180ms ease,
-			border-color 180ms ease,
-			color 180ms ease,
-			transform 240ms cubic-bezier(0.22, 1, 0.36, 1);
-	}
-
-	.profile-node:hover,
-	.profile-node.is-active {
-		border-color: var(--accent-strong);
-		background-color: var(--accent-wash);
-		color: var(--fg);
-		transform: translate(-50%, -50%) scale(1.08);
-	}
-
-	.node-code {
-		display: inline-grid;
-		place-content: center;
-		min-width: 24px;
-		height: 24px;
-		border-radius: var(--radius-sm);
-		background: var(--accent);
-		color: var(--on-accent);
-		font-size: 0.62rem;
-		font-weight: 700;
-		line-height: 1;
-	}
-
-	.network-footer {
-		display: grid;
-		grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.2fr);
-		gap: 24px;
-		align-items: center;
-		min-height: 84px;
-		padding: 14px clamp(18px, 2.4vw, 28px);
-		border-top: 1px solid var(--line);
-	}
-
-	.active-profile {
-		display: flex;
-		align-items: center;
-		gap: 10px;
-		min-width: 0;
-	}
-
-	.active-profile div {
-		display: grid;
-		min-width: 0;
-	}
-
-	.active-profile strong {
-		font-family: var(--font-title);
-		font-size: 1rem;
-		font-weight: 500;
-	}
-
-	.active-profile div span {
-		color: var(--fg-faint);
-		font-size: 0.66rem;
-		overflow: hidden;
-		text-overflow: ellipsis;
-		white-space: nowrap;
-	}
-
-	.mail-links {
-		display: flex;
-		align-items: center;
-		justify-content: flex-end;
-		gap: 14px;
-		min-width: 0;
-		font-size: 0.7rem;
-	}
-
-	.mail-links a {
-		color: var(--fg-dim);
-	}
-
-	.mail-links a:hover {
-		color: var(--accent-strong);
-	}
-
-	@media (max-width: 720px) {
-		header {
-			align-items: flex-start;
-			flex-direction: column;
-		}
-
-		.graph {
-			display: grid;
-			grid-template-columns: repeat(2, minmax(0, 1fr));
-			gap: 8px;
-			min-height: 0;
-			padding: 20px;
-		}
-
-		svg {
-			display: none;
-		}
-
-		.identity-node,
-		.profile-node {
-			position: relative;
-			left: auto;
-			top: auto;
-			transform: none;
-		}
-
-		.identity-node {
-			grid-column: 1 / -1;
-			justify-self: center;
-			margin: 6px 0 18px;
-		}
-
-		.profile-node {
-			justify-content: flex-start;
-			white-space: normal;
-		}
-
-		.profile-node:hover,
-		.profile-node.is-active {
-			transform: translateY(-2px);
-		}
-
-		.network-footer {
-			grid-template-columns: 1fr;
-		}
-
-		.mail-links {
-			align-items: flex-start;
-			justify-content: flex-start;
-			flex-direction: column;
-			gap: 5px;
-		}
-	}
-
-	@media (max-width: 420px) {
-		.graph {
-			grid-template-columns: 1fr;
-		}
-	}
-
-	@media (prefers-reduced-motion: reduce) {
-		.profile-node,
-		line {
-			transition-duration: 1ms;
-		}
-	}
-</style>
