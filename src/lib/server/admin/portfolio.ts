@@ -1,6 +1,10 @@
 import { db } from '$lib/server/db';
 import { getPortfolioProjects } from '$lib/server/portfolio-projects';
-import type { PortfolioProjectMetadata } from '$lib/types/portfolio';
+import { hasProjectStory } from '$lib/content/project-story-registry';
+import type {
+	PortfolioProjectMetadata,
+	PortfolioPublicationStatus
+} from '$lib/types/portfolio';
 import { entityDefinitions, isEntityType, type EntityType } from './entity-definitions';
 import type { EntryKey } from './controls';
 
@@ -28,6 +32,11 @@ export interface PortfolioRelation extends EntryKey {
 	portfolioSlug: string;
 	featured: boolean;
 }
+
+export type PortfolioProjectListItem = PortfolioProjectMetadata & {
+	relationCount: number;
+	hasNarrative: boolean;
+};
 
 export function parsePortfolioSlug(value: FormDataEntryValue | null): string | null {
 	if (typeof value !== 'string') return null;
@@ -57,7 +66,12 @@ export function parsePortfolioProjectInput(formData: FormData): PortfolioProject
 	const linkLabelEn = formText(formData, 'linkLabelEn', 160) || linkLabelEs;
 	const rawOrder = formText(formData, 'sortOrder', 8);
 	const sortOrder = rawOrder === '' ? null : Number(rawOrder);
-	const showHome = formData.get('showHome') === '1';
+	const rawPublicationStatus = formText(formData, 'publicationStatus', 20);
+	const publicationStatus: PortfolioPublicationStatus =
+		rawPublicationStatus === 'published' || rawPublicationStatus === 'archived'
+			? rawPublicationStatus
+			: 'draft';
+	const showHome = publicationStatus === 'published' && formData.get('showHome') === '1';
 
 	if (!slug || !titleEs || !kindEs || !summaryEs || !period) return null;
 	if (sortOrder !== null && (!Number.isInteger(sortOrder) || sortOrder < 0 || sortOrder > 999999)) return null;
@@ -80,13 +94,30 @@ export function parsePortfolioProjectInput(formData: FormData): PortfolioProject
 		period,
 		tags,
 		links: linkUrl ? [{ label: { es: linkLabelEs || titleEs, en: linkLabelEn || titleEn }, url: linkUrl }] : [],
+		publicationStatus,
 		showHome,
 		sortOrder
 	};
 }
 
-export async function getPortfolioAdminData(): Promise<{
-	projects: PortfolioProjectMetadata[];
+export async function getPortfolioProjectList(): Promise<PortfolioProjectListItem[]> {
+	const [projects, countsResult] = await Promise.all([
+		getPortfolioProjects(),
+		db.execute(`SELECT portfolio_slug, COUNT(*) AS relation_count
+			FROM portfolio_items GROUP BY portfolio_slug`)
+	]);
+	const counts = new Map(
+		countsResult.rows.map((row) => [String(row.portfolio_slug), Number(row.relation_count)])
+	);
+	return projects.map((project) => ({
+		...project,
+		relationCount: counts.get(project.slug) ?? 0,
+		hasNarrative: hasProjectStory(project.slug)
+	}));
+}
+
+export async function getPortfolioAdminData(portfolioSlug: string): Promise<{
+	project: PortfolioProjectMetadata | null;
 	entries: PortfolioCandidate[];
 	relations: PortfolioRelation[];
 }> {
@@ -103,9 +134,10 @@ export async function getPortfolioAdminData(): Promise<{
 			         source.title COLLATE NOCASE ASC`),
 		db.execute(`
 			SELECT portfolio_slug, entity_type, entity_id, featured
-			FROM portfolio_items`)
+			FROM portfolio_items
+			WHERE portfolio_slug = ?`, [portfolioSlug])
 	]);
-	const portfolioSlugs = new Set(projects.map((project) => project.slug));
+	const project = projects.find((item) => item.slug === portfolioSlug) ?? null;
 
 	const entries: PortfolioCandidate[] = entriesResult.rows.map((row) => {
 		const entityType = String(row.entity_type);
@@ -125,7 +157,7 @@ export async function getPortfolioAdminData(): Promise<{
 	const relations: PortfolioRelation[] = relationsResult.rows.flatMap((row) => {
 		const portfolioSlug = String(row.portfolio_slug);
 		const entityType = String(row.entity_type);
-		if (!portfolioSlugs.has(portfolioSlug) || !isEntityType(entityType)) return [];
+		if (portfolioSlug !== project?.slug || !isEntityType(entityType)) return [];
 		return [{
 			portfolioSlug,
 			entityType,
@@ -134,7 +166,7 @@ export async function getPortfolioAdminData(): Promise<{
 		}];
 	});
 
-	return { projects, entries, relations };
+	return { project, entries, relations };
 }
 
 export async function getEntryPortfolioRelations(entry: EntryKey): Promise<Array<PortfolioOption & { featured: boolean }>> {
@@ -235,6 +267,7 @@ const projectArgs = (project: PortfolioProjectInput, sortOrder: number) => [
 		label_en: link.label.en,
 		url: link.url
 	}))),
+	project.publicationStatus,
 	project.showHome ? 1 : 0,
 	sortOrder
 ];
@@ -249,8 +282,8 @@ export async function createPortfolioProject(project: PortfolioProjectInput): Pr
 		sql: `INSERT INTO portfolio_projects
 			(slug, title_es, title_en, kind_es, kind_en, kicker_es, kicker_en,
 			 summary_es, summary_en, status_es, status_en, period, tags_json,
-			 links_json, show_home, sort_order)
-			VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+			 links_json, publication_status, show_home, sort_order)
+			VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
 		args: projectArgs(project, sortOrder)
 	});
 }
@@ -263,7 +296,8 @@ export async function updatePortfolioProject(project: PortfolioProjectInput): Pr
 		sql: `UPDATE portfolio_projects SET
 			title_es = ?, title_en = ?, kind_es = ?, kind_en = ?, kicker_es = ?, kicker_en = ?,
 			summary_es = ?, summary_en = ?, status_es = ?, status_en = ?, period = ?,
-			tags_json = ?, links_json = ?, show_home = ?, sort_order = ?, updated_at = datetime('now')
+			tags_json = ?, links_json = ?, publication_status = ?, show_home = ?, sort_order = ?,
+			updated_at = datetime('now')
 			WHERE slug = ?`,
 		args: [...args.slice(1), project.slug]
 	});
@@ -273,9 +307,27 @@ export async function updatePortfolioProject(project: PortfolioProjectInput): Pr
 export async function setPortfolioProjectVisibility(slug: string, showHome: boolean): Promise<void> {
 	const result = await db.execute({
 		sql: `UPDATE portfolio_projects
-			SET show_home = ?, updated_at = datetime('now')
+			SET show_home = CASE WHEN publication_status = 'published' THEN ? ELSE 0 END,
+			    updated_at = datetime('now')
 			WHERE slug = ?`,
 		args: [showHome ? 1 : 0, slug]
 	});
 	if (result.rowsAffected === 0) throw new Error('La ficha del portfolio no existe');
+}
+
+export async function reorderPortfolioProjects(slugs: string[]): Promise<void> {
+	const projects = await getPortfolioProjects();
+	const existing = new Set(projects.map((project) => project.slug));
+	if (slugs.length !== existing.size || new Set(slugs).size !== slugs.length || slugs.some((slug) => !existing.has(slug))) {
+		throw new Error('El orden no contiene todos los proyectos');
+	}
+	await db.batch(
+		slugs.map((slug, index) => ({
+			sql: `UPDATE portfolio_projects
+				SET sort_order = ?, updated_at = datetime('now')
+				WHERE slug = ?`,
+			args: [(index + 1) * 10, slug]
+		})),
+		'write'
+	);
 }

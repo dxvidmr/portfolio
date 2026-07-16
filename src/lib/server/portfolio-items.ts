@@ -6,7 +6,9 @@ import { getPublicDocuments, groupPublicDocuments } from '$lib/server/public-doc
 const nullable = (value: unknown) => (value == null ? null : String(value));
 
 export async function getPortfolioItems(portfolioSlug?: string): Promise<PortfolioRelatedItem[]> {
-	const where = portfolioSlug ? 'WHERE pi.portfolio_slug = ? AND e.public = 1' : 'WHERE e.public = 1';
+	const where = portfolioSlug
+		? "WHERE pi.portfolio_slug = ? AND e.public = 1 AND portfolio_project.publication_status = 'published'"
+		: "WHERE e.public = 1 AND portfolio_project.publication_status = 'published'";
 	const [result, publicLinks, publicDocuments] = await Promise.all([db.execute({
 		sql: `SELECT pi.portfolio_slug, pi.entity_type, pi.entity_id,
 		             pi.featured, pi.sort_order, e.title_cache AS title, e.sort_date,
@@ -88,6 +90,8 @@ export async function getPortfolioItems(portfolioSlug?: string): Promise<Portfol
 			               award.url
 			             ) AS url
 		      FROM portfolio_items pi
+		      JOIN portfolio_projects portfolio_project
+		        ON portfolio_project.slug = pi.portfolio_slug
 		      JOIN entries e
 		        ON e.entity_type = pi.entity_type AND e.entity_id = pi.entity_id
 		      LEFT JOIN publications pub

@@ -232,7 +232,7 @@
 				<li class="flex items-center gap-2 border border-rule px-3 py-2">
 					<a
 						class="text-ink hover:text-accent"
-						href={`/admin/portfolio?ficha=${relation.slug}&q=${encodeURIComponent(data.heading)}`}
+						href={`/admin/portfolio/${relation.slug}`}
 					>
 						{relation.featured ? '★ ' : ''}{relation.title}
 					</a>
@@ -249,7 +249,7 @@
 	{/if}
 	<a
 		class="mt-2 inline-block text-xs text-ink hover:text-accent"
-		href={`/admin/portfolio?q=${encodeURIComponent(data.heading)}`}
+		href="/admin/portfolio"
 	>
 		Gestionar relaciones del portfolio →
 	</a>

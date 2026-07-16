@@ -1,357 +1,122 @@
 <script lang="ts">
 	import { enhance } from '$app/forms';
 	import type { SubmitFunction } from '@sveltejs/kit';
+	import GripVertical from '@lucide/svelte/icons/grip-vertical';
+	import ChevronUp from '@lucide/svelte/icons/chevron-up';
+	import ChevronDown from '@lucide/svelte/icons/chevron-down';
 	import { untrack } from 'svelte';
 	import AdminToast from '$lib/components/AdminToast.svelte';
 	import AdminPageHeader from '$lib/components/admin/AdminPageHeader.svelte';
-	import AdminField from '$lib/components/admin/AdminField.svelte';
 	import Button from '$lib/components/ui/Button.svelte';
 	import ButtonLink from '$lib/components/ui/ButtonLink.svelte';
-	import Input from '$lib/components/ui/Input.svelte';
-	import Select from '$lib/components/ui/Select.svelte';
-	import Textarea from '$lib/components/ui/Textarea.svelte';
 	import type { ActionData, PageData } from './$types';
 
 	let { data, form }: { data: PageData; form: ActionData } = $props();
+	const initialProjects = untrack(() => data.projects);
+	let projects = $state(initialProjects.map((project) => ({ ...project })));
+	let draggedSlug = $state<string | null>(null);
+	let orderForm = $state<HTMLFormElement | null>(null);
+	const orderValue = $derived(JSON.stringify(projects.map((project) => project.slug)));
 
-	type Entry = PageData['entries'][number];
-	type Relation = PageData['relations'][number];
-
-	const initialData = untrack(() => data);
-	const entries = initialData.entries;
-	const entryMap = new Map(entries.map((entry) => [`${entry.entityType}:${entry.entityId}`, entry]));
-	let relations = $state(initialData.relations.map((relation) => ({ ...relation })));
-	let selectedSlug = $state(initialData.selectedSlug);
-	let query = $state(initialData.initialQuery);
-	let type = $state('');
-	let pending = $state<string[]>([]);
-
-	const normalize = (value: string) =>
-		value.toLocaleLowerCase('es').normalize('NFD').replace(/[\u0300-\u036f]/g, '');
-
-	const relationKey = (relation: Pick<Relation, 'portfolioSlug' | 'entityType' | 'entityId'>) =>
-		`${relation.portfolioSlug}:${relation.entityType}:${relation.entityId}`;
-
-	const entryKey = (entry: Entry) => `${entry.entityType}:${entry.entityId}`;
-	const tagsValue = (tags: string[]) => tags.join(', ');
-
-	const compareEntries = (a: Entry, b: Entry) => {
-		if (a.sortDate == null && b.sortDate != null) return 1;
-		if (a.sortDate != null && b.sortDate == null) return -1;
-		const byDate = (b.sortDate ?? '').localeCompare(a.sortDate ?? '');
-		return byDate || a.title.localeCompare(b.title, 'es');
+	const saveOrder = () => window.queueMicrotask(() => orderForm?.requestSubmit());
+	const moveProject = (slug: string, targetIndex: number) => {
+		const fromIndex = projects.findIndex((project) => project.slug === slug);
+		if (fromIndex < 0) return;
+		const boundedIndex = Math.max(0, Math.min(targetIndex, projects.length - 1));
+		if (fromIndex === boundedIndex) return;
+		const next = [...projects];
+		const [project] = next.splice(fromIndex, 1);
+		next.splice(boundedIndex, 0, project);
+		projects = next;
+		saveOrder();
 	};
-
-	let selectedProject = $derived(
-		data.projects.find((project) => project.slug === selectedSlug) ?? data.projects[0]
-	);
-
-	let typeOptions = $derived.by(() => {
-		const labels = new Map<string, string>();
-		for (const entry of entries) labels.set(entry.entityType, entry.typeLabel);
-		return [...labels].map(([value, label]) => ({ value, label })).sort((a, b) =>
-			a.label.localeCompare(b.label, 'es')
-		);
-	});
-
-	let currentRelations = $derived.by(() =>
-		relations
-			.filter((relation) => relation.portfolioSlug === selectedSlug)
-			.map((relation) => ({ relation, entry: entryMap.get(`${relation.entityType}:${relation.entityId}`) }))
-			.filter((item): item is { relation: Relation; entry: Entry } => Boolean(item.entry))
-			.sort((a, b) => compareEntries(a.entry, b.entry))
-	);
-
-	let availableEntries = $derived.by(() => {
-		const normalizedQuery = normalize(query.trim());
-		const related = new Set(
-			relations
-				.filter((relation) => relation.portfolioSlug === selectedSlug)
-				.map((relation) => `${relation.entityType}:${relation.entityId}`)
-		);
-		return entries
-			.filter((entry) => !related.has(entryKey(entry)))
-			.filter((entry) => !type || entry.entityType === type)
-			.filter((entry) =>
-				!normalizedQuery
-					? true
-					: normalize(`${entry.title} ${entry.typeLabel}`).includes(normalizedQuery)
-			)
-			.sort(compareEntries);
-	});
-
-	const entryRelationCount = (entry: Entry) =>
-		relations.filter(
-			(relation) => relation.entityType === entry.entityType && relation.entityId === entry.entityId
-		).length;
-
-	const addSubmit = (entry: Entry): SubmitFunction =>
-		({ formData }) => {
-			const portfolioSlug = String(formData.get('portfolioSlug') ?? '');
-			const optimistic: Relation = {
-				portfolioSlug,
-				entityType: entry.entityType,
-				entityId: entry.entityId,
-				featured: false
-			};
-			const key = `add:${relationKey(optimistic)}`;
-			const existed = relations.some((relation) => relationKey(relation) === relationKey(optimistic));
-			if (!existed) relations = [...relations, optimistic];
-			pending = [...pending, key];
-
-			return async ({ result, update }) => {
-				if (result.type !== 'success' && !existed) {
-					relations = relations.filter((relation) => relationKey(relation) !== relationKey(optimistic));
-				}
-				pending = pending.filter((item) => item !== key);
-				await update({ reset: false, invalidateAll: false });
-			};
+	const reorderSubmit: SubmitFunction = () =>
+		async ({ result, update }) => {
+			if (result.type !== 'success') projects = initialProjects.map((project) => ({ ...project }));
+			await update({ reset: false });
 		};
 
-	const removeSubmit = (relation: Relation): SubmitFunction =>
-		() => {
-			const previous = { ...relation };
-			const key = `remove:${relationKey(relation)}`;
-			relations = relations.filter((item) => relationKey(item) !== relationKey(relation));
-			pending = [...pending, key];
-
-			return async ({ result, update }) => {
-				if (result.type !== 'success') relations = [...relations, previous];
-				pending = pending.filter((item) => item !== key);
-				await update({ reset: false, invalidateAll: false });
-			};
-		};
-
-	const featuredSubmit = (relation: Relation): SubmitFunction =>
-		({ formData }) => {
-			const previous = relation.featured;
-			const next = !relation.featured;
-			const key = `featured:${relationKey(relation)}`;
-			formData.set('featured', next ? '1' : '0');
-			relation.featured = next;
-			pending = [...pending, key];
-
-			return async ({ result, update }) => {
-				if (result.type !== 'success') relation.featured = previous;
-				pending = pending.filter((item) => item !== key);
-				await update({ reset: false, invalidateAll: false });
-			};
-		};
-
-	const isPending = (operation: string, relation: Pick<Relation, 'portfolioSlug' | 'entityType' | 'entityId'>) =>
-		pending.includes(`${operation}:${relationKey(relation)}`);
+	const statusLabel = {
+		draft: 'Borrador',
+		published: 'Publicado',
+		archived: 'Archivado'
+	} as const;
+	const statusClass = {
+		draft: 'text-warning',
+		published: 'text-accent-strong',
+		archived: 'text-ink-faint'
+	} as const;
 </script>
 
-<svelte:head>
-	<title>Portfolio · cv/admin</title>
-</svelte:head>
+<svelte:head><title>Portfolio · cv/admin</title></svelte:head>
 
 {#if form?.message}
-	{#key form}
-		<AdminToast message={form.message} success={form.success} />
-	{/key}
+	{#key form}<AdminToast message={form.message} success={form.success} />{/key}
 {/if}
 
 <AdminPageHeader
-	title="Fichas del portfolio"
-	eyebrow="Curación editorial"
-	description="Relaciona cada ficha narrativa con resultados del CV. La lista pública se ordena automáticamente por fecha."
+	title="Portfolio"
+	eyebrow="Proyectos públicos"
+	description="Gestiona el estado editorial, el orden y las relaciones de cada ficha."
 >
-	{#snippet actions()}
-		{#if selectedProject}
-			<ButtonLink href={`/es/proyectos/${selectedProject.slug}`} target="_blank" rel="noreferrer"
-				>Ver ficha pública ↗</ButtonLink
-			>
-		{/if}
-	{/snippet}
+	{#snippet actions()}<ButtonLink href="/admin/portfolio/nuevo" variant="primary">+ Nuevo proyecto</ButtonLink>{/snippet}
 </AdminPageHeader>
 
-<section class="grid grid-cols-[minmax(16rem,34rem)_minmax(0,1fr)_auto] items-end gap-4 border-b border-rule pb-5 max-[760px]:grid-cols-1" aria-label="Seleccionar ficha del portfolio">
-	<AdminField label="Ficha del portfolio · orden público">
-		<Select bind:value={selectedSlug}>
-			{#each data.projects as project, index (project.slug)}
-				<option value={project.slug}>
-					{String(index + 1).padStart(2, '0')} · {project.title.es} · {project.period}
-				</option>
-			{/each}
-		</Select>
-	</AdminField>
-	{#if selectedProject}
-		<p class="mb-2 text-[0.68rem] text-ink-faint">
-			{selectedProject.kind.es} · {currentRelations.length} relacionados · {selectedProject.showHome ? 'visible' : 'oculto'}
-		</p>
-		<form method="POST" action="?/visibility" use:enhance>
-			<input type="hidden" name="portfolioSlug" value={selectedProject.slug} />
-			<input type="hidden" name="showHome" value={selectedProject.showHome ? '0' : '1'} />
-			<Button type="submit" variant={selectedProject.showHome ? 'danger' : 'primary'} size="sm">
-				{selectedProject.showHome ? 'Ocultar de la portada' : 'Mostrar en la portada'}
-			</Button>
-		</form>
-	{/if}
-</section>
+<form class="hidden" method="POST" action="?/reorder" use:enhance={reorderSubmit} bind:this={orderForm}>
+	<input type="hidden" name="order" value={orderValue} />
+</form>
 
-<section class="mt-5 grid gap-3 border-b border-rule pb-5">
-	<details class="rounded-ui border border-rule bg-surface px-4 py-3">
-		<summary class="cursor-pointer font-mono text-xs text-ink">Editar datos básicos</summary>
-		{#if selectedProject}
-			<form class="mt-5 grid grid-cols-2 gap-4 max-[760px]:grid-cols-1" method="POST" action="?/update" use:enhance>
-				<input type="hidden" name="slug" value={selectedProject.slug} />
-				<AdminField label="Título (ES)"><Input name="titleEs" required value={selectedProject.title.es} /></AdminField>
-				<AdminField label="Título (EN)"><Input name="titleEn" value={selectedProject.title.en} /></AdminField>
-				<AdminField label="Tipo (ES)"><Input name="kindEs" required value={selectedProject.kind.es} /></AdminField>
-				<AdminField label="Tipo (EN)"><Input name="kindEn" value={selectedProject.kind.en} /></AdminField>
-				<AdminField label="Línea superior (ES)"><Input name="kickerEs" value={selectedProject.kicker.es} /></AdminField>
-				<AdminField label="Línea superior (EN)"><Input name="kickerEn" value={selectedProject.kicker.en} /></AdminField>
-				<AdminField label="Estado (ES)"><Input name="statusEs" value={selectedProject.status.es} /></AdminField>
-				<AdminField label="Estado (EN)"><Input name="statusEn" value={selectedProject.status.en} /></AdminField>
-				<AdminField label="Periodo"><Input name="period" required value={selectedProject.period} /></AdminField>
-				<AdminField label="Orden"><Input name="sortOrder" type="number" min="0" value={selectedProject.sortOrder} /></AdminField>
-				<div class="col-span-full"><AdminField label="Descripción (ES)"><Textarea name="summaryEs" required rows={3} value={selectedProject.summary.es} /></AdminField></div>
-				<div class="col-span-full"><AdminField label="Descripción (EN)"><Textarea name="summaryEn" rows={3} value={selectedProject.summary.en} /></AdminField></div>
-				<div class="col-span-full"><AdminField label="Etiquetas · separadas por comas"><Input name="tags" value={tagsValue(selectedProject.tags)} /></AdminField></div>
-				<AdminField label="Enlace principal"><Input name="linkUrl" type="url" value={selectedProject.links[0]?.url ?? ''} /></AdminField>
-				<AdminField label="Etiqueta del enlace (ES)"><Input name="linkLabelEs" value={selectedProject.links[0]?.label.es ?? ''} /></AdminField>
-				<AdminField label="Etiqueta del enlace (EN)"><Input name="linkLabelEn" value={selectedProject.links[0]?.label.en ?? ''} /></AdminField>
-				<label class="flex items-center gap-2 self-end pb-2 font-mono text-xs text-ink-dim"><input name="showHome" type="checkbox" value="1" checked={selectedProject.showHome} /> Visible en portada</label>
-				<div class="col-span-full flex justify-end"><Button type="submit" variant="primary">Guardar datos</Button></div>
-			</form>
-		{/if}
-	</details>
-
-	<details class="rounded-ui border border-dashed border-rule-strong px-4 py-3">
-		<summary class="cursor-pointer font-mono text-xs text-accent-strong">+ Crear proyecto</summary>
-		<form class="mt-5 grid grid-cols-2 gap-4 max-[760px]:grid-cols-1" method="POST" action="?/create" use:enhance>
-			<AdminField label="Slug"><Input name="slug" required pattern="[a-z0-9]+(?:-[a-z0-9]+)*" placeholder="mi-proyecto" /></AdminField>
-			<AdminField label="Periodo"><Input name="period" required placeholder="2026—" /></AdminField>
-			<AdminField label="Título (ES)"><Input name="titleEs" required /></AdminField>
-			<AdminField label="Título (EN)"><Input name="titleEn" /></AdminField>
-			<AdminField label="Tipo (ES)"><Input name="kindEs" required placeholder="Proyecto digital" /></AdminField>
-			<AdminField label="Tipo (EN)"><Input name="kindEn" /></AdminField>
-			<AdminField label="Línea superior (ES)"><Input name="kickerEs" /></AdminField>
-			<AdminField label="Línea superior (EN)"><Input name="kickerEn" /></AdminField>
-			<AdminField label="Estado (ES)"><Input name="statusEs" placeholder="En desarrollo" /></AdminField>
-			<AdminField label="Estado (EN)"><Input name="statusEn" /></AdminField>
-			<div class="col-span-full"><AdminField label="Descripción (ES)"><Textarea name="summaryEs" required rows={3} /></AdminField></div>
-			<div class="col-span-full"><AdminField label="Descripción (EN)"><Textarea name="summaryEn" rows={3} /></AdminField></div>
-			<div class="col-span-full"><AdminField label="Etiquetas · separadas por comas"><Input name="tags" /></AdminField></div>
-			<AdminField label="Enlace principal"><Input name="linkUrl" type="url" /></AdminField>
-			<AdminField label="Etiqueta del enlace (ES)"><Input name="linkLabelEs" /></AdminField>
-			<AdminField label="Etiqueta del enlace (EN)"><Input name="linkLabelEn" /></AdminField>
-			<label class="flex items-center gap-2 self-end pb-2 font-mono text-xs text-ink-dim"><input name="showHome" type="checkbox" value="1" checked /> Visible en portada</label>
-			<div class="col-span-full flex justify-end"><Button type="submit" variant="primary">Crear proyecto</Button></div>
-		</form>
-	</details>
-</section>
-
-<div class="mt-6 grid grid-cols-2 items-start gap-8 max-[960px]:grid-cols-1">
-	<section class="min-w-0 border-t border-rule" aria-labelledby="related-title">
-		<header class="flex items-end justify-between gap-4 py-4">
-			<div>
-				<p class="m-0 text-[0.68rem] uppercase tracking-[0.1em] text-ink-faint">Selección actual</p>
-				<h2 class="mt-1 mb-0 text-base text-ink" id="related-title">Trabajos relacionados</h2>
-			</div>
-			<span class="text-[0.68rem] text-ink-faint">Orden cronológico</span>
-		</header>
-
-		{#if currentRelations.length === 0}
-			<p class="m-0 border-t border-rule px-4 py-8 text-center text-xs text-ink-faint">Esta ficha todavía no tiene trabajos relacionados.</p>
-		{:else}
-			<ol class="m-0 list-none border-t border-rule p-0">
-				{#each currentRelations as item (`${item.relation.entityType}:${item.relation.entityId}`)}
-					<li class="flex min-w-0 items-center justify-between gap-4 border-b border-rule px-2 py-3 max-[620px]:flex-col max-[620px]:items-start">
-						<div class="min-w-0">
-							<div class="mb-1 flex flex-wrap gap-x-3 gap-y-1 text-[0.62rem] text-ink-faint">
-								<span>{item.entry.typeLabel}</span>
-								<span>{item.entry.sortDate ?? 'sin fecha'}</span>
-								{#if !item.entry.isPublic}<span class="text-warning">Privada</span>{/if}
-							</div>
-							<strong class="block text-xs font-medium leading-snug text-ink">{item.entry.title}</strong>
-						</div>
-						<div class="flex shrink-0 gap-1.5">
-							<form method="POST" action="?/featured" use:enhance={featuredSubmit(item.relation)}>
-								<input type="hidden" name="portfolioSlug" value={item.relation.portfolioSlug} />
-								<input type="hidden" name="entityType" value={item.relation.entityType} />
-								<input type="hidden" name="entityId" value={item.relation.entityId} />
-								<Button
-									type="submit"
-									variant="ghost"
-									size="icon"
-									class={item.relation.featured ? 'text-warning hover:text-warning' : 'text-rule-strong'}
-									disabled={isPending('featured', item.relation)}
-									aria-label={`${item.relation.featured ? 'Desactivar destacado de' : 'Destacar'} ${item.entry.title}`}
-									title={item.relation.featured ? 'Desactivar destacado' : 'Destacar en la ficha'}
-								>★</Button>
-							</form>
-							<form method="POST" action="?/remove" use:enhance={removeSubmit(item.relation)}>
-								<input type="hidden" name="portfolioSlug" value={item.relation.portfolioSlug} />
-								<input type="hidden" name="entityType" value={item.relation.entityType} />
-								<input type="hidden" name="entityId" value={item.relation.entityId} />
-								<Button
-									type="submit"
-									variant="danger"
-									size="sm"
-									disabled={isPending('remove', item.relation)}
-								>Eliminar</Button>
-							</form>
-						</div>
-					</li>
-				{/each}
-			</ol>
-		{/if}
-	</section>
-
-	<section class="min-w-0 border-t border-rule" aria-labelledby="add-title">
-		<header class="py-4">
-			<p class="m-0 text-[0.68rem] uppercase tracking-[0.1em] text-ink-faint">Añadir resultados</p>
-			<h2 class="mt-1 mb-0 text-base text-ink" id="add-title">Buscar entradas</h2>
-		</header>
-		<div class="grid grid-cols-[minmax(0,1fr)_10rem] gap-3 border-t border-rule pt-4 max-[620px]:grid-cols-1">
-			<AdminField label="Buscar por título">
-				<Input type="search" bind:value={query} placeholder="Escribe para filtrar…" />
-			</AdminField>
-			<AdminField label="Tipo">
-				<Select bind:value={type}>
-					<option value="">Todos</option>
-					{#each typeOptions as option (option.value)}
-						<option value={option.value}>{option.label}</option>
-					{/each}
-				</Select>
-			</AdminField>
-		</div>
-		<p class="m-0 px-0 py-3 text-[0.68rem] text-ink-faint">{availableEntries.length} entradas disponibles</p>
-
-		{#if availableEntries.length === 0}
-			<p class="m-0 border-t border-rule px-4 py-8 text-center text-xs text-ink-faint">No hay entradas disponibles con estos filtros.</p>
-		{:else}
-			<ul class="m-0 max-h-[55rem] list-none overflow-y-auto border-t border-rule p-0">
-				{#each availableEntries as entry (entryKey(entry))}
-					<li class="flex min-w-0 items-center justify-between gap-4 border-b border-rule px-2 py-3 max-[620px]:flex-col max-[620px]:items-start">
-						<div class="min-w-0">
-							<div class="mb-1 flex flex-wrap gap-x-3 gap-y-1 text-[0.62rem] text-ink-faint">
-								<span>{entry.typeLabel}</span>
-								<span>{entry.sortDate ?? 'sin fecha'}</span>
-								{#if !entry.isPublic}<span class="text-warning">Privada</span>{/if}
-								{#if entryRelationCount(entry) > 0}
-									<span>{entryRelationCount(entry)} {entryRelationCount(entry) === 1 ? 'ficha' : 'fichas'}</span>
-								{/if}
-							</div>
-							<strong class="block text-xs font-medium leading-snug text-ink">{entry.title}</strong>
-						</div>
-						<form method="POST" action="?/add" use:enhance={addSubmit(entry)}>
-							<input type="hidden" name="portfolioSlug" value={selectedSlug} />
-							<input type="hidden" name="entityType" value={entry.entityType} />
-							<input type="hidden" name="entityId" value={entry.entityId} />
-							<Button
-								type="submit"
-								variant="primary"
-								size="sm"
-								class="min-w-24 max-[620px]:w-full"
-								disabled={isPending('add', { portfolioSlug: selectedSlug, entityType: entry.entityType, entityId: entry.entityId })}
-							>+ Añadir</Button>
+{#if projects.length === 0}
+	<p class="m-0 border-y border-rule px-4 py-10 text-center text-xs text-ink-faint">Todavía no hay proyectos.</p>
+{:else}
+	<ol class="m-0 list-none border-t border-rule p-0">
+		{#each projects as project, index (project.slug)}
+			<li
+				class={`grid grid-cols-[3rem_minmax(0,1fr)_auto] items-center gap-4 border-b border-rule py-4 max-[700px]:grid-cols-[2rem_minmax(0,1fr)] ${draggedSlug === project.slug ? 'opacity-45' : ''}`}
+				ondragover={(event) => event.preventDefault()}
+				ondrop={(event) => { event.preventDefault(); if (draggedSlug) moveProject(draggedSlug, index); draggedSlug = null; }}
+			>
+				<button
+					type="button"
+					class="flex cursor-grab items-center gap-1 border-0 bg-transparent p-0 text-ink-faint active:cursor-grabbing"
+					draggable="true"
+					ondragstart={() => (draggedSlug = project.slug)}
+					ondragend={() => (draggedSlug = null)}
+					aria-label={`Arrastrar ${project.title.es} para reordenar`}
+					title="Arrastrar para reordenar"
+				>
+					<GripVertical size={16} strokeWidth={1.6} aria-hidden="true" />
+					<span class="font-mono text-[0.65rem]">{String(index + 1).padStart(2, '0')}</span>
+				</button>
+				<a class="group grid min-w-0 gap-1 text-inherit no-underline" href={`/admin/portfolio/${project.slug}`}>
+					<span class="flex flex-wrap items-baseline gap-x-3 gap-y-1">
+						<strong class="font-title text-lg font-medium text-ink group-hover:text-accent-strong">{project.title.es}</strong>
+						<span class="font-mono text-[0.62rem] text-ink-faint">{project.period}</span>
+					</span>
+					<span class="flex flex-wrap gap-x-3 gap-y-1 font-mono text-[0.62rem]">
+						<span class={statusClass[project.publicationStatus]}>{statusLabel[project.publicationStatus]}</span>
+						<span class="text-ink-faint">{project.showHome ? 'En portada' : 'Fuera de portada'}</span>
+						<span class="text-ink-faint">{project.relationCount} relacionados</span>
+						<span class={project.hasNarrative ? 'text-accent-strong' : 'text-ink-faint'}>{project.hasNarrative ? 'Narrativa especial' : 'Plantilla básica'}</span>
+					</span>
+				</a>
+				<div class="flex items-center gap-2 max-[700px]:col-start-2 max-[700px]:justify-end">
+					<div class="flex gap-px">
+						<Button type="button" variant="ghost" size="icon" disabled={index === 0} onclick={() => moveProject(project.slug, index - 1)} aria-label={`Subir ${project.title.es}`} title="Subir"><ChevronUp size={16} /></Button>
+						<Button type="button" variant="ghost" size="icon" disabled={index === projects.length - 1} onclick={() => moveProject(project.slug, index + 1)} aria-label={`Bajar ${project.title.es}`} title="Bajar"><ChevronDown size={16} /></Button>
+					</div>
+					{#if project.publicationStatus === 'published'}
+						<form method="POST" action="?/visibility" use:enhance>
+							<input type="hidden" name="portfolioSlug" value={project.slug} />
+							<input type="hidden" name="showHome" value={project.showHome ? '0' : '1'} />
+							<Button type="submit" variant={project.showHome ? 'danger' : 'secondary'} size="sm">
+								{project.showHome ? 'Ocultar' : 'Mostrar'}
+							</Button>
 						</form>
-					</li>
-				{/each}
-			</ul>
-		{/if}
-	</section>
-</div>
+					{/if}
+					<ButtonLink href={`/admin/portfolio/${project.slug}`} size="sm">Editar</ButtonLink>
+				</div>
+			</li>
+		{/each}
+	</ol>
+{/if}

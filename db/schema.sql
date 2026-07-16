@@ -300,6 +300,8 @@ CREATE TABLE portfolio_projects (
     CHECK (json_valid(tags_json) AND json_type(tags_json) = 'array'),
   links_json TEXT NOT NULL DEFAULT '[]'
     CHECK (json_valid(links_json) AND json_type(links_json) = 'array'),
+  publication_status TEXT NOT NULL DEFAULT 'published'
+    CHECK (publication_status IN ('draft', 'published', 'archived')),
   show_home INTEGER NOT NULL DEFAULT 1 CHECK (show_home IN (0, 1)),
   sort_order INTEGER NOT NULL DEFAULT 0,
   created_at TEXT NOT NULL DEFAULT (datetime('now')),

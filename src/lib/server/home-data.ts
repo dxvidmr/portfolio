@@ -26,7 +26,7 @@ export async function getHomeData() {
 			 ORDER BY sort_order ASC, (sort_date IS NULL) ASC, sort_date DESC`
 		),
 		getPortfolioItems(),
-		getPortfolioProjects()
+		getPortfolioProjects({ publicOnly: true })
 	]);
 
 	const entries = recentRes.rows.map((row) => rowToEntry(row));

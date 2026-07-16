@@ -1,7 +1,11 @@
 import { db } from '$lib/server/db';
-import type { PortfolioProjectMetadata } from '$lib/types/portfolio';
+import type { PortfolioProjectMetadata, PortfolioPublicationStatus } from '$lib/types/portfolio';
 
 const text = (value: unknown) => String(value ?? '').trim();
+const publicationStatus = (value: unknown): PortfolioPublicationStatus => {
+	const status = String(value);
+	return status === 'draft' || status === 'archived' ? status : 'published';
+};
 
 function tagsFromJson(value: unknown): string[] {
 	try {
@@ -41,16 +45,18 @@ const metadataFromRow = (row: Record<string, unknown>): PortfolioProjectMetadata
 			return [];
 		}
 	})(),
+	publicationStatus: publicationStatus(row.publication_status),
 	showHome: Number(row.show_home) === 1,
 	sortOrder: Number(row.sort_order)
 });
 
-export async function getPortfolioProjects(): Promise<PortfolioProjectMetadata[]> {
+export async function getPortfolioProjects(options: { publicOnly?: boolean } = {}): Promise<PortfolioProjectMetadata[]> {
 	const result = await db.execute(`
 		SELECT slug, title_es, title_en, kind_es, kind_en, kicker_es, kicker_en,
 		       summary_es, summary_en, status_es, status_en, period, tags_json,
-		       links_json, show_home, sort_order
+		       links_json, publication_status, show_home, sort_order
 		FROM portfolio_projects
+		${options.publicOnly ? "WHERE publication_status = 'published'" : ''}
 		ORDER BY sort_order ASC, title_es COLLATE NOCASE ASC`);
 	return result.rows.map((row) => metadataFromRow(row));
 }

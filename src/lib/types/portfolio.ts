@@ -25,6 +25,8 @@ export type PortfolioRelatedItem = {
 	sort_order: number;
 };
 
+export type PortfolioPublicationStatus = 'draft' | 'published' | 'archived';
+
 export type PortfolioProjectMetadata = {
 	slug: string;
 	title: { es: string; en: string };
@@ -35,6 +37,7 @@ export type PortfolioProjectMetadata = {
 	period: string;
 	tags: string[];
 	links: Array<{ label: { es: string; en: string }; url: string }>;
+	publicationStatus: PortfolioPublicationStatus;
 	showHome: boolean;
 	sortOrder: number;
 };

@@ -80,7 +80,13 @@ await expectZero(
 await expectZero(
 	'Versología existe y está oculta de la portada',
 	`SELECT ABS(COUNT(*) - 1) FROM portfolio_projects
-	 WHERE slug = 'versologia-metadrama' AND show_home = 0`
+	 WHERE slug = 'versologia-metadrama' AND publication_status = 'published' AND show_home = 0`
+);
+
+await expectZero(
+	'solo los proyectos publicados aparecen en portada',
+	`SELECT COUNT(*) FROM portfolio_projects
+	 WHERE publication_status <> 'published' AND show_home = 1`
 );
 
 await expectZero(

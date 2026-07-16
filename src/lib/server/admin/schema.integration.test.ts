@@ -22,11 +22,12 @@ describe('esquema posterior a la limpieza 013', () => {
 					('slug-obsoleto', 'publications', 2, 0, 0);
 			`);
 			await db.executeMultiple(readFileSync('db/migrations/014_portfolio_projects.sql', 'utf8'));
+			await db.executeMultiple(readFileSync('db/migrations/015_portfolio_publication_status.sql', 'utf8'));
 
 			expect((await db.execute('SELECT COUNT(*) AS total FROM portfolio_projects')).rows[0]?.total).toBe(6);
 			expect((await db.execute(
-				`SELECT show_home FROM portfolio_projects WHERE slug = 'versologia-metadrama'`
-			)).rows[0]?.show_home).toBe(0);
+				`SELECT show_home, publication_status FROM portfolio_projects WHERE slug = 'versologia-metadrama'`
+			)).rows[0]).toMatchObject({ show_home: 0, publication_status: 'published' });
 			expect((await db.execute('SELECT portfolio_slug FROM portfolio_items')).rows).toMatchObject([
 				{ portfolio_slug: 'todos-a-una' }
 			]);
@@ -133,9 +134,9 @@ describe('esquema posterior a la limpieza 013', () => {
 				]
 			});
 			expect((await db.execute(
-				`SELECT show_home, tags_json, links_json FROM portfolio_projects
+				`SELECT show_home, publication_status, tags_json, links_json FROM portfolio_projects
 				 WHERE slug = 'proyecto-sin-narrativa'`
-			)).rows[0]).toMatchObject({ show_home: 1, tags_json: '[]', links_json: '[]' });
+			)).rows[0]).toMatchObject({ show_home: 1, publication_status: 'published', tags_json: '[]', links_json: '[]' });
 			expect((await db.execute('PRAGMA foreign_key_check')).rows).toHaveLength(0);
 		} finally {
 			db.close();
