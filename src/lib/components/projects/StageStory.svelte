@@ -1,9 +1,11 @@
 <script lang="ts">
 	import MoveUpRight from '@lucide/svelte/icons/move-up-right';
 	import type { Locale } from '$lib/paraglide/runtime';
+	import { createReveal } from '$lib/actions/reveal';
 	import ProjectFigure from './ProjectFigure.svelte';
 
 	let { locale }: { locale: Locale } = $props();
+	const reveal = createReveal({ threshold: 0.1, rootMargin: '0px 0px -5% 0px' });
 
 	const copy = $derived(locale === 'es' ? {
 		researchLabel: 'Investigación escénica',
@@ -111,17 +113,6 @@
 		closing: 'Performance research does not replace theatre practice or reduce it to an academic demonstration. The two strands coexist: acting is also a way of observing, testing, and understanding theatre from within.'
 	});
 
-	function reveal(node: HTMLElement) {
-		if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
-		node.classList.add('reveal-pending');
-		const observer = new IntersectionObserver(([entry]) => {
-			if (!entry.isIntersecting) return;
-			node.classList.add('reveal-visible');
-			observer.disconnect();
-		}, { threshold: 0.1, rootMargin: '0px 0px -5% 0px' });
-		observer.observe(node);
-		return { destroy: () => observer.disconnect() };
-	}
 </script>
 
 <section class="stage-story">
@@ -260,8 +251,6 @@
 	.dido-media { display: grid; grid-template-columns: minmax(0, 1fr) minmax(150px, .36fr); gap: clamp(20px, 3vw, 40px); align-items: start; }
 	.dido-media > :global(figure:last-child) { margin-top: 28%; }
 	.closing { width: min(70%, 850px); margin: 0 6% 0 auto; padding-top: clamp(48px, 7vw, 90px); border-top: 1px solid var(--line-strong); font-family: var(--font-title); font-size: clamp(1.5rem, 3vw, 2.7rem); line-height: 1.25 !important; }
-	:global(.reveal-pending) { opacity: 0; transform: translate3d(0, 26px, 0); transition: opacity 700ms ease, transform 850ms cubic-bezier(.16, 1, .3, 1); }
-	:global(.reveal-pending.reveal-visible) { opacity: 1; transform: none; }
 	@media (max-width: 960px) {
 		.research { grid-template-columns: 1fr; }
 		.research-copy { position: static; }
@@ -289,5 +278,4 @@
 		.fuente-gallery .masonry-item { display: inline-block; width: 100%; margin: 0 0 8px; break-inside: avoid; }
 		.fuente-gallery .item-accion, .fuente-gallery .item-frondoso { margin-top: 0; }
 	}
-	@media (prefers-reduced-motion: reduce) { :global(.reveal-pending) { opacity: 1; transform: none; transition: none; } }
 </style>

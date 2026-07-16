@@ -1,9 +1,11 @@
 <script lang="ts">
 	import MoveUpRight from '@lucide/svelte/icons/move-up-right';
 	import type { Locale } from '$lib/paraglide/runtime';
+	import { createReveal } from '$lib/actions/reveal';
 	import ProjectFigure from './ProjectFigure.svelte';
 
 	let { locale }: { locale: Locale } = $props();
+	const reveal = createReveal({ threshold: 0.14, rootMargin: '0px 0px -8% 0px' });
 
 	const copy = $derived(locale === 'es' ? {
 		label: 'XML-TEI · herramientas · corpus',
@@ -219,17 +221,6 @@
 		]
 	});
 
-	function reveal(node: HTMLElement) {
-		if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
-		node.classList.add('reveal-pending');
-		const observer = new IntersectionObserver(([entry]) => {
-			if (!entry.isIntersecting) return;
-			node.classList.add('reveal-visible');
-			observer.disconnect();
-		}, { threshold: 0.14, rootMargin: '0px 0px -8% 0px' });
-		observer.observe(node);
-		return { destroy: () => observer.disconnect() };
-	}
 </script>
 
 <section class="digital-story">
@@ -576,19 +567,6 @@
 		margin-top: clamp(28px, 5vw, 64px);
 	}
 
-	:global(.reveal-pending) {
-		opacity: 0;
-		transform: translate3d(0, 26px, 0);
-		transition:
-			opacity 700ms ease,
-			transform 850ms cubic-bezier(0.16, 1, 0.3, 1);
-	}
-
-	:global(.reveal-pending.reveal-visible) {
-		opacity: 1;
-		transform: none;
-	}
-
 	@media (max-width: 900px) {
 		.section-copy,
 		.case-copy {
@@ -620,11 +598,4 @@
 		}
 	}
 
-	@media (prefers-reduced-motion: reduce) {
-		:global(.reveal-pending) {
-			opacity: 1;
-			transform: none;
-			transition: none;
-		}
-	}
 </style>

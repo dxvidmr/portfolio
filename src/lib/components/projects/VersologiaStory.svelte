@@ -1,8 +1,10 @@
 <script lang="ts">
 	import type { Locale } from '$lib/paraglide/runtime';
+	import { createReveal } from '$lib/actions/reveal';
 	import ProjectFigure from './ProjectFigure.svelte';
 
 	let { locale }: { locale: Locale } = $props();
+	const reveal = createReveal();
 
 	const copy = $derived(locale === 'es' ? {
 		introLabel: 'Verso dramático · datos · comparación',
@@ -76,17 +78,6 @@
 		stack: ['SvelteKit', 'Supabase', 'PostgreSQL', 'ECharts', 'RLS']
 	});
 
-	function reveal(node: HTMLElement) {
-		if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
-		node.classList.add('reveal-pending');
-		const observer = new IntersectionObserver(([entry]) => {
-			if (!entry.isIntersecting) return;
-			node.classList.add('reveal-visible');
-			observer.disconnect();
-		}, { threshold: 0.12, rootMargin: '0px 0px -6% 0px' });
-		observer.observe(node);
-		return { destroy: () => observer.disconnect() };
-	}
 </script>
 
 <section class="versologia-story">
@@ -228,8 +219,6 @@
 	.role > p:not(.label) { max-width: 70ch; margin: 25px 0 0; }
 	.stack { display: flex; flex-wrap: wrap; gap: 8px 20px; margin-top: 30px; color: var(--fg-faint); }
 	.stack span:not(:last-child)::after { padding-left: 20px; color: var(--accent-strong); content: '/'; }
-	:global(.reveal-pending) { opacity: 0; transform: translate3d(0, 26px, 0); transition: opacity 700ms ease, transform 850ms cubic-bezier(.16, 1, .3, 1); }
-	:global(.reveal-pending.reveal-visible) { opacity: 1; transform: none; }
 	@media (max-width: 850px) {
 		.opening, .public-view, .laboratory { grid-template-columns: 1fr; }
 		.model-copy { grid-column: 2 / span 10; }
@@ -247,5 +236,4 @@
 		.future-slot { min-height: 300px; }
 		.attribution-flow { font-size: .5rem; }
 	}
-	@media (prefers-reduced-motion: reduce) { :global(.reveal-pending) { opacity: 1; transform: none; transition: none; } }
 </style>

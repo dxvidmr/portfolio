@@ -1,8 +1,10 @@
 <script lang="ts">
 	import type { Locale } from '$lib/paraglide/runtime';
+	import { createReveal } from '$lib/actions/reveal';
 	import ProjectFigure from './ProjectFigure.svelte';
 
 	let { locale }: { locale: Locale } = $props();
+	const reveal = createReveal({ threshold: 0.1 });
 
 	const copy = $derived(locale === 'es' ? {
 		introLabel: 'Investigación y pedagogía · 2022—2025',
@@ -127,17 +129,6 @@
 		]
 	});
 
-	function reveal(node: HTMLElement) {
-		if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
-		node.classList.add('reveal-pending');
-		const observer = new IntersectionObserver(([entry]) => {
-			if (!entry.isIntersecting) return;
-			node.classList.add('reveal-visible');
-			observer.disconnect();
-		}, { threshold: 0.1, rootMargin: '0px 0px -6% 0px' });
-		observer.observe(node);
-		return { destroy: () => observer.disconnect() };
-	}
 </script>
 
 <section class="networks-story">
@@ -353,8 +344,6 @@
 	.path-meta span { color: var(--accent-strong); }
 	.pedagogy-path h4 { margin: 0; font-family: var(--font-title); font-size: clamp(1.45rem, 2.8vw, 2.6rem); font-weight: 450; letter-spacing: -.025em; }
 	.pedagogy-path p { max-width: 68ch; margin: 12px 0 0; }
-	:global(.reveal-pending) { opacity: 0; transform: translate3d(0, 26px, 0); transition: opacity 700ms ease, transform 850ms cubic-bezier(.16, 1, .3, 1); }
-	:global(.reveal-pending.reveal-visible) { opacity: 1; transform: none; }
 	@media (max-width: 850px) {
 		.opening, .method, .encoding, .bridge, .density, .pedagogy > header { grid-template-columns: 1fr; }
 		.sticky-copy { position: static; }
@@ -373,5 +362,4 @@
 		.parallel-figures > :global(figure:nth-child(n)) { grid-column: 1; margin-top: 0; }
 		.pedagogy-path li { grid-template-columns: 1fr; }
 	}
-	@media (prefers-reduced-motion: reduce) { :global(.reveal-pending) { opacity: 1; transform: none; transition: none; } }
 </style>

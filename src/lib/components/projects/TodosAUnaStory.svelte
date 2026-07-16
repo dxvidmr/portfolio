@@ -1,8 +1,10 @@
 <script lang="ts">
 	import type { Locale } from '$lib/paraglide/runtime';
+	import { createReveal } from '$lib/actions/reveal';
 	import ProjectFigure from './ProjectFigure.svelte';
 
 	let { locale }: { locale: Locale } = $props();
+	const reveal = createReveal();
 
 	const copy = $derived(locale === 'es' ? {
 		introLabel: '1619 — presente',
@@ -80,17 +82,6 @@
 		}
 	});
 
-	function reveal(node: HTMLElement) {
-		if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
-		node.classList.add('reveal-pending');
-		const observer = new IntersectionObserver(([entry]) => {
-			if (!entry.isIntersecting) return;
-			node.classList.add('reveal-visible');
-			observer.disconnect();
-		}, { threshold: 0.12, rootMargin: '0px 0px -6% 0px' });
-		observer.observe(node);
-		return { destroy: () => observer.disconnect() };
-	}
 </script>
 
 <section class="todos-story">
@@ -223,8 +214,6 @@
 	.closing > p:not(.label) { max-width: 68ch; margin: 25px 0 0; }
 	.stack { display: flex; flex-wrap: wrap; gap: 8px 20px; margin-top: 30px; color: var(--fg-faint); }
 	.stack span:not(:last-child)::after { padding-left: 20px; color: var(--accent-strong); content: '/'; }
-	:global(.reveal-pending) { opacity: 0; transform: translate3d(0, 26px, 0); transition: opacity 700ms ease, transform 850ms cubic-bezier(0.16, 1, 0.3, 1); }
-	:global(.reveal-pending.reveal-visible) { opacity: 1; transform: none; }
 	@media (max-width: 800px) {
 		.opening,
 		.model-grid,
@@ -245,8 +234,5 @@
 		.mobile-figure { width: min(72vw, 310px); justify-self: center; }
 		.edition-grid { display: block; }
 		.edition-figure { margin-top: 36px; }
-	}
-	@media (prefers-reduced-motion: reduce) {
-		:global(.reveal-pending) { opacity: 1; transform: none; transition: none; }
 	}
 </style>
