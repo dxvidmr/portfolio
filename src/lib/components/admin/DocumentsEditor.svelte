@@ -2,6 +2,12 @@
 	import { enhance } from '$app/forms';
 	import type { SubmitFunction } from '@sveltejs/kit';
 	import type { DocumentEditor } from '$lib/server/admin/documents';
+	import AdminField from './AdminField.svelte';
+	import Button from '$lib/components/ui/Button.svelte';
+	import Checkbox from '$lib/components/ui/Checkbox.svelte';
+	import Input from '$lib/components/ui/Input.svelte';
+	import Select from '$lib/components/ui/Select.svelte';
+	import Textarea from '$lib/components/ui/Textarea.svelte';
 
 	let { editor }: { editor: DocumentEditor } = $props();
 	let pending = $state<string[]>([]);
@@ -17,56 +23,67 @@
 		};
 </script>
 
-<section class:attendance aria-labelledby="documents-title">
-	<h2 id="documents-title">{attendance ? 'Certificados de asistencia' : 'Documentos'}</h2>
-	<p class="intro">
+<section
+	class="tw:mt-10 tw:border-t tw:border-rule tw:pt-6 {attendance
+		? 'tw:rounded-ui tw:border tw:border-warning tw:p-5'
+		: ''}"
+	aria-labelledby="documents-title"
+>
+	<h2 class="tw:mt-0 tw:mb-4 tw:text-base" id="documents-title">
+		{attendance ? 'Certificados de asistencia' : 'Documentos'}
+	</h2>
+	<p class="tw:max-w-[72ch] tw:leading-[1.6] tw:text-ink-dim">
 		{attendance
 			? 'Enlaza el certificado de Drive u otra ubicación. Estos archivos son siempre privados y nunca llegan a la web pública.'
 			: 'Gestiona archivos enlazados sin subirlos a la aplicación. Los certificados son siempre privados; los demás solo se publican con autorización explícita.'}
 	</p>
 
-	<div class="document-list">
+	<div class="tw:grid tw:gap-3">
 		{#if editor.documents.length === 0}
-			<p class="empty">{attendance ? 'No hay certificado enlazado.' : 'No hay documentos enlazados.'}</p>
+			<p class="tw:m-0 tw:border tw:border-dashed tw:border-rule tw:p-4 tw:text-xs tw:text-ink-faint">
+				{attendance ? 'No hay certificado enlazado.' : 'No hay documentos enlazados.'}
+			</p>
 		{:else}
 			{#each editor.documents as document, index (document.id)}
-				<article>
-					<form method="POST" action="?/guardarDocumento" use:enhance={enhancedSubmit(`save:${document.id}`)}>
+				<article
+					class="tw:grid tw:grid-cols-[minmax(0,1fr)_auto] tw:items-end tw:gap-[0.9rem] tw:rounded-ui tw:border tw:border-rule tw:bg-[var(--admin-surface)] tw:p-4 tw:max-[850px]:grid-cols-1"
+				>
+					<form class="tw:grid tw:gap-[0.8rem]" method="POST" action="?/guardarDocumento" use:enhance={enhancedSubmit(`save:${document.id}`)}>
 						<input type="hidden" name="documentId" value={document.id} />
-						<div class="fields">
+						<div class="tw:grid tw:grid-cols-3 tw:gap-[0.65rem] tw:max-[650px]:grid-cols-1">
 							{#if attendance}
 								<input type="hidden" name="documentType" value="doc_certificate" />
 								<input type="hidden" name="isCertificate" value="1" />
 							{:else}
-								<label><span>Tipo</span><select name="documentType" value={document.documentType}>{#each editor.types as type (type.value)}<option value={type.value}>{type.label}</option>{/each}</select></label>
+								<AdminField label="Tipo"><Select name="documentType" value={document.documentType}>{#each editor.types as type (type.value)}<option value={type.value}>{type.label}</option>{/each}</Select></AdminField>
 							{/if}
-							<label class:wide={attendance}><span>Título</span><input name="title" value={document.title} placeholder="Opcional" /></label>
-							<label class="wide"><span>URL</span><input type="url" name="url" value={document.url} required /></label>
-							<label><span>ID de Drive</span><input name="driveFileId" value={document.driveFileId} placeholder="Se detecta desde la URL" /></label>
-							<label><span>Emitido por</span><input name="issuedBy" value={document.issuedBy} /></label>
-							<label><span>Fecha de emisión</span><input name="issuedDate" value={document.issuedDate} placeholder="AAAA-MM-DD" /></label>
-							<label class="wide"><span>Notas privadas</span><textarea name="notesPrivate" rows="2">{document.notesPrivate}</textarea></label>
+							<AdminField label="Título" wide={attendance}><Input name="title" value={document.title} placeholder="Opcional" /></AdminField>
+							<AdminField label="URL" wide><Input type="url" name="url" value={document.url} required /></AdminField>
+							<AdminField label="ID de Drive"><Input name="driveFileId" value={document.driveFileId} placeholder="Se detecta desde la URL" /></AdminField>
+							<AdminField label="Emitido por"><Input name="issuedBy" value={document.issuedBy} /></AdminField>
+							<AdminField label="Fecha de emisión"><Input name="issuedDate" value={document.issuedDate} placeholder="AAAA-MM-DD" /></AdminField>
+							<AdminField label="Notas privadas" wide><Textarea name="notesPrivate" rows={2} value={document.notesPrivate} /></AdminField>
 						</div>
 						{#if !attendance}
-							<div class="checks">
-								<label><input type="checkbox" name="isCertificate" value="1" checked={document.isCertificate} /> Certificado (siempre privado)</label>
-								<label><input type="checkbox" name="isPublic" value="1" checked={document.isPublic} disabled={document.isCertificate} /> Público</label>
+							<div class="tw:flex tw:flex-wrap tw:items-center tw:gap-2">
+								<label class="tw:flex tw:items-center tw:gap-1.5 tw:text-[0.68rem] tw:text-ink-dim"><Checkbox name="isCertificate" value="1" checked={document.isCertificate} /> Certificado (siempre privado)</label>
+								<label class="tw:flex tw:items-center tw:gap-1.5 tw:text-[0.68rem] tw:text-ink-dim"><Checkbox name="isPublic" value="1" checked={document.isPublic} disabled={document.isCertificate} /> Público</label>
 							</div>
 						{/if}
-						<button type="submit" disabled={pending.includes(`save:${document.id}`)}>Guardar documento</button>
+						<Button type="submit" disabled={pending.includes(`save:${document.id}`)}>Guardar documento</Button>
 					</form>
-					<div class="row-actions">
+					<div class="tw:flex tw:flex-wrap tw:items-center tw:justify-end tw:gap-2 tw:max-[850px]:justify-start">
 						<form method="POST" action="?/moverDocumento" use:enhance={enhancedSubmit(`up:${document.id}`)}>
 							<input type="hidden" name="documentId" value={document.id} /><input type="hidden" name="direction" value="up" />
-							<button type="submit" aria-label="Subir documento" disabled={index === 0 || pending.includes(`up:${document.id}`)}>↑</button>
+							<Button size="icon" type="submit" aria-label="Subir documento" disabled={index === 0 || pending.includes(`up:${document.id}`)}>↑</Button>
 						</form>
 						<form method="POST" action="?/moverDocumento" use:enhance={enhancedSubmit(`down:${document.id}`)}>
 							<input type="hidden" name="documentId" value={document.id} /><input type="hidden" name="direction" value="down" />
-							<button type="submit" aria-label="Bajar documento" disabled={index === editor.documents.length - 1 || pending.includes(`down:${document.id}`)}>↓</button>
+							<Button size="icon" type="submit" aria-label="Bajar documento" disabled={index === editor.documents.length - 1 || pending.includes(`down:${document.id}`)}>↓</Button>
 						</form>
 						<form method="POST" action="?/eliminarDocumento" use:enhance={enhancedSubmit(`remove:${document.id}`)}>
 							<input type="hidden" name="documentId" value={document.id} />
-							<button class="remove" type="submit" disabled={pending.includes(`remove:${document.id}`)}>Eliminar</button>
+							<Button variant="danger" type="submit" disabled={pending.includes(`remove:${document.id}`)}>Eliminar</Button>
 						</form>
 					</div>
 				</article>
@@ -74,60 +91,30 @@
 		{/if}
 	</div>
 
-	<details class="add">
-		<summary>+ {attendance ? 'Enlazar certificado' : 'Añadir documento'}</summary>
-		<form method="POST" action="?/crearDocumento" use:enhance={enhancedSubmit('create')}>
-			<div class="fields">
+	<details class="tw:mt-3 tw:rounded-ui tw:border tw:border-rule tw:bg-[var(--admin-surface)] tw:p-4">
+		<summary class="tw:cursor-pointer tw:text-xs tw:text-accent-strong">+ {attendance ? 'Enlazar certificado' : 'Añadir documento'}</summary>
+		<form class="tw:mt-4 tw:grid tw:gap-[0.8rem]" method="POST" action="?/crearDocumento" use:enhance={enhancedSubmit('create')}>
+			<div class="tw:grid tw:grid-cols-3 tw:gap-[0.65rem] tw:max-[650px]:grid-cols-1">
 				{#if attendance}
 					<input type="hidden" name="documentType" value="doc_certificate" />
 					<input type="hidden" name="isCertificate" value="1" />
 				{:else}
-					<label><span>Tipo</span><select name="documentType">{#each editor.types as type (type.value)}<option value={type.value}>{type.label}</option>{/each}</select></label>
+					<AdminField label="Tipo"><Select name="documentType">{#each editor.types as type (type.value)}<option value={type.value}>{type.label}</option>{/each}</Select></AdminField>
 				{/if}
-				<label class:wide={attendance}><span>Título</span><input name="title" placeholder="Opcional" /></label>
-				<label class="wide"><span>URL</span><input type="url" name="url" placeholder="https://drive.google.com/…" required /></label>
-				<label><span>ID de Drive</span><input name="driveFileId" placeholder="Se detecta desde la URL" /></label>
-				<label><span>Emitido por</span><input name="issuedBy" /></label>
-				<label><span>Fecha de emisión</span><input name="issuedDate" placeholder="AAAA-MM-DD" /></label>
-				<label class="wide"><span>Notas privadas</span><textarea name="notesPrivate" rows="2"></textarea></label>
+				<AdminField label="Título" wide={attendance}><Input name="title" placeholder="Opcional" /></AdminField>
+				<AdminField label="URL" wide><Input type="url" name="url" placeholder="https://drive.google.com/…" required /></AdminField>
+				<AdminField label="ID de Drive"><Input name="driveFileId" placeholder="Se detecta desde la URL" /></AdminField>
+				<AdminField label="Emitido por"><Input name="issuedBy" /></AdminField>
+				<AdminField label="Fecha de emisión"><Input name="issuedDate" placeholder="AAAA-MM-DD" /></AdminField>
+				<AdminField label="Notas privadas" wide><Textarea name="notesPrivate" rows={2} /></AdminField>
 			</div>
 			{#if !attendance}
-				<div class="checks">
-					<label><input type="checkbox" name="isCertificate" value="1" /> Certificado (siempre privado)</label>
-					<label><input type="checkbox" name="isPublic" value="1" /> Público</label>
+				<div class="tw:flex tw:flex-wrap tw:items-center tw:gap-2">
+					<label class="tw:flex tw:items-center tw:gap-1.5 tw:text-[0.68rem] tw:text-ink-dim"><Checkbox name="isCertificate" value="1" /> Certificado (siempre privado)</label>
+					<label class="tw:flex tw:items-center tw:gap-1.5 tw:text-[0.68rem] tw:text-ink-dim"><Checkbox name="isPublic" value="1" /> Público</label>
 				</div>
 			{/if}
-			<button type="submit" disabled={pending.includes('create')}>{attendance ? 'Enlazar certificado' : 'Añadir documento'}</button>
+			<Button type="submit" disabled={pending.includes('create')}>{attendance ? 'Enlazar certificado' : 'Añadir documento'}</Button>
 		</form>
 	</details>
 </section>
-
-<style>
-	section { margin-top: 2.5rem; padding-top: 1.5rem; border-top: 1px solid var(--line); }
-	section.attendance { padding: 1.2rem; border: 1px solid var(--tone-amber); }
-	h2 { margin: 0 0 1rem; color: var(--fg-dim); font-size: 0.85rem; letter-spacing: 0.08em; text-transform: uppercase; }
-	.intro { max-width: 72ch; color: var(--fg-dim); line-height: 1.6; }
-	.document-list { display: grid; gap: 0.75rem; }
-	article, .add { border: 1px solid var(--line); background: var(--admin-surface); padding: 1rem; }
-	article { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 0.9rem; align-items: end; }
-	article > form, .add form { display: grid; gap: 0.8rem; }
-	.fields { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0.65rem; }
-	.fields label { display: grid; gap: 0.3rem; color: var(--fg-faint); font-size: 0.62rem; letter-spacing: 0.05em; text-transform: uppercase; }
-	.fields .wide { grid-column: 1 / -1; }
-	input, select, textarea { min-width: 0; border: 1px solid var(--line); background: var(--bg); color: var(--fg); padding: 0.5rem; font: inherit; font-size: 0.7rem; }
-	textarea { resize: vertical; }
-	.checks, .row-actions { display: flex; flex-wrap: wrap; gap: 0.5rem; align-items: center; }
-	.checks label { display: flex; gap: 0.35rem; align-items: center; color: var(--fg-dim); font-size: 0.68rem; }
-	.checks input { accent-color: var(--accent-strong); }
-	button { border: 1px solid var(--line-strong); background: transparent; color: var(--fg); padding: 0.45rem 0.6rem; font: inherit; font-size: 0.67rem; cursor: pointer; }
-	button:hover:not(:disabled) { border-color: var(--accent-strong); color: var(--accent-strong); }
-	button.remove:hover:not(:disabled) { border-color: var(--admin-danger); color: var(--admin-danger); }
-	button:disabled { opacity: 0.35; cursor: not-allowed; }
-	.row-actions { justify-content: end; }
-	.add { margin-top: 0.75rem; }
-	.add summary { color: var(--accent-strong); cursor: pointer; font-size: 0.75rem; }
-	.add form { margin-top: 1rem; }
-	.empty { margin: 0; padding: 1rem; border: 1px dashed var(--line); color: var(--fg-faint); font-size: 0.75rem; }
-	@media (max-width: 850px) { article { grid-template-columns: 1fr; } .row-actions { justify-content: start; } }
-	@media (max-width: 650px) { .fields { grid-template-columns: 1fr; } .fields .wide { grid-column: auto; } }
-</style>

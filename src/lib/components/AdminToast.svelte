@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { fade, fly } from 'svelte/transition';
+	import Button from '$lib/components/ui/Button.svelte';
 
 	let {
 		message,
@@ -8,6 +9,9 @@
 	}: { message: string; success?: boolean; duration?: number } = $props();
 
 	let visible = $state(true);
+	const toastClasses = $derived(
+		`tw:fixed tw:top-4 tw:right-4 tw:z-[1000] tw:grid tw:w-[min(26rem,calc(100vw-2rem))] tw:grid-cols-[auto_minmax(0,1fr)_auto] tw:items-center tw:gap-3 tw:border tw:border-l-[3px] tw:border-rule tw:bg-[var(--admin-surface-raised)] tw:px-[0.9rem] tw:py-[0.8rem] tw:text-ink tw:shadow-[0_1rem_2.5rem_rgb(0_0_0/55%)] tw:motion-reduce:transition-none tw:max-[520px]:top-3 tw:max-[520px]:right-3 tw:max-[520px]:w-[calc(100vw-1.5rem)] ${success ? 'tw:border-l-accent-strong' : 'tw:border-l-danger'}`
+	);
 
 	$effect(() => {
 		const timeout = window.setTimeout(() => {
@@ -20,89 +24,25 @@
 
 {#if visible}
 	<div
-		class:success
-		class:error={!success}
+		class={toastClasses}
 		role={success ? 'status' : 'alert'}
 		aria-live={success ? 'polite' : 'assertive'}
 		in:fly={{ y: -12, duration: 160 }}
 		out:fade={{ duration: 140 }}
 	>
-		<span class="icon" aria-hidden="true">{success ? '✓' : '!'}</span>
-		<p>{message}</p>
-		<button type="button" onclick={() => (visible = false)} aria-label="Cerrar notificación">
-			×
-		</button>
+		<span
+			class="tw:grid tw:size-[1.35rem] tw:place-items-center tw:rounded-full tw:border tw:border-current tw:text-[0.72rem] {success
+				? 'tw:text-accent-strong'
+				: 'tw:text-danger'}"
+			aria-hidden="true">{success ? '✓' : '!'}</span
+		>
+		<p class="tw:m-0 tw:text-[0.78rem] tw:leading-[1.45]">{message}</p>
+		<Button
+			variant="ghost"
+			size="icon"
+			onclick={() => (visible = false)}
+			aria-label="Cerrar notificación"
+			class="tw:text-[1.1rem]"
+		>×</Button>
 	</div>
 {/if}
-
-<style>
-	div {
-		position: fixed;
-		top: 1rem;
-		right: 1rem;
-		z-index: 1000;
-		display: grid;
-		grid-template-columns: auto minmax(0, 1fr) auto;
-		align-items: center;
-		gap: 0.75rem;
-		width: min(26rem, calc(100vw - 2rem));
-		padding: 0.8rem 0.9rem;
-		border: 1px solid var(--line);
-		border-left: 3px solid;
-		background: var(--admin-surface-raised);
-		box-shadow: 0 1rem 2.5rem rgb(0 0 0 / 55%);
-		color: var(--fg);
-	}
-
-	div.success { border-left-color: var(--accent-strong); }
-	div.error { border-left-color: var(--admin-danger); }
-
-	.icon {
-		display: grid;
-		place-items: center;
-		width: 1.35rem;
-		height: 1.35rem;
-		border: 1px solid currentColor;
-		border-radius: 50%;
-		font-size: 0.72rem;
-	}
-
-	.success .icon { color: var(--accent-strong); }
-	.error .icon { color: var(--admin-danger); }
-
-	p {
-		margin: 0;
-		font-size: 0.78rem;
-		line-height: 1.45;
-	}
-
-	button {
-		border: 0;
-		background: transparent;
-		color: var(--fg-dim);
-		padding: 0.2rem 0.35rem;
-		font: inherit;
-		font-size: 1.1rem;
-		line-height: 1;
-		cursor: pointer;
-	}
-
-	button:hover { color: var(--fg); }
-
-	button:focus-visible {
-		outline: 2px solid var(--accent-strong);
-		outline-offset: 2px;
-	}
-
-	@media (max-width: 520px) {
-		div {
-			top: 0.75rem;
-			right: 0.75rem;
-			width: calc(100vw - 1.5rem);
-		}
-	}
-
-	@media (prefers-reduced-motion: reduce) {
-		div { transition: none; }
-	}
-</style>

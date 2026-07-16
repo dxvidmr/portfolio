@@ -1,5 +1,8 @@
 <script lang="ts">
 	import type { CanonicalEventValues } from '$lib/server/admin/events';
+	import AdminField from './AdminField.svelte';
+	import Input from '$lib/components/ui/Input.svelte';
+	import Textarea from '$lib/components/ui/Textarea.svelte';
 
 	let {
 		values = {},
@@ -37,11 +40,16 @@
 	];
 </script>
 
-<div class="grid">
+<div class="tw:grid tw:grid-cols-2 tw:gap-x-5 tw:gap-y-4 tw:max-[700px]:grid-cols-1">
 	{#each fields as field (field.name)}
-		<label class:wide={field.wide}>
-			<span>{field.label}{field.required ? ' *' : ''}</span>
-			<input
+		<AdminField
+			label={field.label}
+			required={field.required}
+			wide={field.wide}
+			error={errors[field.name]}
+			help={field.help}
+		>
+			<Input
 				type={field.type ?? 'text'}
 				name={field.name}
 				value={values[field.name] ?? ''}
@@ -49,28 +57,14 @@
 				required={field.required}
 				aria-invalid={errors[field.name] ? 'true' : undefined}
 			/>
-			{#if errors[field.name]}<small class="error">{errors[field.name]}</small>{/if}
-			{#if field.help}<small class="help">{field.help}</small>{/if}
-		</label>
+		</AdminField>
 	{/each}
-	<label class="wide private">
-		<span>Notas privadas</span>
-		<textarea name="notes_private" rows="4">{values.notes_private ?? ''}</textarea>
-		<small>No se muestran en la web pública.</small>
-	</label>
+	<AdminField
+		label="Notas privadas"
+		wide
+		privateField
+		help="No se muestran en la web pública."
+	>
+		<Textarea name="notes_private" rows={4} value={values.notes_private ?? ''} />
+	</AdminField>
 </div>
-
-<style>
-	.grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1rem 1.25rem; }
-	label { display: grid; gap: 0.35rem; color: var(--fg-dim); font-size: 0.75rem; }
-	.wide { grid-column: 1 / -1; }
-	input, textarea { min-width: 0; border: 1px solid var(--line); background: var(--admin-surface); color: var(--fg); padding: 0.55rem 0.65rem; font: inherit; }
-	textarea { resize: vertical; }
-	input:focus-visible, textarea:focus-visible { outline: 2px solid var(--accent-strong); outline-offset: 2px; }
-	input[aria-invalid='true'] { border-color: var(--admin-danger); }
-	.error { color: var(--admin-danger); }
-	.help { color: var(--fg-faint); line-height: 1.4; }
-	.private { padding: 0.8rem; border: 1px dashed var(--line); }
-	.private small { color: var(--fg-faint); }
-	@media (max-width: 700px) { .grid { grid-template-columns: 1fr; } .wide { grid-column: auto; } }
-</style>

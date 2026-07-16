@@ -2,6 +2,10 @@
 	import ListFilter from '@lucide/svelte/icons/list-filter';
 	import AdminPageHeader from '$lib/components/admin/AdminPageHeader.svelte';
 	import ButtonLink from '$lib/components/ui/ButtonLink.svelte';
+	import AdminField from '$lib/components/admin/AdminField.svelte';
+	import Button from '$lib/components/ui/Button.svelte';
+	import Input from '$lib/components/ui/Input.svelte';
+	import Select from '$lib/components/ui/Select.svelte';
 	import type { PageData } from './$types';
 	let { data }: { data: PageData } = $props();
 	let query = $state('');
@@ -58,95 +62,65 @@
 	{/snippet}
 </AdminPageHeader>
 
-<section class="filters" aria-label="Filtros de eventos">
-	<div class="filter-search">
-		<label>
-			<span>Buscar eventos</span>
-			<input type="search" bind:value={query} placeholder="Nombre, lugar o año…" />
-		</label>
-		<div class="filter-summary" aria-live="polite">
-			<strong>{filtered.length}</strong>
-			<span>resultados</span>
+<section class="tw:my-6 tw:grid tw:gap-4 tw:rounded-ui tw:border tw:border-rule tw:bg-[var(--admin-surface)] tw:p-[clamp(0.8rem,2vw,1.15rem)]" aria-label="Filtros de eventos">
+	<div class="tw:grid tw:grid-cols-[minmax(0,1fr)_auto] tw:items-end tw:gap-4 tw:max-[650px]:grid-cols-1">
+		<AdminField class="tw:max-w-3xl" label="Buscar eventos">
+			<Input type="search" bind:value={query} placeholder="Nombre, lugar o año…" />
+		</AdminField>
+		<div class="tw:grid tw:min-w-24 tw:text-right tw:text-ink-dim tw:max-[650px]:hidden" aria-live="polite">
+			<strong class="tw:font-title tw:text-[1.35rem] tw:font-medium tw:leading-none tw:text-ink">{filtered.length}</strong>
+			<span class="tw:text-[0.65rem] tw:text-ink-faint">resultados</span>
 		</div>
 	</div>
 
-	<div class="filter-primary">
-		<label>
-			<span>Actividad</span>
-			<select bind:value={activity}>
+	<div class="tw:grid tw:grid-cols-2 tw:gap-3 tw:max-[650px]:grid-cols-1">
+		<AdminField label="Actividad">
+			<Select bind:value={activity}>
 				<option value="all">Cualquier actividad</option>
 				<option value="contribution">Con contribuciones</option>
 				<option value="service">Con servicio</option>
 				<option value="attendance">Con asistencia</option>
 				<option value="empty">Sin actividad asociada</option>
-			</select>
-		</label>
-		<label>
-			<span>Orden</span>
-			<select bind:value={sortBy}>
+			</Select>
+		</AdminField>
+		<AdminField label="Orden">
+			<Select bind:value={sortBy}>
 				<option value="date">Más recientes primero</option>
 				<option value="name">Nombre A–Z</option>
-			</select>
-		</label>
+			</Select>
+		</AdminField>
 	</div>
 
-	<details class="filter-advanced" open={Boolean(year)}>
-		<summary><ListFilter size={14} strokeWidth={1.8} aria-hidden="true" /> Más filtros</summary>
-		<div>
-			<label>
-				<span>Año</span>
-				<input bind:value={year} inputmode="numeric" pattern="[0-9]{4}" maxlength="4" placeholder="AAAA" />
-			</label>
+	<details class="tw:rounded-ui tw:border tw:border-rule tw:bg-[color-mix(in_srgb,var(--bg)_45%,transparent)] tw:p-3 tw:open:[&>summary]:mb-3" open={Boolean(year)}>
+		<summary class="tw:inline-flex tw:cursor-pointer tw:items-center tw:gap-1.5 tw:text-[0.7rem] tw:text-ink-dim"><ListFilter size={14} strokeWidth={1.8} aria-hidden="true" /> Más filtros</summary>
+		<div class="tw:grid tw:grid-cols-[minmax(8rem,12rem)]">
+			<AdminField label="Año">
+				<Input bind:value={year} inputmode="numeric" pattern="[0-9]{4}" maxlength={4} placeholder="AAAA" />
+			</AdminField>
 		</div>
 	</details>
 
-	<div class="filter-actions">
-		<span>{activeFilterCount === 0 ? 'Sin filtros activos' : `${activeFilterCount} filtros activos`}</span>
-		<button type="button" onclick={resetFilters} disabled={activeFilterCount === 0 && sortBy === 'date'}>Limpiar</button>
+	<div class="tw:flex tw:items-center tw:justify-end tw:gap-3">
+		<span class="tw:text-[0.65rem] tw:text-ink-faint">{activeFilterCount === 0 ? 'Sin filtros activos' : `${activeFilterCount} filtros activos`}</span>
+		<Button onclick={resetFilters} disabled={activeFilterCount === 0 && sortBy === 'date'}>Limpiar</Button>
 	</div>
 </section>
 
-<ul class="events">
+<ul class="tw:mt-4 tw:mb-0 tw:list-none tw:border-t tw:border-rule tw:p-0">
 	{#each filtered as event (event.id)}
 		<li>
-			<a href={`/admin/eventos/${event.id}`}>
-				<div>
-					<span class="date">{event.sortDate ?? 'Sin fecha'}</span>
-					<strong>{event.title}</strong>
-					{#if event.place}<small>{event.place}</small>{/if}
+			<a class="tw:group tw:flex tw:items-center tw:justify-between tw:gap-4 tw:border-b tw:border-rule tw:px-1 tw:py-4 tw:text-ink tw:max-[650px]:flex-col tw:max-[650px]:items-start" href={`/admin/eventos/${event.id}`}>
+				<div class="tw:grid tw:min-w-0 tw:gap-[0.3rem]">
+					<span class="tw:text-[0.65rem] tw:text-ink-faint">{event.sortDate ?? 'Sin fecha'}</span>
+					<strong class="tw:text-[0.82rem] tw:leading-[1.35] tw:group-hover:text-accent-strong">{event.title}</strong>
+					{#if event.place}<small class="tw:text-[0.65rem] tw:text-ink-faint">{event.place}</small>{/if}
 				</div>
-				<div class="roles">
-					{#if event.contributionCount}<span>{event.contributionCount} contrib.</span>{/if}
-					{#if event.serviceCount}<span>{event.serviceCount} servicio</span>{/if}
-					{#if event.hasAttendance}<span class="private">Oyente · privado</span>{/if}
+				<div class="tw:flex tw:flex-none tw:flex-wrap tw:justify-end tw:gap-1.5 tw:max-[650px]:justify-start">
+					{#if event.contributionCount}<span class="tw:border tw:border-rule tw:px-1.5 tw:py-1 tw:text-[0.6rem] tw:text-ink-dim">{event.contributionCount} contrib.</span>{/if}
+					{#if event.serviceCount}<span class="tw:border tw:border-rule tw:px-1.5 tw:py-1 tw:text-[0.6rem] tw:text-ink-dim">{event.serviceCount} servicio</span>{/if}
+					{#if event.hasAttendance}<span class="tw:border tw:border-warning tw:px-1.5 tw:py-1 tw:text-[0.6rem] tw:text-warning">Oyente · privado</span>{/if}
 				</div>
 			</a>
 		</li>
 	{/each}
 </ul>
-
-<style>
-	.filters { display: grid; gap: 1rem; margin: 1.5rem 0; padding: clamp(0.8rem, 2vw, 1.15rem); border: 1px solid var(--line); background: var(--admin-surface); }
-	.filters label { display: grid; gap: 0.35rem; }
-	.filter-search { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: end; gap: 1rem; }
-	.filter-search label { max-width: 48rem; }
-	.filter-primary { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0.75rem; }
-	.filter-summary { display: grid; min-width: 6rem; color: var(--fg-dim); text-align: right; }
-	.filter-summary strong { color: var(--fg); font-family: var(--font-title); font-size: 1.35rem; font-weight: 500; line-height: 1; }
-	.filter-summary span, .filter-actions > span { color: var(--fg-faint); font-size: 0.65rem; }
-	.filter-advanced { padding: 0.75rem; border: 1px solid var(--line); background: color-mix(in srgb, var(--bg) 45%, transparent); }
-	.filter-advanced summary { display: inline-flex; align-items: center; gap: 0.4rem; color: var(--fg-dim); font-size: 0.7rem; cursor: pointer; }
-	.filter-advanced[open] summary { margin-bottom: 0.75rem; }
-	.filter-advanced > div { display: grid; grid-template-columns: minmax(8rem, 12rem); }
-	.filter-actions { display: flex; align-items: center; justify-content: flex-end; gap: 0.75rem; }
-	.events { margin: 1rem 0 0; padding: 0; border-top: 1px solid var(--line); list-style: none; }
-	.events a { display: flex; align-items: center; justify-content: space-between; gap: 1rem; padding: 1rem 0.25rem; border-bottom: 1px solid var(--line); color: var(--fg); }
-	.events a:hover strong { color: var(--accent-strong); }
-	.events a > div:first-child { display: grid; gap: 0.3rem; min-width: 0; }
-	.events strong { font-size: 0.82rem; line-height: 1.35; }
-	.date, .events small { color: var(--fg-faint); font-size: 0.65rem; }
-	.roles { display: flex; flex: 0 0 auto; flex-wrap: wrap; justify-content: end; gap: 0.4rem; }
-	.roles span { border: 1px solid var(--line); padding: 0.25rem 0.4rem; color: var(--fg-dim); font-size: 0.6rem; }
-	.roles .private { color: var(--tone-amber); border-color: var(--tone-amber); }
-	@media (max-width: 650px) { .filter-search, .filter-primary { grid-template-columns: 1fr; } .filter-summary { display: none; } .events a { align-items: start; flex-direction: column; } .roles { justify-content: start; } }
-</style>

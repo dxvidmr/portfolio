@@ -3,6 +3,13 @@
 	import CanonicalEventForm from '$lib/components/admin/CanonicalEventForm.svelte';
 	import EntityForm from '$lib/components/admin/EntityForm.svelte';
 	import AdminToast from '$lib/components/AdminToast.svelte';
+	import AdminPageHeader from '$lib/components/admin/AdminPageHeader.svelte';
+	import AdminField from '$lib/components/admin/AdminField.svelte';
+	import Button from '$lib/components/ui/Button.svelte';
+	import ButtonLink from '$lib/components/ui/ButtonLink.svelte';
+	import Checkbox from '$lib/components/ui/Checkbox.svelte';
+	import Input from '$lib/components/ui/Input.svelte';
+	import Textarea from '$lib/components/ui/Textarea.svelte';
 
 	let { data, form }: { data: PageData; form: ActionData } = $props();
 
@@ -19,32 +26,34 @@
 
 <svelte:head><title>Nuevo evento · cv/admin</title></svelte:head>
 
-<a class="back" href="/admin/eventos">← Volver a eventos</a>
-<h1>Nuevo evento</h1>
-<p>
-	Registra una sola vez los datos comunes del evento y marca los papeles que quieras crear ahora.
-	Las contribuciones y servicios nacen privados; podrás completarlos y publicarlos después.
-</p>
+<ButtonLink variant="ghost" size="sm" href="/admin/eventos" class="tw:mb-4 tw:px-0"
+	>← Volver a eventos</ButtonLink
+>
+<AdminPageHeader
+	title="Nuevo evento"
+	eyebrow="Identidad académica compartida"
+	description="Registra una sola vez los datos comunes del evento y marca los papeles que quieras crear ahora. Las contribuciones y servicios nacen privados; podrás completarlos y publicarlos después."
+/>
 
 {#if form?.errors}<AdminToast message="Revisa los campos marcados." success={false} />{/if}
 
-<form method="POST" action="?/crear">
+<form class="tw:mt-6 tw:grid tw:gap-8" method="POST" action="?/crear">
 	<section>
-		<h2>Datos del evento</h2>
+		<h2 class="tw:mt-0 tw:mb-3 tw:text-base">Datos del evento</h2>
 		<CanonicalEventForm values={form?.raw ?? {}} errors={form?.errors ?? {}} />
 	</section>
 
 	<section>
-		<h2>¿Cuál fue tu papel?</h2>
-		<p class="hint">Puedes marcar varios; también puedes registrar solo el evento y añadir roles más tarde.</p>
+		<h2 class="tw:mt-0 tw:mb-3 tw:text-base">¿Cuál fue tu papel?</h2>
+		<p class="tw:mt-0 tw:mb-3 tw:text-[0.78rem] tw:text-ink-faint">Puedes marcar varios; también puedes registrar solo el evento y añadir roles más tarde.</p>
 
-		<label class="role">
-			<input type="checkbox" name="rol_contribucion" value="1" bind:checked={withTalk} />
-			<span>Contribución <small>comunicación, ponencia, póster…</small></span>
+		<label class="tw:mt-3 tw:mb-1.5 tw:flex tw:cursor-pointer tw:items-baseline tw:gap-2.5 tw:text-ink">
+			<Checkbox name="rol_contribucion" value="1" bind:checked={withTalk} />
+			<span>Contribución <small class="tw:ml-1.5 tw:text-ink-faint">comunicación, ponencia, póster…</small></span>
 		</label>
 		{#if withTalk}
-			<fieldset>
-				<legend>Contribución</legend>
+			<fieldset class="tw:mt-1.5 tw:mb-4 tw:rounded-ui tw:border tw:border-dashed tw:border-rule tw:p-4">
+				<legend class="tw:px-2 tw:text-[0.8rem] tw:text-ink-dim">Contribución</legend>
 				<EntityForm
 					fields={data.talkFields}
 					values={form?.raw ?? {}}
@@ -54,14 +63,14 @@
 			</fieldset>
 		{/if}
 
-		<label class="role">
-			<input type="checkbox" name="rol_servicio" value="1" bind:checked={withService} />
-			<span>Servicio <small>organización, comité, evaluación…</small></span>
+		<label class="tw:mt-3 tw:mb-1.5 tw:flex tw:cursor-pointer tw:items-baseline tw:gap-2.5 tw:text-ink">
+			<Checkbox name="rol_servicio" value="1" bind:checked={withService} />
+			<span>Servicio <small class="tw:ml-1.5 tw:text-ink-faint">organización, comité, evaluación…</small></span>
 		</label>
 		{#if withService}
-			<fieldset>
-				<legend>Servicio</legend>
-				<p class="hint">Si dejas el título vacío se usará el nombre del evento.</p>
+			<fieldset class="tw:mt-1.5 tw:mb-4 tw:rounded-ui tw:border tw:border-dashed tw:border-rule tw:p-4">
+				<legend class="tw:px-2 tw:text-[0.8rem] tw:text-ink-dim">Servicio</legend>
+				<p class="tw:mt-0 tw:mb-3 tw:text-[0.78rem] tw:text-ink-faint">Si dejas el título vacío se usará el nombre del evento.</p>
 				<EntityForm
 					fields={data.serviceFields}
 					values={form?.raw ?? {}}
@@ -71,47 +80,27 @@
 			</fieldset>
 		{/if}
 
-		<label class="role">
-			<input type="checkbox" name="rol_asistencia" value="1" bind:checked={withAttendance} />
-			<span>Asistencia como oyente <small>siempre privada; nunca llega a la web pública</small></span>
+		<label class="tw:mt-3 tw:mb-1.5 tw:flex tw:cursor-pointer tw:items-baseline tw:gap-2.5 tw:text-ink">
+			<Checkbox name="rol_asistencia" value="1" bind:checked={withAttendance} />
+			<span>Asistencia como oyente <small class="tw:ml-1.5 tw:text-ink-faint">siempre privada; nunca llega a la web pública</small></span>
 		</label>
 		{#if withAttendance}
-			<fieldset>
-				<legend>Asistencia</legend>
-				<div class="attendance-grid">
-					<label>
-						<span>Rol registrado</span>
-						<input name="at_role_label" value={form?.raw?.at_role_label || 'Oyente/asistente'} />
-					</label>
-					<label>
-						<span>Notas privadas</span>
-						<textarea name="at_notes" rows="3">{form?.raw?.at_notes ?? ''}</textarea>
-					</label>
+			<fieldset class="tw:mt-1.5 tw:mb-4 tw:rounded-ui tw:border tw:border-dashed tw:border-rule tw:p-4">
+				<legend class="tw:px-2 tw:text-[0.8rem] tw:text-ink-dim">Asistencia</legend>
+				<div class="tw:grid tw:gap-4">
+					<AdminField label="Rol registrado">
+						<Input name="at_role_label" value={form?.raw?.at_role_label || 'Oyente/asistente'} />
+					</AdminField>
+					<AdminField label="Notas privadas">
+						<Textarea name="at_notes" rows={3} value={form?.raw?.at_notes ?? ''} />
+					</AdminField>
 				</div>
 			</fieldset>
 		{/if}
 	</section>
 
-	<div class="actions"><button type="submit">Crear evento</button><a href="/admin/eventos">Cancelar</a></div>
+	<div class="tw:flex tw:items-center tw:gap-3">
+		<Button variant="primary" type="submit">Crear evento</Button>
+		<ButtonLink href="/admin/eventos">Cancelar</ButtonLink>
+	</div>
 </form>
-
-<style>
-	.back { display: inline-block; margin-bottom: 1rem; color: var(--fg-dim); }
-	h1 { margin: 0 0 0.6rem; color: var(--fg); font-size: 1.3rem; }
-	p { max-width: 70ch; color: var(--fg-dim); line-height: 1.6; }
-	form { margin-top: 1.5rem; display: grid; gap: 2rem; }
-	section h2 { margin: 0 0 0.8rem; color: var(--fg); font-size: 1rem; }
-	.hint { margin: 0 0 0.8rem; font-size: 0.78rem; color: var(--fg-faint); }
-	.role { display: flex; align-items: baseline; gap: 0.6rem; margin: 0.8rem 0 0.4rem; color: var(--fg); cursor: pointer; }
-	.role input { width: 1.05rem; height: 1.05rem; accent-color: var(--accent-strong); }
-	.role small { color: var(--fg-faint); margin-left: 0.4rem; }
-	fieldset { margin: 0.4rem 0 1rem; padding: 1rem; border: 1px dashed var(--line); }
-	legend { padding: 0 0.5rem; color: var(--fg-dim); font-size: 0.8rem; }
-	.attendance-grid { display: grid; gap: 1rem; }
-	.attendance-grid label { display: grid; gap: 0.35rem; color: var(--fg-dim); font-size: 0.75rem; }
-	.attendance-grid input, .attendance-grid textarea { border: 1px solid var(--line); background: var(--admin-surface); color: var(--fg); padding: 0.55rem 0.65rem; font: inherit; }
-	.attendance-grid input:focus-visible, .attendance-grid textarea:focus-visible { outline: 2px solid var(--accent-strong); outline-offset: 2px; }
-	.actions { display: flex; gap: 0.75rem; align-items: center; }
-	button, .actions a { border: 1px solid var(--line-strong); background: transparent; color: var(--fg); padding: 0.55rem 0.8rem; font: inherit; cursor: pointer; }
-	button { border-color: var(--accent-strong); color: var(--accent-strong); }
-</style>

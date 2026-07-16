@@ -6,6 +6,10 @@
 		FundingRelationCandidate,
 		FundingRelationEditor
 	} from '$lib/server/admin/funding-relations';
+	import AdminField from './AdminField.svelte';
+	import Button from '$lib/components/ui/Button.svelte';
+	import Input from '$lib/components/ui/Input.svelte';
+	import Select from '$lib/components/ui/Select.svelte';
 
 	let { editor }: { editor: FundingRelationEditor } = $props();
 
@@ -74,40 +78,41 @@
 		};
 </script>
 
-<section aria-labelledby="funding-relations-title">
-	<h2 id="funding-relations-title">
+<section class="tw:mt-10 tw:border-t tw:border-rule tw:pt-6" aria-labelledby="funding-relations-title">
+	<h2 class="tw:mt-0 tw:mb-4 tw:text-base" id="funding-relations-title">
 		{editor.mode === 'funding' ? 'Actividad relacionada' : 'Financiación y premios'}
 	</h2>
-	<p class="intro">
+	<p class="tw:mt-0 tw:mb-4 tw:max-w-[68ch] tw:leading-[1.6] tw:text-ink-dim">
 		{editor.mode === 'funding'
 			? 'Vincula esta ayuda, contrato o premio con las actividades académicas a las que da soporte o reconoce.'
 			: 'Vincula esta entrada con las ayudas, contratos o premios relacionados.'}
 	</p>
 
-	<div class="workspace">
-		<div class="current-panel">
-			<header>
+	<div class="tw:grid tw:grid-cols-2 tw:items-start tw:gap-4 tw:max-[900px]:grid-cols-1">
+		<div class="tw:min-w-0 tw:overflow-hidden tw:rounded-ui tw:border tw:border-rule tw:bg-[var(--admin-surface)]">
+			<header class="tw:flex tw:justify-between tw:border-b tw:border-rule tw:px-4 tw:py-[0.9rem] tw:text-[0.78rem] tw:text-ink">
 				<strong>Relaciones actuales</strong>
-				<span>{editor.relations.length}</span>
+				<span class="tw:text-accent-strong">{editor.relations.length}</span>
 			</header>
 			{#if editor.relations.length === 0}
-				<p class="empty">Todavía no hay financiación o premios relacionados.</p>
+				<p class="tw:m-0 tw:p-4 tw:text-xs tw:text-ink-faint">Todavía no hay financiación o premios relacionados.</p>
 			{:else}
-				<ul class="relation-list">
+				<ul class="tw:m-0 tw:list-none tw:p-0">
 					{#each editor.relations as relation (relationKey(relation))}
-						<li>
-							<div class="relation-copy">
-								<div class="meta">
+						<li class="tw:flex tw:items-center tw:justify-between tw:gap-[0.9rem] tw:border-b tw:border-rule tw:px-4 tw:py-[0.85rem] tw:last:border-b-0 tw:max-[620px]:flex-col tw:max-[620px]:items-stretch">
+							<div class="tw:min-w-0">
+								<div class="tw:mb-[0.3rem] tw:flex tw:flex-wrap tw:gap-x-[0.65rem] tw:gap-y-[0.35rem] tw:text-[0.61rem] tw:text-ink-faint">
 									<span>{relationType(relation)}</span>
 									<span>{relationDate(relation) ?? 'Sin fecha'}</span>
-									<span class:public={relationPublic(relation)}>
+									<span class={relationPublic(relation) ? 'tw:text-accent-strong' : ''}>
 										{relationPublic(relation) ? 'Pública' : 'Privada'}
 									</span>
 								</div>
-								<a href={relationHref(relation)}>{relationTitle(relation)}</a>
+								<a class="tw:block tw:text-[0.76rem] tw:leading-[1.35] tw:text-ink tw:hover:text-accent-strong" href={relationHref(relation)}>{relationTitle(relation)}</a>
 							</div>
-							<div class="relation-actions">
+							<div class="tw:flex tw:flex-none tw:items-end tw:gap-1.5 tw:max-[620px]:flex-col tw:max-[620px]:items-stretch">
 								<form
+									class="tw:flex tw:items-end tw:gap-1.5 tw:max-[620px]:w-full"
 									method="POST"
 									action="?/tipoFinanciacion"
 									use:enhance={enhancedSubmit(`kind:${relationKey(relation)}`)}
@@ -116,17 +121,18 @@
 									<input type="hidden" name="entityType" value={relation.entityType} />
 									<input type="hidden" name="entityId" value={relation.entityId} />
 									<label>
-										<span class="sr-only">Tipo de relación con {relationTitle(relation)}</span>
-										<select name="relationKind" value={relation.relationKind}>
+										<span class="tw:sr-only">Tipo de relación con {relationTitle(relation)}</span>
+										<Select class="tw:text-[0.68rem]" name="relationKind" value={relation.relationKind}>
 											{#each editor.kinds as kind (kind.value)}
 												<option value={kind.value}>{kind.label}</option>
 											{/each}
-										</select>
+										</Select>
 									</label>
-									<button
+									<Button
+										size="sm"
 										type="submit"
 										disabled={pending.includes(`kind:${relationKey(relation)}`)}
-									>Guardar tipo</button>
+									>Guardar tipo</Button>
 								</form>
 								<form
 									method="POST"
@@ -136,11 +142,12 @@
 									<input type="hidden" name="fundingAwardId" value={relation.fundingAwardId} />
 									<input type="hidden" name="entityType" value={relation.entityType} />
 									<input type="hidden" name="entityId" value={relation.entityId} />
-									<button
+									<Button
+										variant="danger"
+										size="sm"
 										type="submit"
-										class="remove"
 										disabled={pending.includes(`remove:${relationKey(relation)}`)}
-									>Eliminar</button>
+									>Eliminar</Button>
 								</form>
 							</div>
 						</li>
@@ -149,42 +156,40 @@
 			{/if}
 		</div>
 
-		<div class="add-panel">
-			<header><strong>Añadir relación</strong></header>
-			<div class="filters">
-				<label>
-					<span>Buscar</span>
-					<input type="search" bind:value={query} placeholder="Título o tipo…" />
-				</label>
+		<div class="tw:min-w-0 tw:overflow-hidden tw:rounded-ui tw:border tw:border-rule tw:bg-[var(--admin-surface)]">
+			<header class="tw:flex tw:justify-between tw:border-b tw:border-rule tw:px-4 tw:py-[0.9rem] tw:text-[0.78rem] tw:text-ink"><strong>Añadir relación</strong></header>
+			<div class="tw:grid tw:grid-cols-[minmax(0,1fr)_10rem] tw:gap-[0.65rem] tw:px-4 tw:pt-[0.9rem] tw:max-[620px]:grid-cols-1">
+				<AdminField label="Buscar">
+					<Input type="search" bind:value={query} placeholder="Título o tipo…" />
+				</AdminField>
 				{#if editor.mode === 'funding'}
-					<label>
-						<span>Tipo</span>
-						<select bind:value={type}>
+					<AdminField label="Tipo">
+						<Select bind:value={type}>
 							<option value="">Todos</option>
 							{#each typeOptions as option (option.value)}
 								<option value={option.value}>{option.label}</option>
 							{/each}
-						</select>
-					</label>
+						</Select>
+					</AdminField>
 				{/if}
 			</div>
-			<p class="count">{availableCandidates.length} disponibles</p>
+			<p class="tw:m-0 tw:px-4 tw:pt-[0.55rem] tw:pb-[0.85rem] tw:text-[0.65rem] tw:text-ink-faint">{availableCandidates.length} disponibles</p>
 			{#if availableCandidates.length === 0}
-				<p class="empty">No hay entradas disponibles con estos filtros.</p>
+				<p class="tw:m-0 tw:p-4 tw:text-xs tw:text-ink-faint">No hay entradas disponibles con estos filtros.</p>
 			{:else}
-				<ul class="relation-list candidates">
+				<ul class="tw:m-0 tw:list-none tw:p-0">
 					{#each availableCandidates as candidate (relationKey(candidate))}
-						<li>
-							<div class="relation-copy">
-								<div class="meta">
+						<li class="tw:flex tw:items-center tw:justify-between tw:gap-[0.9rem] tw:border-b tw:border-rule tw:px-4 tw:py-[0.85rem] tw:last:border-b-0 tw:max-[620px]:flex-col tw:max-[620px]:items-stretch">
+							<div class="tw:min-w-0">
+								<div class="tw:mb-[0.3rem] tw:flex tw:flex-wrap tw:gap-x-[0.65rem] tw:gap-y-[0.35rem] tw:text-[0.61rem] tw:text-ink-faint">
 									<span>{candidateType(candidate)}</span>
 									<span>{candidateDate(candidate) ?? 'Sin fecha'}</span>
-									<span class:public={candidatePublic(candidate)}>
+									<span class={candidatePublic(candidate) ? 'tw:text-accent-strong' : ''}>
 										{candidatePublic(candidate) ? 'Pública' : 'Privada'}
 									</span>
 								</div>
-								<strong>{candidateTitle(candidate)}</strong>
-								<small>{kindLabel(candidate.suggestedKind)}</small>
+								<strong class="tw:block tw:text-[0.76rem] tw:leading-[1.35] tw:text-ink">{candidateTitle(candidate)}</strong>
+								<small class="tw:mt-[0.3rem] tw:block tw:text-[0.62rem] tw:text-ink-faint">{kindLabel(candidate.suggestedKind)}</small>
 							</div>
 							<form
 								method="POST"
@@ -195,10 +200,12 @@
 								<input type="hidden" name="entityType" value={candidate.entityType} />
 								<input type="hidden" name="entityId" value={candidate.entityId} />
 								<input type="hidden" name="relationKind" value={candidate.suggestedKind} />
-								<button
+								<Button
+									variant="primary"
+									size="sm"
 									type="submit"
 									disabled={pending.includes(`add:${relationKey(candidate)}`)}
-								>+ Añadir</button>
+								>+ Añadir</Button>
 							</form>
 						</li>
 					{/each}
@@ -207,46 +214,3 @@
 		</div>
 	</div>
 </section>
-
-<style>
-	section { margin-top: 2.5rem; padding-top: 1.5rem; border-top: 1px solid var(--line); }
-	h2 { margin: 0 0 1rem; color: var(--fg-dim); font-size: 0.85rem; letter-spacing: 0.08em; text-transform: uppercase; }
-	.intro { max-width: 68ch; margin: 0 0 1rem; color: var(--fg-dim); line-height: 1.6; }
-	.workspace { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 1rem; align-items: start; }
-	.current-panel, .add-panel { min-width: 0; border: 1px solid var(--line); background: var(--admin-surface); }
-	.current-panel > header, .add-panel > header { display: flex; justify-content: space-between; padding: 0.9rem 1rem; border-bottom: 1px solid var(--line); color: var(--fg); font-size: 0.78rem; }
-	.current-panel > header span { color: var(--accent-strong); }
-	.relation-list { margin: 0; padding: 0; list-style: none; }
-	.relation-list > li { display: flex; align-items: center; justify-content: space-between; gap: 0.9rem; padding: 0.85rem 1rem; border-bottom: 1px solid var(--line); }
-	.relation-list > li:last-child { border-bottom: 0; }
-	.relation-copy { min-width: 0; }
-	.relation-copy > a, .relation-copy > strong { display: block; color: var(--fg); font-size: 0.76rem; line-height: 1.35; }
-	.relation-copy > a:hover { color: var(--accent-strong); }
-	.relation-copy > small { display: block; margin-top: 0.3rem; color: var(--fg-faint); font-size: 0.62rem; }
-	.meta { display: flex; flex-wrap: wrap; gap: 0.35rem 0.65rem; margin-bottom: 0.3rem; color: var(--fg-faint); font-size: 0.61rem; }
-	.meta .public { color: var(--accent-strong); }
-	.relation-actions { display: flex; flex: 0 0 auto; gap: 0.35rem; align-items: end; }
-	.relation-actions form { display: flex; gap: 0.3rem; align-items: end; }
-	.filters { display: grid; grid-template-columns: minmax(0, 1fr) 10rem; gap: 0.65rem; padding: 0.9rem 1rem 0; }
-	.filters label { display: grid; gap: 0.3rem; }
-	.filters label > span { color: var(--fg-faint); font-size: 0.62rem; letter-spacing: 0.06em; text-transform: uppercase; }
-	input, select { min-width: 0; border: 1px solid var(--line); background: var(--bg); color: var(--fg); padding: 0.48rem; font: inherit; font-size: 0.68rem; }
-	button { flex: 0 0 auto; border: 1px solid var(--line-strong); background: transparent; color: var(--fg); padding: 0.42rem 0.55rem; font: inherit; font-size: 0.65rem; cursor: pointer; }
-	button:hover:not(:disabled) { border-color: var(--accent-strong); color: var(--accent-strong); }
-	button.remove:hover:not(:disabled) { border-color: var(--admin-danger); color: var(--admin-danger); }
-	button:disabled { opacity: 0.4; cursor: wait; }
-	.count { margin: 0; padding: 0.55rem 1rem 0.85rem; color: var(--fg-faint); font-size: 0.65rem; }
-	.empty { margin: 0; padding: 1rem; color: var(--fg-faint); font-size: 0.75rem; }
-	.sr-only { position: absolute; width: 1px; height: 1px; padding: 0; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0; }
-
-	@media (max-width: 900px) {
-		.workspace { grid-template-columns: 1fr; }
-	}
-
-	@media (max-width: 620px) {
-		.filters { grid-template-columns: 1fr; }
-		.relation-list > li, .relation-actions { align-items: stretch; flex-direction: column; }
-		.relation-actions form { width: 100%; }
-		.relation-actions select { flex: 1; }
-	}
-</style>

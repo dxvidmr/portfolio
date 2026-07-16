@@ -3,7 +3,7 @@
 	import type { HTMLButtonAttributes } from 'svelte/elements';
 
 	type Variant = 'primary' | 'secondary' | 'danger' | 'ghost';
-	type Size = 'sm' | 'md';
+	type Size = 'icon' | 'sm' | 'md';
 
 	type Props = Omit<HTMLButtonAttributes, 'children' | 'class'> & {
 		children: Snippet;
@@ -34,6 +34,7 @@
 			'tw:border-transparent tw:text-ink-dim tw:hover:bg-accent-wash tw:hover:text-accent-strong'
 	};
 	const sizes: Record<Size, string> = {
+		icon: 'tw:size-9 tw:min-h-9 tw:p-0 tw:text-[0.72rem]',
 		sm: 'tw:min-h-8 tw:px-2 tw:py-1.5 tw:text-[0.65rem]',
 		md: 'tw:min-h-9 tw:px-3 tw:py-2 tw:text-[0.72rem]'
 	};
