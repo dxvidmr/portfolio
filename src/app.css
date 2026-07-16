@@ -213,3 +213,30 @@ h1, h2, h3, h4 {
 		transition: none;
 	}
 }
+
+html.editorial-cursor-enabled,
+html.editorial-cursor-enabled body,
+html.editorial-cursor-enabled :is(a, button, summary, label[for], [role='button'], [role='link']) {
+	cursor: none !important;
+}
+
+html.editorial-cursor-enabled
+	:is(
+		textarea,
+		input:not([type]),
+		input[type='text'],
+		input[type='email'],
+		input[type='search'],
+		input[type='url'],
+		input[type='tel'],
+		input[type='password'],
+		[contenteditable='true']
+	) {
+	cursor: text !important;
+}
+
+@media (hover: none), (pointer: coarse) {
+	.editorial-cursor {
+		display: none;
+	}
+}
