@@ -5,6 +5,11 @@
 
 	let { locale }: { locale: Locale } = $props();
 	const reveal = createReveal();
+	const headingClass = 'tw:m-0 tw:font-[450] tw:tracking-[-0.035em]';
+	const bodyClass = 'tw:text-ink-dim tw:leading-[1.68]';
+	const labelClass = 'meta tw:mt-0 tw:mb-4 tw:text-accent-strong';
+	const sectionHeadingClass = `${headingClass} tw:text-[clamp(2.1rem,4.6vw,4.6rem)] tw:leading-[0.94]`;
+	const stack = ['Jekyll', 'CollectionBuilder', 'XML / CSV', 'Supabase'];
 
 	const copy = $derived(locale === 'es' ? {
 		introLabel: '1619 — presente',
@@ -84,155 +89,88 @@
 
 </script>
 
-<section class="todos-story">
-	<article class="opening" use:reveal>
-		<div class="opening-copy">
-			<p class="meta label">{copy.introLabel}</p>
-			<h3>{copy.introTitle}</h3>
-			<p>{copy.introBody}</p>
+<section class="tw:grid tw:gap-[clamp(90px,14vw,210px)] tw:border-t tw:border-rule-strong tw:py-[clamp(76px,11vw,150px)]">
+	<article class="tw:grid tw:grid-cols-[minmax(0,1.2fr)_minmax(300px,.8fr)] tw:items-end tw:gap-[clamp(50px,9vw,130px)] tw:max-[800px]:grid-cols-1" use:reveal>
+		<div class="tw:max-w-[760px]">
+			<p class={labelClass}>{copy.introLabel}</p>
+			<h3 class="{headingClass} tw:max-w-[11ch] tw:text-[clamp(2.8rem,6.5vw,6.5rem)] tw:leading-[0.9]">{copy.introTitle}</h3>
+			<p class="{bodyClass} tw:mt-7 tw:mb-0 tw:max-w-[65ch]">{copy.introBody}</p>
 		</div>
-		<ol class="timeline">
+		<ol class="tw:m-0 tw:list-none tw:border-t tw:border-rule-strong tw:p-0">
 			{#each copy.timeline as item, index (item)}
-				<li><span class="meta">{index === 0 ? '1619' : index === 1 ? 'XIX' : 'XX–XXI'}</span><strong>{item}</strong></li>
+				<li class="tw:grid tw:grid-cols-[70px_1fr] tw:gap-3.5 tw:border-b tw:border-rule tw:py-[15px]">
+					<span class="meta tw:text-ink-faint">{index === 0 ? '1619' : index === 1 ? 'XIX' : 'XX–XXI'}</span>
+					<strong class="tw:font-title tw:text-[1.05rem] tw:font-[450]">{item}</strong>
+				</li>
 			{/each}
 		</ol>
 	</article>
 
-	<div class="identity-grid" use:reveal>
-		<div class="identity-copy">
-			<h3>{copy.identityTitle}</h3>
-			<p>{copy.identityBody}</p>
+	<div class="tw:grid tw:grid-cols-12 tw:items-end tw:gap-x-[clamp(18px,3vw,42px)] tw:gap-y-6 tw:max-[560px]:grid-cols-1 tw:max-[560px]:gap-[52px]" use:reveal>
+		<div class="tw:col-start-2 tw:col-span-7 tw:mb-[22px] tw:max-w-[650px] tw:max-[800px]:col-span-full tw:max-[560px]:col-start-1 tw:max-[560px]:col-span-1">
+			<h3 class="{headingClass} tw:text-[clamp(2rem,4vw,4rem)] tw:leading-[0.95]">{copy.identityTitle}</h3>
+			<p class="{bodyClass} tw:mt-[18px] tw:mb-0 tw:max-w-[52ch]">{copy.identityBody}</p>
 		</div>
-		<div class="cover-figure">
+		<div class="tw:col-start-1 tw:col-span-9 tw:max-[800px]:col-span-8 tw:max-[560px]:col-span-1">
 			<ProjectFigure src="/images/projects/todos-a-una/portada.webp" alt={copy.alts.cover} caption={copy.captions.cover} number="01" priority />
 		</div>
-		<div class="mobile-figure">
+		<div class="tw:col-start-10 tw:col-span-3 tw:justify-self-end tw:max-[800px]:col-start-9 tw:max-[800px]:col-span-4 tw:max-[560px]:col-start-1 tw:max-[560px]:col-span-1 tw:max-[560px]:w-[min(72vw,310px)] tw:max-[560px]:justify-self-center">
 			<ProjectFigure src="/images/projects/todos-a-una/edicion-movil.webp" alt={copy.alts.mobile} caption={copy.captions.mobile} number="02" portrait />
 		</div>
 	</div>
 
-	<article class="model-grid" use:reveal>
-		<div class="network-figure">
+	<article class="tw:grid tw:grid-cols-[minmax(0,1.25fr)_minmax(300px,.75fr)] tw:items-center tw:gap-[clamp(46px,8vw,120px)] tw:max-[800px]:grid-cols-1" use:reveal>
+		<div class="tw:w-[min(100%,840px)]">
 			<ProjectFigure src="/images/projects/todos-a-una/red-recepcion.webp" alt={copy.alts.network} caption={copy.captions.network} number="03" />
 		</div>
-		<div class="model-copy">
-			<p class="meta label">{copy.modelLabel}</p>
-			<h3>{copy.modelTitle}</h3>
-			<p>{copy.modelBody}</p>
-			<ul>{#each copy.standards as standard (standard)}<li>{standard}</li>{/each}</ul>
+		<div>
+			<p class={labelClass}>{copy.modelLabel}</p>
+			<h3 class={sectionHeadingClass}>{copy.modelTitle}</h3>
+			<p class="{bodyClass} tw:mt-[23px] tw:mb-0">{copy.modelBody}</p>
+			<ul class="tw:mt-7 tw:mb-0 tw:flex tw:list-none tw:flex-wrap tw:gap-[7px] tw:p-0">
+				{#each copy.standards as standard (standard)}
+					<li class="tw:rounded-full tw:border tw:border-rule tw:px-[10px] tw:py-[7px] tw:font-mono tw:text-[0.58rem] tw:text-ink-faint">{standard}</li>
+				{/each}
+			</ul>
 		</div>
 	</article>
 
-	<article class="edition-grid" use:reveal>
-		<div class="edition-copy">
-			<p class="meta label">{copy.editionLabel}</p>
-			<h3>{copy.editionTitle}</h3>
-			<p>{copy.editionBody}</p>
+	<article class="tw:grid tw:grid-cols-12 tw:gap-10 tw:max-[560px]:block" use:reveal>
+		<div class="tw:col-start-2 tw:col-span-5 tw:max-w-[610px] tw:max-[800px]:col-start-1 tw:max-[800px]:col-span-9">
+			<p class={labelClass}>{copy.editionLabel}</p>
+			<h3 class={sectionHeadingClass}>{copy.editionTitle}</h3>
+			<p class="{bodyClass} tw:mt-[23px] tw:mb-0">{copy.editionBody}</p>
 		</div>
-		<div class="edition-figure">
+		<div class="tw:col-span-full tw:max-[560px]:mt-9">
 			<ProjectFigure src="/images/projects/todos-a-una/edicion-anotada.webp" alt={copy.alts.edition} caption={copy.captions.edition} number="04" />
 		</div>
 	</article>
 
-	<div class="archive-grid">
-		<article use:reveal>
-			<div class="short-copy"><h3>{copy.archiveTitle}</h3><p>{copy.archiveBody}</p></div>
+	<div class="tw:grid tw:grid-cols-[minmax(0,1.15fr)_minmax(320px,.85fr)] tw:items-start tw:gap-[clamp(28px,5vw,74px)] tw:max-[800px]:grid-cols-1">
+		<article class="tw:grid tw:gap-7" use:reveal>
+			<div class="tw:max-w-[560px]">
+				<h3 class="{headingClass} tw:text-[clamp(1.8rem,3.6vw,3.6rem)] tw:leading-[0.98]">{copy.archiveTitle}</h3>
+				<p class="{bodyClass} tw:mt-[17px] tw:mb-0">{copy.archiveBody}</p>
+			</div>
 			<ProjectFigure src="/images/projects/todos-a-una/archivo.webp" alt={copy.alts.archive} caption={copy.captions.archive} number="05" />
 		</article>
-		<article class="lab" use:reveal>
-			<div class="short-copy"><h3>{copy.participationTitle}</h3><p>{copy.participationBody}</p></div>
+		<article class="tw:mt-[clamp(80px,12vw,180px)] tw:grid tw:gap-7 tw:max-[800px]:mt-[30px]" use:reveal>
+			<div class="tw:max-w-[560px]">
+				<h3 class="{headingClass} tw:text-[clamp(1.8rem,3.6vw,3.6rem)] tw:leading-[0.98]">{copy.participationTitle}</h3>
+				<p class="{bodyClass} tw:mt-[17px] tw:mb-0">{copy.participationBody}</p>
+			</div>
 			<ProjectFigure src="/images/projects/todos-a-una/laboratorio-notas.webp" alt={copy.alts.lab} caption={copy.captions.lab} number="06" />
 		</article>
 	</div>
 
-	<article class="closing" use:reveal>
-		<p class="meta label">{copy.closingLabel}</p>
-		<h3>{copy.closingTitle}</h3>
-		<p>{copy.closingBody}</p>
-		<div class="stack meta"><span>Jekyll</span><span>CollectionBuilder</span><span>XML / CSV</span><span>Supabase</span></div>
+	<article class="tw:ml-auto tw:w-[min(74%,850px)] tw:border-t tw:border-rule-strong tw:pt-[clamp(52px,8vw,100px)] tw:max-[800px]:w-full" use:reveal>
+		<p class={labelClass}>{copy.closingLabel}</p>
+		<h3 class="{headingClass} tw:text-[clamp(2.4rem,5vw,5rem)] tw:leading-[0.92]">{copy.closingTitle}</h3>
+		<p class="{bodyClass} tw:mt-[25px] tw:mb-0 tw:max-w-[68ch]">{copy.closingBody}</p>
+		<div class="meta tw:mt-[30px] tw:flex tw:flex-wrap tw:gap-x-5 tw:gap-y-2 tw:text-ink-faint">
+			{#each stack as item, index (item)}
+				<span class={index < stack.length - 1 ? "tw:after:pl-5 tw:after:text-accent-strong tw:after:content-['/']" : ''}>{item}</span>
+			{/each}
+		</div>
 	</article>
 </section>
-
-<style>
-	.todos-story {
-		display: grid;
-		gap: clamp(90px, 14vw, 210px);
-		padding-block: clamp(76px, 11vw, 150px);
-		border-top: 1px solid var(--line-strong);
-	}
-	.todos-story h3 { margin: 0; font-weight: 450; letter-spacing: -0.035em; }
-	.todos-story p:not(.label) { color: var(--fg-dim); line-height: 1.68; }
-	.label { margin: 0 0 16px; color: var(--accent-strong); }
-	.opening {
-		display: grid;
-		grid-template-columns: minmax(0, 1.2fr) minmax(300px, 0.8fr);
-		gap: clamp(50px, 9vw, 130px);
-		align-items: end;
-	}
-	.opening-copy { max-width: 760px; }
-	.opening h3 { max-width: 11ch; font-size: clamp(2.8rem, 6.5vw, 6.5rem); line-height: 0.9; }
-	.opening-copy > p:last-child { max-width: 65ch; margin: 28px 0 0; }
-	.timeline { margin: 0; padding: 0; border-top: 1px solid var(--line-strong); list-style: none; }
-	.timeline li { display: grid; grid-template-columns: 70px 1fr; gap: 14px; padding: 15px 0; border-bottom: 1px solid var(--line); }
-	.timeline span { color: var(--fg-faint); }
-	.timeline strong { font-family: var(--font-title); font-size: 1.05rem; font-weight: 450; }
-	.identity-grid {
-		display: grid;
-		grid-template-columns: repeat(12, minmax(0, 1fr));
-		gap: 24px clamp(18px, 3vw, 42px);
-		align-items: end;
-	}
-	.identity-copy { grid-column: 2 / span 7; max-width: 650px; margin-bottom: 22px; }
-	.identity-copy h3 { font-size: clamp(2rem, 4vw, 4rem); line-height: 0.95; }
-	.identity-copy p { max-width: 52ch; margin: 18px 0 0; }
-	.cover-figure { grid-column: 1 / span 9; }
-	.mobile-figure { grid-column: 10 / span 3; justify-self: end; }
-	.model-grid {
-		display: grid;
-		grid-template-columns: minmax(0, 1.25fr) minmax(300px, 0.75fr);
-		gap: clamp(46px, 8vw, 120px);
-		align-items: center;
-	}
-	.network-figure { width: min(100%, 840px); }
-	.model-copy h3,
-	.edition-copy h3 { font-size: clamp(2.1rem, 4.6vw, 4.6rem); line-height: 0.94; }
-	.model-copy > p:not(.label),
-	.edition-copy > p:not(.label) { margin: 23px 0 0; }
-	.model-copy ul { display: flex; flex-wrap: wrap; gap: 7px; margin: 28px 0 0; padding: 0; list-style: none; }
-	.model-copy li { padding: 7px 10px; border: 1px solid var(--line); border-radius: 999px; color: var(--fg-faint); font-family: var(--font-mono); font-size: 0.58rem; }
-	.edition-grid { display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); gap: 40px; }
-	.edition-copy { grid-column: 2 / span 5; max-width: 610px; }
-	.edition-figure { grid-column: 1 / -1; }
-	.archive-grid { display: grid; grid-template-columns: minmax(0, 1.15fr) minmax(320px, 0.85fr); gap: clamp(28px, 5vw, 74px); align-items: start; }
-	.archive-grid article { display: grid; gap: 28px; }
-	.archive-grid .lab { margin-top: clamp(80px, 12vw, 180px); }
-	.short-copy { max-width: 560px; }
-	.short-copy h3 { font-size: clamp(1.8rem, 3.6vw, 3.6rem); line-height: 0.98; }
-	.short-copy p { margin: 17px 0 0; }
-	.closing { width: min(74%, 850px); margin-left: auto; padding-top: clamp(52px, 8vw, 100px); border-top: 1px solid var(--line-strong); }
-	.closing h3 { font-size: clamp(2.4rem, 5vw, 5rem); line-height: 0.92; }
-	.closing > p:not(.label) { max-width: 68ch; margin: 25px 0 0; }
-	.stack { display: flex; flex-wrap: wrap; gap: 8px 20px; margin-top: 30px; color: var(--fg-faint); }
-	.stack span:not(:last-child)::after { padding-left: 20px; color: var(--accent-strong); content: '/'; }
-	@media (max-width: 800px) {
-		.opening,
-		.model-grid,
-		.archive-grid { grid-template-columns: 1fr; }
-		.identity-copy { grid-column: 1 / -1; }
-		.cover-figure { grid-column: 1 / span 8; }
-		.mobile-figure { grid-column: 9 / span 4; }
-		.edition-copy { grid-column: 1 / span 9; }
-		.archive-grid .lab { margin-top: 30px; }
-		.closing { width: 100%; }
-	}
-	@media (max-width: 560px) {
-		.identity-grid { display: grid; grid-template-columns: 1fr; gap: 52px; }
-		.identity-copy,
-		.cover-figure,
-		.mobile-figure,
-		.edition-copy { grid-column: 1; }
-		.mobile-figure { width: min(72vw, 310px); justify-self: center; }
-		.edition-grid { display: block; }
-		.edition-figure { margin-top: 36px; }
-	}
-</style>
