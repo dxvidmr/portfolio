@@ -85,3 +85,45 @@
 		transform: translate3d(22px, 0, 0);
 	}
 }
+
+@keyframes home-intro-from-top {
+	from {
+		opacity: 0;
+		filter: blur(6px);
+		transform: translate3d(0, -125%, 0);
+	}
+}
+
+@keyframes home-intro-from-left {
+	from {
+		opacity: 0;
+		filter: blur(7px);
+		transform: translate3d(-72vw, 0, 0);
+	}
+}
+
+@keyframes home-intro-from-right {
+	from {
+		opacity: 0;
+		filter: blur(7px);
+		transform: translate3d(72vw, 0, 0);
+	}
+}
+
+@keyframes home-intro-from-bottom {
+	from {
+		opacity: 0;
+		filter: blur(6px);
+		transform: translate3d(0, 24vh, 0);
+	}
+}
+
+@keyframes home-scroll-cue {
+	0%,
+	100% {
+		transform: translateY(-2px);
+	}
+	50% {
+		transform: translateY(7px);
+	}
+}

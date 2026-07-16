@@ -121,6 +121,15 @@ body.project-modal-open .site-header {
 	pointer-events: none !important;
 }
 
+body.home-intro {
+	overflow: hidden;
+}
+
+body.home-page,
+body:has(.home) {
+	background-image: none;
+}
+
 a {
 	color: inherit;
 	text-decoration: none;

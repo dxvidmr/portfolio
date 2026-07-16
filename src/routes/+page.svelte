@@ -38,6 +38,9 @@
 		x: 'fa-x-twitter',
 		instagram: 'fa-instagram'
 	};
+	const sectionClass = 'wrap tw:scroll-mt-[76px] tw:py-[clamp(48px,8vw,96px)]';
+	const sectionHeadClass = 'tw:mb-[26px] tw:grid tw:gap-3';
+	const sectionTitleClass = 'tw:max-w-[760px] tw:text-[clamp(1.45rem,4vw,3rem)] tw:leading-[1.05]';
 	const ui = $derived({
 		es: {
 			navProjects: 'Proyectos',
@@ -137,74 +140,77 @@
 	});
 </script>
 
-<div class="home" class:intro-ready={introReady}>
+<div class="home tw:relative tw:isolate tw:flex tw:flex-col">
 	<EditorialBackground onIntroComplete={completeIntro} />
 
 	{#if !projectModalOpen}
-	<header class="site-header" class:is-hidden={headerHidden} class:is-scrolled={headerScrolled}>
-		<div class="topbar wrap">
-			<a class="brand" href={localizedPath('/', locale)} aria-label={profile.name}>
-				<strong class="brand-name">
+	<header
+		class={`site-header tw:fixed tw:inset-x-0 tw:top-0 tw:z-20 tw:border-b tw:border-transparent tw:py-3.5 tw:[transition:transform_260ms_cubic-bezier(.22,1,.36,1),padding_220ms_ease,background-color_220ms_ease,border-color_220ms_ease] tw:motion-reduce:duration-[1ms] tw:max-[780px]:bg-[var(--surface-glass)] tw:max-[780px]:py-2 tw:max-[780px]:[backdrop-filter:blur(14px)] ${headerHidden ? 'tw:[transform:translateY(-110%)]' : ''} ${headerScrolled ? 'tw:border-rule tw:bg-[var(--surface-glass)] tw:py-2 tw:[backdrop-filter:blur(14px)]' : ''} ${introReady ? 'tw:[animation:home-intro-from-top_880ms_cubic-bezier(.16,1,.3,1)_backwards] tw:motion-reduce:animate-none' : 'tw:invisible'}`}
+	>
+		<div class="wrap tw:flex tw:items-center tw:justify-between tw:gap-6 tw:max-[780px]:gap-2.5">
+			<a class="tw:flex tw:min-w-0 tw:items-center tw:hover:text-inherit" href={localizedPath('/', locale)} aria-label={profile.name}>
+				<strong class="tw:inline-flex tw:gap-[.28em] tw:whitespace-nowrap tw:font-title tw:text-[1.02rem] tw:font-normal tw:leading-[1.1] tw:max-[520px]:text-[.9rem]">
 					{#each profile.name.split(' ') as word (word)}
-						<span><b>{word.slice(0, 1)}</b>{word.slice(1)}</span>
+						<span><b class="tw:font-bold tw:text-accent-strong">{word.slice(0, 1)}</b>{word.slice(1)}</span>
 					{/each}
 				</strong>
 			</a>
-			<nav class="nav meta" aria-label="Principal">
-				<a href="#proyectos"><span>01</span>{ui.navProjects}</a>
-				<a href="#about"><span>02</span>{ui.navAbout}</a>
-				<a href="#cv"><span>03</span>CV</a>
+			<nav class="meta tw:flex tw:items-center tw:gap-[clamp(14px,2.3vw,30px)] tw:max-[780px]:gap-2.5 tw:max-[520px]:gap-2" aria-label="Principal">
+				<a class="tw:inline-flex tw:items-baseline tw:gap-[7px] tw:text-ink-dim tw:max-[780px]:gap-0 tw:max-[780px]:text-[.62rem] tw:max-[520px]:text-[.57rem] tw:max-[520px]:tracking-[.08em]" href="#proyectos"><span class="tw:text-[.58rem] tw:tracking-normal tw:text-accent tw:max-[780px]:hidden">01</span>{ui.navProjects}</a>
+				<a class="tw:inline-flex tw:items-baseline tw:gap-[7px] tw:text-ink-dim tw:max-[780px]:gap-0 tw:max-[780px]:text-[.62rem] tw:max-[520px]:text-[.57rem] tw:max-[520px]:tracking-[.08em]" href="#about"><span class="tw:text-[.58rem] tw:tracking-normal tw:text-accent tw:max-[780px]:hidden">02</span>{ui.navAbout}</a>
+				<a class="tw:inline-flex tw:items-baseline tw:gap-[7px] tw:text-ink-dim tw:max-[780px]:gap-0 tw:max-[780px]:text-[.62rem] tw:max-[520px]:text-[.57rem] tw:max-[520px]:tracking-[.08em]" href="#cv"><span class="tw:text-[.58rem] tw:tracking-normal tw:text-accent tw:max-[780px]:hidden">03</span>CV</a>
 				<SiteControls />
 			</nav>
 		</div>
 	</header>
 	{/if}
 
-	<section class="landing wrap">
-		<div class="hero">
-			<div class="hero-main" data-text-bg-avoid>
-				<div class="hero-identity">
-					<h1 class="name">{profile.name}</h1>
+	<section class="wrap tw:relative tw:z-[1] tw:grid tw:min-h-svh tw:grid-rows-[1fr_auto] tw:gap-[clamp(32px,6vh,64px)] tw:pt-[clamp(112px,16vh,168px)] tw:pb-[clamp(22px,4vh,42px)] tw:max-[780px]:pt-[104px]">
+		<div class="tw:grid tw:max-w-[1080px] tw:grid-cols-[minmax(0,1fr)] tw:content-center tw:max-[780px]:grid-cols-1 tw:max-[780px]:items-start">
+			<div class="tw:relative tw:isolate tw:min-w-0 tw:before:pointer-events-none tw:before:absolute tw:before:inset-[clamp(-5rem,-7vw,-3rem)_-9vw] tw:before:z-[-1] tw:before:bg-[radial-gradient(ellipse_at_38%_48%,color-mix(in_srgb,var(--bg)_98%,transparent)_0_42%,color-mix(in_srgb,var(--bg)_84%,transparent)_58%,transparent_80%)] tw:before:content-['']" data-text-bg-avoid>
+				<div class={`tw:mb-[clamp(25px,4vh,42px)] tw:grid tw:gap-[7px] tw:max-[780px]:mb-6 ${introReady ? 'tw:[animation:home-intro-from-left_980ms_cubic-bezier(.16,1,.3,1)_90ms_backwards] tw:motion-reduce:animate-none' : 'tw:invisible'}`}>
+					<h1 class="tw:text-[clamp(1.55rem,2.6vw,2.45rem)] tw:font-normal tw:leading-none tw:tracking-[-.02em]">{profile.name}</h1>
 				</div>
 
-				<p class="thesis">
-					<span>{ui.thesisLine1Before}<em>{ui.thesisAccent}</em></span>
-					<span>{ui.thesisLine2}</span>
-					<span>{ui.thesisLine3}</span>
+				<p class="tw:m-0 tw:font-title tw:text-[clamp(3.2rem,7.15vw,7.2rem)] tw:font-normal tw:leading-[.87] tw:tracking-[-.06em] tw:max-[780px]:text-[clamp(3rem,13.5vw,5.6rem)] tw:max-[780px]:leading-[.9] tw:max-[520px]:text-[clamp(2.8rem,13.6vw,4.4rem)]">
+					<span class={`tw:block ${introReady ? 'tw:[animation:home-intro-from-right_1080ms_cubic-bezier(.16,1,.3,1)_170ms_backwards] tw:motion-reduce:animate-none' : 'tw:invisible'}`}>{ui.thesisLine1Before}<em class="tw:inline-block tw:bg-accent tw:[background-image:var(--accent-grain)] tw:[background-size:180px_180px] tw:[background-blend-mode:soft-light] tw:px-[.13em] tw:pt-[.01em] tw:pb-[.03em] tw:font-normal tw:italic tw:tracking-[-.04em] tw:text-[var(--on-accent)]">{ui.thesisAccent}</em></span>
+					<span class={`tw:block ${introReady ? 'tw:[animation:home-intro-from-left_1120ms_cubic-bezier(.16,1,.3,1)_250ms_backwards] tw:motion-reduce:animate-none' : 'tw:invisible'}`}>{ui.thesisLine2}</span>
+					<span class={`tw:block ${introReady ? 'tw:[animation:home-intro-from-right_1160ms_cubic-bezier(.16,1,.3,1)_330ms_backwards] tw:motion-reduce:animate-none' : 'tw:invisible'}`}>{ui.thesisLine3}</span>
 				</p>
 
-				<p class="hero-summary">{ui.heroSummary}</p>
-				<p class="affiliation meta">{ui.affiliation}</p>
+				<p class={`tw:mt-[clamp(25px,4vh,40px)] tw:mb-0 tw:max-w-[54ch] tw:font-title tw:text-[clamp(1.05rem,1.5vw,1.3rem)] tw:leading-[1.35] tw:text-ink-dim tw:max-[520px]:text-base ${introReady ? 'tw:[animation:home-intro-from-bottom_960ms_cubic-bezier(.16,1,.3,1)_460ms_backwards] tw:motion-reduce:animate-none' : 'tw:invisible'}`}>{ui.heroSummary}</p>
+				<p class={`meta tw:mt-3 tw:mb-0 tw:block tw:text-ink-dim ${introReady ? 'tw:[animation:home-intro-from-bottom_920ms_cubic-bezier(.16,1,.3,1)_540ms_backwards] tw:motion-reduce:animate-none' : 'tw:invisible'}`}>{ui.affiliation}</p>
 			</div>
 
 		</div>
 
-		<div class="landing-foot">
-			<a class="scroll-cue" href="#proyectos" aria-label={ui.scrollHint} title={ui.scrollHint}>
+		<div class={`tw:grid tw:place-items-center ${introReady ? 'tw:[animation:home-intro-from-bottom_1050ms_cubic-bezier(.16,1,.3,1)_620ms_backwards] tw:motion-reduce:animate-none' : 'tw:invisible'}`}>
+			<a class="tw:grid tw:h-[42px] tw:w-[42px] tw:place-items-center tw:text-ink-faint tw:[animation:home-scroll-cue_1700ms_ease-in-out_infinite] tw:hover:text-accent-strong tw:motion-reduce:animate-none" href="#proyectos" aria-label={ui.scrollHint} title={ui.scrollHint}>
 				<ChevronDown size={30} strokeWidth={1.4} aria-hidden="true" />
 			</a>
 		</div>
 	</section>
 
-	<main>
-		<section id="proyectos" class="section wrap">
-			<div class="section-head">
+	<main class="tw:relative tw:z-[1] tw:pb-[88px]">
+		<section id="proyectos" class={sectionClass}>
+			<div class={sectionHeadClass}>
 				<span class="meta tag">{ui.navProjects}</span>
-				<h2>{ui.selectedWork}</h2>
+				<h2 class={sectionTitleClass}>{ui.selectedWork}</h2>
 			</div>
 			<SelectedWorks {locale} relatedItems={data.portfolioItems} />
 		</section>
 
-		<section id="about" class="section wrap about-editorial">
-			<div class="section-head">
+		<section id="about" class={`${sectionClass} tw:relative tw:isolate tw:before:pointer-events-none tw:before:absolute tw:before:top-[16%] tw:before:left-[-10vw] tw:before:z-[-2] tw:before:aspect-square tw:before:w-[min(52vw,720px)] tw:before:rounded-full tw:before:bg-accent tw:before:opacity-[.11] tw:before:[filter:blur(150px)] tw:before:content-['']`}>
+			<div class={`${sectionHeadClass} tw:mb-[clamp(38px,6vw,78px)]`}>
 				<span class="meta tag">{ui.aboutLabel}</span>
-				<h2>{ui.aboutTitle}</h2>
+				<h2 class={sectionTitleClass}>{ui.aboutTitle}</h2>
 			</div>
 
-			<div class="about-layout">
-				<figure class="about-portrait">
-					<div class="portrait-image">
+			<div class="tw:relative tw:grid tw:grid-cols-[minmax(240px,4fr)_minmax(0,7fr)] tw:items-start tw:gap-[clamp(34px,7vw,112px)] tw:before:pointer-events-none tw:before:absolute tw:before:inset-[-5vw] tw:before:z-[-1] tw:before:bg-[color-mix(in_srgb,var(--bg)_44%,transparent)] tw:before:[backdrop-filter:blur(7px)] tw:before:[mask-image:radial-gradient(ellipse_at_center,#000_38%,transparent_78%)] tw:before:content-[''] tw:max-[780px]:grid-cols-1 tw:max-[780px]:gap-[42px]">
+				<figure class="tw:sticky tw:top-[104px] tw:m-0 tw:max-[780px]:relative tw:max-[780px]:top-auto tw:max-[780px]:w-[min(74vw,420px)]">
+					<div class="tw:group tw:relative tw:overflow-hidden tw:rounded-ui tw:border tw:border-rule-strong tw:bg-[#777]">
 						<img
+							class="tw:block tw:h-auto tw:w-full"
 							src="/images/about/david-merino-recalde.jpg"
 							alt={ui.portraitAlt}
 							width="820"
@@ -212,7 +218,7 @@
 							loading="lazy"
 						/>
 						<img
-							class="portrait-hover"
+							class="tw:pointer-events-none tw:absolute tw:inset-0 tw:h-full tw:w-full tw:origin-center tw:object-cover tw:opacity-0 tw:[transform:scale(1)] tw:[transition:opacity_520ms_cubic-bezier(.22,1,.36,1),transform_900ms_cubic-bezier(.22,1,.36,1)] tw:group-hover:opacity-100 tw:group-hover:[transform:scale(1.035)] tw:motion-reduce:transition-none"
 							src="/images/about/david-merino-recalde-hover.webp"
 							alt=""
 							width="820"
@@ -220,44 +226,44 @@
 							loading="lazy"
 							aria-hidden="true"
 						/>
-						<div class="portrait-data" aria-hidden="true">
-							<span class="portrait-data__label">// DMR [ DECODED ]</span>
-							<span>01100100 01100001 01110110 01101001 01100100</span>
-							<span>01110100 01100101 01111000 01110100 01101111</span>
-							<span>01100101 01110011 01100011 01100101 01101110 01100001</span>
+						<div class="tw:pointer-events-none tw:absolute tw:right-[5%] tw:bottom-[12%] tw:left-[7%] tw:z-[2] tw:grid tw:gap-1 tw:font-mono tw:text-[clamp(.42rem,.72vw,.58rem)] tw:leading-[1.25] tw:tracking-[.08em] tw:text-[rgba(255,255,255,.82)] tw:opacity-0 tw:[text-shadow:0_1px_8px_rgba(0,0,0,.72)] tw:[transition:opacity_360ms_ease_90ms] tw:group-hover:opacity-100 tw:motion-reduce:transition-none" aria-hidden="true">
+							<span class="tw:mb-2 tw:overflow-hidden tw:text-[.92em] tw:whitespace-nowrap">// DMR [ DECODED ]</span>
+							<span class="tw:overflow-hidden tw:whitespace-nowrap">01100100 01100001 01110110 01101001 01100100</span>
+							<span class="tw:ml-[8%] tw:overflow-hidden tw:whitespace-nowrap tw:opacity-[.68]">01110100 01100101 01111000 01110100 01101111</span>
+							<span class="tw:ml-[3%] tw:overflow-hidden tw:whitespace-nowrap tw:opacity-[.44]">01100101 01110011 01100011 01100101 01101110 01100001</span>
 						</div>
 					</div>
-					<figcaption class="meta">
+					<figcaption class="meta tw:mt-2.5 tw:flex tw:justify-between tw:gap-[18px] tw:text-[.6rem] tw:text-ink-faint">
 						<span>{ui.portraitCaption}</span>
 						<span>Barcelona</span>
 					</figcaption>
 				</figure>
 
-				<div class="about-content">
-					<p class="about-text">{ui.aboutText}</p>
-					<ul class="areas">
+				<div class="tw:min-w-0 tw:pt-[clamp(8px,2vw,28px)] tw:max-[780px]:pt-0">
+					<p class="tw:mt-0 tw:mb-[clamp(26px,4vw,48px)] tw:max-w-[36ch] tw:font-title tw:text-[clamp(1.35rem,2.2vw,2rem)] tw:leading-[1.32] tw:text-ink">{ui.aboutText}</p>
+					<ul class="tw:mt-0 tw:mb-[clamp(48px,7vw,84px)] tw:flex tw:list-none tw:flex-wrap tw:gap-x-3 tw:gap-y-[7px] tw:p-0">
 						{#each t(profile.areas, locale) as area (area)}
-							<li>{area}</li>
+							<li class="tw:inline-flex tw:items-center tw:gap-3 tw:text-[.7rem] tw:tracking-[.06em] tw:text-ink-dim tw:uppercase tw:after:text-accent-strong tw:after:content-['/'] tw:last:after:content-none">{area}</li>
 						{/each}
 					</ul>
 					<AcademicPath {locale} />
 				</div>
 			</div>
 
-			<footer class="about-contact">
-				<div class="contact-copy">
-					<span class="meta tag">{ui.contactTitle}</span>
-					<a class="contact-primary" href={'mailto:' + profile.contact.mail}>{profile.contact.mail}</a>
-					<a class="contact-secondary" href={'mailto:' + profile.contact.mailAlt}>{profile.contact.mailAlt}</a>
+			<footer class="tw:mt-[clamp(28px,4vw,54px)] tw:grid tw:grid-cols-[minmax(260px,.8fr)_minmax(0,1.2fr)] tw:items-end tw:gap-[clamp(30px,6vw,92px)] tw:border-y tw:border-t-rule-strong tw:border-b-rule tw:bg-[linear-gradient(to_bottom,color-mix(in_srgb,var(--bg)_72%,transparent),color-mix(in_srgb,var(--bg)_92%,transparent))] tw:py-[clamp(24px,3vw,38px)] tw:[backdrop-filter:blur(12px)] tw:max-[780px]:grid-cols-1 tw:max-[780px]:items-start">
+				<div class="tw:grid tw:justify-items-start tw:gap-1">
+					<span class="meta tag tw:mb-2.5">{ui.contactTitle}</span>
+					<a class="tw:font-title tw:text-[clamp(1.1rem,2vw,1.55rem)] tw:leading-[1.2]" href={'mailto:' + profile.contact.mail}>{profile.contact.mail}</a>
+					<a class="tw:text-[.68rem] tw:text-ink-faint" href={'mailto:' + profile.contact.mailAlt}>{profile.contact.mailAlt}</a>
 				</div>
-				<nav class="profile-links" aria-label={ui.profilesLabel}>
-					<span class="meta tag profile-links__label">{ui.profilesLabel}</span>
+				<nav class="tw:flex tw:flex-wrap tw:items-center tw:justify-end tw:gap-x-[18px] tw:gap-y-[5px] tw:max-[780px]:justify-start" aria-label={ui.profilesLabel}>
+					<span class="meta tag tw:mb-2.5 tw:flex-[0_0_100%] tw:text-right tw:max-[780px]:text-left">{ui.profilesLabel}</span>
 					{#each profile.profiles as item (item.id)}
-						<a href={item.url} target="_blank" rel="noreferrer" title={`${item.label}: ${item.handle}`}>
+						<a class="tw:inline-flex tw:items-center tw:gap-1.5 tw:py-1 tw:text-[.66rem] tw:text-ink-dim tw:hover:text-accent-strong" href={item.url} target="_blank" rel="noreferrer" title={`${item.label}: ${item.handle}`}>
 							{#if academicIcons[item.id]}
-								<i class="ai {academicIcons[item.id]}" aria-hidden="true"></i>
+								<i class="ai {academicIcons[item.id]} tw:min-w-[22px] tw:text-center tw:text-xl tw:font-bold tw:leading-none tw:not-italic tw:text-accent-strong" aria-hidden="true"></i>
 							{:else if socialIcons[item.id]}
-								<i class="fa-brands {socialIcons[item.id]}" aria-hidden="true"></i>
+								<i class="fa-brands {socialIcons[item.id]} tw:min-w-[22px] tw:text-center tw:text-xl tw:font-bold tw:leading-none tw:not-italic tw:text-accent-strong" aria-hidden="true"></i>
 							{/if}
 							<span>{item.label}</span>
 						</a>
@@ -266,810 +272,32 @@
 			</footer>
 		</section>
 
-		<section id="cv" class="section wrap">
-			<div class="section-head">
+		<section id="cv" class={sectionClass}>
+			<div class={sectionHeadClass}>
 				<span class="meta tag">{ui.recentLabel}</span>
-				<h2>{ui.recentTitle}</h2>
+				<h2 class={sectionTitleClass}>{ui.recentTitle}</h2>
 			</div>
 			<div class="rule"></div>
-			<ol class="rows dense">
+			<ol class="dense tw:m-0 tw:list-none tw:p-0">
 				{#each data.recentActivity as e, i (e.entity_type + e.entity_id)}
-					<li class="row">
-						<span class="idx meta--faint">{String(i + 1).padStart(2, '0')}</span>
-						<span class="etype meta">{entityLabel(e.entity_type, locale)}</span>
-						<span class="rtitle">{e.title}</span>
-						<span class="rdate meta--faint dense">{yr(e.sort_date)}</span>
+					<li class="tw:group tw:grid tw:grid-cols-[34px_150px_1fr_56px] tw:items-baseline tw:gap-4 tw:border-b tw:border-rule tw:py-[11px] tw:max-[780px]:grid-cols-[26px_1fr_46px]">
+						<span class="meta--faint tw:group-hover:text-accent">{String(i + 1).padStart(2, '0')}</span>
+						<span class="meta tw:text-ink-dim tw:group-hover:text-accent tw:max-[780px]:hidden">{entityLabel(e.entity_type, locale)}</span>
+						<span class="tw:overflow-hidden tw:text-ellipsis tw:whitespace-nowrap tw:text-ink tw:group-hover:text-accent">{e.title}</span>
+						<span class="meta--faint dense tw:text-right tw:group-hover:text-accent">{yr(e.sort_date)}</span>
 					</li>
 				{/each}
 			</ol>
-			<a class="cv-gateway" href={localizedPath('/cv', locale)}>
-				<span class="cv-gateway__copy">
+			<a class="tw:group tw:mt-[clamp(30px,5vw,54px)] tw:grid tw:grid-cols-[minmax(0,1fr)_auto] tw:items-center tw:gap-6 tw:rounded-ui tw:border tw:border-rule-strong tw:bg-[color-mix(in_srgb,var(--bg-panel)_72%,transparent)] tw:p-[clamp(22px,3.4vw,38px)] tw:[transition:border-color_180ms_ease,background-color_180ms_ease] tw:hover:border-accent-strong tw:hover:bg-accent-wash tw:hover:text-ink" href={localizedPath('/cv', locale)}>
+				<span class="tw:grid tw:min-w-0 tw:justify-items-start tw:gap-[7px]">
 					<span class="meta tag">{ui.cvLabel}</span>
-					<strong>{ui.cvCta}</strong>
-					<small>{ui.cvSummary}</small>
+					<strong class="tw:font-title tw:text-[clamp(1.65rem,3.8vw,3.2rem)] tw:font-medium tw:leading-none tw:tracking-[-.035em]">{ui.cvCta}</strong>
+					<small class="tw:text-[.72rem] tw:text-ink-dim">{ui.cvSummary}</small>
 				</span>
-				<span class="cv-gateway__icon" aria-hidden="true">
+				<span class="tw:grid tw:aspect-square tw:w-[clamp(48px,6vw,66px)] tw:place-items-center tw:rounded-full tw:bg-accent tw:[background-image:var(--accent-grain)] tw:[background-size:150px_150px] tw:text-[var(--on-accent)] tw:[&>svg]:[transition:transform_220ms_cubic-bezier(.22,1,.36,1)] tw:group-hover:[&>svg]:translate-x-1" aria-hidden="true">
 					<ArrowRight size={32} strokeWidth={1.4} />
 				</span>
 			</a>
 		</section>
 	</main>
 </div>
-
-<style>
-	.home {
-		position: relative;
-		display: flex;
-		flex-direction: column;
-		isolation: isolate;
-	}
-
-	:global(body.home-intro) {
-		overflow: hidden;
-	}
-
-	.home:not(.intro-ready) .site-header,
-	.home:not(.intro-ready) .hero-identity,
-	.home:not(.intro-ready) .thesis > span,
-	.home:not(.intro-ready) .hero-summary,
-	.home:not(.intro-ready) .affiliation,
-	.home:not(.intro-ready) .landing-foot {
-		visibility: hidden;
-	}
-
-	.home.intro-ready .site-header {
-		animation: intro-from-top 880ms cubic-bezier(0.16, 1, 0.3, 1) backwards;
-	}
-
-	.home.intro-ready .hero-identity {
-		animation: intro-from-left 980ms cubic-bezier(0.16, 1, 0.3, 1) 90ms backwards;
-	}
-
-	.home.intro-ready .thesis > span:nth-child(1) {
-		animation: intro-from-right 1080ms cubic-bezier(0.16, 1, 0.3, 1) 170ms backwards;
-	}
-
-	.home.intro-ready .thesis > span:nth-child(2) {
-		animation: intro-from-left 1120ms cubic-bezier(0.16, 1, 0.3, 1) 250ms backwards;
-	}
-
-	.home.intro-ready .thesis > span:nth-child(3) {
-		animation: intro-from-right 1160ms cubic-bezier(0.16, 1, 0.3, 1) 330ms backwards;
-	}
-
-	.home.intro-ready .hero-summary {
-		animation: intro-from-bottom 960ms cubic-bezier(0.16, 1, 0.3, 1) 460ms backwards;
-	}
-
-	.home.intro-ready .affiliation {
-		animation: intro-from-bottom 920ms cubic-bezier(0.16, 1, 0.3, 1) 540ms backwards;
-	}
-
-	.home.intro-ready .landing-foot {
-		animation: intro-from-bottom 1050ms cubic-bezier(0.16, 1, 0.3, 1) 620ms backwards;
-	}
-
-	@keyframes intro-from-top {
-		from {
-			opacity: 0;
-			filter: blur(6px);
-			transform: translate3d(0, -125%, 0);
-		}
-	}
-
-	@keyframes intro-from-left {
-		from {
-			opacity: 0;
-			filter: blur(7px);
-			transform: translate3d(-72vw, 0, 0);
-		}
-	}
-
-	@keyframes intro-from-right {
-		from {
-			opacity: 0;
-			filter: blur(7px);
-			transform: translate3d(72vw, 0, 0);
-		}
-	}
-
-	@keyframes intro-from-bottom {
-		from {
-			opacity: 0;
-			filter: blur(6px);
-			transform: translate3d(0, 24vh, 0);
-		}
-	}
-
-	:global(body.home-page),
-	:global(body:has(.home)) {
-		background-image: none;
-	}
-
-	.landing,
-	main {
-		position: relative;
-		z-index: 1;
-	}
-
-	.site-header {
-		position: fixed;
-		inset: 0 0 auto;
-		z-index: 20;
-		padding-block: 14px;
-		border-bottom: 1px solid transparent;
-		transition:
-			transform 260ms cubic-bezier(0.22, 1, 0.36, 1),
-			padding 220ms ease,
-			background-color 220ms ease,
-			border-color 220ms ease;
-	}
-
-	.site-header.is-scrolled {
-		padding-block: 8px;
-		border-color: var(--line);
-		background: var(--surface-glass);
-		-webkit-backdrop-filter: blur(14px);
-		backdrop-filter: blur(14px);
-	}
-
-	.site-header.is-hidden {
-		transform: translateY(-110%);
-	}
-
-	.landing {
-		min-height: 100svh;
-		padding-block: clamp(112px, 16vh, 168px) clamp(22px, 4vh, 42px);
-		display: grid;
-		grid-template-rows: 1fr auto;
-		gap: clamp(32px, 6vh, 64px);
-	}
-
-	.topbar {
-		display: flex;
-		justify-content: space-between;
-		align-items: center;
-		gap: 24px;
-	}
-
-	.brand {
-		display: flex;
-		align-items: center;
-		min-width: 0;
-	}
-
-	.brand:hover {
-		color: inherit;
-	}
-
-	.brand-name {
-		display: inline-flex;
-		gap: 0.28em;
-		font-family: var(--font-title);
-		font-size: 1.02rem;
-		font-weight: 400;
-		line-height: 1.1;
-		white-space: nowrap;
-	}
-
-	.brand-name b {
-		color: var(--accent-strong);
-		font-weight: 700;
-	}
-
-	.nav {
-		display: flex;
-		align-items: center;
-		gap: clamp(14px, 2.3vw, 30px);
-	}
-
-	.nav > a {
-		display: inline-flex;
-		align-items: baseline;
-		gap: 7px;
-		color: var(--fg-dim);
-	}
-
-	.nav > a span {
-		color: var(--accent);
-		font-size: 0.58rem;
-		letter-spacing: 0;
-	}
-
-	.hero {
-		display: grid;
-		grid-template-columns: minmax(0, 1fr);
-		align-content: center;
-		max-width: 1080px;
-	}
-
-	.hero-main {
-		position: relative;
-		isolation: isolate;
-		min-width: 0;
-	}
-
-	.hero-main::before {
-		position: absolute;
-		z-index: -1;
-		inset: clamp(-5rem, -7vw, -3rem) -9vw;
-		content: '';
-		background: radial-gradient(
-			ellipse at 38% 48%,
-			color-mix(in srgb, var(--bg) 98%, transparent) 0 42%,
-			color-mix(in srgb, var(--bg) 84%, transparent) 58%,
-			transparent 80%
-		);
-		pointer-events: none;
-	}
-
-	.hero-identity {
-		display: grid;
-		gap: 7px;
-		margin-bottom: clamp(25px, 4vh, 42px);
-	}
-
-	.name {
-		font-size: clamp(1.55rem, 2.6vw, 2.45rem);
-		font-weight: 400;
-		line-height: 1;
-		letter-spacing: -0.02em;
-	}
-
-	.thesis {
-		margin: 0;
-		font-family: var(--font-title);
-		font-size: clamp(3.2rem, 7.15vw, 7.2rem);
-		font-weight: 400;
-		line-height: 0.87;
-		letter-spacing: -0.06em;
-	}
-
-	.thesis > span {
-		display: block;
-	}
-
-	.thesis em {
-		display: inline-block;
-		padding: 0.01em 0.13em 0.03em;
-		background-color: var(--accent);
-		background-image: var(--accent-grain);
-		background-size: 180px 180px;
-		background-blend-mode: soft-light;
-		color: var(--on-accent);
-		font-weight: 400;
-		font-style: italic;
-		letter-spacing: -0.04em;
-	}
-
-	.hero-summary {
-		max-width: 54ch;
-		margin: clamp(25px, 4vh, 40px) 0 0;
-		font-family: var(--font-title);
-		font-size: clamp(1.05rem, 1.5vw, 1.3rem);
-		line-height: 1.35;
-		color: var(--fg-dim);
-	}
-
-	.affiliation {
-		display: block;
-		margin: 12px 0 0;
-		color: var(--fg-dim);
-	}
-
-	.landing-foot {
-		display: grid;
-		place-items: center;
-	}
-
-	.scroll-cue {
-		display: grid;
-		place-items: center;
-		width: 42px;
-		height: 42px;
-		color: var(--fg-faint);
-		animation: scroll-cue 1700ms ease-in-out infinite;
-	}
-
-	.scroll-cue:hover {
-		color: var(--accent-strong);
-	}
-
-	@keyframes scroll-cue {
-		0%,
-		100% {
-			transform: translateY(-2px);
-		}
-		50% {
-			transform: translateY(7px);
-		}
-	}
-
-	main {
-		padding-bottom: 88px;
-	}
-	.section {
-		padding-block: clamp(48px, 8vw, 96px);
-		scroll-margin-top: 76px;
-	}
-	.section-head {
-		display: grid;
-		gap: 12px;
-		margin-bottom: 26px;
-	}
-	.section-head h2 {
-		max-width: 760px;
-		font-size: clamp(1.45rem, 4vw, 3rem);
-		line-height: 1.05;
-	}
-	.about-editorial {
-		position: relative;
-		isolation: isolate;
-	}
-
-	.about-editorial::before {
-		position: absolute;
-		z-index: -2;
-		top: 16%;
-		left: -10vw;
-		width: min(52vw, 720px);
-		aspect-ratio: 1;
-		border-radius: 50%;
-		background: var(--accent);
-		filter: blur(150px);
-		opacity: 0.11;
-		content: '';
-		pointer-events: none;
-	}
-
-	.about-editorial .section-head {
-		margin-bottom: clamp(38px, 6vw, 78px);
-	}
-
-	.about-layout {
-		position: relative;
-		display: grid;
-		grid-template-columns: minmax(240px, 4fr) minmax(0, 7fr);
-		gap: clamp(34px, 7vw, 112px);
-		align-items: start;
-	}
-
-	.about-layout::before {
-		position: absolute;
-		z-index: -1;
-		inset: -5vw;
-		background: color-mix(in srgb, var(--bg) 44%, transparent);
-		-webkit-backdrop-filter: blur(7px);
-		backdrop-filter: blur(7px);
-		-webkit-mask-image: radial-gradient(ellipse at center, #000 38%, transparent 78%);
-		mask-image: radial-gradient(ellipse at center, #000 38%, transparent 78%);
-		content: '';
-		pointer-events: none;
-	}
-
-	.about-portrait {
-		position: sticky;
-		top: 104px;
-		margin: 0;
-	}
-
-	.portrait-image {
-		position: relative;
-		border: 1px solid var(--line-strong);
-		border-radius: var(--radius);
-		background: #777;
-		overflow: hidden;
-	}
-
-	.portrait-image img {
-		display: block;
-		width: 100%;
-		height: auto;
-	}
-
-	.portrait-image .portrait-hover {
-		position: absolute;
-		inset: 0;
-		height: 100%;
-		object-fit: cover;
-		opacity: 0;
-		pointer-events: none;
-		transform: scale(1);
-		transform-origin: center;
-		transition:
-			opacity 520ms cubic-bezier(0.22, 1, 0.36, 1),
-			transform 900ms cubic-bezier(0.22, 1, 0.36, 1);
-	}
-
-	.portrait-data {
-		position: absolute;
-		z-index: 2;
-		left: 7%;
-		right: 5%;
-		bottom: 12%;
-		display: grid;
-		gap: 4px;
-		color: rgba(255, 255, 255, 0.82);
-		font-family: var(--font-mono);
-		font-size: clamp(0.42rem, 0.72vw, 0.58rem);
-		letter-spacing: 0.08em;
-		line-height: 1.25;
-		opacity: 0;
-		pointer-events: none;
-		text-shadow: 0 1px 8px rgba(0, 0, 0, 0.72);
-		transition: opacity 360ms ease 90ms;
-	}
-
-	.portrait-data span {
-		overflow: hidden;
-		white-space: nowrap;
-	}
-
-	.portrait-data span:nth-child(3) {
-		margin-left: 8%;
-		opacity: 0.68;
-	}
-
-	.portrait-data span:nth-child(4) {
-		margin-left: 3%;
-		opacity: 0.44;
-	}
-
-	.portrait-data__label {
-		margin-bottom: 8px;
-		font-size: 0.92em;
-	}
-
-	.portrait-image:hover .portrait-hover {
-		opacity: 1;
-		transform: scale(1.035);
-	}
-
-	.portrait-image:hover .portrait-data {
-		opacity: 1;
-	}
-
-	.about-portrait figcaption {
-		display: flex;
-		justify-content: space-between;
-		gap: 18px;
-		margin-top: 10px;
-		color: var(--fg-faint);
-		font-size: 0.6rem;
-	}
-
-	.about-content {
-		min-width: 0;
-		padding-top: clamp(8px, 2vw, 28px);
-	}
-
-	.about-text {
-		max-width: 36ch;
-		margin: 0 0 clamp(26px, 4vw, 48px);
-		font-family: var(--font-title);
-		font-size: clamp(1.35rem, 2.2vw, 2rem);
-		line-height: 1.32;
-		color: var(--fg);
-	}
-
-	.areas {
-		display: flex;
-		flex-wrap: wrap;
-		gap: 7px 12px;
-		margin: 0 0 clamp(48px, 7vw, 84px);
-		padding: 0;
-		list-style: none;
-	}
-
-	.areas li {
-		display: inline-flex;
-		align-items: center;
-		gap: 12px;
-		color: var(--fg-dim);
-		font-size: 0.7rem;
-		letter-spacing: 0.06em;
-		text-transform: uppercase;
-	}
-
-	.areas li:not(:last-child)::after {
-		color: var(--accent-strong);
-		content: '/';
-	}
-
-	.about-contact {
-		display: grid;
-		grid-template-columns: minmax(260px, 0.8fr) minmax(0, 1.2fr);
-		gap: clamp(30px, 6vw, 92px);
-		align-items: end;
-		margin-top: clamp(28px, 4vw, 54px);
-		padding-block: clamp(24px, 3vw, 38px);
-		border-top: 1px solid var(--line-strong);
-		border-bottom: 1px solid var(--line);
-		background: linear-gradient(
-			to bottom,
-			color-mix(in srgb, var(--bg) 72%, transparent),
-			color-mix(in srgb, var(--bg) 92%, transparent)
-		);
-		-webkit-backdrop-filter: blur(12px);
-		backdrop-filter: blur(12px);
-	}
-
-	.contact-copy {
-		display: grid;
-		justify-items: start;
-		gap: 4px;
-	}
-
-	.contact-copy > .tag {
-		margin-bottom: 10px;
-	}
-
-	.contact-primary {
-		font-family: var(--font-title);
-		font-size: clamp(1.1rem, 2vw, 1.55rem);
-		line-height: 1.2;
-	}
-
-	.contact-secondary {
-		color: var(--fg-faint);
-		font-size: 0.68rem;
-	}
-
-	.profile-links {
-		display: flex;
-		align-items: center;
-		justify-content: flex-end;
-		flex-wrap: wrap;
-		gap: 5px 18px;
-	}
-
-	.profile-links__label {
-		flex: 0 0 100%;
-		margin-bottom: 10px;
-		text-align: right;
-	}
-
-	.profile-links a {
-		display: inline-flex;
-		align-items: center;
-		gap: 6px;
-		padding: 4px 0;
-		color: var(--fg-dim);
-		font-size: 0.66rem;
-	}
-
-	.profile-links a:hover {
-		color: var(--accent-strong);
-	}
-
-	.profile-links i {
-		min-width: 22px;
-		color: var(--accent-strong);
-		font-size: 1.25rem;
-		font-style: normal;
-		font-weight: 700;
-		line-height: 1;
-		text-align: center;
-	}
-
-	.rows {
-		margin: 0;
-		padding: 0;
-		list-style: none;
-	}
-	.row {
-		display: grid;
-		grid-template-columns: 34px 150px 1fr 56px;
-		gap: 16px;
-		align-items: baseline;
-		padding: 11px 0;
-		border-bottom: 1px solid var(--line);
-	}
-	.row:hover,
-	.row:hover .etype,
-	.row:hover .idx,
-	.row:hover .rdate {
-		color: var(--accent);
-	}
-	.etype {
-		color: var(--fg-dim);
-	}
-	.rtitle {
-		color: var(--fg);
-		overflow: hidden;
-		text-overflow: ellipsis;
-		white-space: nowrap;
-	}
-	.rdate {
-		text-align: right;
-	}
-
-	.cv-gateway {
-		display: grid;
-		grid-template-columns: minmax(0, 1fr) auto;
-		gap: 24px;
-		align-items: center;
-		margin-top: clamp(30px, 5vw, 54px);
-		padding: clamp(22px, 3.4vw, 38px);
-		border: 1px solid var(--line-strong);
-		border-radius: var(--radius);
-		background: color-mix(in srgb, var(--bg-panel) 72%, transparent);
-		transition:
-			border-color 180ms ease,
-			background-color 180ms ease;
-	}
-
-	.cv-gateway:hover {
-		border-color: var(--accent-strong);
-		background-color: var(--accent-wash);
-		color: var(--fg);
-	}
-
-	.cv-gateway__copy {
-		display: grid;
-		justify-items: start;
-		gap: 7px;
-		min-width: 0;
-	}
-
-	.cv-gateway__copy strong {
-		font-family: var(--font-title);
-		font-size: clamp(1.65rem, 3.8vw, 3.2rem);
-		font-weight: 500;
-		line-height: 1;
-		letter-spacing: -0.035em;
-	}
-
-	.cv-gateway__copy small {
-		color: var(--fg-dim);
-		font-size: 0.72rem;
-	}
-
-	.cv-gateway__icon {
-		display: grid;
-		place-items: center;
-		width: clamp(48px, 6vw, 66px);
-		aspect-ratio: 1;
-		border-radius: 50%;
-		background-color: var(--accent);
-		background-image: var(--accent-grain);
-		background-size: 150px 150px;
-		color: var(--on-accent);
-	}
-
-	.cv-gateway__icon :global(svg) {
-		transition: transform 220ms cubic-bezier(0.22, 1, 0.36, 1);
-	}
-
-	.cv-gateway:hover .cv-gateway__icon :global(svg) {
-		transform: translateX(4px);
-	}
-
-	@media (max-width: 780px) {
-		.site-header,
-		.site-header.is-scrolled {
-			padding-block: 8px;
-			background: var(--surface-glass);
-			-webkit-backdrop-filter: blur(14px);
-			backdrop-filter: blur(14px);
-		}
-
-		.topbar {
-			gap: 10px;
-		}
-
-		.nav {
-			gap: 10px;
-		}
-
-		.nav > a {
-			gap: 0;
-			font-size: 0.62rem;
-		}
-
-		.nav > a span {
-			display: none;
-		}
-
-		.landing {
-			padding-top: 104px;
-		}
-
-		.about-layout {
-			grid-template-columns: 1fr;
-			gap: 42px;
-		}
-
-		.about-portrait {
-			position: relative;
-			top: auto;
-			width: min(74vw, 420px);
-		}
-
-		.about-content {
-			padding-top: 0;
-		}
-
-		.about-contact {
-			grid-template-columns: 1fr;
-			align-items: start;
-		}
-
-		.profile-links {
-			justify-content: flex-start;
-		}
-
-		.profile-links__label {
-			text-align: left;
-		}
-
-		.hero {
-			grid-template-columns: 1fr;
-			align-items: start;
-		}
-
-		.hero-identity {
-			margin-bottom: 24px;
-		}
-
-		.thesis {
-			font-size: clamp(3rem, 13.5vw, 5.6rem);
-			line-height: 0.9;
-		}
-
-		.row {
-			grid-template-columns: 26px 1fr 46px;
-		}
-		.row .etype {
-			display: none;
-		}
-	}
-
-	@media (max-width: 520px) {
-		.brand-name {
-			font-size: 0.9rem;
-		}
-
-		.nav {
-			gap: 8px;
-		}
-
-		.nav > a {
-			font-size: 0.57rem;
-			letter-spacing: 0.08em;
-		}
-
-		.thesis {
-			font-size: clamp(2.8rem, 13.6vw, 4.4rem);
-		}
-
-		.hero-summary {
-			font-size: 1rem;
-		}
-
-	}
-
-	@media (prefers-reduced-motion: reduce) {
-		.site-header {
-			transition-duration: 1ms;
-		}
-
-		.home.intro-ready .site-header,
-		.home.intro-ready .hero-identity,
-		.home.intro-ready .thesis > span,
-		.home.intro-ready .hero-summary,
-		.home.intro-ready .affiliation,
-		.home.intro-ready .landing-foot {
-			animation: none;
-		}
-
-		.scroll-cue {
-			animation: none;
-		}
-
-		.portrait-hover,
-		.portrait-data {
-			transition: none;
-		}
-	}
-</style>
