@@ -26,5 +26,5 @@
 	{:else}
 		<Sun size={15} strokeWidth={1.7} aria-hidden="true" />
 	{/if}
-	<span class="tw:max-[620px]:hidden">{theme === 'light' ? 'Oscuro' : 'Claro'}</span>
+	<span class="max-[620px]:hidden">{theme === 'light' ? 'Oscuro' : 'Claro'}</span>
 </Button>

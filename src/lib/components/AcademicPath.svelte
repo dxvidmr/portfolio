@@ -57,44 +57,44 @@
 </script>
 
 <section
-	class="tw:min-h-[max(680px,125vh)] tw:border-t tw:border-rule-strong tw:pt-[clamp(24px,4vw,44px)]"
+	class="min-h-[max(680px,125vh)] border-t border-rule-strong pt-[clamp(24px,4vw,44px)]"
 	bind:this={root}
 >
-	<div class="tw:sticky tw:top-[clamp(88px,13vh,126px)]">
+	<div class="sticky top-[clamp(88px,13vh,126px)]">
 		<header
-			class="tw:flex tw:items-baseline tw:justify-between tw:gap-[18px] tw:max-[520px]:flex-col tw:max-[520px]:items-start"
+			class="flex items-baseline justify-between gap-[18px] max-[520px]:flex-col max-[520px]:items-start"
 		>
 			<span class="meta">{copy.label}</span>
 			<h3
-				class="tw:font-title tw:text-[clamp(1.25rem,2.2vw,1.8rem)] tw:font-normal tw:leading-none tw:text-right tw:max-[520px]:text-left"
+				class="font-title text-[clamp(1.25rem,2.2vw,1.8rem)] font-normal leading-none text-right max-[520px]:text-left"
 			>
 				{copy.title}
 			</h3>
 		</header>
 
 		<div
-			class="tw:grid tw:grid-cols-[minmax(210px,.9fr)_minmax(0,1.1fr)] tw:gap-[clamp(26px,4vw,54px)] tw:pt-[clamp(26px,4vw,42px)] tw:max-[940px]:grid-cols-1"
+			class="grid grid-cols-[minmax(210px,.9fr)_minmax(0,1.1fr)] gap-[clamp(26px,4vw,54px)] pt-[clamp(26px,4vw,42px)] max-[940px]:grid-cols-1"
 		>
 			<ol
-				class="tw:relative tw:m-0 tw:grid tw:list-none tw:gap-[3px] tw:pt-0 tw:pr-0 tw:pb-0 tw:pl-[14px] tw:before:absolute tw:before:top-[11px] tw:before:bottom-[11px] tw:before:left-[3px] tw:before:w-px tw:before:bg-rule tw:before:content-['']"
+				class="relative m-0 grid list-none gap-[3px] pt-0 pr-0 pb-0 pl-[14px] before:absolute before:top-[11px] before:bottom-[11px] before:left-[3px] before:w-px before:bg-rule before:content-['']"
 			>
 				{#each entries as entry, index (entry.period)}
 					<li
-						class={`tw:relative tw:before:absolute tw:before:top-[13px] tw:before:left-[-14px] tw:before:h-[7px] tw:before:w-[7px] tw:before:rounded-full tw:before:border tw:before:bg-canvas tw:before:content-[''] tw:before:[transition:background-color_180ms_ease,transform_180ms_ease] ${selected === index ? 'tw:before:scale-[1.45] tw:before:border-accent-strong tw:before:bg-accent' : 'tw:before:border-rule-strong'}`}
+						class={`relative before:absolute before:top-[13px] before:left-[-14px] before:h-[7px] before:w-[7px] before:rounded-full before:border before:bg-canvas before:content-[''] before:[transition:background-color_180ms_ease,transform_180ms_ease] ${selected === index ? 'before:scale-[1.45] before:border-accent-strong before:bg-accent' : 'before:border-rule-strong'}`}
 					>
 						<button
-							class="tw:group tw:grid tw:w-full tw:cursor-pointer tw:grid-cols-[82px_minmax(0,1fr)] tw:gap-2.5 tw:rounded-ui-sm tw:border-0 tw:bg-transparent tw:py-2 tw:pr-0 tw:pl-2.5 tw:text-left tw:[transition:color_160ms_ease] tw:max-[520px]:grid-cols-[76px_minmax(0,1fr)]"
+							class="group grid w-full cursor-pointer grid-cols-[82px_minmax(0,1fr)] gap-2.5 rounded-ui-sm border-0 bg-transparent py-2 pr-0 pl-2.5 text-left [transition:color_160ms_ease] max-[520px]:grid-cols-[76px_minmax(0,1fr)]"
 							type="button"
 							aria-pressed={selected === index}
 							onclick={() => selectEntry(index)}
 						>
 							<span
-								class="tw:text-[0.68rem] tw:text-ink-faint tw:uppercase tw:[font-variant-numeric:tabular-nums]"
+								class="text-[0.68rem] text-ink-faint uppercase [font-variant-numeric:tabular-nums]"
 							>
 								{entry.period}
 							</span>
 							<span
-								class={`tw:text-[0.76rem] tw:leading-[1.35] tw:group-hover:text-accent-strong ${selected === index ? 'tw:text-accent-strong' : 'tw:text-ink-dim'}`}
+								class={`text-[0.76rem] leading-[1.35] group-hover:text-accent-strong ${selected === index ? 'text-accent-strong' : 'text-ink-dim'}`}
 							>
 								{entry.degree}
 							</span>
@@ -104,29 +104,29 @@
 			</ol>
 
 			<div
-				class="tw:relative tw:min-h-[138px] tw:overflow-hidden tw:pl-6 tw:[perspective:760px]"
+				class="relative min-h-[138px] overflow-hidden pl-6 [perspective:760px]"
 			>
 				<span
-					class="tw:pointer-events-none tw:absolute tw:top-0.5 tw:bottom-0.5 tw:left-0 tw:z-[2] tw:w-0.5 tw:rounded-[2px] tw:bg-accent"
+					class="pointer-events-none absolute top-0.5 bottom-0.5 left-0 z-[2] w-0.5 rounded-[2px] bg-accent"
 					aria-hidden="true"
 				></span>
 				{#key active.period}
 					<article
-						class={`tw:relative tw:z-[1] tw:min-h-[138px] tw:py-0.5 tw:[backface-visibility:hidden] tw:motion-reduce:animate-none ${direction < 0 ? 'tw:origin-[50%_0] tw:[animation:academic-cube-previous_900ms_cubic-bezier(.16,1,.3,1)_both]' : 'tw:origin-[50%_100%] tw:[animation:academic-cube-next_900ms_cubic-bezier(.16,1,.3,1)_both]'}`}
+						class={`relative z-[1] min-h-[138px] py-0.5 [backface-visibility:hidden] motion-reduce:animate-none ${direction < 0 ? 'origin-[50%_0] [animation:academic-cube-previous_900ms_cubic-bezier(.16,1,.3,1)_both]' : 'origin-[50%_100%] [animation:academic-cube-next_900ms_cubic-bezier(.16,1,.3,1)_both]'}`}
 					>
-						<p class="meta tw:m-0 tw:block tw:text-[0.74rem] tw:leading-[1.45] tw:text-ink-dim">
+						<p class="meta m-0 block text-[0.74rem] leading-[1.45] text-ink-dim">
 							{active.period}
 						</p>
 						<h4
-							class="tw:mt-[5px] tw:mb-2 tw:font-title tw:text-[clamp(1.1rem,1.7vw,1.35rem)] tw:font-medium tw:leading-[1.2]"
+							class="mt-[5px] mb-2 font-title text-[clamp(1.1rem,1.7vw,1.35rem)] font-medium leading-[1.2]"
 						>
 							{active.degree}
 						</h4>
-						<p class="tw:m-0 tw:block tw:text-[0.74rem] tw:leading-[1.45] tw:text-ink-dim">
+						<p class="m-0 block text-[0.74rem] leading-[1.45] text-ink-dim">
 							{active.institution}
 						</p>
 						<small
-							class="tw:mt-[7px] tw:block tw:text-[0.74rem] tw:leading-[1.45] tw:text-ink-faint"
+							class="mt-[7px] block text-[0.74rem] leading-[1.45] text-ink-faint"
 							>{active.detail}</small
 						>
 					</article>

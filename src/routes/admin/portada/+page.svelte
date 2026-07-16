@@ -87,13 +87,13 @@
 {/if}
 
 {#if entries.length === 0}
-	<div class="tw:border tw:border-warning tw:bg-admin-surface tw:px-4 tw:py-3 tw:text-ink" role="alert">
-		<strong class="tw:mb-1 tw:block">No hay entradas seleccionadas.</strong>
+	<div class="border border-warning bg-admin-surface px-4 py-3 text-ink" role="alert">
+		<strong class="mb-1 block">No hay entradas seleccionadas.</strong>
 		La web pública utilizará automáticamente el fallback de actividad reciente.
 	</div>
 {:else}
-	<div class="tw:flex tw:items-center tw:justify-between tw:gap-4 tw:border tw:border-rule tw:border-b-0 tw:bg-admin-surface tw:px-4 tw:py-3 tw:max-[680px]:flex-col tw:max-[680px]:items-start">
-		<span class={dirty ? 'tw:text-xs tw:text-warning' : 'tw:text-xs tw:text-ink-faint'}>
+	<div class="flex items-center justify-between gap-4 border border-rule border-b-0 bg-admin-surface px-4 py-3 max-[680px]:flex-col max-[680px]:items-start">
+		<span class={dirty ? 'text-xs text-warning' : 'text-xs text-ink-faint'}>
 			{dirty ? 'Hay cambios de orden sin guardar' : 'El orden está guardado'}
 		</span>
 		<form method="POST" action="?/saveOrder" use:enhance={saveOrder}>
@@ -104,15 +104,15 @@
 		</form>
 	</div>
 
-	<ol class="tw:m-0 tw:list-none tw:border tw:border-rule tw:p-0">
+	<ol class="m-0 list-none border border-rule p-0">
 		{#each entries as entry, index (entryKey(entry))}
-			<li class="tw:grid tw:grid-cols-[3rem_minmax(0,1fr)_auto] tw:items-center tw:gap-4 tw:border-b tw:border-rule tw:bg-admin-surface tw:p-4 last:tw:border-b-0 tw:max-[680px]:grid-cols-[2rem_1fr]">
-				<span class="tw:text-lg tw:text-rule-strong">{String(index + 1).padStart(2, '0')}</span>
+			<li class="grid grid-cols-[3rem_minmax(0,1fr)_auto] items-center gap-4 border-b border-rule bg-admin-surface p-4 last:border-b-0 max-[680px]:grid-cols-[2rem_1fr]">
+				<span class="text-lg text-rule-strong">{String(index + 1).padStart(2, '0')}</span>
 				<div>
-					<strong class="tw:block tw:font-medium tw:text-ink">{entry.title}</strong>
-					<span class="tw:mt-1 tw:block tw:text-xs tw:text-ink-faint">{entry.typeLabel} · {entry.sortDate ?? 'sin fecha'}</span>
+					<strong class="block font-medium text-ink">{entry.title}</strong>
+					<span class="mt-1 block text-xs text-ink-faint">{entry.typeLabel} · {entry.sortDate ?? 'sin fecha'}</span>
 				</div>
-				<div class="tw:flex tw:gap-1.5 tw:max-[680px]:col-start-2">
+				<div class="flex gap-1.5 max-[680px]:col-start-2">
 					<Button
 						variant="secondary"
 						size="icon"

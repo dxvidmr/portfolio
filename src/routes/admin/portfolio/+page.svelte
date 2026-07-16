@@ -164,7 +164,7 @@
 	{/snippet}
 </AdminPageHeader>
 
-<section class="tw:grid tw:grid-cols-[minmax(16rem,34rem)_minmax(0,1fr)] tw:items-end tw:gap-4 tw:border-b tw:border-rule tw:pb-5 tw:max-[620px]:grid-cols-1" aria-label="Seleccionar ficha del portfolio">
+<section class="grid grid-cols-[minmax(16rem,34rem)_minmax(0,1fr)] items-end gap-4 border-b border-rule pb-5 max-[620px]:grid-cols-1" aria-label="Seleccionar ficha del portfolio">
 	<AdminField label="Ficha del portfolio · orden público">
 		<Select bind:value={selectedSlug}>
 			{#each data.projects as project, index (project.slug)}
@@ -175,37 +175,37 @@
 		</Select>
 	</AdminField>
 	{#if selectedProject}
-		<p class="tw:mb-2 tw:text-[0.68rem] tw:text-ink-faint">
+		<p class="mb-2 text-[0.68rem] text-ink-faint">
 			{selectedProject.kind} · {currentRelations.length} relacionados
 		</p>
 	{/if}
 </section>
 
-<div class="tw:mt-6 tw:grid tw:grid-cols-2 tw:items-start tw:gap-8 tw:max-[960px]:grid-cols-1">
-	<section class="tw:min-w-0 tw:border-t tw:border-rule" aria-labelledby="related-title">
-		<header class="tw:flex tw:items-end tw:justify-between tw:gap-4 tw:py-4">
+<div class="mt-6 grid grid-cols-2 items-start gap-8 max-[960px]:grid-cols-1">
+	<section class="min-w-0 border-t border-rule" aria-labelledby="related-title">
+		<header class="flex items-end justify-between gap-4 py-4">
 			<div>
-				<p class="tw:m-0 tw:text-[0.68rem] tw:uppercase tw:tracking-[0.1em] tw:text-ink-faint">Selección actual</p>
-				<h2 class="tw:mt-1 tw:mb-0 tw:text-base tw:text-ink" id="related-title">Trabajos relacionados</h2>
+				<p class="m-0 text-[0.68rem] uppercase tracking-[0.1em] text-ink-faint">Selección actual</p>
+				<h2 class="mt-1 mb-0 text-base text-ink" id="related-title">Trabajos relacionados</h2>
 			</div>
-			<span class="tw:text-[0.68rem] tw:text-ink-faint">Orden cronológico</span>
+			<span class="text-[0.68rem] text-ink-faint">Orden cronológico</span>
 		</header>
 
 		{#if currentRelations.length === 0}
-			<p class="tw:m-0 tw:border-t tw:border-rule tw:px-4 tw:py-8 tw:text-center tw:text-xs tw:text-ink-faint">Esta ficha todavía no tiene trabajos relacionados.</p>
+			<p class="m-0 border-t border-rule px-4 py-8 text-center text-xs text-ink-faint">Esta ficha todavía no tiene trabajos relacionados.</p>
 		{:else}
-			<ol class="tw:m-0 tw:list-none tw:border-t tw:border-rule tw:p-0">
+			<ol class="m-0 list-none border-t border-rule p-0">
 				{#each currentRelations as item (`${item.relation.entityType}:${item.relation.entityId}`)}
-					<li class="tw:flex tw:min-w-0 tw:items-center tw:justify-between tw:gap-4 tw:border-b tw:border-rule tw:px-2 tw:py-3 tw:max-[620px]:flex-col tw:max-[620px]:items-start">
-						<div class="tw:min-w-0">
-							<div class="tw:mb-1 tw:flex tw:flex-wrap tw:gap-x-3 tw:gap-y-1 tw:text-[0.62rem] tw:text-ink-faint">
+					<li class="flex min-w-0 items-center justify-between gap-4 border-b border-rule px-2 py-3 max-[620px]:flex-col max-[620px]:items-start">
+						<div class="min-w-0">
+							<div class="mb-1 flex flex-wrap gap-x-3 gap-y-1 text-[0.62rem] text-ink-faint">
 								<span>{item.entry.typeLabel}</span>
 								<span>{item.entry.sortDate ?? 'sin fecha'}</span>
-								{#if !item.entry.isPublic}<span class="tw:text-warning">Privada</span>{/if}
+								{#if !item.entry.isPublic}<span class="text-warning">Privada</span>{/if}
 							</div>
-							<strong class="tw:block tw:text-xs tw:font-medium tw:leading-snug tw:text-ink">{item.entry.title}</strong>
+							<strong class="block text-xs font-medium leading-snug text-ink">{item.entry.title}</strong>
 						</div>
-						<div class="tw:flex tw:shrink-0 tw:gap-1.5">
+						<div class="flex shrink-0 gap-1.5">
 							<form method="POST" action="?/featured" use:enhance={featuredSubmit(item.relation)}>
 								<input type="hidden" name="portfolioSlug" value={item.relation.portfolioSlug} />
 								<input type="hidden" name="entityType" value={item.relation.entityType} />
@@ -214,7 +214,7 @@
 									type="submit"
 									variant="ghost"
 									size="icon"
-									class={item.relation.featured ? 'tw:text-warning tw:hover:text-warning' : 'tw:text-rule-strong'}
+									class={item.relation.featured ? 'text-warning hover:text-warning' : 'text-rule-strong'}
 									disabled={isPending('featured', item.relation)}
 									aria-label={`${item.relation.featured ? 'Desactivar destacado de' : 'Destacar'} ${item.entry.title}`}
 									title={item.relation.featured ? 'Desactivar destacado' : 'Destacar en la ficha'}
@@ -238,12 +238,12 @@
 		{/if}
 	</section>
 
-	<section class="tw:min-w-0 tw:border-t tw:border-rule" aria-labelledby="add-title">
-		<header class="tw:py-4">
-			<p class="tw:m-0 tw:text-[0.68rem] tw:uppercase tw:tracking-[0.1em] tw:text-ink-faint">Añadir resultados</p>
-			<h2 class="tw:mt-1 tw:mb-0 tw:text-base tw:text-ink" id="add-title">Buscar entradas</h2>
+	<section class="min-w-0 border-t border-rule" aria-labelledby="add-title">
+		<header class="py-4">
+			<p class="m-0 text-[0.68rem] uppercase tracking-[0.1em] text-ink-faint">Añadir resultados</p>
+			<h2 class="mt-1 mb-0 text-base text-ink" id="add-title">Buscar entradas</h2>
 		</header>
-		<div class="tw:grid tw:grid-cols-[minmax(0,1fr)_10rem] tw:gap-3 tw:border-t tw:border-rule tw:pt-4 tw:max-[620px]:grid-cols-1">
+		<div class="grid grid-cols-[minmax(0,1fr)_10rem] gap-3 border-t border-rule pt-4 max-[620px]:grid-cols-1">
 			<AdminField label="Buscar por título">
 				<Input type="search" bind:value={query} placeholder="Escribe para filtrar…" />
 			</AdminField>
@@ -256,24 +256,24 @@
 				</Select>
 			</AdminField>
 		</div>
-		<p class="tw:m-0 tw:px-0 tw:py-3 tw:text-[0.68rem] tw:text-ink-faint">{availableEntries.length} entradas disponibles</p>
+		<p class="m-0 px-0 py-3 text-[0.68rem] text-ink-faint">{availableEntries.length} entradas disponibles</p>
 
 		{#if availableEntries.length === 0}
-			<p class="tw:m-0 tw:border-t tw:border-rule tw:px-4 tw:py-8 tw:text-center tw:text-xs tw:text-ink-faint">No hay entradas disponibles con estos filtros.</p>
+			<p class="m-0 border-t border-rule px-4 py-8 text-center text-xs text-ink-faint">No hay entradas disponibles con estos filtros.</p>
 		{:else}
-			<ul class="tw:m-0 tw:max-h-[55rem] tw:list-none tw:overflow-y-auto tw:border-t tw:border-rule tw:p-0">
+			<ul class="m-0 max-h-[55rem] list-none overflow-y-auto border-t border-rule p-0">
 				{#each availableEntries as entry (entryKey(entry))}
-					<li class="tw:flex tw:min-w-0 tw:items-center tw:justify-between tw:gap-4 tw:border-b tw:border-rule tw:px-2 tw:py-3 tw:max-[620px]:flex-col tw:max-[620px]:items-start">
-						<div class="tw:min-w-0">
-							<div class="tw:mb-1 tw:flex tw:flex-wrap tw:gap-x-3 tw:gap-y-1 tw:text-[0.62rem] tw:text-ink-faint">
+					<li class="flex min-w-0 items-center justify-between gap-4 border-b border-rule px-2 py-3 max-[620px]:flex-col max-[620px]:items-start">
+						<div class="min-w-0">
+							<div class="mb-1 flex flex-wrap gap-x-3 gap-y-1 text-[0.62rem] text-ink-faint">
 								<span>{entry.typeLabel}</span>
 								<span>{entry.sortDate ?? 'sin fecha'}</span>
-								{#if !entry.isPublic}<span class="tw:text-warning">Privada</span>{/if}
+								{#if !entry.isPublic}<span class="text-warning">Privada</span>{/if}
 								{#if entryRelationCount(entry) > 0}
 									<span>{entryRelationCount(entry)} {entryRelationCount(entry) === 1 ? 'ficha' : 'fichas'}</span>
 								{/if}
 							</div>
-							<strong class="tw:block tw:text-xs tw:font-medium tw:leading-snug tw:text-ink">{entry.title}</strong>
+							<strong class="block text-xs font-medium leading-snug text-ink">{entry.title}</strong>
 						</div>
 						<form method="POST" action="?/add" use:enhance={addSubmit(entry)}>
 							<input type="hidden" name="portfolioSlug" value={selectedSlug} />
@@ -283,7 +283,7 @@
 								type="submit"
 								variant="primary"
 								size="sm"
-								class="tw:min-w-24 tw:max-[620px]:w-full"
+								class="min-w-24 max-[620px]:w-full"
 								disabled={isPending('add', { portfolioSlug: selectedSlug, entityType: entry.entityType, entityId: entry.entityId })}
 							>+ Añadir</Button>
 						</form>

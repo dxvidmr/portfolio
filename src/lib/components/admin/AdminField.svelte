@@ -22,15 +22,15 @@
 	} = $props();
 
 	const classes = $derived(
-		`tw:grid tw:gap-[0.35rem] tw:text-xs tw:text-ink-dim ${wide ? 'tw:col-span-full tw:max-[700px]:col-span-1' : ''} ${privateField ? 'tw:border tw:border-dashed tw:border-rule tw:p-3' : ''} ${className}`
+		`grid gap-[0.35rem] text-xs text-ink-dim ${wide ? 'col-span-full max-[700px]:col-span-1' : ''} ${privateField ? 'border border-dashed border-rule p-3' : ''} ${className}`
 	);
 </script>
 
 <label class={classes}>
-	<span class="tw:font-mono tw:text-meta tw:font-medium tw:tracking-meta tw:text-ink-dim tw:uppercase">
-		{label}{#if required}<span class="tw:ml-1 tw:text-accent-strong" aria-hidden="true">*</span>{/if}
+	<span class="font-mono text-meta font-medium tracking-meta text-ink-dim uppercase">
+		{label}{#if required}<span class="ml-1 text-accent-strong" aria-hidden="true">*</span>{/if}
 	</span>
 	{@render children()}
-	{#if error}<small class="tw:text-danger">{error}</small>{/if}
-	{#if help}<small class="tw:leading-[1.4] tw:text-ink-faint">{help}</small>{/if}
+	{#if error}<small class="text-danger">{error}</small>{/if}
+	{#if help}<small class="leading-[1.4] text-ink-faint">{help}</small>{/if}
 </label>

@@ -120,8 +120,8 @@
 	const isPending = (entry: Entry, control: Control) =>
 		pending.includes(`${entry.entityType}:${entry.entityId}:${control}`);
 	const tableHeadingClass =
-		'tw:border-b tw:border-rule tw:bg-[var(--admin-surface)] tw:p-3 tw:text-left tw:align-top tw:text-[0.68rem] tw:tracking-[0.08em] tw:text-ink-faint tw:uppercase';
-	const tableCellClass = 'tw:border-b tw:border-rule tw:p-3 tw:text-left tw:align-top';
+		'border-b border-rule bg-[var(--admin-surface)] p-3 text-left align-top text-[0.68rem] tracking-[0.08em] text-ink-faint uppercase';
+	const tableCellClass = 'border-b border-rule p-3 text-left align-top';
 </script>
 
 <svelte:head>
@@ -130,7 +130,7 @@
 
 <AdminPageHeader title="Entradas" eyebrow="Índice transversal">
 	{#snippet actions()}
-		<span class="tw:text-xs tw:text-ink-faint">{filteredEntries.length} de {entries.length} entradas</span>
+		<span class="text-xs text-ink-faint">{filteredEntries.length} de {entries.length} entradas</span>
 		<ButtonLink variant="primary" href="/admin/entradas/nueva" data-sveltekit-preload-data="off"
 			>Nueva entrada</ButtonLink
 		>
@@ -146,18 +146,18 @@
 	<AdminToast message="Entrada eliminada." success={true} />
 {/if}
 
-<section class="tw:mb-6 tw:grid tw:gap-4 tw:rounded-ui tw:border tw:border-rule tw:bg-[var(--admin-surface)] tw:p-[clamp(0.8rem,2vw,1.15rem)]" aria-label="Filtros de entradas">
-	<div class="tw:grid tw:grid-cols-[minmax(0,1fr)_auto] tw:items-end tw:gap-4 tw:max-[640px]:grid-cols-1">
-		<AdminField class="tw:max-w-3xl" label="Buscar entradas">
+<section class="mb-6 grid gap-4 rounded-ui border border-rule bg-[var(--admin-surface)] p-[clamp(0.8rem,2vw,1.15rem)]" aria-label="Filtros de entradas">
+	<div class="grid grid-cols-[minmax(0,1fr)_auto] items-end gap-4 max-[640px]:grid-cols-1">
+		<AdminField class="max-w-3xl" label="Buscar entradas">
 			<Input type="search" bind:value={query} placeholder="Título de la entrada…" />
 		</AdminField>
-		<div class="tw:grid tw:min-w-24 tw:text-right tw:text-ink-dim tw:max-[640px]:hidden" aria-live="polite">
-			<strong class="tw:font-title tw:text-[1.35rem] tw:font-medium tw:leading-none tw:text-ink">{filteredEntries.length}</strong>
-			<span class="tw:text-[0.65rem] tw:text-ink-faint">resultados</span>
+		<div class="grid min-w-24 text-right text-ink-dim max-[640px]:hidden" aria-live="polite">
+			<strong class="font-title text-[1.35rem] font-medium leading-none text-ink">{filteredEntries.length}</strong>
+			<span class="text-[0.65rem] text-ink-faint">resultados</span>
 		</div>
 	</div>
 
-	<div class="tw:grid tw:grid-cols-3 tw:gap-3 tw:max-[1100px]:grid-cols-2 tw:max-[640px]:grid-cols-1">
+	<div class="grid grid-cols-3 gap-3 max-[1100px]:grid-cols-2 max-[640px]:grid-cols-1">
 		<AdminField label="Tipo">
 			<Select bind:value={type}>
 				<option value="">Todos los tipos</option>
@@ -182,9 +182,9 @@
 		</AdminField>
 	</div>
 
-	<details class="tw:rounded-ui tw:border tw:border-rule tw:bg-[color-mix(in_srgb,var(--bg)_45%,transparent)] tw:p-3 tw:[&[open]>summary]:mb-3" open={Boolean(year || home !== 'all' || relations !== 'all')}>
-		<summary class="tw:inline-flex tw:cursor-pointer tw:items-center tw:gap-1.5 tw:text-[0.7rem] tw:text-ink-dim"><ListFilter size={14} strokeWidth={1.8} aria-hidden="true" /> Más filtros</summary>
-		<div class="tw:grid tw:grid-cols-3 tw:gap-3 tw:max-[1100px]:grid-cols-2 tw:max-[640px]:grid-cols-1">
+	<details class="rounded-ui border border-rule bg-[color-mix(in_srgb,var(--bg)_45%,transparent)] p-3 [&[open]>summary]:mb-3" open={Boolean(year || home !== 'all' || relations !== 'all')}>
+		<summary class="inline-flex cursor-pointer items-center gap-1.5 text-[0.7rem] text-ink-dim"><ListFilter size={14} strokeWidth={1.8} aria-hidden="true" /> Más filtros</summary>
+		<div class="grid grid-cols-3 gap-3 max-[1100px]:grid-cols-2 max-[640px]:grid-cols-1">
 			<AdminField label="Año">
 				<Input bind:value={year} inputmode="numeric" pattern="[0-9]{4}" maxlength={4} placeholder="AAAA" />
 			</AdminField>
@@ -205,14 +205,14 @@
 		</div>
 	</details>
 
-	<div class="tw:flex tw:items-center tw:justify-end tw:gap-3">
-		<span class="tw:text-[0.65rem] tw:text-ink-faint">{activeFilterCount === 0 ? 'Sin filtros activos' : `${activeFilterCount} filtros activos`}</span>
+	<div class="flex items-center justify-end gap-3">
+		<span class="text-[0.65rem] text-ink-faint">{activeFilterCount === 0 ? 'Sin filtros activos' : `${activeFilterCount} filtros activos`}</span>
 		<Button onclick={resetFilters} disabled={activeFilterCount === 0 && sortBy === 'fecha'}>Limpiar</Button>
 	</div>
 </section>
 
-<div class="tw:overflow-x-auto tw:rounded-ui tw:border tw:border-rule">
-	<table class="tw:w-full tw:border-collapse tw:text-[0.78rem]">
+<div class="overflow-x-auto rounded-ui border border-rule">
+	<table class="w-full border-collapse text-[0.78rem]">
 		<thead>
 			<tr>
 				<th class={tableHeadingClass}>Entrada</th>
@@ -226,19 +226,19 @@
 		<tbody>
 			{#each filteredEntries as entry (`${entry.entityType}:${entry.entityId}`)}
 				<tr>
-					<td class="{tableCellClass} tw:min-w-[22rem] tw:max-[640px]:min-w-[16rem]">
+					<td class="{tableCellClass} min-w-[22rem] max-[640px]:min-w-[16rem]">
 						{#if data.editableTypes.includes(entry.entityType)}
 							<a
-								class="tw:group tw:text-inherit tw:focus-visible:outline-2 tw:focus-visible:outline-offset-3 tw:focus-visible:outline-accent-strong"
+								class="group text-inherit focus-visible:outline-2 focus-visible:outline-offset-3 focus-visible:outline-accent-strong"
 								href={`/admin/entradas/${entry.entityType}/${entry.entityId}`}
 								data-sveltekit-preload-data="off"
 							>
-								<strong class="tw:mb-1 tw:block tw:font-medium tw:text-ink tw:group-hover:text-accent-strong">{entry.title}</strong>
+								<strong class="mb-1 block font-medium text-ink group-hover:text-accent-strong">{entry.title}</strong>
 							</a>
 						{:else}
-							<strong class="tw:mb-1 tw:block tw:font-medium tw:text-ink">{entry.title}</strong>
+							<strong class="mb-1 block font-medium text-ink">{entry.title}</strong>
 						{/if}
-						<span class="tw:block tw:text-[0.7rem] tw:text-ink-faint">{entry.typeLabel} · #{entry.entityId}</span>
+						<span class="block text-[0.7rem] text-ink-faint">{entry.typeLabel} · #{entry.entityId}</span>
 					</td>
 					<td class={tableCellClass}>{entry.sortDate ?? '—'}</td>
 					<td class={tableCellClass}>{entry.relationCount}</td>
@@ -250,7 +250,7 @@
 							<Button
 								variant={entry.isPublic ? 'primary' : 'secondary'}
 								size="sm"
-								class="tw:min-w-12"
+								class="min-w-12"
 								type="submit"
 								name="enabled"
 								value={entry.isPublic ? '0' : '1'}
@@ -269,7 +269,7 @@
 							<Button
 								variant={entry.showHome ? 'primary' : 'secondary'}
 								size="sm"
-								class="tw:min-w-12"
+								class="min-w-12"
 								type="submit"
 								name="enabled"
 								value={entry.showHome ? '0' : '1'}
@@ -280,7 +280,7 @@
 							</Button>
 						</form>
 					</td>
-					<td class="{tableCellClass} tw:text-[0.7rem] tw:text-ink-faint">{entry.updatedAt ?? '—'}</td>
+					<td class="{tableCellClass} text-[0.7rem] text-ink-faint">{entry.updatedAt ?? '—'}</td>
 				</tr>
 			{/each}
 		</tbody>
@@ -288,5 +288,5 @@
 </div>
 
 {#if filteredEntries.length === 0}
-	<p class="tw:p-8 tw:text-center tw:text-ink-faint">No hay entradas que coincidan con estos filtros.</p>
+	<p class="p-8 text-center text-ink-faint">No hay entradas que coincidan con estos filtros.</p>
 {/if}

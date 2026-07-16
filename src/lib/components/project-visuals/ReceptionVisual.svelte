@@ -67,30 +67,30 @@
 </script>
 
 <svg
-	class={`tw:absolute ${compact ? 'tw:inset-[4%_-18%_9%] tw:h-[87%] tw:w-[130%]' : 'tw:inset-[2%_1%_4%] tw:h-[94%] tw:w-[98%]'}`}
+	class={`absolute ${compact ? 'inset-[4%_-18%_9%] h-[87%] w-[130%]' : 'inset-[2%_1%_4%] h-[94%] w-[98%]'}`}
 	viewBox="0 0 640 440"
 	role="presentation"
 >
-	<g class="tw:fill-none tw:stroke-[#8f4142] tw:stroke-[0.85] tw:opacity-[.34]">
+	<g class="fill-none stroke-[#8f4142] stroke-[0.85] opacity-[.34]">
 		{#each edges as edge}<path d={path(edge)} />{/each}
 	</g>
 	<g>
 		{#each nodes as node}
 			<circle
 				class={node.degree === 'work'
-					? 'tw:fill-[#8f4142] tw:stroke-[#383634] tw:stroke-2'
+					? 'fill-[#8f4142] stroke-[#383634] stroke-2'
 					: node.degree === 'place'
-						? 'tw:fill-[color-mix(in_srgb,#8f4142_72%,#ddd7d6)] tw:stroke-[#8f4142] tw:stroke-[1.4]'
+						? 'fill-[color-mix(in_srgb,#8f4142_72%,#ddd7d6)] stroke-[#8f4142] stroke-[1.4]'
 						: node.degree === 'mid'
-							? 'tw:fill-[color-mix(in_srgb,#8f4142_42%,#ddd7d6)] tw:stroke-[color-mix(in_srgb,#8f4142_68%,#ddd7d6)] tw:stroke-[0.8]'
-							: 'tw:fill-[color-mix(in_srgb,#ddd7d6_84%,white)] tw:stroke-[color-mix(in_srgb,#8f4142_45%,#ddd7d6)] tw:stroke-[0.8]'}
+							? 'fill-[color-mix(in_srgb,#8f4142_42%,#ddd7d6)] stroke-[color-mix(in_srgb,#8f4142_68%,#ddd7d6)] stroke-[0.8]'
+							: 'fill-[color-mix(in_srgb,#ddd7d6_84%,white)] stroke-[color-mix(in_srgb,#8f4142_45%,#ddd7d6)] stroke-[0.8]'}
 				cx={node.x}
 				cy={node.y}
 				r={node.r}
 			/>
 		{/each}
 	</g>
-	<g class="tw:fill-[#383634] tw:font-mono tw:text-[7px] tw:tracking-[0.14em]">
+	<g class="fill-[#383634] font-mono text-[7px] tracking-[0.14em]">
 		<text x="306" y="287" text-anchor="middle">OBRA</text>
 		<text x="474" y="250" text-anchor="middle">LUGAR</text>
 		<text x="382" y="76" text-anchor="middle">LUGAR</text>
@@ -98,9 +98,9 @@
 </svg>
 
 <div
-	class={`tw:absolute tw:bottom-[6%] tw:left-[6%] tw:z-[3] tw:grid tw:gap-[5px] tw:rounded-ui-sm tw:bg-[color-mix(in_srgb,#ddd7d6_78%,transparent)] tw:px-3.5 tw:py-3 tw:[backdrop-filter:blur(8px)] ${compact ? 'tw:right-[6%]' : ''}`}
+	class={`absolute bottom-[6%] left-[6%] z-[3] grid gap-[5px] rounded-ui-sm bg-[color-mix(in_srgb,#ddd7d6_78%,transparent)] px-3.5 py-3 [backdrop-filter:blur(8px)] ${compact ? 'right-[6%]' : ''}`}
 >
-	<span class="meta tw:text-[clamp(.38rem,.7vw,.55rem)]">1619 — PRESENTE</span>
-	<strong class="tw:font-title tw:text-[clamp(1.7rem,4vw,3.5rem)] tw:font-[550] tw:leading-[0.9] tw:tracking-[-0.04em]">TODOS A UNA</strong>
-	<span class="meta tw:text-[clamp(.38rem,.7vw,.55rem)]">EDICIÓN · ARCHIVO · PARTICIPACIÓN</span>
+	<span class="meta text-[clamp(.38rem,.7vw,.55rem)]">1619 — PRESENTE</span>
+	<strong class="font-title text-[clamp(1.7rem,4vw,3.5rem)] font-[550] leading-[0.9] tracking-[-0.04em]">TODOS A UNA</strong>
+	<span class="meta text-[clamp(.38rem,.7vw,.55rem)]">EDICIÓN · ARCHIVO · PARTICIPACIÓN</span>
 </div>

@@ -7,23 +7,23 @@
 	}: { children: Snippet; padded?: boolean; class?: string } = $props();
 
 	const panelClasses = $derived(
-		`tw:relative tw:overflow-hidden tw:rounded-ui tw:border tw:border-rule tw:bg-panel ${padded ? 'tw:p-[clamp(16px,2.4vw,26px)]' : ''} ${klass}`
+		`relative overflow-hidden rounded-ui border border-rule bg-panel ${padded ? 'p-[clamp(16px,2.4vw,26px)]' : ''} ${klass}`
 	);
-	const corner = 'tw:pointer-events-none tw:absolute tw:size-[9px]';
+	const corner = 'pointer-events-none absolute size-[9px]';
 </script>
 
 <div class={panelClasses}>
 	<span
-		class="{corner} tw:-top-px tw:-left-px tw:rounded-tl-ui-sm tw:border-t tw:border-l tw:border-ink"
+		class="{corner} -top-px -left-px rounded-tl-ui-sm border-t border-l border-ink"
 	></span>
 	<span
-		class="{corner} tw:-top-px tw:-right-px tw:rounded-tr-ui-sm tw:border-t tw:border-r tw:border-ink"
+		class="{corner} -top-px -right-px rounded-tr-ui-sm border-t border-r border-ink"
 	></span>
 	<span
-		class="{corner} tw:-bottom-px tw:-left-px tw:rounded-bl-ui-sm tw:border-b tw:border-l tw:border-ink"
+		class="{corner} -bottom-px -left-px rounded-bl-ui-sm border-b border-l border-ink"
 	></span>
 	<span
-		class="{corner} tw:-right-px tw:-bottom-px tw:rounded-br-ui-sm tw:border-r tw:border-b tw:border-ink"
+		class="{corner} -right-px -bottom-px rounded-br-ui-sm border-r border-b border-ink"
 	></span>
 	{@render children()}
 </div>

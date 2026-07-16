@@ -25,7 +25,7 @@
 				: 'Switch to light'
 	);
 	const controlClass =
-		'tw:inline-flex tw:h-6.5 tw:min-w-7 tw:cursor-pointer tw:items-center tw:justify-center tw:gap-[5px] tw:rounded-ui-sm tw:border-0 tw:bg-transparent tw:px-[7px] tw:font-[inherit] tw:text-meta tw:leading-none tw:tracking-[0.08em] tw:text-ink-dim tw:hover:bg-accent-wash tw:hover:text-accent-strong';
+		'inline-flex h-6.5 min-w-7 cursor-pointer items-center justify-center gap-[5px] rounded-ui-sm border-0 bg-transparent px-[7px] font-[inherit] text-meta leading-none tracking-[0.08em] text-ink-dim hover:bg-accent-wash hover:text-accent-strong';
 
 	onMount(() => {
 		const current = document.documentElement.dataset.theme;
@@ -40,7 +40,7 @@
 </script>
 
 <div
-	class="tw:inline-flex tw:items-center tw:gap-px tw:border-l tw:border-rule-strong tw:pl-2.5"
+	class="inline-flex items-center gap-px border-l border-rule-strong pl-2.5"
 	aria-label={currentLocale === 'es' ? 'Controles del sitio' : 'Site controls'}
 >
 	<a
@@ -53,7 +53,7 @@
 		<span>{targetLocale.toUpperCase()}</span>
 	</a>
 	<button
-		class="{controlClass} tw:w-7 tw:px-0"
+		class="{controlClass} w-7 px-0"
 		type="button"
 		aria-label={themeLabel}
 		title={themeLabel}

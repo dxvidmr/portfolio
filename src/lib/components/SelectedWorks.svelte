@@ -99,39 +99,39 @@
 </script>
 
 <div
-	class="tw:grid tw:grid-cols-[minmax(0,1.08fr)_minmax(360px,.92fr)] tw:items-start tw:gap-[clamp(48px,8vw,120px)] tw:max-[900px]:grid-cols-[minmax(0,1.08fr)_minmax(290px,.92fr)] tw:max-[900px]:gap-[30px] tw:max-[700px]:flex tw:max-[700px]:flex-col"
+	class="grid grid-cols-[minmax(0,1.08fr)_minmax(360px,.92fr)] items-start gap-[clamp(48px,8vw,120px)] max-[900px]:grid-cols-[minmax(0,1.08fr)_minmax(290px,.92fr)] max-[900px]:gap-[30px] max-[700px]:flex max-[700px]:flex-col"
 >
 	<ol
-		class="tw:m-0 tw:list-none tw:border-t tw:border-rule-strong tw:p-0 tw:max-[700px]:w-full"
+		class="m-0 list-none border-t border-rule-strong p-0 max-[700px]:w-full"
 		aria-label={copy.contents}
 	>
 		{#each projects as project, index (project.slug)}
-			<li class="tw:border-b tw:border-rule">
+			<li class="border-b border-rule">
 				<a
-					class="tw:grid tw:grid-cols-[36px_minmax(0,1fr)_auto] tw:items-center tw:gap-[clamp(12px,2vw,24px)] tw:py-[clamp(18px,2.5vw,31px)] tw:text-inherit tw:no-underline tw:max-[900px]:grid-cols-[30px_minmax(0,1fr)]"
+					class="grid grid-cols-[36px_minmax(0,1fr)_auto] items-center gap-[clamp(12px,2vw,24px)] py-[clamp(18px,2.5vw,31px)] text-inherit no-underline max-[900px]:grid-cols-[30px_minmax(0,1fr)]"
 					href={localizedPath(`/proyectos/${project.slug}`, locale)}
 					aria-current={activeIndex === index ? 'true' : undefined}
 					onmouseenter={() => (activeIndex = index)}
 					onfocus={() => (activeIndex = index)}
 					onclick={(event) => openProject(event, index)}
 				>
-					<span class="meta tw:text-ink-faint">{String(index + 1).padStart(2, '0')}</span>
-					<span class="tw:grid tw:min-w-0 tw:gap-2">
+					<span class="meta text-ink-faint">{String(index + 1).padStart(2, '0')}</span>
+					<span class="grid min-w-0 gap-2">
 						<span
-							class={`meta tw:[transition:color_180ms_ease] ${activeIndex === index ? 'tw:text-ink-dim' : 'tw:text-ink-faint'}`}
+							class={`meta [transition:color_180ms_ease] ${activeIndex === index ? 'text-ink-dim' : 'text-ink-faint'}`}
 						>
 							{projectText(project.kind, locale)}
 						</span>
 						<span
-							class={`tw:font-title tw:text-[clamp(1.9rem,3.9vw,4.4rem)] tw:font-[450] tw:leading-[0.9] tw:tracking-[-0.04em] tw:[transition:color_180ms_ease,transform_320ms_cubic-bezier(.16,1,.3,1)] tw:motion-reduce:transition-none tw:max-[700px]:text-[clamp(2rem,10vw,3.6rem)] ${activeIndex === index ? 'tw:translate-x-[9px] tw:text-accent-strong' : ''}`}
+							class={`font-title text-[clamp(1.9rem,3.9vw,4.4rem)] font-[450] leading-[0.9] tracking-[-0.04em] [transition:color_180ms_ease,transform_320ms_cubic-bezier(.16,1,.3,1)] motion-reduce:transition-none max-[700px]:text-[clamp(2rem,10vw,3.6rem)] ${activeIndex === index ? 'translate-x-[9px] text-accent-strong' : ''}`}
 						>
 							{projectText(project.title, locale)}
 						</span>
 					</span>
 					<span
-						class="tw:justify-self-end tw:max-[900px]:col-start-2 tw:max-[900px]:row-start-2 tw:max-[900px]:flex tw:max-[900px]:justify-between tw:max-[900px]:justify-items-[initial]"
+						class="justify-self-end max-[900px]:col-start-2 max-[900px]:row-start-2 max-[900px]:flex max-[900px]:justify-between max-[900px]:justify-items-[initial]"
 					>
-						<span class="meta tw:text-ink-faint">{project.year}</span>
+						<span class="meta text-ink-faint">{project.year}</span>
 					</span>
 				</a>
 			</li>
@@ -139,20 +139,20 @@
 	</ol>
 
 	<aside
-		class="tw:relative tw:h-full tw:max-[700px]:order-[-1] tw:max-[700px]:w-full"
+		class="relative h-full max-[700px]:order-[-1] max-[700px]:w-full"
 		aria-live="polite"
 	>
-		<div class="tw:sticky tw:top-[clamp(82px,11vh,118px)] tw:max-[700px]:static">
+		<div class="sticky top-[clamp(82px,11vh,118px)] max-[700px]:static">
 			<a
-				class="tw:group tw:block tw:text-inherit tw:no-underline"
+				class="group block text-inherit no-underline"
 				href={localizedPath(`/proyectos/${activeProject.slug}`, locale)}
 				onclick={(event) => openProject(event, activeIndex)}
 			>
 				{#key activeProject.slug}
 					<div
-						class="tw:[animation:editorial-preview-in_600ms_cubic-bezier(.16,1,.3,1)_both] tw:motion-reduce:animate-none"
+						class="[animation:editorial-preview-in_600ms_cubic-bezier(.16,1,.3,1)_both] motion-reduce:animate-none"
 					>
-						<div class="meta tw:mb-[11px] tw:flex tw:justify-between tw:gap-[18px] tw:text-ink-faint">
+						<div class="meta mb-[11px] flex justify-between gap-[18px] text-ink-faint">
 							<span>{copy.preview}</span>
 							<span>{String(activeIndex + 1).padStart(2, '0')} / {String(projects.length).padStart(2, '0')}</span>
 						</div>
@@ -162,17 +162,17 @@
 							period={activeProject.year}
 						/>
 						<p
-							class="tw:mt-[18px] tw:mb-0 tw:max-w-[58ch] tw:text-[clamp(.78rem,1.1vw,.9rem)] tw:leading-[1.6] tw:text-ink-dim"
+							class="mt-[18px] mb-0 max-w-[58ch] text-[clamp(.78rem,1.1vw,.9rem)] leading-[1.6] text-ink-dim"
 						>
 							{projectText(activeProject.summary, locale)}
 						</p>
 						<ul
-							class="tw:mt-4 tw:mb-0 tw:flex tw:list-none tw:flex-wrap tw:gap-x-[14px] tw:gap-y-1.5 tw:p-0 tw:text-ink-faint"
+							class="mt-4 mb-0 flex list-none flex-wrap gap-x-[14px] gap-y-1.5 p-0 text-ink-faint"
 							aria-label={locale === 'es' ? 'Temas' : 'Topics'}
 						>
 							{#each activeProject.tags.slice(0, 4) as tag (tag)}
 								<li
-									class="meta tw:after:pl-[14px] tw:after:text-accent-strong tw:after:content-['/'] tw:last:after:content-none"
+									class="meta after:pl-[14px] after:text-accent-strong after:content-['/'] last:after:content-none"
 								>
 									{tag}
 								</li>
@@ -181,11 +181,11 @@
 					</div>
 				{/key}
 				<div
-					class="meta tw:mt-[22px] tw:flex tw:items-center tw:justify-between tw:gap-[18px] tw:border-y tw:border-rule-strong tw:py-[13px] tw:text-ink"
+					class="meta mt-[22px] flex items-center justify-between gap-[18px] border-y border-rule-strong py-[13px] text-ink"
 				>
 					<span>{copy.open}</span>
 					<span
-						class="tw:inline-grid tw:place-items-center tw:text-accent-strong tw:[transition:transform_180ms_ease] tw:motion-reduce:transition-none tw:group-hover:translate-x-[3px] tw:group-hover:translate-y-[-3px] tw:group-focus-visible:translate-x-[3px] tw:group-focus-visible:translate-y-[-3px]"
+						class="inline-grid place-items-center text-accent-strong [transition:transform_180ms_ease] motion-reduce:transition-none group-hover:translate-x-[3px] group-hover:translate-y-[-3px] group-focus-visible:translate-x-[3px] group-focus-visible:translate-y-[-3px]"
 						aria-hidden="true"><MoveUpRight size={19} strokeWidth={1.7} /></span
 					>
 				</div>

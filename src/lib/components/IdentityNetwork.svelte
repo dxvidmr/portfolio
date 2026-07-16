@@ -20,9 +20,9 @@
 	}));
 	const active = $derived(nodes.find((node) => node.id === activeId) ?? nodes[0]);
 	const nodeCodeClass =
-		'tw:inline-grid tw:h-6 tw:min-w-6 tw:place-content-center tw:rounded-ui-sm tw:bg-accent tw:text-[0.62rem] tw:font-bold tw:leading-none tw:text-[var(--on-accent)]';
+		'inline-grid h-6 min-w-6 place-content-center rounded-ui-sm bg-accent text-[0.62rem] font-bold leading-none text-[var(--on-accent)]';
 	const profileNodeClass =
-		'tw:absolute tw:top-[var(--y,50%)] tw:left-[var(--x,50%)] tw:inline-flex tw:min-h-9 tw:items-center tw:gap-2 tw:whitespace-nowrap tw:rounded-ui tw:border tw:px-2.5 tw:py-[7px] tw:text-[0.68rem] tw:[backdrop-filter:blur(7px)] tw:[transform:translate(-50%,-50%)] tw:[transition:background-color_180ms_ease,border-color_180ms_ease,color_180ms_ease,transform_240ms_cubic-bezier(.22,1,.36,1)] tw:motion-reduce:duration-[1ms] tw:hover:border-accent-strong tw:hover:bg-accent-wash tw:hover:text-ink tw:hover:[transform:translate(-50%,-50%)_scale(1.08)] tw:max-[720px]:relative tw:max-[720px]:top-auto tw:max-[720px]:left-auto tw:max-[720px]:justify-start tw:max-[720px]:whitespace-normal tw:max-[720px]:[transform:none] tw:max-[720px]:hover:[transform:translateY(-2px)]';
+		'absolute top-[var(--y,50%)] left-[var(--x,50%)] inline-flex min-h-9 items-center gap-2 whitespace-nowrap rounded-ui border px-2.5 py-[7px] text-[0.68rem] [backdrop-filter:blur(7px)] [transform:translate(-50%,-50%)] [transition:background-color_180ms_ease,border-color_180ms_ease,color_180ms_ease,transform_240ms_cubic-bezier(.22,1,.36,1)] motion-reduce:duration-[1ms] hover:border-accent-strong hover:bg-accent-wash hover:text-ink hover:[transform:translate(-50%,-50%)_scale(1.08)] max-[720px]:relative max-[720px]:top-auto max-[720px]:left-auto max-[720px]:justify-start max-[720px]:whitespace-normal max-[720px]:[transform:none] max-[720px]:hover:[transform:translateY(-2px)]';
 	const copy = $derived(
 		locale === 'es'
 			? {
@@ -40,36 +40,36 @@
 	);
 </script>
 
-<section class="tw:overflow-hidden tw:rounded-ui tw:border tw:border-rule tw:bg-panel">
+<section class="overflow-hidden rounded-ui border border-rule bg-panel">
 	<header
-		class="tw:flex tw:items-end tw:justify-between tw:gap-5 tw:border-b tw:border-rule tw:p-[clamp(18px,2.4vw,28px)] tw:max-[720px]:flex-col tw:max-[720px]:items-start"
+		class="flex items-end justify-between gap-5 border-b border-rule p-[clamp(18px,2.4vw,28px)] max-[720px]:flex-col max-[720px]:items-start"
 	>
 		<div>
 			<span class="meta">{copy.label}</span>
 			<h3
-				class="tw:mt-2 tw:font-title tw:text-[clamp(1.55rem,3vw,2.4rem)] tw:font-normal tw:leading-none"
+				class="mt-2 font-title text-[clamp(1.55rem,3vw,2.4rem)] font-normal leading-none"
 			>
 				{copy.title}
 			</h3>
 		</div>
-		<span class="meta tw:inline-flex tw:items-center tw:gap-1.5 tw:text-ink-faint">
+		<span class="meta inline-flex items-center gap-1.5 text-ink-faint">
 			{copy.hint}
 			<MoveUpRight size={16} strokeWidth={1.8} aria-hidden="true" />
 		</span>
 	</header>
 
 	<div
-		class="tw:relative tw:min-h-[clamp(310px,35vw,410px)] tw:[background-image:linear-gradient(to_right,var(--visual-grid)_1px,transparent_1px),linear-gradient(to_bottom,var(--visual-grid)_1px,transparent_1px)] tw:[background-size:36px_36px] tw:max-[720px]:grid tw:max-[720px]:min-h-0 tw:max-[720px]:grid-cols-2 tw:max-[720px]:gap-2 tw:max-[720px]:p-5 tw:max-[420px]:grid-cols-1"
+		class="relative min-h-[clamp(310px,35vw,410px)] [background-image:linear-gradient(to_right,var(--visual-grid)_1px,transparent_1px),linear-gradient(to_bottom,var(--visual-grid)_1px,transparent_1px)] [background-size:36px_36px] max-[720px]:grid max-[720px]:min-h-0 max-[720px]:grid-cols-2 max-[720px]:gap-2 max-[720px]:p-5 max-[420px]:grid-cols-1"
 	>
 		<svg
-			class="tw:absolute tw:inset-0 tw:h-full tw:w-full tw:overflow-visible tw:max-[720px]:hidden"
+			class="absolute inset-0 h-full w-full overflow-visible max-[720px]:hidden"
 			viewBox="0 0 100 100"
 			preserveAspectRatio="none"
 			aria-hidden="true"
 		>
 			{#each nodes as node (node.id)}
 				<line
-					class={`tw:[vector-effect:non-scaling-stroke] tw:[transition:opacity_180ms_ease,stroke_180ms_ease,stroke-width_180ms_ease] tw:motion-reduce:duration-[1ms] ${node.id === activeId ? 'tw:stroke-accent-strong tw:stroke-2 tw:opacity-100 tw:[stroke-dasharray:none]' : 'tw:stroke-rule-strong tw:stroke-1 tw:opacity-[.55] tw:[stroke-dasharray:2_5]'}`}
+					class={`[vector-effect:non-scaling-stroke] [transition:opacity_180ms_ease,stroke_180ms_ease,stroke-width_180ms_ease] motion-reduce:duration-[1ms] ${node.id === activeId ? 'stroke-accent-strong stroke-2 opacity-100 [stroke-dasharray:none]' : 'stroke-rule-strong stroke-1 opacity-[.55] [stroke-dasharray:2_5]'}`}
 					x1="50"
 					y1="48"
 					x2={node.x}
@@ -79,16 +79,16 @@
 		</svg>
 
 		<div
-			class="tw:absolute tw:top-[48%] tw:left-1/2 tw:grid tw:h-[106px] tw:w-[106px] tw:place-content-center tw:rounded-full tw:border tw:border-accent-strong tw:bg-accent tw:[background-image:var(--accent-grain)] tw:[background-blend-mode:soft-light] tw:[background-size:180px_180px] tw:text-center tw:text-[var(--on-accent)] tw:shadow-[0_0_0_10px_color-mix(in_srgb,var(--accent)_12%,transparent)] tw:[transform:translate(-50%,-50%)] tw:max-[720px]:relative tw:max-[720px]:top-auto tw:max-[720px]:left-auto tw:max-[720px]:col-span-full tw:max-[720px]:mx-0 tw:max-[720px]:mt-1.5 tw:max-[720px]:mb-[18px] tw:max-[720px]:justify-self-center tw:max-[720px]:[transform:none]"
+			class="absolute top-[48%] left-1/2 grid h-[106px] w-[106px] place-content-center rounded-full border border-accent-strong bg-accent [background-image:var(--accent-grain)] [background-blend-mode:soft-light] [background-size:180px_180px] text-center text-[var(--on-accent)] shadow-[0_0_0_10px_color-mix(in_srgb,var(--accent)_12%,transparent)] [transform:translate(-50%,-50%)] max-[720px]:relative max-[720px]:top-auto max-[720px]:left-auto max-[720px]:col-span-full max-[720px]:mx-0 max-[720px]:mt-1.5 max-[720px]:mb-[18px] max-[720px]:justify-self-center max-[720px]:[transform:none]"
 			aria-hidden="true"
 		>
-			<strong class="tw:font-title tw:text-[1.85rem] tw:leading-none">DMR</strong>
-			<span class="tw:mt-[5px] tw:text-[0.54rem] tw:tracking-[0.08em]">network_id</span>
+			<strong class="font-title text-[1.85rem] leading-none">DMR</strong>
+			<span class="mt-[5px] text-[0.54rem] tracking-[0.08em]">network_id</span>
 		</div>
 
 		{#each nodes as node (node.id)}
 			<a
-				class={`${profileNodeClass} ${node.id === activeId ? 'tw:border-accent-strong tw:bg-accent-wash tw:text-ink tw:[transform:translate(-50%,-50%)_scale(1.08)] tw:max-[720px]:[transform:translateY(-2px)]' : 'tw:border-rule-strong tw:bg-[color-mix(in_srgb,var(--bg-panel)_91%,transparent)] tw:text-ink-dim'}`}
+				class={`${profileNodeClass} ${node.id === activeId ? 'border-accent-strong bg-accent-wash text-ink [transform:translate(-50%,-50%)_scale(1.08)] max-[720px]:[transform:translateY(-2px)]' : 'border-rule-strong bg-[color-mix(in_srgb,var(--bg-panel)_91%,transparent)] text-ink-dim'}`}
 				href={node.url}
 				target="_blank"
 				rel="noreferrer"
@@ -104,27 +104,27 @@
 	</div>
 
 	<div
-		class="tw:grid tw:min-h-[84px] tw:grid-cols-[minmax(0,.8fr)_minmax(0,1.2fr)] tw:items-center tw:gap-6 tw:border-t tw:border-rule tw:py-3.5 tw:px-[clamp(18px,2.4vw,28px)] tw:max-[720px]:grid-cols-1"
+		class="grid min-h-[84px] grid-cols-[minmax(0,.8fr)_minmax(0,1.2fr)] items-center gap-6 border-t border-rule py-3.5 px-[clamp(18px,2.4vw,28px)] max-[720px]:grid-cols-1"
 		aria-live="polite"
 	>
-		<div class="tw:flex tw:min-w-0 tw:items-center tw:gap-2.5">
+		<div class="flex min-w-0 items-center gap-2.5">
 			<span class={nodeCodeClass}>{active.code}</span>
-			<div class="tw:grid tw:min-w-0">
-				<strong class="tw:font-title tw:text-base tw:font-medium">{active.label}</strong>
-				<span class="tw:overflow-hidden tw:text-[0.66rem] tw:text-ellipsis tw:whitespace-nowrap tw:text-ink-faint">
+			<div class="grid min-w-0">
+				<strong class="font-title text-base font-medium">{active.label}</strong>
+				<span class="overflow-hidden text-[0.66rem] text-ellipsis whitespace-nowrap text-ink-faint">
 					{active.handle}
 				</span>
 			</div>
 		</div>
 		<div
-			class="tw:flex tw:min-w-0 tw:items-center tw:justify-end tw:gap-3.5 tw:text-[0.7rem] tw:max-[720px]:flex-col tw:max-[720px]:items-start tw:max-[720px]:justify-start tw:max-[720px]:gap-[5px]"
+			class="flex min-w-0 items-center justify-end gap-3.5 text-[0.7rem] max-[720px]:flex-col max-[720px]:items-start max-[720px]:justify-start max-[720px]:gap-[5px]"
 		>
 			<span class="meta">{copy.contact}</span>
-			<a class="tw:text-ink-dim tw:hover:text-accent-strong" href={'mailto:' + profile.contact.mail}
+			<a class="text-ink-dim hover:text-accent-strong" href={'mailto:' + profile.contact.mail}
 				>{profile.contact.mail}</a
 			>
 			<a
-				class="tw:text-ink-dim tw:hover:text-accent-strong"
+				class="text-ink-dim hover:text-accent-strong"
 				href={'mailto:' + profile.contact.mailAlt}>{profile.contact.mailAlt}</a
 			>
 		</div>

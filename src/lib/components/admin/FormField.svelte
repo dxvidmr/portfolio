@@ -37,15 +37,15 @@
 				: undefined)
 	);
 	const controlClass =
-		'tw:w-full tw:border tw:border-rule tw:bg-[var(--admin-surface)] tw:px-[0.65rem] tw:py-2 tw:font-[inherit] tw:text-ink tw:focus-visible:outline-2 tw:focus-visible:outline-offset-2 tw:focus-visible:outline-accent-strong';
-	const invalidControlClass = $derived(error ? 'tw:border-danger!' : '');
+		'w-full border border-rule bg-[var(--admin-surface)] px-[0.65rem] py-2 font-[inherit] text-ink focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent-strong';
+	const invalidControlClass = $derived(error ? 'border-danger!' : '');
 </script>
 
-<div class="tw:grid tw:gap-[0.35rem]">
+<div class="grid gap-[0.35rem]">
 	{#if field.kind === 'boolean'}
-		<label class="tw:flex tw:items-center tw:gap-[0.6rem] tw:text-ink" for={inputId}>
+		<label class="flex items-center gap-[0.6rem] text-ink" for={inputId}>
 			<input
-				class="tw:size-[1.05rem] tw:accent-accent-strong"
+				class="size-[1.05rem] accent-accent-strong"
 				id={inputId}
 				type="checkbox"
 				name={field.name}
@@ -56,20 +56,20 @@
 			<span>{field.label}</span>
 		</label>
 	{:else}
-		<label class="tw:grid tw:gap-[0.35rem]" for={inputId}>
-			<span class="tw:text-[0.8rem] tw:text-ink-dim">
+		<label class="grid gap-[0.35rem]" for={inputId}>
+			<span class="text-[0.8rem] text-ink-dim">
 				{field.label}
-				{#if field.required}<span class="tw:ml-[0.15rem] tw:text-accent-strong" aria-hidden="true"
+				{#if field.required}<span class="ml-[0.15rem] text-accent-strong" aria-hidden="true"
 						>*</span
 					>{/if}
 				{#if field.isPrivate}<span
-						class="tw:ml-2 tw:border tw:border-rule tw:px-[0.35rem] tw:py-[0.05rem] tw:text-[0.65rem] tw:tracking-[0.08em] tw:text-ink-faint tw:uppercase"
+						class="ml-2 border border-rule px-[0.35rem] py-[0.05rem] text-[0.65rem] tracking-[0.08em] text-ink-faint uppercase"
 						>privado</span
 					>{/if}
 			</span>
 			{#if field.kind === 'textarea'}
 				<textarea
-					class="{controlClass} {invalidControlClass} tw:min-h-22 tw:resize-y"
+					class="{controlClass} {invalidControlClass} min-h-22 resize-y"
 					id={inputId}
 					name={field.name}
 					rows="4"
@@ -107,9 +107,9 @@
 		</label>
 	{/if}
 	{#if help}
-		<p class="tw:m-0 tw:text-[0.72rem] tw:text-ink-faint">{help}</p>
+		<p class="m-0 text-[0.72rem] text-ink-faint">{help}</p>
 	{/if}
 	{#if error}
-		<p class="tw:m-0 tw:text-[0.78rem] tw:text-danger" id={errorId}>{error}</p>
+		<p class="m-0 text-[0.78rem] text-danger" id={errorId}>{error}</p>
 	{/if}
 </div>

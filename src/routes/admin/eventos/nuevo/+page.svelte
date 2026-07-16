@@ -26,7 +26,7 @@
 
 <svelte:head><title>Nuevo evento · cv/admin</title></svelte:head>
 
-<ButtonLink variant="ghost" size="sm" href="/admin/eventos" class="tw:mb-4 tw:px-0"
+<ButtonLink variant="ghost" size="sm" href="/admin/eventos" class="mb-4 px-0"
 	>← Volver a eventos</ButtonLink
 >
 <AdminPageHeader
@@ -37,23 +37,23 @@
 
 {#if form?.errors}<AdminToast message="Revisa los campos marcados." success={false} />{/if}
 
-<form class="tw:mt-6 tw:grid tw:gap-8" method="POST" action="?/crear">
+<form class="mt-6 grid gap-8" method="POST" action="?/crear">
 	<section>
-		<h2 class="tw:mt-0 tw:mb-3 tw:text-base">Datos del evento</h2>
+		<h2 class="mt-0 mb-3 text-base">Datos del evento</h2>
 		<CanonicalEventForm values={form?.raw ?? {}} errors={form?.errors ?? {}} />
 	</section>
 
 	<section>
-		<h2 class="tw:mt-0 tw:mb-3 tw:text-base">¿Cuál fue tu papel?</h2>
-		<p class="tw:mt-0 tw:mb-3 tw:text-[0.78rem] tw:text-ink-faint">Puedes marcar varios; también puedes registrar solo el evento y añadir roles más tarde.</p>
+		<h2 class="mt-0 mb-3 text-base">¿Cuál fue tu papel?</h2>
+		<p class="mt-0 mb-3 text-[0.78rem] text-ink-faint">Puedes marcar varios; también puedes registrar solo el evento y añadir roles más tarde.</p>
 
-		<label class="tw:mt-3 tw:mb-1.5 tw:flex tw:cursor-pointer tw:items-baseline tw:gap-2.5 tw:text-ink">
+		<label class="mt-3 mb-1.5 flex cursor-pointer items-baseline gap-2.5 text-ink">
 			<Checkbox name="rol_contribucion" value="1" bind:checked={withTalk} />
-			<span>Contribución <small class="tw:ml-1.5 tw:text-ink-faint">comunicación, ponencia, póster…</small></span>
+			<span>Contribución <small class="ml-1.5 text-ink-faint">comunicación, ponencia, póster…</small></span>
 		</label>
 		{#if withTalk}
-			<fieldset class="tw:mt-1.5 tw:mb-4 tw:rounded-ui tw:border tw:border-dashed tw:border-rule tw:p-4">
-				<legend class="tw:px-2 tw:text-[0.8rem] tw:text-ink-dim">Contribución</legend>
+			<fieldset class="mt-1.5 mb-4 rounded-ui border border-dashed border-rule p-4">
+				<legend class="px-2 text-[0.8rem] text-ink-dim">Contribución</legend>
 				<EntityForm
 					fields={data.talkFields}
 					values={form?.raw ?? {}}
@@ -63,14 +63,14 @@
 			</fieldset>
 		{/if}
 
-		<label class="tw:mt-3 tw:mb-1.5 tw:flex tw:cursor-pointer tw:items-baseline tw:gap-2.5 tw:text-ink">
+		<label class="mt-3 mb-1.5 flex cursor-pointer items-baseline gap-2.5 text-ink">
 			<Checkbox name="rol_servicio" value="1" bind:checked={withService} />
-			<span>Servicio <small class="tw:ml-1.5 tw:text-ink-faint">organización, comité, evaluación…</small></span>
+			<span>Servicio <small class="ml-1.5 text-ink-faint">organización, comité, evaluación…</small></span>
 		</label>
 		{#if withService}
-			<fieldset class="tw:mt-1.5 tw:mb-4 tw:rounded-ui tw:border tw:border-dashed tw:border-rule tw:p-4">
-				<legend class="tw:px-2 tw:text-[0.8rem] tw:text-ink-dim">Servicio</legend>
-				<p class="tw:mt-0 tw:mb-3 tw:text-[0.78rem] tw:text-ink-faint">Si dejas el título vacío se usará el nombre del evento.</p>
+			<fieldset class="mt-1.5 mb-4 rounded-ui border border-dashed border-rule p-4">
+				<legend class="px-2 text-[0.8rem] text-ink-dim">Servicio</legend>
+				<p class="mt-0 mb-3 text-[0.78rem] text-ink-faint">Si dejas el título vacío se usará el nombre del evento.</p>
 				<EntityForm
 					fields={data.serviceFields}
 					values={form?.raw ?? {}}
@@ -80,14 +80,14 @@
 			</fieldset>
 		{/if}
 
-		<label class="tw:mt-3 tw:mb-1.5 tw:flex tw:cursor-pointer tw:items-baseline tw:gap-2.5 tw:text-ink">
+		<label class="mt-3 mb-1.5 flex cursor-pointer items-baseline gap-2.5 text-ink">
 			<Checkbox name="rol_asistencia" value="1" bind:checked={withAttendance} />
-			<span>Asistencia como oyente <small class="tw:ml-1.5 tw:text-ink-faint">siempre privada; nunca llega a la web pública</small></span>
+			<span>Asistencia como oyente <small class="ml-1.5 text-ink-faint">siempre privada; nunca llega a la web pública</small></span>
 		</label>
 		{#if withAttendance}
-			<fieldset class="tw:mt-1.5 tw:mb-4 tw:rounded-ui tw:border tw:border-dashed tw:border-rule tw:p-4">
-				<legend class="tw:px-2 tw:text-[0.8rem] tw:text-ink-dim">Asistencia</legend>
-				<div class="tw:grid tw:gap-4">
+			<fieldset class="mt-1.5 mb-4 rounded-ui border border-dashed border-rule p-4">
+				<legend class="px-2 text-[0.8rem] text-ink-dim">Asistencia</legend>
+				<div class="grid gap-4">
 					<AdminField label="Rol registrado">
 						<Input name="at_role_label" value={form?.raw?.at_role_label || 'Oyente/asistente'} />
 					</AdminField>
@@ -99,7 +99,7 @@
 		{/if}
 	</section>
 
-	<div class="tw:flex tw:items-center tw:gap-3">
+	<div class="flex items-center gap-3">
 		<Button variant="primary" type="submit">Crear evento</Button>
 		<ButtonLink href="/admin/eventos">Cancelar</ButtonLink>
 	</div>

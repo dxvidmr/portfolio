@@ -6,10 +6,10 @@
 
 	let { locale }: { locale: Locale } = $props();
 	const reveal = createReveal({ threshold: 0.1 });
-	const headingClass = 'tw:m-0 tw:font-[450] tw:tracking-[-0.04em]';
-	const bodyClass = 'tw:text-ink-dim tw:leading-[1.68]';
-	const labelClass = 'meta tw:mt-0 tw:mb-4 tw:text-accent-strong';
-	const sectionHeadingClass = `${headingClass} tw:text-[clamp(2.2rem,4.7vw,4.8rem)] tw:leading-[0.94]`;
+	const headingClass = 'm-0 font-[450] tracking-[-0.04em]';
+	const bodyClass = 'text-ink-dim leading-[1.68]';
+	const labelClass = 'meta mt-0 mb-4 text-accent-strong';
+	const sectionHeadingClass = `${headingClass} text-[clamp(2.2rem,4.7vw,4.8rem)] leading-[0.94]`;
 
 	const copy = $derived(locale === 'es' ? {
 		introLabel: 'Investigación y pedagogía · 2022—2025',
@@ -136,130 +136,130 @@
 
 </script>
 
-<section class="tw:grid tw:gap-[clamp(90px,14vw,210px)] tw:border-t tw:border-rule-strong tw:py-[clamp(76px,11vw,150px)]">
-	<article class="tw:grid tw:grid-cols-[minmax(0,1.2fr)_minmax(280px,.8fr)] tw:items-end tw:gap-[clamp(50px,9vw,130px)] tw:max-[850px]:grid-cols-1" use:reveal>
-		<div class="tw:max-w-[800px]">
+<section class="grid gap-[clamp(90px,14vw,210px)] border-t border-rule-strong py-[clamp(76px,11vw,150px)]">
+	<article class="grid grid-cols-[minmax(0,1.2fr)_minmax(280px,.8fr)] items-end gap-[clamp(50px,9vw,130px)] max-[850px]:grid-cols-1" use:reveal>
+		<div class="max-w-[800px]">
 			<p class={labelClass}>{copy.introLabel}</p>
-			<h3 class="{headingClass} tw:max-w-[12ch] tw:text-[clamp(2.8rem,6.5vw,6.5rem)] tw:leading-[0.9]">{copy.introTitle}</h3>
-			<p class="{bodyClass} tw:mt-7 tw:mb-0 tw:max-w-[66ch]">{copy.introBody}</p>
+			<h3 class="{headingClass} max-w-[12ch] text-[clamp(2.8rem,6.5vw,6.5rem)] leading-[0.9]">{copy.introTitle}</h3>
+			<p class="{bodyClass} mt-7 mb-0 max-w-[66ch]">{copy.introBody}</p>
 		</div>
-		<dl class="tw:m-0 tw:grid tw:border-t tw:border-rule-strong">
+		<dl class="m-0 grid border-t border-rule-strong">
 			{#each copy.stats as stat (stat.label)}
-				<div class="tw:grid tw:grid-cols-[minmax(105px,.8fr)_1fr] tw:items-baseline tw:gap-4 tw:border-b tw:border-rule tw:py-3.5">
-					<dt class="tw:font-title tw:text-[clamp(1.6rem,2.8vw,2.7rem)] tw:leading-none">{stat.value}</dt>
-					<dd class="meta tw:m-0 tw:text-ink-faint">{stat.label}</dd>
+				<div class="grid grid-cols-[minmax(105px,.8fr)_1fr] items-baseline gap-4 border-b border-rule py-3.5">
+					<dt class="font-title text-[clamp(1.6rem,2.8vw,2.7rem)] leading-none">{stat.value}</dt>
+					<dd class="meta m-0 text-ink-faint">{stat.label}</dd>
 				</div>
 			{/each}
 		</dl>
 	</article>
 
-	<article class="tw:grid tw:grid-cols-[minmax(300px,.8fr)_minmax(0,1.2fr)] tw:items-end tw:gap-[clamp(55px,10vw,150px)] tw:max-[850px]:grid-cols-1" use:reveal>
-		<div class="tw:max-w-[650px]">
+	<article class="grid grid-cols-[minmax(300px,.8fr)_minmax(0,1.2fr)] items-end gap-[clamp(55px,10vw,150px)] max-[850px]:grid-cols-1" use:reveal>
+		<div class="max-w-[650px]">
 			<p class={labelClass}>{copy.methodLabel}</p>
 			<h3 class={sectionHeadingClass}>{copy.methodTitle}</h3>
-			<p class="{bodyClass} tw:mt-[23px] tw:mb-0">{copy.methodBody}</p>
-			<ul class="meta tw:mt-7 tw:mb-0 tw:flex tw:list-none tw:flex-wrap tw:gap-[7px] tw:p-0">
-				{#each copy.attributes as attribute (attribute)}<li class="tw:rounded-full tw:border tw:border-rule tw:px-[10px] tw:py-[7px] tw:text-[0.58rem] tw:text-ink-faint">{attribute}</li>{/each}
+			<p class="{bodyClass} mt-[23px] mb-0">{copy.methodBody}</p>
+			<ul class="meta mt-7 mb-0 flex list-none flex-wrap gap-[7px] p-0">
+				{#each copy.attributes as attribute (attribute)}<li class="rounded-full border border-rule px-[10px] py-[7px] text-[0.58rem] text-ink-faint">{attribute}</li>{/each}
 			</ul>
 		</div>
-		<ol class="tw:m-0 tw:grid tw:list-none tw:grid-cols-4 tw:border-t tw:border-rule-strong tw:p-0 tw:max-[600px]:grid-cols-2">
+		<ol class="m-0 grid list-none grid-cols-4 border-t border-rule-strong p-0 max-[600px]:grid-cols-2">
 			{#each copy.methodSteps as step, index (step)}
-				<li class={`tw:relative tw:grid tw:min-h-[230px] tw:grid-rows-[1fr_auto] tw:gap-[22px] tw:border-b tw:border-rule tw:px-3.5 tw:pt-5 tw:pb-3.5 ${index < copy.methodSteps.length - 1 ? "tw:border-r tw:after:absolute tw:after:top-1/2 tw:after:right-[-7px] tw:after:z-[2] tw:after:text-accent-strong tw:after:content-['→']" : ''} ${index === 1 ? 'tw:max-[600px]:border-r-0 tw:max-[600px]:after:hidden' : ''}`}>
+				<li class={`relative grid min-h-[230px] grid-rows-[1fr_auto] gap-[22px] border-b border-rule px-3.5 pt-5 pb-3.5 ${index < copy.methodSteps.length - 1 ? "border-r after:absolute after:top-1/2 after:right-[-7px] after:z-[2] after:text-accent-strong after:content-['→']" : ''} ${index === 1 ? 'max-[600px]:border-r-0 max-[600px]:after:hidden' : ''}`}>
 					<NetworkMethodVisual {index} />
-					<div class="tw:grid tw:gap-2"><span class="meta tw:text-ink-faint">0{index + 1}</span><strong class="tw:font-title tw:text-[clamp(1rem,1.8vw,1.6rem)] tw:font-[450]">{step}</strong></div>
+					<div class="grid gap-2"><span class="meta text-ink-faint">0{index + 1}</span><strong class="font-title text-[clamp(1rem,1.8vw,1.6rem)] font-[450]">{step}</strong></div>
 				</li>
 			{/each}
 		</ol>
 	</article>
 
-	<article class="tw:grid tw:grid-cols-[minmax(0,.9fr)_minmax(380px,1.1fr)] tw:gap-[clamp(50px,9vw,130px)] tw:border-y tw:border-rule-strong tw:py-[clamp(50px,7vw,86px)] tw:max-[850px]:grid-cols-1" use:reveal>
-		<div class="tw:max-w-[650px]">
-			<h3 class="{headingClass} tw:text-[clamp(2rem,3.8vw,3.9rem)] tw:leading-[0.96]">{copy.encodingTitle}</h3>
-			<p class="{bodyClass} tw:mt-[22px] tw:mb-0">{copy.encodingBody}</p>
+	<article class="grid grid-cols-[minmax(0,.9fr)_minmax(380px,1.1fr)] gap-[clamp(50px,9vw,130px)] border-y border-rule-strong py-[clamp(50px,7vw,86px)] max-[850px]:grid-cols-1" use:reveal>
+		<div class="max-w-[650px]">
+			<h3 class="{headingClass} text-[clamp(2rem,3.8vw,3.9rem)] leading-[0.96]">{copy.encodingTitle}</h3>
+			<p class="{bodyClass} mt-[22px] mb-0">{copy.encodingBody}</p>
 		</div>
-		<dl class="tw:m-0 tw:grid tw:grid-cols-4 tw:max-[600px]:grid-cols-2">
+		<dl class="m-0 grid grid-cols-4 max-[600px]:grid-cols-2">
 			{#each copy.encoding as item, index (item)}
-				<div class="tw:grid tw:place-items-center tw:gap-[10px] tw:border-b tw:border-rule tw:px-2 tw:py-[18px]">
-					<dt class={`tw:font-title tw:text-[clamp(2rem,4vw,4rem)] tw:leading-none ${index === 3 ? 'tw:translate-x-[-12px] tw:text-[#d1be5c] tw:[text-shadow:12px_0_#7baea0,24px_0_#aaa0bd]' : 'tw:text-ink-dim'}`}>{item.mark}</dt>
-					<dd class="meta tw:m-0 tw:text-ink-faint">{item.label}</dd>
+				<div class="grid place-items-center gap-[10px] border-b border-rule px-2 py-[18px]">
+					<dt class={`font-title text-[clamp(2rem,4vw,4rem)] leading-none ${index === 3 ? 'translate-x-[-12px] text-[#d1be5c] [text-shadow:12px_0_#7baea0,24px_0_#aaa0bd]' : 'text-ink-dim'}`}>{item.mark}</dt>
+					<dd class="meta m-0 text-ink-faint">{item.label}</dd>
 				</div>
 			{/each}
 		</dl>
 	</article>
 
-	<article class="tw:grid tw:gap-[clamp(50px,8vw,100px)]" use:reveal>
-		<div class="tw:ml-[8%] tw:w-[min(720px,76%)] tw:max-[600px]:ml-0 tw:max-[600px]:w-full">
+	<article class="grid gap-[clamp(50px,8vw,100px)]" use:reveal>
+		<div class="ml-[8%] w-[min(720px,76%)] max-[600px]:ml-0 max-[600px]:w-full">
 			<p class={labelClass}>{copy.nightLabel}</p>
 			<h3 class={sectionHeadingClass}>{copy.nightTitle}</h3>
-			<p class="{bodyClass} tw:mt-[23px] tw:mb-0">{copy.nightBody}</p>
+			<p class="{bodyClass} mt-[23px] mb-0">{copy.nightBody}</p>
 		</div>
-		<div class="tw:relative">
+		<div class="relative">
 			<ProjectFigure src="/images/projects/redes-personajes/noche-san-juan.webp" alt={copy.nightAlt} caption={copy.nightCaption} number="01" priority bare />
-			<span class="meta tw:absolute tw:top-[35%] tw:left-[3%] tw:z-[3] tw:max-w-[180px] tw:rounded-ui-sm tw:bg-[color-mix(in_srgb,var(--bg)_76%,transparent)] tw:px-3 tw:py-[9px] tw:text-ink-dim tw:backdrop-blur-[8px] tw:after:absolute tw:after:top-1/2 tw:after:left-[96%] tw:after:h-px tw:after:w-[clamp(60px,10vw,150px)] tw:after:origin-left tw:after:rotate-[-14deg] tw:after:bg-accent-strong tw:after:content-[''] tw:max-[600px]:hidden">{copy.peripheryCallout}</span>
-			<span class="meta tw:absolute tw:top-[19%] tw:right-[4%] tw:z-[3] tw:max-w-[180px] tw:rounded-ui-sm tw:bg-[color-mix(in_srgb,var(--bg)_76%,transparent)] tw:px-3 tw:py-[9px] tw:text-ink-dim tw:backdrop-blur-[8px] tw:after:absolute tw:after:top-full tw:after:left-[15%] tw:after:h-px tw:after:w-[clamp(55px,8vw,120px)] tw:after:origin-left tw:after:rotate-[124deg] tw:after:bg-accent-strong tw:after:content-[''] tw:max-[600px]:hidden">{copy.coreCallout}</span>
+			<span class="meta absolute top-[35%] left-[3%] z-[3] max-w-[180px] rounded-ui-sm bg-[color-mix(in_srgb,var(--bg)_76%,transparent)] px-3 py-[9px] text-ink-dim backdrop-blur-[8px] after:absolute after:top-1/2 after:left-[96%] after:h-px after:w-[clamp(60px,10vw,150px)] after:origin-left after:rotate-[-14deg] after:bg-accent-strong after:content-[''] max-[600px]:hidden">{copy.peripheryCallout}</span>
+			<span class="meta absolute top-[19%] right-[4%] z-[3] max-w-[180px] rounded-ui-sm bg-[color-mix(in_srgb,var(--bg)_76%,transparent)] px-3 py-[9px] text-ink-dim backdrop-blur-[8px] after:absolute after:top-full after:left-[15%] after:h-px after:w-[clamp(55px,8vw,120px)] after:origin-left after:rotate-[124deg] after:bg-accent-strong after:content-[''] max-[600px]:hidden">{copy.coreCallout}</span>
 		</div>
 	</article>
 
-	<article class="tw:grid tw:grid-cols-[minmax(300px,.72fr)_minmax(0,1.28fr)] tw:items-start tw:gap-[clamp(55px,9vw,130px)] tw:max-[850px]:grid-cols-1" use:reveal>
-		<div class="tw:h-full">
-			<div class="tw:sticky tw:top-[18vh] tw:max-w-[610px] tw:max-[850px]:static">
+	<article class="grid grid-cols-[minmax(300px,.72fr)_minmax(0,1.28fr)] items-start gap-[clamp(55px,9vw,130px)] max-[850px]:grid-cols-1" use:reveal>
+		<div class="h-full">
+			<div class="sticky top-[18vh] max-w-[610px] max-[850px]:static">
 				<p class={labelClass}>{copy.bridgeLabel}</p>
 				<h3 class={sectionHeadingClass}>{copy.bridgeTitle}</h3>
-				<p class="{bodyClass} tw:mt-[23px] tw:mb-0">{copy.bridgeBody}</p>
-				<div class="tw:mt-11 tw:grid tw:gap-1.5 tw:border-t tw:border-rule-strong tw:pt-[18px]">
-					<strong class="tw:font-title tw:text-[clamp(3rem,7vw,7rem)] tw:font-[450] tw:leading-[0.8] tw:tracking-[-0.05em]">{copy.bridgeStat}</strong>
-					<span class="meta tw:text-ink-faint">{copy.bridgeStatLabel}</span>
+				<p class="{bodyClass} mt-[23px] mb-0">{copy.bridgeBody}</p>
+				<div class="mt-11 grid gap-1.5 border-t border-rule-strong pt-[18px]">
+					<strong class="font-title text-[clamp(3rem,7vw,7rem)] font-[450] leading-[0.8] tracking-[-0.05em]">{copy.bridgeStat}</strong>
+					<span class="meta text-ink-faint">{copy.bridgeStatLabel}</span>
 				</div>
 			</div>
 		</div>
-		<div class="tw:w-[min(100%,670px)] tw:justify-self-center tw:max-[850px]:w-[min(78vw,620px)] tw:max-[600px]:w-full"><ProjectFigure src="/images/projects/redes-personajes/ferias-intermediacion.webp" alt={copy.bridgeAlt} caption={copy.bridgeCaption} number="02" bare /></div>
+		<div class="w-[min(100%,670px)] justify-self-center max-[850px]:w-[min(78vw,620px)] max-[600px]:w-full"><ProjectFigure src="/images/projects/redes-personajes/ferias-intermediacion.webp" alt={copy.bridgeAlt} caption={copy.bridgeCaption} number="02" bare /></div>
 	</article>
 
-	<article class="tw:grid tw:grid-cols-[minmax(0,1.18fr)_minmax(300px,.82fr)] tw:items-center tw:gap-[clamp(55px,9vw,130px)] tw:max-[850px]:grid-cols-1" use:reveal>
+	<article class="grid grid-cols-[minmax(0,1.18fr)_minmax(300px,.82fr)] items-center gap-[clamp(55px,9vw,130px)] max-[850px]:grid-cols-1" use:reveal>
 		<div><ProjectFigure src="/images/projects/redes-personajes/densidad.webp" alt={copy.densityAlt} caption={copy.densityCaption} number="03" bare /></div>
-		<div class="tw:max-w-[620px] tw:max-[850px]:row-start-1">
+		<div class="max-w-[620px] max-[850px]:row-start-1">
 			<p class={labelClass}>{copy.densityLabel}</p>
 			<h3 class={sectionHeadingClass}>{copy.densityTitle}</h3>
-			<p class="{bodyClass} tw:mt-[23px] tw:mb-0">{copy.densityBody}</p>
-			<dl class="tw:mt-[38px] tw:mb-0 tw:grid tw:grid-cols-2 tw:gap-7 tw:border-t tw:border-rule-strong tw:pt-[18px] tw:max-[600px]:grid-cols-1">
+			<p class="{bodyClass} mt-[23px] mb-0">{copy.densityBody}</p>
+			<dl class="mt-[38px] mb-0 grid grid-cols-2 gap-7 border-t border-rule-strong pt-[18px] max-[600px]:grid-cols-1">
 				{#each copy.densityStats as stat (stat.label)}
-					<div class="tw:grid tw:gap-2"><dt class="tw:font-title tw:text-[clamp(1.8rem,3.5vw,3.4rem)] tw:leading-none">{stat.value}</dt><dd class="meta tw:m-0 tw:text-ink-faint">{stat.label}</dd></div>
+					<div class="grid gap-2"><dt class="font-title text-[clamp(1.8rem,3.5vw,3.4rem)] leading-none">{stat.value}</dt><dd class="meta m-0 text-ink-faint">{stat.label}</dd></div>
 				{/each}
 			</dl>
 		</div>
 	</article>
 
-	<section class="tw:grid tw:gap-[clamp(60px,9vw,120px)]" use:reveal>
-		<div class="tw:ml-[12%] tw:max-w-[740px] tw:max-[600px]:ml-0 tw:max-[600px]:w-full">
+	<section class="grid gap-[clamp(60px,9vw,120px)]" use:reveal>
+		<div class="ml-[12%] max-w-[740px] max-[600px]:ml-0 max-[600px]:w-full">
 			<p class={labelClass}>{copy.parallelLabel}</p>
 			<h3 class={sectionHeadingClass}>{copy.parallelTitle}</h3>
-			<p class="{bodyClass} tw:mt-[23px] tw:mb-0">{copy.parallelBody}</p>
+			<p class="{bodyClass} mt-[23px] mb-0">{copy.parallelBody}</p>
 		</div>
-		<div class="tw:grid tw:grid-cols-12 tw:items-start tw:gap-x-6 tw:gap-y-[clamp(38px,6vw,90px)] tw:max-[600px]:grid-cols-1">
+		<div class="grid grid-cols-12 items-start gap-x-6 gap-y-[clamp(38px,6vw,90px)] max-[600px]:grid-cols-1">
 			{#each copy.parallelFigures as figure, index (figure.src)}
-				<div class={`${index === 0 ? 'tw:col-start-1 tw:col-span-7' : index === 1 ? 'tw:col-start-8 tw:col-span-5 tw:mt-[clamp(70px,10vw,140px)]' : 'tw:col-start-3 tw:col-span-6'} tw:max-[600px]:col-start-1 tw:max-[600px]:col-span-1 tw:max-[600px]:mt-0`}>
+				<div class={`${index === 0 ? 'col-start-1 col-span-7' : index === 1 ? 'col-start-8 col-span-5 mt-[clamp(70px,10vw,140px)]' : 'col-start-3 col-span-6'} max-[600px]:col-start-1 max-[600px]:col-span-1 max-[600px]:mt-0`}>
 					<ProjectFigure src={figure.src} alt={figure.alt} caption={figure.caption} number={figure.number} bare />
 				</div>
 			{/each}
 		</div>
 	</section>
 
-	<section class="tw:grid tw:gap-[clamp(58px,9vw,120px)] tw:border-y tw:border-rule-strong tw:py-[clamp(58px,9vw,110px)]" use:reveal>
-		<header class="tw:grid tw:grid-cols-[minmax(0,1.15fr)_minmax(280px,.85fr)] tw:items-end tw:gap-[clamp(48px,9vw,130px)] tw:max-[850px]:grid-cols-1">
-			<div class="tw:max-w-[760px]">
+	<section class="grid gap-[clamp(58px,9vw,120px)] border-y border-rule-strong py-[clamp(58px,9vw,110px)]" use:reveal>
+		<header class="grid grid-cols-[minmax(0,1.15fr)_minmax(280px,.85fr)] items-end gap-[clamp(48px,9vw,130px)] max-[850px]:grid-cols-1">
+			<div class="max-w-[760px]">
 				<p class={labelClass}>{copy.pedagogyLabel}</p>
 				<h3 class={sectionHeadingClass}>{copy.pedagogyTitle}</h3>
-				<p class="{bodyClass} tw:mt-[23px] tw:mb-0">{copy.pedagogyBody}</p>
+				<p class="{bodyClass} mt-[23px] mb-0">{copy.pedagogyBody}</p>
 			</div>
-			<p class="tw:m-0 tw:max-w-[48ch] tw:border-l-2 tw:border-accent tw:pl-6 tw:font-title tw:text-[clamp(1.05rem,1.8vw,1.45rem)] tw:text-ink-dim tw:leading-[1.68]">{copy.pedagogyNote}</p>
+			<p class="m-0 max-w-[48ch] border-l-2 border-accent pl-6 font-title text-[clamp(1.05rem,1.8vw,1.45rem)] text-ink-dim leading-[1.68]">{copy.pedagogyNote}</p>
 		</header>
-		<ol class="tw:m-0 tw:list-none tw:border-t tw:border-rule-strong tw:p-0">
+		<ol class="m-0 list-none border-t border-rule-strong p-0">
 			{#each copy.pedagogyItems as item (item.type)}
-				<li class="tw:grid tw:grid-cols-[minmax(190px,.55fr)_minmax(0,1.45fr)] tw:gap-[clamp(28px,7vw,100px)] tw:border-b tw:border-rule tw:py-[clamp(24px,4vw,48px)] tw:max-[600px]:grid-cols-1">
-					<div class="tw:pt-2"><span class="meta tw:text-accent-strong">{item.type}</span></div>
+				<li class="grid grid-cols-[minmax(190px,.55fr)_minmax(0,1.45fr)] gap-[clamp(28px,7vw,100px)] border-b border-rule py-[clamp(24px,4vw,48px)] max-[600px]:grid-cols-1">
+					<div class="pt-2"><span class="meta text-accent-strong">{item.type}</span></div>
 					<div>
-						<h4 class="tw:m-0 tw:font-title tw:text-[clamp(1.45rem,2.8vw,2.6rem)] tw:font-[450] tw:tracking-[-0.025em]">{item.title}</h4>
-						<p class="{bodyClass} tw:mt-3 tw:mb-0 tw:max-w-[68ch]">{item.body}</p>
+						<h4 class="m-0 font-title text-[clamp(1.45rem,2.8vw,2.6rem)] font-[450] tracking-[-0.025em]">{item.title}</h4>
+						<p class="{bodyClass} mt-3 mb-0 max-w-[68ch]">{item.body}</p>
 					</div>
 				</li>
 			{/each}

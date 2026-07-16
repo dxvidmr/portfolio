@@ -78,41 +78,41 @@
 		};
 </script>
 
-<section class="tw:mt-10 tw:border-t tw:border-rule tw:pt-6" aria-labelledby="funding-relations-title">
-	<h2 class="tw:mt-0 tw:mb-4 tw:text-base" id="funding-relations-title">
+<section class="mt-10 border-t border-rule pt-6" aria-labelledby="funding-relations-title">
+	<h2 class="mt-0 mb-4 text-base" id="funding-relations-title">
 		{editor.mode === 'funding' ? 'Actividad relacionada' : 'Financiación y premios'}
 	</h2>
-	<p class="tw:mt-0 tw:mb-4 tw:max-w-[68ch] tw:leading-[1.6] tw:text-ink-dim">
+	<p class="mt-0 mb-4 max-w-[68ch] leading-[1.6] text-ink-dim">
 		{editor.mode === 'funding'
 			? 'Vincula esta ayuda, contrato o premio con las actividades académicas a las que da soporte o reconoce.'
 			: 'Vincula esta entrada con las ayudas, contratos o premios relacionados.'}
 	</p>
 
-	<div class="tw:grid tw:grid-cols-2 tw:items-start tw:gap-4 tw:max-[900px]:grid-cols-1">
-		<div class="tw:min-w-0 tw:overflow-hidden tw:rounded-ui tw:border tw:border-rule tw:bg-[var(--admin-surface)]">
-			<header class="tw:flex tw:justify-between tw:border-b tw:border-rule tw:px-4 tw:py-[0.9rem] tw:text-[0.78rem] tw:text-ink">
+	<div class="grid grid-cols-2 items-start gap-4 max-[900px]:grid-cols-1">
+		<div class="min-w-0 overflow-hidden rounded-ui border border-rule bg-[var(--admin-surface)]">
+			<header class="flex justify-between border-b border-rule px-4 py-[0.9rem] text-[0.78rem] text-ink">
 				<strong>Relaciones actuales</strong>
-				<span class="tw:text-accent-strong">{editor.relations.length}</span>
+				<span class="text-accent-strong">{editor.relations.length}</span>
 			</header>
 			{#if editor.relations.length === 0}
-				<p class="tw:m-0 tw:p-4 tw:text-xs tw:text-ink-faint">Todavía no hay financiación o premios relacionados.</p>
+				<p class="m-0 p-4 text-xs text-ink-faint">Todavía no hay financiación o premios relacionados.</p>
 			{:else}
-				<ul class="tw:m-0 tw:list-none tw:p-0">
+				<ul class="m-0 list-none p-0">
 					{#each editor.relations as relation (relationKey(relation))}
-						<li class="tw:flex tw:items-center tw:justify-between tw:gap-[0.9rem] tw:border-b tw:border-rule tw:px-4 tw:py-[0.85rem] tw:last:border-b-0 tw:max-[620px]:flex-col tw:max-[620px]:items-stretch">
-							<div class="tw:min-w-0">
-								<div class="tw:mb-[0.3rem] tw:flex tw:flex-wrap tw:gap-x-[0.65rem] tw:gap-y-[0.35rem] tw:text-[0.61rem] tw:text-ink-faint">
+						<li class="flex items-center justify-between gap-[0.9rem] border-b border-rule px-4 py-[0.85rem] last:border-b-0 max-[620px]:flex-col max-[620px]:items-stretch">
+							<div class="min-w-0">
+								<div class="mb-[0.3rem] flex flex-wrap gap-x-[0.65rem] gap-y-[0.35rem] text-[0.61rem] text-ink-faint">
 									<span>{relationType(relation)}</span>
 									<span>{relationDate(relation) ?? 'Sin fecha'}</span>
-									<span class={relationPublic(relation) ? 'tw:text-accent-strong' : ''}>
+									<span class={relationPublic(relation) ? 'text-accent-strong' : ''}>
 										{relationPublic(relation) ? 'Pública' : 'Privada'}
 									</span>
 								</div>
-								<a class="tw:block tw:text-[0.76rem] tw:leading-[1.35] tw:text-ink tw:hover:text-accent-strong" href={relationHref(relation)}>{relationTitle(relation)}</a>
+								<a class="block text-[0.76rem] leading-[1.35] text-ink hover:text-accent-strong" href={relationHref(relation)}>{relationTitle(relation)}</a>
 							</div>
-							<div class="tw:flex tw:flex-none tw:items-end tw:gap-1.5 tw:max-[620px]:flex-col tw:max-[620px]:items-stretch">
+							<div class="flex flex-none items-end gap-1.5 max-[620px]:flex-col max-[620px]:items-stretch">
 								<form
-									class="tw:flex tw:items-end tw:gap-1.5 tw:max-[620px]:w-full"
+									class="flex items-end gap-1.5 max-[620px]:w-full"
 									method="POST"
 									action="?/tipoFinanciacion"
 									use:enhance={enhancedSubmit(`kind:${relationKey(relation)}`)}
@@ -121,8 +121,8 @@
 									<input type="hidden" name="entityType" value={relation.entityType} />
 									<input type="hidden" name="entityId" value={relation.entityId} />
 									<label>
-										<span class="tw:sr-only">Tipo de relación con {relationTitle(relation)}</span>
-										<Select class="tw:text-[0.68rem]" name="relationKind" value={relation.relationKind}>
+										<span class="sr-only">Tipo de relación con {relationTitle(relation)}</span>
+										<Select class="text-[0.68rem]" name="relationKind" value={relation.relationKind}>
 											{#each editor.kinds as kind (kind.value)}
 												<option value={kind.value}>{kind.label}</option>
 											{/each}
@@ -156,9 +156,9 @@
 			{/if}
 		</div>
 
-		<div class="tw:min-w-0 tw:overflow-hidden tw:rounded-ui tw:border tw:border-rule tw:bg-[var(--admin-surface)]">
-			<header class="tw:flex tw:justify-between tw:border-b tw:border-rule tw:px-4 tw:py-[0.9rem] tw:text-[0.78rem] tw:text-ink"><strong>Añadir relación</strong></header>
-			<div class="tw:grid tw:grid-cols-[minmax(0,1fr)_10rem] tw:gap-[0.65rem] tw:px-4 tw:pt-[0.9rem] tw:max-[620px]:grid-cols-1">
+		<div class="min-w-0 overflow-hidden rounded-ui border border-rule bg-[var(--admin-surface)]">
+			<header class="flex justify-between border-b border-rule px-4 py-[0.9rem] text-[0.78rem] text-ink"><strong>Añadir relación</strong></header>
+			<div class="grid grid-cols-[minmax(0,1fr)_10rem] gap-[0.65rem] px-4 pt-[0.9rem] max-[620px]:grid-cols-1">
 				<AdminField label="Buscar">
 					<Input type="search" bind:value={query} placeholder="Título o tipo…" />
 				</AdminField>
@@ -173,23 +173,23 @@
 					</AdminField>
 				{/if}
 			</div>
-			<p class="tw:m-0 tw:px-4 tw:pt-[0.55rem] tw:pb-[0.85rem] tw:text-[0.65rem] tw:text-ink-faint">{availableCandidates.length} disponibles</p>
+			<p class="m-0 px-4 pt-[0.55rem] pb-[0.85rem] text-[0.65rem] text-ink-faint">{availableCandidates.length} disponibles</p>
 			{#if availableCandidates.length === 0}
-				<p class="tw:m-0 tw:p-4 tw:text-xs tw:text-ink-faint">No hay entradas disponibles con estos filtros.</p>
+				<p class="m-0 p-4 text-xs text-ink-faint">No hay entradas disponibles con estos filtros.</p>
 			{:else}
-				<ul class="tw:m-0 tw:list-none tw:p-0">
+				<ul class="m-0 list-none p-0">
 					{#each availableCandidates as candidate (relationKey(candidate))}
-						<li class="tw:flex tw:items-center tw:justify-between tw:gap-[0.9rem] tw:border-b tw:border-rule tw:px-4 tw:py-[0.85rem] tw:last:border-b-0 tw:max-[620px]:flex-col tw:max-[620px]:items-stretch">
-							<div class="tw:min-w-0">
-								<div class="tw:mb-[0.3rem] tw:flex tw:flex-wrap tw:gap-x-[0.65rem] tw:gap-y-[0.35rem] tw:text-[0.61rem] tw:text-ink-faint">
+						<li class="flex items-center justify-between gap-[0.9rem] border-b border-rule px-4 py-[0.85rem] last:border-b-0 max-[620px]:flex-col max-[620px]:items-stretch">
+							<div class="min-w-0">
+								<div class="mb-[0.3rem] flex flex-wrap gap-x-[0.65rem] gap-y-[0.35rem] text-[0.61rem] text-ink-faint">
 									<span>{candidateType(candidate)}</span>
 									<span>{candidateDate(candidate) ?? 'Sin fecha'}</span>
-									<span class={candidatePublic(candidate) ? 'tw:text-accent-strong' : ''}>
+									<span class={candidatePublic(candidate) ? 'text-accent-strong' : ''}>
 										{candidatePublic(candidate) ? 'Pública' : 'Privada'}
 									</span>
 								</div>
-								<strong class="tw:block tw:text-[0.76rem] tw:leading-[1.35] tw:text-ink">{candidateTitle(candidate)}</strong>
-								<small class="tw:mt-[0.3rem] tw:block tw:text-[0.62rem] tw:text-ink-faint">{kindLabel(candidate.suggestedKind)}</small>
+								<strong class="block text-[0.76rem] leading-[1.35] text-ink">{candidateTitle(candidate)}</strong>
+								<small class="mt-[0.3rem] block text-[0.62rem] text-ink-faint">{kindLabel(candidate.suggestedKind)}</small>
 							</div>
 							<form
 								method="POST"

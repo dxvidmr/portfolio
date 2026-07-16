@@ -15,7 +15,7 @@
 <EditorialCursor />
 
 <!-- Enlaces de idioma ocultos para rastreadores (hreflang lo añadiremos luego) -->
-<div class="tw:hidden" aria-hidden="true">
+<div class="hidden" aria-hidden="true">
 	{#each locales as locale (locale)}
 		<a href={localizedPath(canonicalHref, locale)}>{locale}</a>
 	{/each}

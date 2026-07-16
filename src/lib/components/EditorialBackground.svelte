@@ -226,23 +226,23 @@
 	];
 	const placementClasses: Record<string, string> = {
 		'arenga-inicio':
-			'tw:top-[8vh] tw:left-[-7.5rem] tw:[--scene-x:-24vw] tw:[--scene-y:-20vh] tw:[--scene-rotation:-5deg] tw:max-[780px]:top-[7vh] tw:max-[780px]:left-[-17rem]',
+			'top-[8vh] left-[-7.5rem] [--scene-x:-24vw] [--scene-y:-20vh] [--scene-rotation:-5deg] max-[780px]:top-[7vh] max-[780px]:left-[-17rem]',
 		'arenga-centro':
-			'tw:top-[7vh] tw:right-[-8rem] tw:[--scene-x:24vw] tw:[--scene-y:-18vh] tw:[--scene-rotation:5deg] tw:max-[780px]:top-[5vh] tw:max-[780px]:right-[-17rem]',
+			'top-[7vh] right-[-8rem] [--scene-x:24vw] [--scene-y:-18vh] [--scene-rotation:5deg] max-[780px]:top-[5vh] max-[780px]:right-[-17rem]',
 		'arenga-final':
-			'tw:bottom-[-3.5vh] tw:left-[-6rem] tw:[--scene-x:-22vw] tw:[--scene-y:23vh] tw:[--scene-rotation:-4deg] tw:max-[780px]:bottom-[-3vh] tw:max-[780px]:left-[-17rem]',
+			'bottom-[-3.5vh] left-[-6rem] [--scene-x:-22vw] [--scene-y:23vh] [--scene-rotation:-4deg] max-[780px]:bottom-[-3vh] max-[780px]:left-[-17rem]',
 		frondoso:
-			'tw:bottom-[7vh] tw:left-[4vw] tw:w-[min(29rem,35vw)] tw:[--scene-x:-28vw] tw:[--scene-y:22vh] tw:[--scene-rotation:-5deg] tw:max-[780px]:bottom-[5vh] tw:max-[780px]:left-[-15rem] tw:max-[780px]:w-[25rem]',
+			'bottom-[7vh] left-[4vw] w-[min(29rem,35vw)] [--scene-x:-28vw] [--scene-y:22vh] [--scene-rotation:-5deg] max-[780px]:bottom-[5vh] max-[780px]:left-[-15rem] max-[780px]:w-[25rem]',
 		voces:
-			'tw:top-[45vh] tw:right-[8vw] tw:w-[min(25rem,31vw)] tw:[--scene-x:28vw] tw:[--scene-y:22vh] tw:[--scene-rotation:6deg] tw:max-[780px]:top-[48vh] tw:max-[780px]:right-[-14rem] tw:max-[780px]:w-[23rem]',
+			'top-[45vh] right-[8vw] w-[min(25rem,31vw)] [--scene-x:28vw] [--scene-y:22vh] [--scene-rotation:6deg] max-[780px]:top-[48vh] max-[780px]:right-[-14rem] max-[780px]:w-[23rem]',
 		flores:
-			'tw:top-[14vh] tw:left-[18vw] tw:w-[min(27rem,33vw)] tw:[--scene-x:-28vw] tw:[--scene-y:-22vh] tw:[--scene-rotation:-6deg] tw:max-[780px]:top-[17vh] tw:max-[780px]:left-[-9rem] tw:max-[780px]:w-[24rem]',
+			'top-[14vh] left-[18vw] w-[min(27rem,33vw)] [--scene-x:-28vw] [--scene-y:-22vh] [--scene-rotation:-6deg] max-[780px]:top-[17vh] max-[780px]:left-[-9rem] max-[780px]:w-[24rem]',
 		mujeres:
-			'tw:top-[27vh] tw:right-[10vw] tw:w-[min(28rem,34vw)] tw:[--scene-x:28vw] tw:[--scene-y:-18vh] tw:[--scene-rotation:5deg] tw:max-[780px]:top-[29vh] tw:max-[780px]:right-[-12rem] tw:max-[780px]:w-[24rem]',
+			'top-[27vh] right-[10vw] w-[min(28rem,34vw)] [--scene-x:28vw] [--scene-y:-18vh] [--scene-rotation:5deg] max-[780px]:top-[29vh] max-[780px]:right-[-12rem] max-[780px]:w-[24rem]',
 		pesquisidor:
-			'tw:bottom-[11vh] tw:left-[25vw] tw:w-[min(26rem,32vw)] tw:[--scene-x:-26vw] tw:[--scene-y:24vh] tw:[--scene-rotation:-5deg] tw:max-[780px]:bottom-[16vh] tw:max-[780px]:left-[-8rem] tw:max-[780px]:w-[23rem]',
+			'bottom-[11vh] left-[25vw] w-[min(26rem,32vw)] [--scene-x:-26vw] [--scene-y:24vh] [--scene-rotation:-5deg] max-[780px]:bottom-[16vh] max-[780px]:left-[-8rem] max-[780px]:w-[23rem]',
 		mengo:
-			'tw:top-[18vh] tw:right-[16vw] tw:w-[min(25rem,31vw)] tw:[--scene-x:26vw] tw:[--scene-y:-22vh] tw:[--scene-rotation:5deg] tw:max-[780px]:top-[20vh] tw:max-[780px]:right-[-10rem] tw:max-[780px]:w-[23rem]'
+			'top-[18vh] right-[16vw] w-[min(25rem,31vw)] [--scene-x:26vw] [--scene-y:-22vh] [--scene-rotation:5deg] max-[780px]:top-[20vh] max-[780px]:right-[-10rem] max-[780px]:w-[23rem]'
 	};
 
 	let root = $state<HTMLDivElement | null>(null);
@@ -467,50 +467,50 @@
 </script>
 
 <div
-	class="editorial-background tw:pointer-events-none tw:fixed tw:inset-0 tw:z-0 tw:overflow-hidden tw:[contain:strict] tw:[&.is-ready_.passage.is-scene-active]:opacity-[.78] tw:[&.is-ready_.passage.is-scene-active]:[filter:blur(0)] tw:[&.is-ready_.passage.is-scene-active]:[transform:translate3d(0,0,0)] tw:max-[780px]:[&.is-ready_.passage.is-scene-active]:opacity-[.64]"
+	class="editorial-background pointer-events-none fixed inset-0 z-0 overflow-hidden [contain:strict] [&.is-ready_.passage.is-scene-active]:opacity-[.78] [&.is-ready_.passage.is-scene-active]:[filter:blur(0)] [&.is-ready_.passage.is-scene-active]:[transform:translate3d(0,0,0)] max-[780px]:[&.is-ready_.passage.is-scene-active]:opacity-[.64]"
 	bind:this={root}
 	aria-hidden="true"
 >
 	<div
-		class="tw:absolute tw:inset-0 tw:bg-[radial-gradient(ellipse_at_49%_46%,var(--bg)_0_22%,transparent_65%)] tw:opacity-[.92] tw:max-[780px]:bg-[radial-gradient(ellipse_at_46%_42%,var(--bg)_0_30%,transparent_76%)]"
+		class="absolute inset-0 bg-[radial-gradient(ellipse_at_49%_46%,var(--bg)_0_22%,transparent_65%)] opacity-[.92] max-[780px]:bg-[radial-gradient(ellipse_at_46%_42%,var(--bg)_0_30%,transparent_76%)]"
 	></div>
 
 	{#each passages as passage (passage.id)}
 		<article
-			class={`passage tw:absolute tw:w-[min(32rem,39vw)] tw:font-mono tw:text-[clamp(.56rem,.61vw,.68rem)] tw:leading-[1.18] tw:text-[var(--text-background)] tw:opacity-0 tw:[filter:blur(4px)] tw:[transform:translate3d(var(--scene-x),var(--scene-y),0)_scale(.84)_rotate(var(--scene-rotation))] tw:[transition:opacity_760ms_ease,filter_900ms_ease,transform_1150ms_cubic-bezier(.22,1,.36,1)] tw:will-change-[opacity,filter,transform] tw:[--scene-x:0vw] tw:[--scene-y:18vh] tw:[--scene-rotation:0deg] tw:motion-reduce:[filter:none] tw:motion-reduce:[transform:none] tw:motion-reduce:duration-[1ms] tw:max-[780px]:w-[25rem] tw:max-[780px]:text-[.55rem] ${placementClasses[passage.id]}`}
+			class={`passage absolute w-[min(32rem,39vw)] font-mono text-[clamp(.56rem,.61vw,.68rem)] leading-[1.18] text-[var(--text-background)] opacity-0 [filter:blur(4px)] [transform:translate3d(var(--scene-x),var(--scene-y),0)_scale(.84)_rotate(var(--scene-rotation))] [transition:opacity_760ms_ease,filter_900ms_ease,transform_1150ms_cubic-bezier(.22,1,.36,1)] will-change-[opacity,filter,transform] [--scene-x:0vw] [--scene-y:18vh] [--scene-rotation:0deg] motion-reduce:[filter:none] motion-reduce:[transform:none] motion-reduce:duration-[1ms] max-[780px]:w-[25rem] max-[780px]:text-[.55rem] ${placementClasses[passage.id]}`}
 			data-scene={passage.scene}
 		>
-			<header class="tw:flex tw:justify-between tw:gap-4 tw:text-[.82em] tw:tracking-[.045em] tw:text-[var(--text-background-strong)]">
+			<header class="flex justify-between gap-4 text-[.82em] tracking-[.045em] text-[var(--text-background-strong)]">
 				<span>{passage.label}</span>
 				<span>{passage.range}</span>
 			</header>
-			<strong class="tw:mt-[.48rem] tw:mr-0 tw:mb-[.32rem] tw:ml-[3.2rem] tw:block tw:font-medium tw:tracking-[.15em] tw:text-[var(--text-background-strong)]">{passage.speaker}</strong>
-			<div class="tw:grid tw:gap-[.12rem]">
+			<strong class="mt-[.48rem] mr-0 mb-[.32rem] ml-[3.2rem] block font-medium tracking-[.15em] text-[var(--text-background-strong)]">{passage.speaker}</strong>
+			<div class="grid gap-[.12rem]">
 				{#each passage.lines as line (line.n)}
-					<div class="tw:grid tw:grid-cols-[2.65rem_minmax(0,1fr)_auto] tw:items-baseline tw:gap-[.55rem]">
-						<span class="tw:text-right tw:text-[var(--text-background-faint)] tw:[font-variant-numeric:tabular-nums]">{line.n}</span>
-						<p class="tw:m-0 tw:whitespace-nowrap">
+					<div class="grid grid-cols-[2.65rem_minmax(0,1fr)_auto] items-baseline gap-[.55rem]">
+						<span class="text-right text-[var(--text-background-faint)] [font-variant-numeric:tabular-nums]">{line.n}</span>
+						<p class="m-0 whitespace-nowrap">
 							{#each line.parts as part}
 								{#if part.marked}
-									<mark class="tw:bg-accent-wash tw:px-[.12em] tw:text-[var(--accent-background-text)]">
+									<mark class="bg-accent-wash px-[.12em] text-[var(--accent-background-text)]">
 										{#each [...part.text] as character}
-											<span class="glyph tw:inline-block tw:whitespace-pre">{character}</span>
+											<span class="glyph inline-block whitespace-pre">{character}</span>
 										{/each}
 									</mark>
 								{:else}
 									{#each [...part.text] as character}
-									<span class="glyph tw:inline-block tw:whitespace-pre">{character}</span>
+									<span class="glyph inline-block whitespace-pre">{character}</span>
 									{/each}
 								{/if}
 							{/each}
 						</p>
 						{#if line.segmentIds.length}
-							<small class="tw:text-[.69em] tw:tracking-[.025em] tw:text-[var(--accent-background-text)] tw:max-[780px]:hidden">{line.segmentIds.join(' · ')}</small>
+							<small class="text-[.69em] tracking-[.025em] text-[var(--accent-background-text)] max-[780px]:hidden">{line.segmentIds.join(' · ')}</small>
 						{/if}
 					</div>
 				{/each}
 			</div>
-			<footer class="tw:mt-[.38rem] tw:flex tw:justify-end tw:gap-4 tw:text-[.82em] tw:tracking-[.045em] tw:text-[var(--text-background-strong)]">&lt;/sp&gt;</footer>
+			<footer class="mt-[.38rem] flex justify-end gap-4 text-[.82em] tracking-[.045em] text-[var(--text-background-strong)]">&lt;/sp&gt;</footer>
 		</article>
 	{/each}
 </div>

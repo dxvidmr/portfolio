@@ -40,7 +40,7 @@
 	];
 </script>
 
-<div class="tw:grid tw:grid-cols-2 tw:gap-x-5 tw:gap-y-4 tw:max-[700px]:grid-cols-1">
+<div class="grid grid-cols-2 gap-x-5 gap-y-4 max-[700px]:grid-cols-1">
 	{#each fields as field (field.name)}
 		<AdminField
 			label={field.label}

@@ -5,4 +5,4 @@
 	let { class: className = '', checked = $bindable(), ...attributes }: Props = $props();
 </script>
 
-<input {...attributes} type="checkbox" bind:checked class="tw:size-[1.05rem] tw:accent-accent-strong {className}" />
+<input {...attributes} type="checkbox" bind:checked class="size-[1.05rem] accent-accent-strong {className}" />

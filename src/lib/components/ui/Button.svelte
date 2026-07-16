@@ -22,21 +22,21 @@
 	}: Props = $props();
 
 	const base =
-		'tw:inline-flex tw:cursor-pointer tw:items-center tw:justify-center tw:gap-1.5 tw:rounded-ui-sm tw:border tw:bg-transparent tw:font-mono tw:leading-[1.2] tw:transition-[border-color,color,background-color] tw:duration-[120ms] tw:disabled:cursor-not-allowed tw:disabled:opacity-40';
+		'inline-flex cursor-pointer items-center justify-center gap-1.5 rounded-ui-sm border bg-transparent font-mono leading-[1.2] transition-[border-color,color,background-color] duration-[120ms] disabled:cursor-not-allowed disabled:opacity-40';
 	const variants: Record<Variant, string> = {
 		primary:
-			'tw:border-accent-strong tw:text-accent-strong tw:hover:bg-accent-wash tw:hover:text-accent-strong',
+			'border-accent-strong text-accent-strong hover:bg-accent-wash hover:text-accent-strong',
 		secondary:
-			'tw:border-rule-strong tw:text-ink-dim tw:hover:border-accent-strong tw:hover:bg-accent-wash tw:hover:text-accent-strong',
+			'border-rule-strong text-ink-dim hover:border-accent-strong hover:bg-accent-wash hover:text-accent-strong',
 		danger:
-			'tw:border-danger tw:text-danger tw:hover:border-danger tw:hover:bg-danger-soft tw:hover:text-danger',
+			'border-danger text-danger hover:border-danger hover:bg-danger-soft hover:text-danger',
 		ghost:
-			'tw:border-transparent tw:text-ink-dim tw:hover:bg-accent-wash tw:hover:text-accent-strong'
+			'border-transparent text-ink-dim hover:bg-accent-wash hover:text-accent-strong'
 	};
 	const sizes: Record<Size, string> = {
-		icon: 'tw:size-9 tw:min-h-9 tw:p-0 tw:text-[0.72rem]',
-		sm: 'tw:min-h-8 tw:px-2 tw:py-1.5 tw:text-[0.65rem]',
-		md: 'tw:min-h-9 tw:px-3 tw:py-2 tw:text-[0.72rem]'
+		icon: 'size-9 min-h-9 p-0 text-[0.72rem]',
+		sm: 'min-h-8 px-2 py-1.5 text-[0.65rem]',
+		md: 'min-h-9 px-3 py-2 text-[0.72rem]'
 	};
 	const classes = $derived(`${base} ${variants[variant]} ${sizes[size]} ${className}`);
 </script>

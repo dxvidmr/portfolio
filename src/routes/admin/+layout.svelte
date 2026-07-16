@@ -38,33 +38,33 @@
 	<meta name="robots" content="noindex, nofollow" />
 </svelte:head>
 
-<div class="admin-shell tw:min-h-screen tw:bg-canvas tw:font-mono tw:text-ink">
+<div class="admin-shell min-h-screen bg-canvas font-mono text-ink">
 	<header
-		class="tw:sticky tw:top-0 tw:z-[100] tw:flex tw:flex-wrap tw:items-stretch tw:gap-[clamp(1.25rem,3vw,2.5rem)] tw:border-b tw:border-rule tw:bg-[var(--surface-glass)] tw:px-gutter tw:py-[0.7rem] tw:backdrop-blur-[14px] tw:max-[980px]:gap-4 tw:max-[620px]:px-4"
+		class="sticky top-0 z-[100] flex flex-wrap items-stretch gap-[clamp(1.25rem,3vw,2.5rem)] border-b border-rule bg-[var(--surface-glass)] px-gutter py-[0.7rem] backdrop-blur-[14px] max-[980px]:gap-4 max-[620px]:px-4"
 	>
 		<a
-			class="tw:grid tw:min-w-18 tw:content-center tw:leading-none tw:text-ink"
+			class="grid min-w-18 content-center leading-none text-ink"
 			href="/admin"
 			aria-label="Ir al resumen del dashboard"
 		>
-			<span class="tw:font-title tw:text-[1.15rem] tw:font-medium">DMR</span>
-			<small class="tw:mt-1 tw:text-[0.58rem] tw:tracking-[0.12em] tw:text-ink-faint tw:uppercase"
+			<span class="font-title text-[1.15rem] font-medium">DMR</span>
+			<small class="mt-1 text-[0.58rem] tracking-[0.12em] text-ink-faint uppercase"
 				>cv/admin</small
 			>
 		</a>
 		<nav
-			class="tw:flex tw:items-stretch tw:gap-[clamp(1rem,2.5vw,2rem)] tw:max-[980px]:order-3 tw:max-[980px]:w-full tw:max-[980px]:overflow-x-auto tw:max-[980px]:pt-1"
+			class="flex items-stretch gap-[clamp(1rem,2.5vw,2rem)] max-[980px]:order-3 max-[980px]:w-full max-[980px]:overflow-x-auto max-[980px]:pt-1"
 			aria-label="Secciones del dashboard"
 		>
 			{#each groups as group (group.label)}
-				<div class="tw:grid tw:content-center tw:gap-[0.22rem]">
-					<span class="tw:text-[0.55rem] tw:tracking-[0.14em] tw:text-ink-faint tw:uppercase"
+				<div class="grid content-center gap-[0.22rem]">
+					<span class="text-[0.55rem] tracking-[0.14em] text-ink-faint uppercase"
 						>{group.label}</span
 					>
-					<div class="tw:flex tw:gap-3">
+					<div class="flex gap-3">
 						{#each group.links as link (link.href)}
 							<a
-								class="tw:border-b tw:border-transparent tw:pb-[0.2rem] tw:text-[0.72rem] tw:text-ink-dim tw:hover:border-accent-strong tw:hover:text-accent-strong tw:aria-[current=page]:border-accent-strong tw:aria-[current=page]:text-accent-strong"
+								class="border-b border-transparent pb-[0.2rem] text-[0.72rem] text-ink-dim hover:border-accent-strong hover:text-accent-strong aria-[current=page]:border-accent-strong aria-[current=page]:text-accent-strong"
 								href={link.href}
 								data-sveltekit-preload-data="off"
 								aria-current={isCurrent(link.href) ? 'page' : undefined}
@@ -76,15 +76,15 @@
 				</div>
 			{/each}
 		</nav>
-		<div class="tw:ml-auto tw:flex tw:items-center tw:gap-2.5">
+		<div class="ml-auto flex items-center gap-2.5">
 			<ThemeToggle />
 			<a
 				href="/es"
-				class="tw:text-[0.68rem] tw:text-ink-dim tw:hover:text-accent-strong tw:max-[620px]:hidden"
+				class="text-[0.68rem] text-ink-dim hover:text-accent-strong max-[620px]:hidden"
 				>Web pública ↗</a
 			>
 			<span
-				class="tw:max-w-32 tw:overflow-hidden tw:text-[0.65rem] tw:text-ellipsis tw:whitespace-nowrap tw:text-ink-faint tw:max-[620px]:hidden"
+				class="max-w-32 overflow-hidden text-[0.65rem] text-ellipsis whitespace-nowrap text-ink-faint max-[620px]:hidden"
 				title={data.session?.user?.name ?? 'admin'}>{data.session?.user?.name ?? 'admin'}</span
 			>
 			<form method="POST" action="/admin?/salir">
@@ -93,7 +93,7 @@
 		</div>
 	</header>
 	<main
-		class="admin-main tw:mx-auto tw:w-[calc(100%-2*var(--gutter))] tw:max-w-[88rem] tw:py-[clamp(1.5rem,4vw,3.5rem)] tw:max-[720px]:w-[calc(100%-2rem)] tw:max-[720px]:py-6"
+		class="admin-main mx-auto w-[calc(100%-2*var(--gutter))] max-w-[88rem] py-[clamp(1.5rem,4vw,3.5rem)] max-[720px]:w-[calc(100%-2rem)] max-[720px]:py-6"
 	>
 		{@render children()}
 	</main>

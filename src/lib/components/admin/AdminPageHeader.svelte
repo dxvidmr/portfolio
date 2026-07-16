@@ -15,23 +15,23 @@
 </script>
 
 <header
-	class="tw:flex tw:items-end tw:justify-between tw:gap-4 tw:max-[620px]:flex-col tw:max-[620px]:items-start {description
+	class="flex items-end justify-between gap-4 max-[620px]:flex-col max-[620px]:items-start {description
 		? ''
-		: 'tw:mb-6'}"
+		: 'mb-6'}"
 >
 	<div>
 		{#if eyebrow}
-			<p class="tw:m-0 tw:text-meta tw:tracking-[0.1em] tw:text-ink-faint tw:uppercase">{eyebrow}</p>
+			<p class="m-0 text-meta tracking-[0.1em] text-ink-faint uppercase">{eyebrow}</p>
 		{/if}
-		<h1 class="tw:mt-1 tw:mb-0 tw:text-[clamp(1.7rem,3vw,2.45rem)]! tw:leading-[1.05]">{title}</h1>
+		<h1 class="mt-1 mb-0 text-[clamp(1.7rem,3vw,2.45rem)]! leading-[1.05]">{title}</h1>
 	</div>
 	{#if actions}
-		<div class="tw:flex tw:items-center tw:gap-4">
+		<div class="flex items-center gap-4">
 			{@render actions()}
 		</div>
 	{/if}
 </header>
 
 {#if description}
-	<p class="tw:mt-4 tw:mb-6 tw:max-w-[78ch] tw:leading-[1.6] tw:text-ink-dim">{description}</p>
+	<p class="mt-4 mb-6 max-w-[78ch] leading-[1.6] text-ink-dim">{description}</p>
 {/if}

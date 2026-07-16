@@ -15,20 +15,20 @@
 	}: { visual: ProjectVisual; label: string; period: string; compact?: boolean } = $props();
 
 	const visualTone: Record<ProjectVisual, string> = {
-		fuenteovejuna: 'tw:bg-[#ddd7d6] tw:text-[#383634]',
-		versologia: 'tw:bg-[color-mix(in_srgb,#d4aa42_8%,var(--visual-bg))] tw:text-ink',
-		etso: 'tw:bg-[color-mix(in_srgb,#003a92_8%,var(--visual-bg))] tw:text-ink',
-		networks: 'tw:bg-[color-mix(in_srgb,#aaa0bd_14%,var(--visual-bg))] tw:text-ink',
-		editions: 'tw:bg-[color-mix(in_srgb,#2f7f7a_13%,var(--visual-bg))] tw:text-ink',
-		stage: 'tw:bg-[color-mix(in_srgb,#68495f_20%,var(--visual-bg))] tw:text-ink'
+		fuenteovejuna: 'bg-[#ddd7d6] text-[#383634]',
+		versologia: 'bg-[color-mix(in_srgb,#d4aa42_8%,var(--visual-bg))] text-ink',
+		etso: 'bg-[color-mix(in_srgb,#003a92_8%,var(--visual-bg))] text-ink',
+		networks: 'bg-[color-mix(in_srgb,#aaa0bd_14%,var(--visual-bg))] text-ink',
+		editions: 'bg-[color-mix(in_srgb,#2f7f7a_13%,var(--visual-bg))] text-ink',
+		stage: 'bg-[color-mix(in_srgb,#68495f_20%,var(--visual-bg))] text-ink'
 	};
 </script>
 
 <div
-	class={`tw:relative tw:isolate tw:w-full tw:overflow-hidden tw:rounded-ui tw:border tw:border-rule tw:before:absolute tw:before:inset-0 tw:before:z-[-2] tw:before:bg-[linear-gradient(90deg,var(--visual-grid)_1px,transparent_1px),linear-gradient(0deg,var(--visual-grid)_1px,transparent_1px)] tw:before:[background-size:28px_28px] tw:before:opacity-[.55] tw:before:content-[''] tw:after:pointer-events-none tw:after:absolute tw:after:inset-0 tw:after:z-[8] tw:after:[background-image:var(--visual-grain)] tw:after:opacity-[.12] tw:after:[mix-blend-mode:multiply] tw:after:content-[''] ${compact ? 'tw:aspect-[4/5] tw:max-[840px]:aspect-[16/11]' : 'tw:aspect-[16/11]'} ${visualTone[visual]}`}
+	class={`relative isolate w-full overflow-hidden rounded-ui border border-rule before:absolute before:inset-0 before:z-[-2] before:bg-[linear-gradient(90deg,var(--visual-grid)_1px,transparent_1px),linear-gradient(0deg,var(--visual-grid)_1px,transparent_1px)] before:[background-size:28px_28px] before:opacity-[.55] before:content-[''] after:pointer-events-none after:absolute after:inset-0 after:z-[8] after:[background-image:var(--visual-grain)] after:opacity-[.12] after:[mix-blend-mode:multiply] after:content-[''] ${compact ? 'aspect-[4/5] max-[840px]:aspect-[16/11]' : 'aspect-[16/11]'} ${visualTone[visual]}`}
 	aria-hidden="true"
 >
-	<div class="meta tw:absolute tw:top-4 tw:right-[18px] tw:left-[18px] tw:z-10 tw:flex tw:justify-between tw:gap-4 tw:text-current">
+	<div class="meta absolute top-4 right-[18px] left-[18px] z-10 flex justify-between gap-4 text-current">
 		<span>{label}</span>
 		<span>{period}</span>
 	</div>

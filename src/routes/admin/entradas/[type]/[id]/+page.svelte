@@ -14,9 +14,9 @@
 	let { data, form }: { data: PageData; form: ActionData } = $props();
 
 	const created = $derived(page.url.searchParams.get('creada') === '1');
-	const sectionClass = 'tw:mt-10 tw:border-t tw:border-rule tw:pt-6';
+	const sectionClass = 'mt-10 border-t border-rule pt-6';
 	const sectionTitleClass =
-		'tw:mt-0 tw:mb-5 tw:text-sm tw:font-medium tw:uppercase tw:tracking-[0.08em] tw:text-ink-dim';
+		'mt-0 mb-5 text-sm font-medium uppercase tracking-[0.08em] text-ink-dim';
 
 	const toast = $derived.by(() => {
 		if (!form) return null;
@@ -55,12 +55,12 @@
 	variant="ghost"
 	size="sm"
 	href="/admin/entradas"
-	class="tw:mb-4 tw:px-0"
+	class="mb-4 px-0"
 	data-sveltekit-preload-data="off">← Volver</ButtonLink
 >
 
-<nav class="tw:mb-6 tw:flex tw:gap-2 tw:text-[0.8rem] tw:text-ink-faint" aria-label="Ruta">
-	<a class="tw:text-ink-dim tw:hover:text-accent" href="/admin/entradas">Entradas</a>
+<nav class="mb-6 flex gap-2 text-[0.8rem] text-ink-faint" aria-label="Ruta">
+	<a class="text-ink-dim hover:text-accent" href="/admin/entradas">Entradas</a>
 	<span aria-hidden="true">/</span>
 	<span>{data.typeLabel}</span>
 	<span aria-hidden="true">/</span>
@@ -70,14 +70,14 @@
 <AdminPageHeader title={data.heading} eyebrow={data.typeLabel}>
 	{#snippet actions()}
 		<span
-			class={`tw:border tw:px-2 tw:py-1 tw:text-[0.7rem] tw:uppercase tw:tracking-[0.08em] ${
-				data.control.isPublic ? 'tw:border-accent tw:text-accent' : 'tw:border-rule-strong tw:text-ink-dim'
+			class={`border px-2 py-1 text-[0.7rem] uppercase tracking-[0.08em] ${
+				data.control.isPublic ? 'border-accent text-accent' : 'border-rule-strong text-ink-dim'
 			}`}
 		>
 			{data.control.isPublic ? 'Pública' : 'Privada'}
 		</span>
 		{#if data.control.showHome}
-			<span class="tw:border tw:border-accent tw:px-2 tw:py-1 tw:text-[0.7rem] tw:uppercase tw:tracking-[0.08em] tw:text-accent">
+			<span class="border border-accent px-2 py-1 text-[0.7rem] uppercase tracking-[0.08em] text-accent">
 				En portada
 			</span>
 		{/if}
@@ -102,7 +102,7 @@
 			values={form?.raw ?? data.values}
 			errors={form?.errors ?? {}}
 		/>
-		<div class="tw:mt-8">
+		<div class="mt-8">
 			<Button type="submit">Guardar cambios</Button>
 		</div>
 	</form>
@@ -110,17 +110,17 @@
 
 <section class={sectionClass} aria-labelledby="visibilidad-title">
 	<h2 class={sectionTitleClass} id="visibilidad-title">Visibilidad y portada</h2>
-	<div class="tw:grid tw:gap-6 md:tw:grid-cols-2">
-		<div class="tw:grid tw:content-start tw:gap-3 tw:border tw:border-rule tw:p-5">
+	<div class="grid gap-6 md:grid-cols-2">
+		<div class="grid content-start gap-3 border border-rule p-5">
 			{#if data.control.isPublic}
-				<p class="tw:m-0 tw:max-w-[60ch] tw:leading-relaxed tw:text-ink-dim">
+				<p class="m-0 max-w-[60ch] leading-relaxed text-ink-dim">
 					Visible en la web pública. Al pasarla a privada también se retira de la portada.
 				</p>
 				<form method="POST" action="?/despublicar">
 					<Button type="submit" variant="secondary">Hacer privada</Button>
 				</form>
 			{:else}
-				<p class="tw:m-0 tw:max-w-[60ch] tw:leading-relaxed tw:text-ink-dim">
+				<p class="m-0 max-w-[60ch] leading-relaxed text-ink-dim">
 					Entrada privada: no aparece en el CV ni en la portada.
 				</p>
 				<form method="POST" action="?/publicar">
@@ -128,15 +128,15 @@
 				</form>
 			{/if}
 		</div>
-		<div class="tw:grid tw:content-start tw:gap-3 tw:border tw:border-rule tw:p-5">
+		<div class="grid content-start gap-3 border border-rule p-5">
 			{#if data.control.showHome}
-				<p class="tw:m-0 tw:text-ink-dim">Seleccionada en la portada.</p>
+				<p class="m-0 text-ink-dim">Seleccionada en la portada.</p>
 				<form method="POST" action="?/portada">
 					<input type="hidden" name="enabled" value="0" />
 					<Button type="submit" variant="danger">Eliminar de portada</Button>
 				</form>
 			{:else}
-				<p class="tw:m-0 tw:max-w-[60ch] tw:leading-relaxed tw:text-ink-dim">
+				<p class="m-0 max-w-[60ch] leading-relaxed text-ink-dim">
 					No aparece en la portada.
 					{#if !data.control.isPublic}Mostrarla en portada también la hará pública.{/if}
 				</p>
@@ -145,9 +145,9 @@
 					<Button type="submit">Mostrar en portada</Button>
 				</form>
 			{/if}
-			<p class="tw:m-0 tw:text-xs tw:text-ink-faint">
+			<p class="m-0 text-xs text-ink-faint">
 				El orden de la portada se gestiona en
-				<a class="tw:text-ink-dim tw:hover:text-accent" href="/admin/portada">Portada</a>.
+				<a class="text-ink-dim hover:text-accent" href="/admin/portada">Portada</a>.
 			</p>
 		</div>
 	</div>
@@ -156,36 +156,36 @@
 {#if data.hasStructuralRelations}
 	<section class={sectionClass} aria-labelledby="structural-title">
 		<h2 class={sectionTitleClass} id="structural-title">Relaciones estructurales</h2>
-		<p class="tw:-mt-2 tw:mb-4 tw:max-w-[60ch] tw:leading-relaxed tw:text-ink-dim">
+		<p class="-mt-2 mb-4 max-w-[60ch] leading-relaxed text-ink-dim">
 			Estas relaciones proceden de los campos del contenido relacionado. Para cambiarlas, edita
 			la entrada correspondiente y modifica su selector.
 		</p>
-		<div class="tw:grid tw:gap-4 md:tw:grid-cols-2">
+		<div class="grid gap-4 md:grid-cols-2">
 			{#each data.structuralRelations as group (group.entityType)}
-				<article class="tw:min-w-0 tw:border tw:border-rule tw:bg-admin-surface">
-					<header class="tw:flex tw:justify-between tw:gap-4 tw:border-b tw:border-rule tw:p-4">
+				<article class="min-w-0 border border-rule bg-admin-surface">
+					<header class="flex justify-between gap-4 border-b border-rule p-4">
 						<div>
-							<h3 class="tw:m-0 tw:text-sm tw:text-ink">{group.label}</h3>
-							<p class="tw:mt-1 tw:mb-0 tw:text-xs tw:leading-relaxed tw:text-ink-faint">
+							<h3 class="m-0 text-sm text-ink">{group.label}</h3>
+							<p class="mt-1 mb-0 text-xs leading-relaxed text-ink-faint">
 								{group.description}
 							</p>
 						</div>
-						<strong class="tw:text-sm tw:font-medium tw:text-accent">{group.items.length}</strong>
+						<strong class="text-sm font-medium text-accent">{group.items.length}</strong>
 					</header>
 					{#if group.items.length > 0}
-						<ul class="tw:m-0 tw:list-none tw:p-0">
+						<ul class="m-0 list-none p-0">
 							{#each group.items as item (`${item.entityType}:${item.entityId}`)}
-								<li class="tw:flex tw:items-center tw:justify-between tw:gap-3 tw:border-b tw:border-rule tw:px-4 tw:py-3 last:tw:border-b-0">
+								<li class="flex items-center justify-between gap-3 border-b border-rule px-4 py-3 last:border-b-0">
 									<a
-										class="tw:grid tw:min-w-0 tw:gap-1 tw:text-xs tw:leading-snug tw:text-ink tw:hover:text-accent"
+										class="grid min-w-0 gap-1 text-xs leading-snug text-ink hover:text-accent"
 										href={`/admin/entradas/${item.entityType}/${item.entityId}`}
 									>
 										<span>{item.title}</span>
-										<small class="tw:text-[0.65rem] tw:text-ink-faint">{item.sortDate ?? 'Sin fecha'}</small>
+										<small class="text-[0.65rem] text-ink-faint">{item.sortDate ?? 'Sin fecha'}</small>
 									</a>
 									<span
-										class={`tw:shrink-0 tw:text-[0.6rem] tw:uppercase tw:tracking-[0.05em] ${
-											item.isPublic ? 'tw:text-accent' : 'tw:text-ink-dim'
+										class={`shrink-0 text-[0.6rem] uppercase tracking-[0.05em] ${
+											item.isPublic ? 'text-accent' : 'text-ink-dim'
 										}`}
 									>
 										{item.isPublic ? 'Pública' : 'Privada'}
@@ -194,7 +194,7 @@
 							{/each}
 						</ul>
 					{:else}
-						<p class="tw:m-0 tw:p-4 tw:text-xs tw:text-ink-faint">No hay entradas vinculadas.</p>
+						<p class="m-0 p-4 text-xs text-ink-faint">No hay entradas vinculadas.</p>
 					{/if}
 				</article>
 			{/each}
@@ -205,9 +205,9 @@
 {#if data.canonicalEvent}
 	<section class={sectionClass} aria-labelledby="canonical-event-title">
 		<h2 class={sectionTitleClass} id="canonical-event-title">Evento compartido</h2>
-		<p class="tw:max-w-[60ch] tw:leading-relaxed tw:text-ink-dim">
+		<p class="max-w-[60ch] leading-relaxed text-ink-dim">
 			Esta actividad pertenece a
-			<a class="tw:text-accent tw:hover:underline" href={`/admin/eventos/${data.canonicalEvent.id}`}>
+			<a class="text-accent hover:underline" href={`/admin/eventos/${data.canonicalEvent.id}`}>
 				{data.canonicalEvent.title}
 			</a>.
 			Desde su ficha puedes ver los demás roles, incluida la asistencia privada.
@@ -226,46 +226,46 @@
 <section class={sectionClass} aria-labelledby="portfolio-title">
 	<h2 class={sectionTitleClass} id="portfolio-title">Fichas del portfolio</h2>
 	{#if data.portfolioRelations.length > 0}
-		<p class="tw:max-w-[60ch] tw:leading-relaxed tw:text-ink-dim">Esta entrada aparece en:</p>
-		<ul class="tw:my-3 tw:flex tw:list-none tw:flex-wrap tw:gap-2 tw:p-0">
+		<p class="max-w-[60ch] leading-relaxed text-ink-dim">Esta entrada aparece en:</p>
+		<ul class="my-3 flex list-none flex-wrap gap-2 p-0">
 			{#each data.portfolioRelations as relation (relation.slug)}
-				<li class="tw:flex tw:items-center tw:gap-2 tw:border tw:border-rule tw:px-3 tw:py-2">
+				<li class="flex items-center gap-2 border border-rule px-3 py-2">
 					<a
-						class="tw:text-ink tw:hover:text-accent"
+						class="text-ink hover:text-accent"
 						href={`/admin/portfolio?ficha=${relation.slug}&q=${encodeURIComponent(data.heading)}`}
 					>
 						{relation.featured ? '★ ' : ''}{relation.title}
 					</a>
 					{#if relation.featured}
-						<span class="tw:text-[0.65rem] tw:uppercase tw:tracking-[0.06em] tw:text-warning">Destacada</span>
+						<span class="text-[0.65rem] uppercase tracking-[0.06em] text-warning">Destacada</span>
 					{/if}
 				</li>
 			{/each}
 		</ul>
 	{:else}
-		<p class="tw:max-w-[60ch] tw:leading-relaxed tw:text-ink-dim">
+		<p class="max-w-[60ch] leading-relaxed text-ink-dim">
 			No está relacionada con ninguna ficha narrativa.
 		</p>
 	{/if}
 	<a
-		class="tw:mt-2 tw:inline-block tw:text-xs tw:text-ink tw:hover:text-accent"
+		class="mt-2 inline-block text-xs text-ink hover:text-accent"
 		href={`/admin/portfolio?q=${encodeURIComponent(data.heading)}`}
 	>
 		Gestionar relaciones del portfolio →
 	</a>
 </section>
 
-<details class="tw:mt-12 tw:border tw:border-danger tw:p-5 tw:[&[open]>summary]:mb-3">
-	<summary class="tw:cursor-pointer tw:text-sm tw:uppercase tw:tracking-[0.08em] tw:text-danger">
+<details class="mt-12 border border-danger p-5 [&[open]>summary]:mb-3">
+	<summary class="cursor-pointer text-sm uppercase tracking-[0.08em] text-danger">
 		Zona peligrosa
 	</summary>
-	<p class="tw:max-w-[60ch] tw:leading-relaxed tw:text-ink-dim">
+	<p class="max-w-[60ch] leading-relaxed text-ink-dim">
 		Eliminar borra la entrada y sus relaciones (portfolio, etiquetas, enlaces y documentos). No se
 		puede deshacer desde el dashboard.
 	</p>
 	<form method="POST" action="?/eliminar">
-		<label class="tw:mb-4 tw:flex tw:items-center tw:gap-2 tw:text-ink">
-			<Checkbox name="confirmar" value="1" class="tw:accent-danger" />
+		<label class="mb-4 flex items-center gap-2 text-ink">
+			<Checkbox name="confirmar" value="1" class="accent-danger" />
 			<span>Entiendo que la eliminación es definitiva</span>
 		</label>
 		<Button type="submit" variant="danger">Eliminar entrada</Button>

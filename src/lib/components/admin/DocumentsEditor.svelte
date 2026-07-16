@@ -24,33 +24,33 @@
 </script>
 
 <section
-	class="tw:mt-10 tw:border-t tw:border-rule tw:pt-6 {attendance
-		? 'tw:rounded-ui tw:border tw:border-warning tw:p-5'
+	class="mt-10 border-t border-rule pt-6 {attendance
+		? 'rounded-ui border border-warning p-5'
 		: ''}"
 	aria-labelledby="documents-title"
 >
-	<h2 class="tw:mt-0 tw:mb-4 tw:text-base" id="documents-title">
+	<h2 class="mt-0 mb-4 text-base" id="documents-title">
 		{attendance ? 'Certificados de asistencia' : 'Documentos'}
 	</h2>
-	<p class="tw:max-w-[72ch] tw:leading-[1.6] tw:text-ink-dim">
+	<p class="max-w-[72ch] leading-[1.6] text-ink-dim">
 		{attendance
 			? 'Enlaza el certificado de Drive u otra ubicación. Estos archivos son siempre privados y nunca llegan a la web pública.'
 			: 'Gestiona archivos enlazados sin subirlos a la aplicación. Los certificados son siempre privados; los demás solo se publican con autorización explícita.'}
 	</p>
 
-	<div class="tw:grid tw:gap-3">
+	<div class="grid gap-3">
 		{#if editor.documents.length === 0}
-			<p class="tw:m-0 tw:border tw:border-dashed tw:border-rule tw:p-4 tw:text-xs tw:text-ink-faint">
+			<p class="m-0 border border-dashed border-rule p-4 text-xs text-ink-faint">
 				{attendance ? 'No hay certificado enlazado.' : 'No hay documentos enlazados.'}
 			</p>
 		{:else}
 			{#each editor.documents as document, index (document.id)}
 				<article
-					class="tw:grid tw:grid-cols-[minmax(0,1fr)_auto] tw:items-end tw:gap-[0.9rem] tw:rounded-ui tw:border tw:border-rule tw:bg-[var(--admin-surface)] tw:p-4 tw:max-[850px]:grid-cols-1"
+					class="grid grid-cols-[minmax(0,1fr)_auto] items-end gap-[0.9rem] rounded-ui border border-rule bg-[var(--admin-surface)] p-4 max-[850px]:grid-cols-1"
 				>
-					<form class="tw:grid tw:gap-[0.8rem]" method="POST" action="?/guardarDocumento" use:enhance={enhancedSubmit(`save:${document.id}`)}>
+					<form class="grid gap-[0.8rem]" method="POST" action="?/guardarDocumento" use:enhance={enhancedSubmit(`save:${document.id}`)}>
 						<input type="hidden" name="documentId" value={document.id} />
-						<div class="tw:grid tw:grid-cols-3 tw:gap-[0.65rem] tw:max-[650px]:grid-cols-1">
+						<div class="grid grid-cols-3 gap-[0.65rem] max-[650px]:grid-cols-1">
 							{#if attendance}
 								<input type="hidden" name="documentType" value="doc_certificate" />
 								<input type="hidden" name="isCertificate" value="1" />
@@ -65,14 +65,14 @@
 							<AdminField label="Notas privadas" wide><Textarea name="notesPrivate" rows={2} value={document.notesPrivate} /></AdminField>
 						</div>
 						{#if !attendance}
-							<div class="tw:flex tw:flex-wrap tw:items-center tw:gap-2">
-								<label class="tw:flex tw:items-center tw:gap-1.5 tw:text-[0.68rem] tw:text-ink-dim"><Checkbox name="isCertificate" value="1" checked={document.isCertificate} /> Certificado (siempre privado)</label>
-								<label class="tw:flex tw:items-center tw:gap-1.5 tw:text-[0.68rem] tw:text-ink-dim"><Checkbox name="isPublic" value="1" checked={document.isPublic} disabled={document.isCertificate} /> Público</label>
+							<div class="flex flex-wrap items-center gap-2">
+								<label class="flex items-center gap-1.5 text-[0.68rem] text-ink-dim"><Checkbox name="isCertificate" value="1" checked={document.isCertificate} /> Certificado (siempre privado)</label>
+								<label class="flex items-center gap-1.5 text-[0.68rem] text-ink-dim"><Checkbox name="isPublic" value="1" checked={document.isPublic} disabled={document.isCertificate} /> Público</label>
 							</div>
 						{/if}
 						<Button type="submit" disabled={pending.includes(`save:${document.id}`)}>Guardar documento</Button>
 					</form>
-					<div class="tw:flex tw:flex-wrap tw:items-center tw:justify-end tw:gap-2 tw:max-[850px]:justify-start">
+					<div class="flex flex-wrap items-center justify-end gap-2 max-[850px]:justify-start">
 						<form method="POST" action="?/moverDocumento" use:enhance={enhancedSubmit(`up:${document.id}`)}>
 							<input type="hidden" name="documentId" value={document.id} /><input type="hidden" name="direction" value="up" />
 							<Button size="icon" type="submit" aria-label="Subir documento" disabled={index === 0 || pending.includes(`up:${document.id}`)}>↑</Button>
@@ -91,10 +91,10 @@
 		{/if}
 	</div>
 
-	<details class="tw:mt-3 tw:rounded-ui tw:border tw:border-rule tw:bg-[var(--admin-surface)] tw:p-4">
-		<summary class="tw:cursor-pointer tw:text-xs tw:text-accent-strong">+ {attendance ? 'Enlazar certificado' : 'Añadir documento'}</summary>
-		<form class="tw:mt-4 tw:grid tw:gap-[0.8rem]" method="POST" action="?/crearDocumento" use:enhance={enhancedSubmit('create')}>
-			<div class="tw:grid tw:grid-cols-3 tw:gap-[0.65rem] tw:max-[650px]:grid-cols-1">
+	<details class="mt-3 rounded-ui border border-rule bg-[var(--admin-surface)] p-4">
+		<summary class="cursor-pointer text-xs text-accent-strong">+ {attendance ? 'Enlazar certificado' : 'Añadir documento'}</summary>
+		<form class="mt-4 grid gap-[0.8rem]" method="POST" action="?/crearDocumento" use:enhance={enhancedSubmit('create')}>
+			<div class="grid grid-cols-3 gap-[0.65rem] max-[650px]:grid-cols-1">
 				{#if attendance}
 					<input type="hidden" name="documentType" value="doc_certificate" />
 					<input type="hidden" name="isCertificate" value="1" />
@@ -109,9 +109,9 @@
 				<AdminField label="Notas privadas" wide><Textarea name="notesPrivate" rows={2} /></AdminField>
 			</div>
 			{#if !attendance}
-				<div class="tw:flex tw:flex-wrap tw:items-center tw:gap-2">
-					<label class="tw:flex tw:items-center tw:gap-1.5 tw:text-[0.68rem] tw:text-ink-dim"><Checkbox name="isCertificate" value="1" /> Certificado (siempre privado)</label>
-					<label class="tw:flex tw:items-center tw:gap-1.5 tw:text-[0.68rem] tw:text-ink-dim"><Checkbox name="isPublic" value="1" /> Público</label>
+				<div class="flex flex-wrap items-center gap-2">
+					<label class="flex items-center gap-1.5 text-[0.68rem] text-ink-dim"><Checkbox name="isCertificate" value="1" /> Certificado (siempre privado)</label>
+					<label class="flex items-center gap-1.5 text-[0.68rem] text-ink-dim"><Checkbox name="isPublic" value="1" /> Público</label>
 				</div>
 			{/if}
 			<Button type="submit" disabled={pending.includes('create')}>{attendance ? 'Enlazar certificado' : 'Añadir documento'}</Button>

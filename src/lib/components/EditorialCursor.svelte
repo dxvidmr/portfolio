@@ -69,22 +69,22 @@
 
 <div
 	bind:this={cursorElement}
-	class={`editorial-cursor tw:pointer-events-none tw:fixed tw:top-[-12px] tw:left-[-17px] tw:z-[2147483647] tw:h-6 tw:w-[34px] tw:transition-opacity tw:duration-[90ms] tw:ease-linear tw:will-change-transform tw:motion-reduce:transition-none ${visible ? 'tw:opacity-100' : 'tw:opacity-0'}`}
+	class={`editorial-cursor pointer-events-none fixed top-[-12px] left-[-17px] z-[2147483647] h-6 w-[34px] transition-opacity duration-[90ms] ease-linear will-change-transform motion-reduce:transition-none ${visible ? 'opacity-100' : 'opacity-0'}`}
 	aria-hidden="true"
 >
-	<svg class="tw:block tw:size-full tw:overflow-visible" viewBox="0 0 34 24" role="presentation">
+	<svg class="block size-full overflow-visible" viewBox="0 0 34 24" role="presentation">
 		<path
-			class={`tw:fill-none tw:[stroke-linecap:square] tw:[stroke-linejoin:miter] tw:[stroke-width:1.25] tw:[vector-effect:non-scaling-stroke] tw:[transition:transform_150ms_cubic-bezier(0.22,1,0.36,1),stroke_110ms_linear] tw:motion-reduce:transition-none ${interactive ? 'tw:translate-x-[-3px] tw:stroke-accent-strong' : 'tw:translate-x-px tw:stroke-ink'}`}
+			class={`fill-none [stroke-linecap:square] [stroke-linejoin:miter] [stroke-width:1.25] [vector-effect:non-scaling-stroke] [transition:transform_150ms_cubic-bezier(0.22,1,0.36,1),stroke_110ms_linear] motion-reduce:transition-none ${interactive ? 'translate-x-[-3px] stroke-accent-strong' : 'translate-x-px stroke-ink'}`}
 			d="M 11 3 H 6 V 21 H 11"
 		/>
 		<circle
-			class={`tw:origin-center tw:[transform-box:fill-box] tw:[transition:fill_110ms_linear,transform_150ms_cubic-bezier(0.22,1,0.36,1)] tw:motion-reduce:transition-none ${interactive ? 'tw:scale-[1.75] tw:fill-accent' : 'tw:fill-accent-strong'}`}
+			class={`origin-center [transform-box:fill-box] [transition:fill_110ms_linear,transform_150ms_cubic-bezier(0.22,1,0.36,1)] motion-reduce:transition-none ${interactive ? 'scale-[1.75] fill-accent' : 'fill-accent-strong'}`}
 			cx="17"
 			cy="12"
 			r="1.5"
 		/>
 		<path
-			class={`tw:fill-none tw:[stroke-linecap:square] tw:[stroke-linejoin:miter] tw:[stroke-width:1.25] tw:[vector-effect:non-scaling-stroke] tw:[transition:transform_150ms_cubic-bezier(0.22,1,0.36,1),stroke_110ms_linear] tw:motion-reduce:transition-none ${interactive ? 'tw:translate-x-[3px] tw:stroke-accent-strong' : 'tw:translate-x-[-1px] tw:stroke-ink'}`}
+			class={`fill-none [stroke-linecap:square] [stroke-linejoin:miter] [stroke-width:1.25] [vector-effect:non-scaling-stroke] [transition:transform_150ms_cubic-bezier(0.22,1,0.36,1),stroke_110ms_linear] motion-reduce:transition-none ${interactive ? 'translate-x-[3px] stroke-accent-strong' : 'translate-x-[-1px] stroke-ink'}`}
 			d="M 23 3 H 28 V 21 H 23"
 		/>
 	</svg>

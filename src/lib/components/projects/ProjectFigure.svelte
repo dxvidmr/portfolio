@@ -18,19 +18,19 @@
 	} = $props();
 
 	const figureClasses = $derived(
-		`tw:m-0 tw:min-w-0 ${portrait ? 'tw:w-[min(100%,310px)]' : ''}`
+		`m-0 min-w-0 ${portrait ? 'w-[min(100%,310px)]' : ''}`
 	);
 	const frameClasses = $derived(
 		bare
-			? 'tw:relative tw:overflow-visible tw:bg-transparent'
-			: 'tw:relative tw:overflow-hidden tw:rounded-ui tw:bg-[var(--visual-bg)]'
+			? 'relative overflow-visible bg-transparent'
+			: 'relative overflow-hidden rounded-ui bg-[var(--visual-bg)]'
 	);
 </script>
 
 <figure class={figureClasses}>
 	<div class={frameClasses}>
 		<img
-			class="tw:block tw:h-auto tw:w-full"
+			class="block h-auto w-full"
 			{src}
 			{alt}
 			loading={priority ? 'eager' : 'lazy'}
@@ -39,15 +39,15 @@
 		/>
 		{#if !bare}
 			<span
-				class="tw:pointer-events-none tw:absolute tw:inset-0 tw:rounded-[inherit] tw:border tw:border-[color-mix(in_srgb,var(--fg)_8%,transparent)]"
+				class="pointer-events-none absolute inset-0 rounded-[inherit] border border-[color-mix(in_srgb,var(--fg)_8%,transparent)]"
 				aria-hidden="true"
 			></span>
 		{/if}
 	</div>
 	<figcaption
-		class="tw:mt-[13px] tw:grid tw:max-w-[76ch] tw:grid-cols-[28px_minmax(0,1fr)] tw:gap-3 tw:text-ink-faint"
+		class="mt-[13px] grid max-w-[76ch] grid-cols-[28px_minmax(0,1fr)] gap-3 text-ink-faint"
 	>
-		<span class="meta tw:pt-[3px]">{number}</span>
-		<p class="tw:m-0 tw:text-[0.7rem] tw:leading-[1.5]">{caption}</p>
+		<span class="meta pt-[3px]">{number}</span>
+		<p class="m-0 text-[0.7rem] leading-[1.5]">{caption}</p>
 	</figcaption>
 </figure>

@@ -7,14 +7,14 @@
 
 	let { locale }: { locale: Locale } = $props();
 	const reveal = createReveal({ threshold: 0.1, rootMargin: '0px 0px -5% 0px' });
-	const headingClass = 'tw:m-0 tw:font-[450] tw:tracking-[-0.04em]';
-	const bodyClass = 'tw:text-ink-dim tw:leading-[1.68]';
-	const labelClass = 'meta tw:mt-0 tw:mb-4 tw:text-accent-strong';
-	const productionHeadingClass = `${headingClass} tw:text-[clamp(2.2rem,4.6vw,4.8rem)] tw:leading-[0.94]`;
+	const headingClass = 'm-0 font-[450] tracking-[-0.04em]';
+	const bodyClass = 'text-ink-dim leading-[1.68]';
+	const labelClass = 'meta mt-0 mb-4 text-accent-strong';
+	const productionHeadingClass = `${headingClass} text-[clamp(2.2rem,4.6vw,4.8rem)] leading-[0.94]`;
 	const productionClass =
-		'tw:relative tw:grid tw:grid-cols-[72px_minmax(290px,.72fr)_minmax(0,1.28fr)] tw:gap-[clamp(28px,5vw,80px)] tw:border-t tw:border-rule-strong tw:pt-7 tw:max-[960px]:grid-cols-[52px_1fr] tw:max-[620px]:grid-cols-1';
+		'relative grid grid-cols-[72px_minmax(290px,.72fr)_minmax(0,1.28fr)] gap-[clamp(28px,5vw,80px)] border-t border-rule-strong pt-7 max-[960px]:grid-cols-[52px_1fr] max-[620px]:grid-cols-1';
 	const productionCopyClass =
-		'tw:max-w-[620px] tw:max-[960px]:col-start-2 tw:max-[620px]:col-start-1';
+		'max-w-[620px] max-[960px]:col-start-2 max-[620px]:col-start-1';
 
 	const copy = $derived(locale === 'es' ? {
 		researchLabel: 'Investigación escénica',
@@ -124,88 +124,88 @@
 
 </script>
 
-<section class="tw:grid tw:gap-[clamp(100px,15vw,220px)] tw:border-t tw:border-rule-strong tw:py-[clamp(76px,11vw,150px)]">
-	<article class="tw:grid tw:grid-cols-[minmax(300px,.85fr)_minmax(0,1.15fr)] tw:items-start tw:gap-[clamp(60px,10vw,150px)] tw:max-[960px]:grid-cols-1" id="investigacion" use:reveal>
-		<div class="tw:sticky tw:top-[120px] tw:max-w-[620px] tw:max-[960px]:static">
+<section class="grid gap-[clamp(100px,15vw,220px)] border-t border-rule-strong py-[clamp(76px,11vw,150px)]">
+	<article class="grid grid-cols-[minmax(300px,.85fr)_minmax(0,1.15fr)] items-start gap-[clamp(60px,10vw,150px)] max-[960px]:grid-cols-1" id="investigacion" use:reveal>
+		<div class="sticky top-[120px] max-w-[620px] max-[960px]:static">
 			<p class={labelClass}>{copy.researchLabel}</p>
-			<h3 class="{headingClass} tw:text-[clamp(2.4rem,5.3vw,5.4rem)] tw:leading-[0.93]">{copy.researchTitle}</h3>
-			<p class="{bodyClass} tw:mt-[26px] tw:mb-0">{copy.researchBody}</p>
-			<p class="meta tw:mt-[34px] tw:mb-0 tw:border-t tw:border-rule tw:pt-[18px] tw:leading-[1.6] tw:text-ink-faint">{copy.publication}</p>
+			<h3 class="{headingClass} text-[clamp(2.4rem,5.3vw,5.4rem)] leading-[0.93]">{copy.researchTitle}</h3>
+			<p class="{bodyClass} mt-[26px] mb-0">{copy.researchBody}</p>
+			<p class="meta mt-[34px] mb-0 border-t border-rule pt-[18px] leading-[1.6] text-ink-faint">{copy.publication}</p>
 		</div>
-		<ol class="tw:m-0 tw:list-none tw:border-t tw:border-rule-strong tw:p-0">
+		<ol class="m-0 list-none border-t border-rule-strong p-0">
 			{#each copy.method as step, index (step.title)}
-				<li class="tw:relative tw:grid tw:min-h-[104px] tw:grid-cols-[48px_minmax(0,1fr)] tw:gap-5 tw:border-b tw:border-rule tw:py-[22px] tw:max-[620px]:grid-cols-[42px_1fr] tw:max-[620px]:gap-3.5">
-					<span class="meta tw:grid tw:size-[35px] tw:place-items-center tw:rounded-full tw:border tw:border-[color-mix(in_srgb,var(--accent-strong)_45%,var(--line))] tw:text-accent-strong">0{index + 1}</span>
+				<li class="relative grid min-h-[104px] grid-cols-[48px_minmax(0,1fr)] gap-5 border-b border-rule py-[22px] max-[620px]:grid-cols-[42px_1fr] max-[620px]:gap-3.5">
+					<span class="meta grid size-[35px] place-items-center rounded-full border border-[color-mix(in_srgb,var(--accent-strong)_45%,var(--line))] text-accent-strong">0{index + 1}</span>
 					<div>
-						<strong class="tw:font-title tw:text-xl tw:font-medium">{step.title}</strong>
-						<p class="{bodyClass} tw:mt-[7px] tw:mb-0 tw:max-w-[48ch] tw:text-[0.77rem]">{step.note}</p>
+						<strong class="font-title text-xl font-medium">{step.title}</strong>
+						<p class="{bodyClass} mt-[7px] mb-0 max-w-[48ch] text-[0.77rem]">{step.note}</p>
 					</div>
 				</li>
 			{/each}
 		</ol>
 	</article>
 
-	<section class="tw:grid tw:gap-0">
-		<header class="tw:mb-[clamp(54px,8vw,110px)] tw:grid tw:grid-cols-[minmax(140px,.35fr)_minmax(0,1fr)] tw:items-end tw:gap-[clamp(30px,6vw,90px)] tw:border-b tw:border-rule-strong tw:pb-[clamp(28px,4vw,52px)] tw:max-[620px]:grid-cols-1 tw:max-[620px]:gap-[10px]" id="practica-escenica" use:reveal>
-			<p class="meta tw:mt-0 tw:mb-2 tw:text-accent-strong">{copy.productionsLabel}</p>
-			<h3 class="{headingClass} tw:max-w-[10ch] tw:text-[clamp(3rem,6vw,6.2rem)] tw:leading-[0.9]">{copy.productionsTitle}</h3>
+	<section class="grid gap-0">
+		<header class="mb-[clamp(54px,8vw,110px)] grid grid-cols-[minmax(140px,.35fr)_minmax(0,1fr)] items-end gap-[clamp(30px,6vw,90px)] border-b border-rule-strong pb-[clamp(28px,4vw,52px)] max-[620px]:grid-cols-1 max-[620px]:gap-[10px]" id="practica-escenica" use:reveal>
+			<p class="meta mt-0 mb-2 text-accent-strong">{copy.productionsLabel}</p>
+			<h3 class="{headingClass} max-w-[10ch] text-[clamp(3rem,6vw,6.2rem)] leading-[0.9]">{copy.productionsTitle}</h3>
 		</header>
-		<article class="{productionClass} tw:border-t-0 tw:pt-0" id="fuenteovejuna" use:reveal>
-			<div class="meta tw:text-ink-faint">01 / 03</div>
+		<article class="{productionClass} border-t-0 pt-0" id="fuenteovejuna" use:reveal>
+			<div class="meta text-ink-faint">01 / 03</div>
 			<div class={productionCopyClass}>
-				<p class="meta tw:mt-0 tw:mb-[17px] tw:text-accent-strong">{copy.fuenteMeta}</p>
+				<p class="meta mt-0 mb-[17px] text-accent-strong">{copy.fuenteMeta}</p>
 				<h4 class={productionHeadingClass}>{copy.fuenteTitle}</h4>
-				<p class="{bodyClass} tw:mt-6 tw:mb-0">{copy.fuenteBody}</p>
-				<span class="meta tw:mt-[26px] tw:block tw:text-ink-faint">{copy.fuenteRole}</span>
+				<p class="{bodyClass} mt-6 mb-0">{copy.fuenteBody}</p>
+				<span class="meta mt-[26px] block text-ink-faint">{copy.fuenteRole}</span>
 			</div>
-			<div class="tw:grid tw:min-w-0 tw:grid-cols-[minmax(0,1fr)_minmax(105px,.3fr)] tw:items-end tw:gap-[clamp(12px,2vw,28px)] tw:max-[960px]:col-start-2 tw:max-[960px]:mt-[22px] tw:max-[620px]:col-start-1 tw:max-[620px]:grid-cols-[minmax(0,1fr)_90px]" aria-label={copy.fuenteImages.sequenceCaption}>
+			<div class="grid min-w-0 grid-cols-[minmax(0,1fr)_minmax(105px,.3fr)] items-end gap-[clamp(12px,2vw,28px)] max-[960px]:col-start-2 max-[960px]:mt-[22px] max-[620px]:col-start-1 max-[620px]:grid-cols-[minmax(0,1fr)_90px]" aria-label={copy.fuenteImages.sequenceCaption}>
 				<StageFigure src="/images/projects/escena/fuenteovejuna-conjunto.webp" alt={copy.fuenteImages.conjuntoAlt} caption={copy.fuenteImages.conjuntoCaption} number="01" />
-				<StageFigure class="tw:w-[min(100%,220px)] tw:justify-self-end" src="/images/projects/escena/fuenteovejuna-cartel.webp" alt={copy.fuenteImages.cartelAlt} caption={copy.fuenteImages.cartelCaption} number="02" />
+				<StageFigure class="w-[min(100%,220px)] justify-self-end" src="/images/projects/escena/fuenteovejuna-cartel.webp" alt={copy.fuenteImages.cartelAlt} caption={copy.fuenteImages.cartelCaption} number="02" />
 			</div>
-			<div class="tw:col-span-full tw:mt-[clamp(44px,7vw,100px)] tw:grid tw:grid-cols-12 tw:items-start tw:gap-x-[clamp(12px,2vw,30px)] tw:gap-y-[clamp(28px,4vw,64px)] tw:max-[1180px]:min-[621px]:grid-cols-2 tw:max-[620px]:col-start-1 tw:max-[620px]:mt-[34px] tw:max-[620px]:block tw:max-[620px]:[columns:2] tw:max-[620px]:[column-gap:8px]">
-				<StageFigure masonry class="tw:col-start-1 tw:col-span-4 tw:max-[1180px]:min-[621px]:col-auto" src="/images/projects/escena/fuenteovejuna-escena.webp" alt={copy.fuenteImages.escenaAlt} caption={copy.fuenteImages.escenaCaption} number="03" />
-				<StageFigure masonry class="tw:col-start-5 tw:col-span-4 tw:max-[1180px]:min-[621px]:col-auto" src="/images/projects/escena/fuenteovejuna-accion.webp" alt={copy.fuenteImages.accionAlt} caption={copy.fuenteImages.accionCaption} number="04" />
-				<StageFigure masonry class="tw:col-start-9 tw:col-span-4 tw:max-[1180px]:min-[621px]:col-auto" src="/images/projects/escena/fuenteovejuna-corral.webp" alt={copy.fuenteImages.corralAlt} caption={copy.fuenteImages.corralCaption} number="05" />
-				<StageFigure masonry class="tw:col-start-1 tw:col-span-6 tw:max-[1180px]:min-[621px]:col-auto" src="/images/projects/escena/fuenteovejuna-laurencia-frondoso.webp" alt={copy.fuenteImages.frondosoAlt} caption={copy.fuenteImages.frondosoCaption} number="06" />
-				<StageFigure masonry class="tw:col-start-7 tw:col-span-6 tw:max-[1180px]:min-[621px]:col-span-full tw:max-[1180px]:min-[621px]:w-[64%] tw:max-[1180px]:min-[621px]:justify-self-center" src="/images/projects/escena/fuenteovejuna-reparto.webp" alt={copy.fuenteImages.repartoAlt} caption={copy.fuenteImages.repartoCaption} number="07" />
+			<div class="col-span-full mt-[clamp(44px,7vw,100px)] grid grid-cols-12 items-start gap-x-[clamp(12px,2vw,30px)] gap-y-[clamp(28px,4vw,64px)] max-[1180px]:min-[621px]:grid-cols-2 max-[620px]:col-start-1 max-[620px]:mt-[34px] max-[620px]:block max-[620px]:[columns:2] max-[620px]:[column-gap:8px]">
+				<StageFigure masonry class="col-start-1 col-span-4 max-[1180px]:min-[621px]:col-auto" src="/images/projects/escena/fuenteovejuna-escena.webp" alt={copy.fuenteImages.escenaAlt} caption={copy.fuenteImages.escenaCaption} number="03" />
+				<StageFigure masonry class="col-start-5 col-span-4 max-[1180px]:min-[621px]:col-auto" src="/images/projects/escena/fuenteovejuna-accion.webp" alt={copy.fuenteImages.accionAlt} caption={copy.fuenteImages.accionCaption} number="04" />
+				<StageFigure masonry class="col-start-9 col-span-4 max-[1180px]:min-[621px]:col-auto" src="/images/projects/escena/fuenteovejuna-corral.webp" alt={copy.fuenteImages.corralAlt} caption={copy.fuenteImages.corralCaption} number="05" />
+				<StageFigure masonry class="col-start-1 col-span-6 max-[1180px]:min-[621px]:col-auto" src="/images/projects/escena/fuenteovejuna-laurencia-frondoso.webp" alt={copy.fuenteImages.frondosoAlt} caption={copy.fuenteImages.frondosoCaption} number="06" />
+				<StageFigure masonry class="col-start-7 col-span-6 max-[1180px]:min-[621px]:col-span-full max-[1180px]:min-[621px]:w-[64%] max-[1180px]:min-[621px]:justify-self-center" src="/images/projects/escena/fuenteovejuna-reparto.webp" alt={copy.fuenteImages.repartoAlt} caption={copy.fuenteImages.repartoCaption} number="07" />
 			</div>
 		</article>
 
-		<article class="{productionClass} tw:mt-[clamp(100px,15vw,210px)] tw:grid-cols-[72px_minmax(300px,.68fr)_minmax(0,1.32fr)] tw:max-[960px]:grid-cols-[52px_1fr] tw:max-[620px]:grid-cols-1" id="cueva-salamanca" use:reveal>
-			<div class="meta tw:text-ink-faint">02 / 03</div>
+		<article class="{productionClass} mt-[clamp(100px,15vw,210px)] grid-cols-[72px_minmax(300px,.68fr)_minmax(0,1.32fr)] max-[960px]:grid-cols-[52px_1fr] max-[620px]:grid-cols-1" id="cueva-salamanca" use:reveal>
+			<div class="meta text-ink-faint">02 / 03</div>
 			<div class={productionCopyClass}>
-				<p class="meta tw:mt-0 tw:mb-[17px] tw:text-accent-strong">{copy.cuevaMeta}</p>
+				<p class="meta mt-0 mb-[17px] text-accent-strong">{copy.cuevaMeta}</p>
 				<h4 class={productionHeadingClass}>{copy.cuevaTitle}</h4>
-				<p class="{bodyClass} tw:mt-6 tw:mb-0">{copy.cuevaBody}</p>
-				<ul class="meta tw:mt-7 tw:mb-0 tw:flex tw:list-none tw:flex-wrap tw:gap-[7px] tw:p-0">
-					{#each copy.cuevaStats as stat (stat)}<li class="tw:rounded-full tw:bg-[color-mix(in_srgb,var(--accent)_9%,transparent)] tw:px-[10px] tw:py-[7px] tw:text-ink-faint">{stat}</li>{/each}
+				<p class="{bodyClass} mt-6 mb-0">{copy.cuevaBody}</p>
+				<ul class="meta mt-7 mb-0 flex list-none flex-wrap gap-[7px] p-0">
+					{#each copy.cuevaStats as stat (stat)}<li class="rounded-full bg-[color-mix(in_srgb,var(--accent)_9%,transparent)] px-[10px] py-[7px] text-ink-faint">{stat}</li>{/each}
 				</ul>
-				<a class="meta tw:mt-[26px] tw:inline-flex tw:items-center tw:gap-2 tw:text-ink tw:[&>span]:inline-flex tw:[&>span]:transition-[transform,color] tw:[&>span]:duration-[220ms] tw:hover:[&>span]:translate-x-[3px] tw:hover:[&>span]:translate-y-[-3px] tw:hover:[&>span]:text-accent-strong tw:focus-visible:[&>span]:translate-x-[3px] tw:focus-visible:[&>span]:translate-y-[-3px] tw:focus-visible:[&>span]:text-accent-strong" href="https://www.ub.edu/metadrama/cueva/" target="_blank" rel="noreferrer">
+				<a class="meta mt-[26px] inline-flex items-center gap-2 text-ink [&>span]:inline-flex [&>span]:transition-[transform,color] [&>span]:duration-[220ms] hover:[&>span]:translate-x-[3px] hover:[&>span]:translate-y-[-3px] hover:[&>span]:text-accent-strong focus-visible:[&>span]:translate-x-[3px] focus-visible:[&>span]:translate-y-[-3px] focus-visible:[&>span]:text-accent-strong" href="https://www.ub.edu/metadrama/cueva/" target="_blank" rel="noreferrer">
 					{copy.projectLink}<span><MoveUpRight size={18} strokeWidth={1.6} /></span>
 				</a>
 			</div>
-			<div class="tw:grid tw:grid-cols-[minmax(0,1fr)_minmax(150px,.3fr)] tw:items-end tw:gap-[clamp(20px,3vw,42px)] tw:[&>figure:last-child]:mb-[-16%] tw:max-[960px]:col-start-2 tw:max-[960px]:mt-[22px] tw:max-[620px]:col-start-1 tw:max-[620px]:grid-cols-[minmax(0,1fr)_115px]">
+			<div class="grid grid-cols-[minmax(0,1fr)_minmax(150px,.3fr)] items-end gap-[clamp(20px,3vw,42px)] [&>figure:last-child]:mb-[-16%] max-[960px]:col-start-2 max-[960px]:mt-[22px] max-[620px]:col-start-1 max-[620px]:grid-cols-[minmax(0,1fr)_115px]">
 				<ProjectFigure src="/images/projects/escena/cueva-escena.webp" alt={copy.cuevaAlt} caption={copy.cuevaCaption} number="08" />
 				<ProjectFigure src="/images/projects/escena/cueva-cartel.webp" alt={copy.cuevaPosterAlt} caption={copy.cuevaPosterCaption} number="09" portrait />
 			</div>
 		</article>
 
-		<article class="{productionClass} tw:mt-[clamp(100px,15vw,210px)] tw:grid-cols-[72px_minmax(0,1.25fr)_minmax(300px,.75fr)] tw:items-center tw:max-[960px]:grid-cols-[52px_1fr] tw:max-[620px]:grid-cols-1" id="dido-eneas" use:reveal>
-			<div class="meta tw:text-ink-faint">03 / 03</div>
-			<div class="tw:grid tw:grid-cols-[minmax(0,1fr)_minmax(150px,.36fr)] tw:items-start tw:gap-[clamp(20px,3vw,40px)] tw:[&>figure:last-child]:mt-[28%] tw:max-[960px]:col-start-2 tw:max-[960px]:row-start-3 tw:max-[960px]:mt-[22px] tw:max-[620px]:col-start-1 tw:max-[620px]:grid-cols-[minmax(0,1fr)_115px]">
+		<article class="{productionClass} mt-[clamp(100px,15vw,210px)] grid-cols-[72px_minmax(0,1.25fr)_minmax(300px,.75fr)] items-center max-[960px]:grid-cols-[52px_1fr] max-[620px]:grid-cols-1" id="dido-eneas" use:reveal>
+			<div class="meta text-ink-faint">03 / 03</div>
+			<div class="grid grid-cols-[minmax(0,1fr)_minmax(150px,.36fr)] items-start gap-[clamp(20px,3vw,40px)] [&>figure:last-child]:mt-[28%] max-[960px]:col-start-2 max-[960px]:row-start-3 max-[960px]:mt-[22px] max-[620px]:col-start-1 max-[620px]:grid-cols-[minmax(0,1fr)_115px]">
 				<ProjectFigure src="/images/projects/escena/dido-escena.webp" alt={copy.didoAlt} caption={copy.didoCaption} number="10" />
 				<ProjectFigure src="/images/projects/escena/dido-cartel.webp" alt={copy.didoPosterAlt} caption={copy.didoPosterCaption} number="11" portrait />
 			</div>
-			<div class="{productionCopyClass} tw:max-[960px]:row-start-2">
-				<p class="meta tw:mt-0 tw:mb-[17px] tw:text-accent-strong">{copy.didoMeta}</p>
+			<div class="{productionCopyClass} max-[960px]:row-start-2">
+				<p class="meta mt-0 mb-[17px] text-accent-strong">{copy.didoMeta}</p>
 				<h4 class={productionHeadingClass}>{copy.didoTitle}</h4>
-				<p class="{bodyClass} tw:mt-6 tw:mb-0">{copy.didoBody}</p>
-				<a class="meta tw:mt-[26px] tw:inline-flex tw:items-center tw:gap-2 tw:text-ink tw:[&>span]:inline-flex tw:[&>span]:transition-[transform,color] tw:[&>span]:duration-[220ms] tw:hover:[&>span]:translate-x-[3px] tw:hover:[&>span]:translate-y-[-3px] tw:hover:[&>span]:text-accent-strong tw:focus-visible:[&>span]:translate-x-[3px] tw:focus-visible:[&>span]:translate-y-[-3px] tw:focus-visible:[&>span]:text-accent-strong" href="https://www.ub.edu/metadrama/dido-y-eneas-no-hay-mal-que-por-bien-no-venga/" target="_blank" rel="noreferrer">
+				<p class="{bodyClass} mt-6 mb-0">{copy.didoBody}</p>
+				<a class="meta mt-[26px] inline-flex items-center gap-2 text-ink [&>span]:inline-flex [&>span]:transition-[transform,color] [&>span]:duration-[220ms] hover:[&>span]:translate-x-[3px] hover:[&>span]:translate-y-[-3px] hover:[&>span]:text-accent-strong focus-visible:[&>span]:translate-x-[3px] focus-visible:[&>span]:translate-y-[-3px] focus-visible:[&>span]:text-accent-strong" href="https://www.ub.edu/metadrama/dido-y-eneas-no-hay-mal-que-por-bien-no-venga/" target="_blank" rel="noreferrer">
 					{copy.projectLink}<span><MoveUpRight size={18} strokeWidth={1.6} /></span>
 				</a>
 			</div>
 		</article>
 	</section>
 
-	<p class="tw:mt-0 tw:mr-[6%] tw:mb-0 tw:ml-auto tw:w-[min(70%,850px)] tw:border-t tw:border-rule-strong tw:pt-[clamp(48px,7vw,90px)] tw:font-title tw:text-[clamp(1.5rem,3vw,2.7rem)] tw:leading-[1.25] tw:text-ink-dim tw:max-[620px]:mr-0 tw:max-[620px]:w-full" use:reveal>{copy.closing}</p>
+	<p class="mt-0 mr-[6%] mb-0 ml-auto w-[min(70%,850px)] border-t border-rule-strong pt-[clamp(48px,7vw,90px)] font-title text-[clamp(1.5rem,3vw,2.7rem)] leading-[1.25] text-ink-dim max-[620px]:mr-0 max-[620px]:w-full" use:reveal>{copy.closing}</p>
 </section>

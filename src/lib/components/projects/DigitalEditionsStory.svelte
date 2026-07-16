@@ -6,22 +6,22 @@
 
 	let { locale }: { locale: Locale } = $props();
 	const reveal = createReveal({ threshold: 0.14, rootMargin: '0px 0px -8% 0px' });
-	const headingClass = 'tw:m-0 tw:font-[450] tw:tracking-[-0.04em]';
-	const bodyClass = 'tw:text-ink-dim tw:leading-[1.68]';
+	const headingClass = 'm-0 font-[450] tracking-[-0.04em]';
+	const bodyClass = 'text-ink-dim leading-[1.68]';
 	const storySectionClass =
-		'tw:grid tw:scroll-mt-[110px] tw:gap-[clamp(44px,7vw,90px)]';
+		'grid scroll-mt-[110px] gap-[clamp(44px,7vw,90px)]';
 	const sectionCopyClass =
-		'tw:grid tw:grid-cols-[minmax(280px,.7fr)_minmax(0,1.3fr)] tw:items-end tw:gap-[clamp(32px,7vw,100px)] tw:max-[900px]:grid-cols-1';
+		'grid grid-cols-[minmax(280px,.7fr)_minmax(0,1.3fr)] items-end gap-[clamp(32px,7vw,100px)] max-[900px]:grid-cols-1';
 	const labelClass =
-		'meta tw:col-span-full tw:mt-0 tw:mb-[-8px] tw:text-accent-strong tw:max-[900px]:col-auto';
-	const sectionHeadingClass = `${headingClass} tw:col-start-1 tw:text-[clamp(2.35rem,5vw,5.4rem)] tw:leading-[0.93] tw:max-[900px]:col-auto`;
-	const sectionBodyClass = `${bodyClass} tw:col-start-2 tw:m-0 tw:max-w-[72ch] tw:max-[900px]:col-auto`;
+		'meta col-span-full mt-0 mb-[-8px] text-accent-strong max-[900px]:col-auto';
+	const sectionHeadingClass = `${headingClass} col-start-1 text-[clamp(2.35rem,5vw,5.4rem)] leading-[0.93] max-[900px]:col-auto`;
+	const sectionBodyClass = `${bodyClass} col-start-2 m-0 max-w-[72ch] max-[900px]:col-auto`;
 	const caseCopyClass =
-		'tw:grid tw:grid-cols-[minmax(220px,.38fr)_minmax(0,.62fr)] tw:items-start tw:gap-[clamp(24px,5vw,70px)] tw:border-t tw:border-rule tw:pt-[18px] tw:max-[900px]:grid-cols-1';
-	const caseHeadingClass = `${headingClass} tw:text-[clamp(1.55rem,2.8vw,3rem)] tw:leading-[0.96]`;
-	const caseBodyClass = `${bodyClass} tw:m-0 tw:max-w-[66ch]`;
+		'grid grid-cols-[minmax(220px,.38fr)_minmax(0,.62fr)] items-start gap-[clamp(24px,5vw,70px)] border-t border-rule pt-[18px] max-[900px]:grid-cols-1';
+	const caseHeadingClass = `${headingClass} text-[clamp(1.55rem,2.8vw,3rem)] leading-[0.96]`;
+	const caseBodyClass = `${bodyClass} m-0 max-w-[66ch]`;
 	const figureGridClass =
-		'tw:grid tw:grid-cols-12 tw:items-start tw:gap-[clamp(22px,3vw,40px)] tw:max-[900px]:block';
+		'grid grid-cols-12 items-start gap-[clamp(22px,3vw,40px)] max-[900px]:block';
 
 	const copy = $derived(locale === 'es' ? {
 		label: 'XML-TEI · herramientas · corpus',
@@ -240,7 +240,7 @@
 </script>
 
 <section
-	class="tw:grid tw:gap-[clamp(90px,13vw,190px)] tw:border-t tw:border-rule tw:py-[clamp(76px,11vw,150px)]"
+	class="grid gap-[clamp(90px,13vw,190px)] border-t border-rule py-[clamp(76px,11vw,150px)]"
 >
 	<article id="herramientas" class={storySectionClass} use:reveal>
 		<div class={sectionCopyClass}>
@@ -249,7 +249,7 @@
 			<p class={sectionBodyClass}>{copy.toolsBody}</p>
 			<div>
 				<p
-					class="tw:m-0 tw:border-t tw:border-rule tw:pt-[18px] tw:text-[0.78rem] tw:leading-[1.68] tw:text-ink-faint"
+					class="m-0 border-t border-rule pt-[18px] text-[0.78rem] leading-[1.68] text-ink-faint"
 				>
 					{copy.toolsNote}
 				</p>
@@ -257,15 +257,15 @@
 			</div>
 		</div>
 		<div class={figureGridClass}>
-			<div class="tw:col-span-7 tw:col-start-1 tw:max-[900px]:mt-[34px]">
+			<div class="col-span-7 col-start-1 max-[900px]:mt-[34px]">
 				<ProjectFigure {...copy.toolsFigures[0]} number="01" priority />
 			</div>
 			<div
-				class="tw:col-span-5 tw:col-start-8 tw:mt-[clamp(30px,7vw,90px)] tw:max-[900px]:mt-[34px]"
+				class="col-span-5 col-start-8 mt-[clamp(30px,7vw,90px)] max-[900px]:mt-[34px]"
 			>
 				<ProjectFigure {...copy.toolsFigures[1]} number="02" />
 			</div>
-			<div class="tw:col-span-8 tw:col-start-3 tw:max-[900px]:mt-[34px]">
+			<div class="col-span-8 col-start-3 max-[900px]:mt-[34px]">
 				<ProjectFigure {...copy.toolsFigures[2]} number="03" />
 			</div>
 		</div>
@@ -273,7 +273,7 @@
 
 	<article
 		id="ediciones-web"
-		class={`${storySectionClass} tw:border-y tw:border-rule tw:py-[clamp(62px,9vw,110px)]`}
+		class={`${storySectionClass} border-y border-rule py-[clamp(62px,9vw,110px)]`}
 		use:reveal
 	>
 		<div class={sectionCopyClass}>
@@ -281,8 +281,8 @@
 			<h3 class={sectionHeadingClass}>{copy.editionsTitle}</h3>
 			<p class={sectionBodyClass}>{copy.editionsBody}</p>
 		</div>
-		<div class="tw:grid tw:gap-[clamp(70px,11vw,150px)]">
-			<section class="tw:grid tw:gap-[clamp(34px,6vw,80px)]">
+		<div class="grid gap-[clamp(70px,11vw,150px)]">
+			<section class="grid gap-[clamp(34px,6vw,80px)]">
 				<div class={caseCopyClass}>
 					<h4 class={caseHeadingClass}>{copy.frayTitle}</h4>
 					<div>
@@ -291,21 +291,21 @@
 					</div>
 				</div>
 				<div class={figureGridClass}>
-					<div class="tw:col-span-6 tw:col-start-1 tw:max-[900px]:mt-[34px]">
+					<div class="col-span-6 col-start-1 max-[900px]:mt-[34px]">
 						<ProjectFigure {...copy.frayFigures[0]} number="04" />
 					</div>
 					<div
-						class="tw:col-span-6 tw:col-start-7 tw:mt-[clamp(36px,8vw,112px)] tw:max-[900px]:mt-[34px]"
+						class="col-span-6 col-start-7 mt-[clamp(36px,8vw,112px)] max-[900px]:mt-[34px]"
 					>
 						<ProjectFigure {...copy.frayFigures[1]} number="05" />
 					</div>
-					<div class="tw:col-span-9 tw:col-start-2 tw:max-[900px]:mt-[34px]">
+					<div class="col-span-9 col-start-2 max-[900px]:mt-[34px]">
 						<ProjectFigure {...copy.frayFigures[2]} number="06" />
 					</div>
 				</div>
 			</section>
 
-			<section class="tw:grid tw:gap-[clamp(34px,6vw,80px)]">
+			<section class="grid gap-[clamp(34px,6vw,80px)]">
 				<div class={caseCopyClass}>
 					<h4 class={caseHeadingClass}>{copy.fuenteTitle}</h4>
 					<div>
@@ -314,15 +314,15 @@
 					</div>
 				</div>
 				<div class={figureGridClass}>
-					<div class="tw:col-span-8 tw:col-start-1 tw:max-[900px]:mt-[34px]">
+					<div class="col-span-8 col-start-1 max-[900px]:mt-[34px]">
 						<ProjectFigure {...copy.fuenteFigures[0]} number="07" />
 					</div>
 					<div
-						class="tw:col-span-7 tw:col-start-6 tw:mt-[clamp(36px,8vw,108px)] tw:max-[900px]:mt-[34px]"
+						class="col-span-7 col-start-6 mt-[clamp(36px,8vw,108px)] max-[900px]:mt-[34px]"
 					>
 						<ProjectFigure {...copy.fuenteFigures[1]} number="08" />
 					</div>
-					<div class="tw:col-span-7 tw:col-start-2 tw:max-[900px]:mt-[34px]">
+					<div class="col-span-7 col-start-2 max-[900px]:mt-[34px]">
 						<ProjectFigure {...copy.fuenteFigures[2]} number="09" />
 					</div>
 				</div>
@@ -336,10 +336,10 @@
 			<h3 class={sectionHeadingClass}>{copy.corpusTitle}</h3>
 			<p class={sectionBodyClass}>{copy.corpusBody}</p>
 		</div>
-		<div class="tw:grid tw:gap-[clamp(70px,11vw,150px)]">
-			<section class="tw:grid tw:gap-[clamp(34px,6vw,80px)]">
+		<div class="grid gap-[clamp(70px,11vw,150px)]">
+			<section class="grid gap-[clamp(34px,6vw,80px)]">
 				<div
-					class="tw:grid tw:grid-cols-[minmax(200px,.28fr)_minmax(0,.42fr)_minmax(240px,.3fr)] tw:items-start tw:gap-[clamp(22px,4vw,56px)] tw:border-t tw:border-rule tw:pt-[18px] tw:max-[900px]:grid-cols-1"
+					class="grid grid-cols-[minmax(200px,.28fr)_minmax(0,.42fr)_minmax(240px,.3fr)] items-start gap-[clamp(22px,4vw,56px)] border-t border-rule pt-[18px] max-[900px]:grid-cols-1"
 				>
 					<h4 class={caseHeadingClass}>{copy.tbsoTitle}</h4>
 					<div>
@@ -347,14 +347,14 @@
 						<EditorialCaseLinks links={copy.tbsoLinks} />
 					</div>
 					<div
-						class="tw:mt-[-8px] tw:[&_figcaption]:max-w-[34ch] tw:max-[900px]:mt-[30px]"
+						class="mt-[-8px] [&_figcaption]:max-w-[34ch] max-[900px]:mt-[30px]"
 					>
 						<ProjectFigure {...copy.tbsoFigures[0]} number="10" />
 					</div>
 				</div>
 			</section>
 
-			<section class="tw:grid tw:gap-[clamp(34px,6vw,80px)]">
+			<section class="grid gap-[clamp(34px,6vw,80px)]">
 				<div class={caseCopyClass}>
 					<h4 class={caseHeadingClass}>{copy.dracorTitle}</h4>
 					<div>
@@ -363,11 +363,11 @@
 					</div>
 				</div>
 				<div class={figureGridClass}>
-					<div class="tw:col-span-6 tw:col-start-1 tw:max-[900px]:mt-[34px]">
+					<div class="col-span-6 col-start-1 max-[900px]:mt-[34px]">
 						<ProjectFigure {...copy.dracorFigures[0]} number="11" />
 					</div>
 					<div
-						class="tw:col-span-6 tw:col-start-7 tw:mt-[clamp(28px,5vw,64px)] tw:max-[900px]:mt-[34px]"
+						class="col-span-6 col-start-7 mt-[clamp(28px,5vw,64px)] max-[900px]:mt-[34px]"
 					>
 						<ProjectFigure {...copy.dracorFigures[1]} number="12" />
 					</div>

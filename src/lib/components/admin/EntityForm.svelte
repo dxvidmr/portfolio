@@ -54,11 +54,11 @@
 </script>
 
 <div
-	class="tw:grid tw:grid-cols-2 tw:gap-x-6 tw:gap-y-[1.1rem] tw:max-[720px]:grid-cols-1"
+	class="grid grid-cols-2 gap-x-6 gap-y-[1.1rem] max-[720px]:grid-cols-1"
 	use:trackDirty
 >
 	{#each fields as field (field.name)}
-		<div class={wide(field.kind) ? 'tw:col-span-full' : ''}>
+		<div class={wide(field.kind) ? 'col-span-full' : ''}>
 			<FormField
 				{field}
 				value={values[field.name] ?? ''}

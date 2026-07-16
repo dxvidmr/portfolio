@@ -23,10 +23,10 @@
 	});
 </script>
 
-<div class="tw:flex tw:flex-col tw:items-center tw:gap-2.5">
+<div class="flex flex-col items-center gap-2.5">
 	<span class="meta meta--faint">{profile.timezone.label}</span>
 	<div
-		class="dense tw:flex tw:gap-5 tw:text-[clamp(2.4rem,6vw,3.4rem)] tw:font-bold tw:tracking-[0.04em]"
+		class="dense flex gap-5 text-[clamp(2.4rem,6vw,3.4rem)] font-bold tracking-[0.04em]"
 	>
 		<span>{hh}</span><span>{mm}</span>
 	</div>

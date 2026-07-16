@@ -11,10 +11,10 @@
 	let { data, form }: { data: PageData; form: ActionData } = $props();
 	let pending = $state<string[]>([]);
 	const rowGridClass =
-		'tw:grid tw:grid-cols-[minmax(9rem,0.9fr)_1.2fr_1.2fr_4.5rem_3rem_6rem_6rem] tw:items-center tw:gap-2 tw:border-b tw:border-rule tw:px-3 tw:py-2 last:tw:border-b-0 tw:max-[900px]:block tw:max-[900px]:rounded-ui tw:max-[900px]:border tw:max-[900px]:bg-admin-surface tw:max-[900px]:p-4';
-	const cellClass = 'tw:min-w-0 tw:max-[900px]:grid tw:max-[900px]:content-end tw:max-[900px]:gap-1';
+		'grid grid-cols-[minmax(9rem,0.9fr)_1.2fr_1.2fr_4.5rem_3rem_6rem_6rem] items-center gap-2 border-b border-rule px-3 py-2 last:border-b-0 max-[900px]:block max-[900px]:rounded-ui max-[900px]:border max-[900px]:bg-admin-surface max-[900px]:p-4';
+	const cellClass = 'min-w-0 max-[900px]:grid max-[900px]:content-end max-[900px]:gap-1';
 	const mobileLabelClass =
-		'tw:hidden tw:text-[0.58rem] tw:uppercase tw:tracking-[0.1em] tw:text-ink-faint tw:max-[900px]:block';
+		'hidden text-[0.58rem] uppercase tracking-[0.1em] text-ink-faint max-[900px]:block';
 
 	// Igual que en los editores de enlaces/documentos: sin reset del formulario
 	// al terminar (el reset dejaría vacíos los campos, cuyo valor por defecto
@@ -47,31 +47,31 @@
 {/if}
 
 {#each data.domains as group (group.domain)}
-	<section class="tw:mb-8 tw:border-t tw:border-rule tw:pt-5" aria-labelledby={`dominio-${group.domain}`}>
-		<h2 class="tw:mb-3 tw:flex tw:items-baseline tw:gap-2 tw:text-base tw:text-ink" id={`dominio-${group.domain}`}>
+	<section class="mb-8 border-t border-rule pt-5" aria-labelledby={`dominio-${group.domain}`}>
+		<h2 class="mb-3 flex items-baseline gap-2 text-base text-ink" id={`dominio-${group.domain}`}>
 			{group.label}
-			<code class="tw:text-xs tw:font-normal tw:text-ink-faint">{group.domain}</code>
+			<code class="text-xs font-normal text-ink-faint">{group.domain}</code>
 		</h2>
 
 		{#if group.types.length > 0}
-			<div class="tw:grid tw:overflow-hidden tw:rounded-ui tw:border tw:border-rule tw:text-[0.82rem] tw:max-[900px]:gap-3 tw:max-[900px]:overflow-visible tw:max-[900px]:border-0" role="table" aria-label={group.label}>
-				<div class="tw:grid tw:grid-cols-[minmax(9rem,0.9fr)_1.2fr_1.2fr_4.5rem_3rem_6rem_6rem] tw:items-center tw:gap-2 tw:border-b tw:border-rule tw:bg-admin-surface-raised tw:px-3 tw:py-2 tw:text-ink-faint tw:max-[900px]:hidden" role="row">
+			<div class="grid overflow-hidden rounded-ui border border-rule text-[0.82rem] max-[900px]:gap-3 max-[900px]:overflow-visible max-[900px]:border-0" role="table" aria-label={group.label}>
+				<div class="grid grid-cols-[minmax(9rem,0.9fr)_1.2fr_1.2fr_4.5rem_3rem_6rem_6rem] items-center gap-2 border-b border-rule bg-admin-surface-raised px-3 py-2 text-ink-faint max-[900px]:hidden" role="row">
 					<span role="columnheader">Código</span>
 					<span role="columnheader">Etiqueta ES</span>
 					<span role="columnheader">Etiqueta EN</span>
 					<span role="columnheader">Orden</span>
 					<span role="columnheader">Usos</span>
-					<span role="columnheader" class="tw:sr-only">Guardar</span>
-					<span role="columnheader" class="tw:sr-only">Eliminar</span>
+					<span role="columnheader" class="sr-only">Guardar</span>
+					<span role="columnheader" class="sr-only">Eliminar</span>
 				</div>
 				{#each group.types as type (type.code)}
 					<div class={rowGridClass} role="row">
-						<form class="tw:contents tw:max-[900px]:grid tw:max-[900px]:grid-cols-2 tw:max-[900px]:gap-3 tw:max-[560px]:grid-cols-1" method="POST" action="?/guardar" use:enhance={enhancedSubmit(`save:${type.code}`)}>
+						<form class="contents max-[900px]:grid max-[900px]:grid-cols-2 max-[900px]:gap-3 max-[560px]:grid-cols-1" method="POST" action="?/guardar" use:enhance={enhancedSubmit(`save:${type.code}`)}>
 							<input type="hidden" name="domain" value={group.domain} />
 							<input type="hidden" name="code" value={type.code} />
-							<span class={`${cellClass} tw:max-[900px]:col-span-full`} role="cell">
+							<span class={`${cellClass} max-[900px]:col-span-full`} role="cell">
 								<span class={mobileLabelClass}>Código</span>
-								<code class="tw:[overflow-wrap:anywhere] tw:text-[0.85em] tw:text-accent-strong">{type.code}</code>
+								<code class="[overflow-wrap:anywhere] text-[0.85em] text-accent-strong">{type.code}</code>
 							</span>
 							<span class={cellClass} role="cell">
 								<span class={mobileLabelClass}>Etiqueta ES</span>
@@ -83,33 +83,33 @@
 							</span>
 							<span class={cellClass} role="cell">
 								<span class={mobileLabelClass}>Orden</span>
-								<Input name="sort_order" value={String(type.sortOrder)} inputmode="numeric" class="tw:max-w-[4.5rem] tw:max-[560px]:max-w-none" aria-label={`Orden de ${type.code}`} />
+								<Input name="sort_order" value={String(type.sortOrder)} inputmode="numeric" class="max-w-[4.5rem] max-[560px]:max-w-none" aria-label={`Orden de ${type.code}`} />
 							</span>
-							<span class="tw:text-center tw:text-ink-faint tw:max-[900px]:grid tw:max-[900px]:content-end tw:max-[900px]:gap-1 tw:max-[900px]:text-left" role="cell">
+							<span class="text-center text-ink-faint max-[900px]:grid max-[900px]:content-end max-[900px]:gap-1 max-[900px]:text-left" role="cell">
 								<span class={mobileLabelClass}>Usos</span>
 								{type.usageCount}
 							</span>
-							<span class="tw:max-[900px]:self-end" role="cell">
-								<Button class="tw:w-full" size="sm" type="submit" disabled={pending.includes(`save:${type.code}`)}>Guardar</Button>
+							<span class="max-[900px]:self-end" role="cell">
+								<Button class="w-full" size="sm" type="submit" disabled={pending.includes(`save:${type.code}`)}>Guardar</Button>
 							</span>
 						</form>
-						<form class="tw:contents tw:max-[900px]:mt-3 tw:max-[900px]:flex tw:max-[900px]:justify-end tw:max-[900px]:border-t tw:max-[900px]:border-rule tw:max-[900px]:pt-3" method="POST" action="?/eliminar" use:enhance={enhancedSubmit(`del:${type.code}`)}>
+						<form class="contents max-[900px]:mt-3 max-[900px]:flex max-[900px]:justify-end max-[900px]:border-t max-[900px]:border-rule max-[900px]:pt-3" method="POST" action="?/eliminar" use:enhance={enhancedSubmit(`del:${type.code}`)}>
 							<input type="hidden" name="domain" value={group.domain} />
 							<input type="hidden" name="code" value={type.code} />
 							{#if type.usageCount === 0}
-								<Button class="tw:w-full" size="sm" variant="danger" type="submit" disabled={pending.includes(`del:${type.code}`)}>Eliminar</Button>
+								<Button class="w-full" size="sm" variant="danger" type="submit" disabled={pending.includes(`del:${type.code}`)}>Eliminar</Button>
 							{:else}
-								<span class="tw:inline-flex tw:min-h-8 tw:w-full tw:items-center tw:justify-center tw:text-[0.65rem] tw:text-ink-faint" aria-hidden="true">En uso</span>
+								<span class="inline-flex min-h-8 w-full items-center justify-center text-[0.65rem] text-ink-faint" aria-hidden="true">En uso</span>
 							{/if}
 						</form>
 					</div>
 				{/each}
 			</div>
 		{:else}
-			<p class="tw:text-[0.82rem] tw:text-ink-faint">Sin tipos todavía.</p>
+			<p class="text-[0.82rem] text-ink-faint">Sin tipos todavía.</p>
 		{/if}
 
-		<form class="tw:mt-3 tw:grid tw:grid-cols-[repeat(3,minmax(9rem,1fr))_5rem_auto] tw:items-end tw:gap-3 tw:rounded-ui tw:border tw:border-dashed tw:border-rule tw:bg-[color-mix(in_srgb,var(--bg-panel)_45%,transparent)] tw:p-3.5 tw:max-[900px]:grid-cols-2 tw:max-[560px]:grid-cols-1" method="POST" action="?/crear" use:enhance={enhancedSubmit(`add:${group.domain}`, true)}>
+		<form class="mt-3 grid grid-cols-[repeat(3,minmax(9rem,1fr))_5rem_auto] items-end gap-3 rounded-ui border border-dashed border-rule bg-[color-mix(in_srgb,var(--bg-panel)_45%,transparent)] p-3.5 max-[900px]:grid-cols-2 max-[560px]:grid-cols-1" method="POST" action="?/crear" use:enhance={enhancedSubmit(`add:${group.domain}`, true)}>
 			<input type="hidden" name="domain" value={group.domain} />
 			<AdminField label="Código nuevo">
 				<Input
@@ -137,7 +137,7 @@
 					value={form?.domain === group.domain && !form?.success ? (form?.raw?.sort_order ?? '') : ''}
 				/>
 			</AdminField>
-			<Button class="tw:w-full" variant="primary" type="submit" disabled={pending.includes(`add:${group.domain}`)}>Añadir tipo</Button>
+			<Button class="w-full" variant="primary" type="submit" disabled={pending.includes(`add:${group.domain}`)}>Añadir tipo</Button>
 		</form>
 	</section>
 {/each}

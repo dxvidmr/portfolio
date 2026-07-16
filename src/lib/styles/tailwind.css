@@ -1,17 +1,14 @@
 /*
- * Tailwind se incorpora de forma progresiva sobre una web existente.
+ * Tailwind comparte los tokens del sistema editorial existente.
  *
- * - Sin Preflight: el reset global alteraría el home antes de migrarlo.
- * - Prefijo `tw:`: evita colisiones con las clases editoriales actuales.
+ * - Sin Preflight: `app.css` conserva el reset y la base visual ya afinada.
+ * - Sin prefijo: completada la migración, se usa la sintaxis estándar.
  * - Fuente explícita: solo se analizan los componentes de `src`.
- *
- * Cuando toda la web esté migrada podremos reevaluar Preflight y el prefijo,
- * pero durante la transición son la garantía de equivalencia visual.
  */
 @layer theme, base, components, utilities;
 
-@import 'tailwindcss/theme.css' layer(theme) prefix(tw);
-@import 'tailwindcss/utilities.css' layer(utilities) source('../../') prefix(tw);
+@import 'tailwindcss/theme.css' layer(theme);
+@import 'tailwindcss/utilities.css' layer(utilities) source('../../');
 
 @theme inline {
 	--color-canvas: var(--bg);
