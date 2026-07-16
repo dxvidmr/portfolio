@@ -4,6 +4,7 @@
 	import { untrack } from 'svelte';
 	import AdminToast from '$lib/components/AdminToast.svelte';
 	import AdminPageHeader from '$lib/components/admin/AdminPageHeader.svelte';
+	import Button from '$lib/components/ui/Button.svelte';
 	import ButtonLink from '$lib/components/ui/ButtonLink.svelte';
 	import type { ActionData, PageData } from './$types';
 
@@ -86,156 +87,63 @@
 {/if}
 
 {#if entries.length === 0}
-	<div class="warning" role="alert">
-		<strong>No hay entradas seleccionadas.</strong>
+	<div class="tw:border tw:border-amber tw:bg-admin-surface tw:px-4 tw:py-3 tw:text-ink" role="alert">
+		<strong class="tw:mb-1 tw:block">No hay entradas seleccionadas.</strong>
 		La web pública utilizará automáticamente el fallback de actividad reciente.
 	</div>
 {:else}
-	<div class="order-toolbar">
-		<span class:pending-order={dirty}>
+	<div class="tw:flex tw:items-center tw:justify-between tw:gap-4 tw:border tw:border-rule tw:border-b-0 tw:bg-admin-surface tw:px-4 tw:py-3 tw:max-[680px]:flex-col tw:max-[680px]:items-start">
+		<span class={dirty ? 'tw:text-xs tw:text-amber' : 'tw:text-xs tw:text-ink-faint'}>
 			{dirty ? 'Hay cambios de orden sin guardar' : 'El orden está guardado'}
 		</span>
 		<form method="POST" action="?/saveOrder" use:enhance={saveOrder}>
 			<input type="hidden" name="order" value={serializedOrder} />
-			<button type="submit" disabled={!dirty || saving}>
+			<Button variant="primary" type="submit" disabled={!dirty || saving}>
 				{saving ? 'Guardando…' : 'Guardar orden'}
-			</button>
+			</Button>
 		</form>
 	</div>
 
-	<ol class="home-list">
+	<ol class="tw:m-0 tw:list-none tw:border tw:border-rule tw:p-0">
 		{#each entries as entry, index (entryKey(entry))}
-			<li>
-				<span class="position">{String(index + 1).padStart(2, '0')}</span>
-				<div class="entry">
-					<strong>{entry.title}</strong>
-					<span>{entry.typeLabel} · {entry.sortDate ?? 'sin fecha'}</span>
+			<li class="tw:grid tw:grid-cols-[3rem_minmax(0,1fr)_auto] tw:items-center tw:gap-4 tw:border-b tw:border-rule tw:bg-admin-surface tw:p-4 last:tw:border-b-0 tw:max-[680px]:grid-cols-[2rem_1fr]">
+				<span class="tw:text-lg tw:text-rule-strong">{String(index + 1).padStart(2, '0')}</span>
+				<div>
+					<strong class="tw:block tw:font-medium tw:text-ink">{entry.title}</strong>
+					<span class="tw:mt-1 tw:block tw:text-xs tw:text-ink-faint">{entry.typeLabel} · {entry.sortDate ?? 'sin fecha'}</span>
 				</div>
-				<div class="controls">
-					<button
+				<div class="tw:flex tw:gap-1.5 tw:max-[680px]:col-start-2">
+					<Button
+						variant="secondary"
+						size="icon"
 						type="button"
 						disabled={index === 0}
 						onclick={() => move(index, -1)}
 						aria-label={`Subir ${entry.title}`}
-					>↑</button>
-					<button
+					>↑</Button>
+					<Button
+						variant="secondary"
+						size="icon"
 						type="button"
 						disabled={index === entries.length - 1}
 						onclick={() => move(index, 1)}
 						aria-label={`Bajar ${entry.title}`}
-					>↓</button>
+					>↓</Button>
 					<form method="POST" action="?/remove" use:enhance={removeEntry(entry)}>
 						<input type="hidden" name="entityType" value={entry.entityType} />
 						<input type="hidden" name="entityId" value={entry.entityId} />
-						<button
+						<Button
 							type="submit"
-							class="remove"
+							variant="danger"
+							size="sm"
 							disabled={removing.includes(entryKey(entry))}
 							aria-label={`Eliminar ${entry.title} de portada`}
 						>
 							Eliminar
-						</button>
+						</Button>
 					</form>
 				</div>
 			</li>
 		{/each}
 	</ol>
 {/if}
-
-<style>
-	.warning {
-		padding: 0.8rem 1rem;
-		background: var(--admin-surface);
-		border-left: 2px solid;
-	}
-
-	.warning { border-color: var(--tone-amber); color: var(--fg); }
-	.warning strong { display: block; margin-bottom: 0.35rem; }
-
-	.order-toolbar {
-		display: flex;
-		align-items: center;
-		justify-content: space-between;
-		gap: 1rem;
-		padding: 0.75rem 1rem;
-		border: 1px solid var(--line);
-		border-bottom: 0;
-		background: var(--admin-surface);
-	}
-
-	.order-toolbar span {
-		font-size: 0.75rem;
-		color: var(--fg-faint);
-	}
-
-	.order-toolbar .pending-order { color: var(--tone-amber); }
-	.order-toolbar form { margin: 0; }
-
-	.order-toolbar button {
-		border: 1px solid var(--accent);
-		background: transparent;
-		color: var(--accent-strong);
-		padding: 0.45rem 0.8rem;
-		cursor: pointer;
-	}
-
-	.order-toolbar button:disabled {
-		border-color: var(--line);
-		color: var(--fg-faint);
-		cursor: not-allowed;
-	}
-
-	.home-list {
-		list-style: none;
-		padding: 0;
-		margin: 0;
-		border: 1px solid var(--line);
-	}
-
-	.home-list li {
-		display: grid;
-		grid-template-columns: 3rem minmax(0, 1fr) auto;
-		gap: 1rem;
-		align-items: center;
-		padding: 1rem;
-		border-bottom: 1px solid var(--line);
-		background: var(--admin-surface);
-	}
-
-	.home-list li:last-child { border-bottom: 0; }
-
-	.position {
-		font-size: 1.1rem;
-		color: var(--line-strong);
-	}
-
-	.entry strong,
-	.entry span { display: block; }
-	.entry strong { color: var(--fg); font-weight: 500; }
-	.entry span { color: var(--fg-faint); font-size: 0.72rem; margin-top: 0.3rem; }
-
-	.controls {
-		display: flex;
-		gap: 0.4rem;
-	}
-
-	.controls form { margin: 0; }
-
-	.controls button {
-		border: 1px solid var(--line);
-		background: transparent;
-		color: var(--fg);
-		padding: 0.35rem 0.6rem;
-		cursor: pointer;
-	}
-
-	.controls button:hover:not(:disabled) { border-color: var(--fg-faint); }
-	.controls button:disabled { opacity: 0.25; cursor: not-allowed; }
-	.controls .remove { color: var(--admin-danger); }
-
-	@media (max-width: 680px) {
-		.order-toolbar { align-items: flex-start; flex-direction: column; }
-		.home-list li { grid-template-columns: 2rem 1fr; }
-		.controls { grid-column: 2; }
-	}
-</style>
