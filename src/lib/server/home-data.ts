@@ -1,5 +1,6 @@
 import { db } from '$lib/server/db';
 import { getPortfolioItems } from '$lib/server/portfolio-items';
+import { getPortfolioProjects } from '$lib/server/portfolio-projects';
 
 const rowToEntry = (row: Record<string, unknown>) => ({
 	entity_type: String(row.entity_type),
@@ -9,7 +10,7 @@ const rowToEntry = (row: Record<string, unknown>) => ({
 });
 
 export async function getHomeData() {
-	const [recentRes, homeRes, portfolioItems] = await Promise.all([
+	const [recentRes, homeRes, portfolioItems, portfolioProjects] = await Promise.all([
 		db.execute(
 			`SELECT entity_type, entity_id, title_cache, sort_date
 			 FROM entries
@@ -24,7 +25,8 @@ export async function getHomeData() {
 			   AND show_home = 1
 			 ORDER BY sort_order ASC, (sort_date IS NULL) ASC, sort_date DESC`
 		),
-		getPortfolioItems()
+		getPortfolioItems(),
+		getPortfolioProjects()
 	]);
 
 	const entries = recentRes.rows.map((row) => rowToEntry(row));
@@ -32,5 +34,5 @@ export async function getHomeData() {
 		? homeRes.rows.map((row) => rowToEntry(row))
 		: entries.slice(0, 4);
 
-	return { entries, recentActivity, portfolioItems };
+	return { entries, recentActivity, portfolioItems, portfolioProjects };
 }

@@ -197,7 +197,7 @@
 				<span class="meta tag">{ui.navProjects}</span>
 				<h2 class={sectionTitleClass}>{ui.selectedWork}</h2>
 			</div>
-			<SelectedWorks {locale} relatedItems={data.portfolioItems} />
+			<SelectedWorks {locale} relatedItems={data.portfolioItems} projectIndex={data.portfolioProjects} />
 		</section>
 
 		<section id="about" class={`${sectionClass} relative isolate before:pointer-events-none before:absolute before:top-[16%] before:left-[-10vw] before:z-[-2] before:aspect-square before:w-[min(52vw,720px)] before:rounded-full before:bg-accent before:opacity-[.11] before:[filter:blur(150px)] before:content-['']`}>

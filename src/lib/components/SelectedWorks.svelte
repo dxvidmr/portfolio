@@ -4,15 +4,27 @@
 	import { page } from '$app/state';
 	import type { Locale } from '$lib/paraglide/runtime';
 	import { localizedPath } from '$lib/i18n';
-	import { projects, projectText } from '$lib/content/projects';
-	import type { PortfolioRelatedItem } from '$lib/types/portfolio';
+	import { projectFromMetadata, projectText } from '$lib/content/projects';
+	import type { PortfolioProjectMetadata, PortfolioRelatedItem } from '$lib/types/portfolio';
 	import ProjectModal from '$lib/components/ProjectModal.svelte';
 	import ProjectVisual from '$lib/components/ProjectVisual.svelte';
 
-	let { locale, relatedItems }: { locale: Locale; relatedItems: PortfolioRelatedItem[] } = $props();
+	let {
+		locale,
+		relatedItems,
+		projectIndex
+	}: {
+		locale: Locale;
+		relatedItems: PortfolioRelatedItem[];
+		projectIndex: PortfolioProjectMetadata[];
+	} = $props();
 	let activeIndex = $state(0);
 	let lastTrigger: HTMLElement | null = null;
-	const activeProject = $derived(projects[activeIndex] ?? projects[0]);
+	const allProjects = $derived(projectIndex.map((metadata) => projectFromMetadata(metadata)));
+	const visibleProjects = $derived(
+		projectIndex.filter((metadata) => metadata.showHome).map((metadata) => projectFromMetadata(metadata))
+	);
+	const activeProject = $derived(visibleProjects[activeIndex] ?? visibleProjects[0] ?? null);
 	const shallowProjectSlug = $derived(
 		typeof (page.state as Record<string, unknown>)?.portfolioModal === 'string'
 			? String((page.state as Record<string, unknown>).portfolioModal)
@@ -23,12 +35,17 @@
 	const modalIndex = $derived(
 		requestedProjectSlug
 			? (() => {
-					const index = projects.findIndex((project) => project.slug === requestedProjectSlug);
+					const index = visibleProjects.findIndex((project) => project.slug === requestedProjectSlug);
 					return index >= 0 ? index : null;
 				})()
 			: null
 	);
-	const modalProject = $derived(modalIndex === null ? null : (projects[modalIndex] ?? null));
+	const modalProject = $derived(
+		requestedProjectSlug
+			? (allProjects.find((project) => project.slug === requestedProjectSlug) ?? null)
+			: null
+	);
+	const modalCanNavigate = $derived(modalIndex !== null && visibleProjects.length > 1);
 	const modalItems = $derived(
 		modalProject ? relatedItems.filter((item) => item.portfolio_slug === modalProject.slug) : []
 	);
@@ -48,8 +65,10 @@
 
 	$effect(() => {
 		if (requestedProjectSlug) {
-			const index = projects.findIndex((project) => project.slug === requestedProjectSlug);
+			const index = visibleProjects.findIndex((project) => project.slug === requestedProjectSlug);
 			if (index >= 0) activeIndex = index;
+		} else if (activeIndex >= visibleProjects.length) {
+			activeIndex = 0;
 		} else {
 			window.requestAnimationFrame(() => lastTrigger?.focus());
 		}
@@ -60,7 +79,8 @@
 		event.preventDefault();
 		lastTrigger = event.currentTarget as HTMLElement;
 		activeIndex = index;
-		const project = projects[index];
+		const project = visibleProjects[index];
+		if (!project) return;
 		const baseUrl = `${window.location.pathname}${window.location.search}${window.location.hash}`;
 		pushState(localizedPath(`/proyectos/${project.slug}`, locale), {
 			portfolioModal: project.slug,
@@ -79,7 +99,8 @@
 
 	const showProject = (index: number) => {
 		activeIndex = index;
-		const project = projects[index];
+		const project = visibleProjects[index];
+		if (!project) return;
 		const state = page.state as Record<string, unknown>;
 		replaceState(localizedPath(`/proyectos/${project.slug}`, locale), {
 			...state,
@@ -89,15 +110,16 @@
 
 	const previousProject = () => {
 		if (modalIndex === null) return;
-		showProject((modalIndex - 1 + projects.length) % projects.length);
+		showProject((modalIndex - 1 + visibleProjects.length) % visibleProjects.length);
 	};
 
 	const nextProject = () => {
 		if (modalIndex === null) return;
-		showProject((modalIndex + 1) % projects.length);
+		showProject((modalIndex + 1) % visibleProjects.length);
 	};
 </script>
 
+{#if activeProject}
 <div
 	class="grid grid-cols-[minmax(0,1.08fr)_minmax(360px,.92fr)] items-start gap-[clamp(48px,8vw,120px)] max-[900px]:grid-cols-[minmax(0,1.08fr)_minmax(290px,.92fr)] max-[900px]:gap-[30px] max-[700px]:flex max-[700px]:flex-col"
 >
@@ -105,7 +127,7 @@
 		class="m-0 list-none border-t border-rule-strong p-0 max-[700px]:w-full"
 		aria-label={copy.contents}
 	>
-		{#each projects as project, index (project.slug)}
+		{#each visibleProjects as project, index (project.slug)}
 			<li class="border-b border-rule">
 				<a
 					class="grid grid-cols-[36px_minmax(0,1fr)_auto] items-center gap-[clamp(12px,2vw,24px)] py-[clamp(18px,2.5vw,31px)] text-inherit no-underline max-[900px]:grid-cols-[30px_minmax(0,1fr)]"
@@ -154,7 +176,7 @@
 					>
 						<div class="meta mb-[11px] flex justify-between gap-[18px] text-ink-faint">
 							<span>{copy.preview}</span>
-							<span>{String(activeIndex + 1).padStart(2, '0')} / {String(projects.length).padStart(2, '0')}</span>
+							<span>{String(activeIndex + 1).padStart(2, '0')} / {String(visibleProjects.length).padStart(2, '0')}</span>
 						</div>
 						<ProjectVisual
 							visual={activeProject.visual}
@@ -193,8 +215,13 @@
 		</div>
 	</aside>
 </div>
+{:else}
+	<p class="m-0 border-y border-rule py-8 text-sm text-ink-faint">
+		{locale === 'es' ? 'No hay proyectos visibles en este momento.' : 'There are no visible projects at the moment.'}
+	</p>
+{/if}
 
-{#if modalProject && modalIndex !== null}
+{#if modalProject}
 	<ProjectModal
 		project={modalProject}
 		relatedItems={modalItems}
@@ -202,5 +229,6 @@
 		onclose={closeModal}
 		onprevious={previousProject}
 		onnext={nextProject}
+		canNavigate={modalCanNavigate}
 	/>
 {/if}

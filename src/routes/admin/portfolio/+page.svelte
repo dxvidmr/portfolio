@@ -9,6 +9,7 @@
 	import ButtonLink from '$lib/components/ui/ButtonLink.svelte';
 	import Input from '$lib/components/ui/Input.svelte';
 	import Select from '$lib/components/ui/Select.svelte';
+	import Textarea from '$lib/components/ui/Textarea.svelte';
 	import type { ActionData, PageData } from './$types';
 
 	let { data, form }: { data: PageData; form: ActionData } = $props();
@@ -32,6 +33,7 @@
 		`${relation.portfolioSlug}:${relation.entityType}:${relation.entityId}`;
 
 	const entryKey = (entry: Entry) => `${entry.entityType}:${entry.entityId}`;
+	const tagsValue = (tags: string[]) => tags.join(', ');
 
 	const compareEntries = (a: Entry, b: Entry) => {
 		if (a.sortDate == null && b.sortDate != null) return 1;
@@ -164,21 +166,81 @@
 	{/snippet}
 </AdminPageHeader>
 
-<section class="grid grid-cols-[minmax(16rem,34rem)_minmax(0,1fr)] items-end gap-4 border-b border-rule pb-5 max-[620px]:grid-cols-1" aria-label="Seleccionar ficha del portfolio">
+<section class="grid grid-cols-[minmax(16rem,34rem)_minmax(0,1fr)_auto] items-end gap-4 border-b border-rule pb-5 max-[760px]:grid-cols-1" aria-label="Seleccionar ficha del portfolio">
 	<AdminField label="Ficha del portfolio · orden público">
 		<Select bind:value={selectedSlug}>
 			{#each data.projects as project, index (project.slug)}
 				<option value={project.slug}>
-					{String(index + 1).padStart(2, '0')} · {project.title} · {project.year}
+					{String(index + 1).padStart(2, '0')} · {project.title.es} · {project.period}
 				</option>
 			{/each}
 		</Select>
 	</AdminField>
 	{#if selectedProject}
 		<p class="mb-2 text-[0.68rem] text-ink-faint">
-			{selectedProject.kind} · {currentRelations.length} relacionados
+			{selectedProject.kind.es} · {currentRelations.length} relacionados · {selectedProject.showHome ? 'visible' : 'oculto'}
 		</p>
+		<form method="POST" action="?/visibility" use:enhance>
+			<input type="hidden" name="portfolioSlug" value={selectedProject.slug} />
+			<input type="hidden" name="showHome" value={selectedProject.showHome ? '0' : '1'} />
+			<Button type="submit" variant={selectedProject.showHome ? 'danger' : 'primary'} size="sm">
+				{selectedProject.showHome ? 'Ocultar de la portada' : 'Mostrar en la portada'}
+			</Button>
+		</form>
 	{/if}
+</section>
+
+<section class="mt-5 grid gap-3 border-b border-rule pb-5">
+	<details class="rounded-ui border border-rule bg-surface px-4 py-3">
+		<summary class="cursor-pointer font-mono text-xs text-ink">Editar datos básicos</summary>
+		{#if selectedProject}
+			<form class="mt-5 grid grid-cols-2 gap-4 max-[760px]:grid-cols-1" method="POST" action="?/update" use:enhance>
+				<input type="hidden" name="slug" value={selectedProject.slug} />
+				<AdminField label="Título (ES)"><Input name="titleEs" required value={selectedProject.title.es} /></AdminField>
+				<AdminField label="Título (EN)"><Input name="titleEn" value={selectedProject.title.en} /></AdminField>
+				<AdminField label="Tipo (ES)"><Input name="kindEs" required value={selectedProject.kind.es} /></AdminField>
+				<AdminField label="Tipo (EN)"><Input name="kindEn" value={selectedProject.kind.en} /></AdminField>
+				<AdminField label="Línea superior (ES)"><Input name="kickerEs" value={selectedProject.kicker.es} /></AdminField>
+				<AdminField label="Línea superior (EN)"><Input name="kickerEn" value={selectedProject.kicker.en} /></AdminField>
+				<AdminField label="Estado (ES)"><Input name="statusEs" value={selectedProject.status.es} /></AdminField>
+				<AdminField label="Estado (EN)"><Input name="statusEn" value={selectedProject.status.en} /></AdminField>
+				<AdminField label="Periodo"><Input name="period" required value={selectedProject.period} /></AdminField>
+				<AdminField label="Orden"><Input name="sortOrder" type="number" min="0" value={selectedProject.sortOrder} /></AdminField>
+				<div class="col-span-full"><AdminField label="Descripción (ES)"><Textarea name="summaryEs" required rows={3} value={selectedProject.summary.es} /></AdminField></div>
+				<div class="col-span-full"><AdminField label="Descripción (EN)"><Textarea name="summaryEn" rows={3} value={selectedProject.summary.en} /></AdminField></div>
+				<div class="col-span-full"><AdminField label="Etiquetas · separadas por comas"><Input name="tags" value={tagsValue(selectedProject.tags)} /></AdminField></div>
+				<AdminField label="Enlace principal"><Input name="linkUrl" type="url" value={selectedProject.links[0]?.url ?? ''} /></AdminField>
+				<AdminField label="Etiqueta del enlace (ES)"><Input name="linkLabelEs" value={selectedProject.links[0]?.label.es ?? ''} /></AdminField>
+				<AdminField label="Etiqueta del enlace (EN)"><Input name="linkLabelEn" value={selectedProject.links[0]?.label.en ?? ''} /></AdminField>
+				<label class="flex items-center gap-2 self-end pb-2 font-mono text-xs text-ink-dim"><input name="showHome" type="checkbox" value="1" checked={selectedProject.showHome} /> Visible en portada</label>
+				<div class="col-span-full flex justify-end"><Button type="submit" variant="primary">Guardar datos</Button></div>
+			</form>
+		{/if}
+	</details>
+
+	<details class="rounded-ui border border-dashed border-rule-strong px-4 py-3">
+		<summary class="cursor-pointer font-mono text-xs text-accent-strong">+ Crear proyecto</summary>
+		<form class="mt-5 grid grid-cols-2 gap-4 max-[760px]:grid-cols-1" method="POST" action="?/create" use:enhance>
+			<AdminField label="Slug"><Input name="slug" required pattern="[a-z0-9]+(?:-[a-z0-9]+)*" placeholder="mi-proyecto" /></AdminField>
+			<AdminField label="Periodo"><Input name="period" required placeholder="2026—" /></AdminField>
+			<AdminField label="Título (ES)"><Input name="titleEs" required /></AdminField>
+			<AdminField label="Título (EN)"><Input name="titleEn" /></AdminField>
+			<AdminField label="Tipo (ES)"><Input name="kindEs" required placeholder="Proyecto digital" /></AdminField>
+			<AdminField label="Tipo (EN)"><Input name="kindEn" /></AdminField>
+			<AdminField label="Línea superior (ES)"><Input name="kickerEs" /></AdminField>
+			<AdminField label="Línea superior (EN)"><Input name="kickerEn" /></AdminField>
+			<AdminField label="Estado (ES)"><Input name="statusEs" placeholder="En desarrollo" /></AdminField>
+			<AdminField label="Estado (EN)"><Input name="statusEn" /></AdminField>
+			<div class="col-span-full"><AdminField label="Descripción (ES)"><Textarea name="summaryEs" required rows={3} /></AdminField></div>
+			<div class="col-span-full"><AdminField label="Descripción (EN)"><Textarea name="summaryEn" rows={3} /></AdminField></div>
+			<div class="col-span-full"><AdminField label="Etiquetas · separadas por comas"><Input name="tags" /></AdminField></div>
+			<AdminField label="Enlace principal"><Input name="linkUrl" type="url" /></AdminField>
+			<AdminField label="Etiqueta del enlace (ES)"><Input name="linkLabelEs" /></AdminField>
+			<AdminField label="Etiqueta del enlace (EN)"><Input name="linkLabelEn" /></AdminField>
+			<label class="flex items-center gap-2 self-end pb-2 font-mono text-xs text-ink-dim"><input name="showHome" type="checkbox" value="1" checked /> Visible en portada</label>
+			<div class="col-span-full flex justify-end"><Button type="submit" variant="primary">Crear proyecto</Button></div>
+		</form>
+	</details>
 </section>
 
 <div class="mt-6 grid grid-cols-2 items-start gap-8 max-[960px]:grid-cols-1">

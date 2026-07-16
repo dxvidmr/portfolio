@@ -15,6 +15,7 @@
 	}: { visual: ProjectVisual; label: string; period: string; compact?: boolean } = $props();
 
 	const visualTone: Record<ProjectVisual, string> = {
+		generic: 'bg-[color-mix(in_srgb,var(--accent)_7%,var(--visual-bg))] text-ink',
 		fuenteovejuna: 'bg-[#ddd7d6] text-[#383634]',
 		versologia: 'bg-[color-mix(in_srgb,#d4aa42_8%,var(--visual-bg))] text-ink',
 		etso: 'bg-[color-mix(in_srgb,#003a92_8%,var(--visual-bg))] text-ink',
@@ -43,7 +44,11 @@
 		<NetworksVisual {compact} />
 	{:else if visual === 'editions'}
 		<EditionsVisual />
-	{:else}
+	{:else if visual === 'stage'}
 		<StageVisual />
+	{:else}
+		<div class="absolute inset-[22%_12%_14%] grid place-items-center border-y border-current/20">
+			<span class="font-title text-[clamp(2rem,5vw,5rem)] leading-none text-current/70">{label}</span>
+		</div>
 	{/if}
 </div>

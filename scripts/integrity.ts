@@ -70,6 +70,20 @@ for (const table of ['portfolio_items', 'entity_tags', 'links']) {
 }
 
 await expectZero(
+	'portfolio_items sin fichas de portfolio huérfanas',
+	`SELECT COUNT(*) FROM portfolio_items item
+	 WHERE NOT EXISTS (
+	   SELECT 1 FROM portfolio_projects project
+	   WHERE project.slug = item.portfolio_slug)`
+);
+
+await expectZero(
+	'Versología existe y está oculta de la portada',
+	`SELECT ABS(COUNT(*) - 1) FROM portfolio_projects
+	 WHERE slug = 'versologia-metadrama' AND show_home = 0`
+);
+
+await expectZero(
 	'documents (propietario entrada) sin huérfanos',
 	`SELECT COUNT(*) FROM documents d
 	 WHERE d.entity_type IS NOT NULL AND NOT EXISTS (

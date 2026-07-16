@@ -3,6 +3,39 @@ import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 
 describe('esquema posterior a la limpieza 013', () => {
+	it('migra el portfolio estático a un catálogo editable sin relaciones huérfanas', async () => {
+		const db = createClient({ url: 'file::memory:' });
+		try {
+			await db.executeMultiple(`
+				CREATE TABLE portfolio_items (
+					portfolio_slug TEXT NOT NULL,
+					entity_type TEXT NOT NULL,
+					entity_id INTEGER NOT NULL,
+					sort_order INTEGER DEFAULT 0,
+					featured INTEGER DEFAULT 0,
+					PRIMARY KEY (portfolio_slug, entity_type, entity_id)
+				);
+				CREATE INDEX idx_portfolio_items_slug
+					ON portfolio_items(portfolio_slug, sort_order);
+				INSERT INTO portfolio_items VALUES
+					('todos-a-una', 'publications', 1, 0, 1),
+					('slug-obsoleto', 'publications', 2, 0, 0);
+			`);
+			await db.executeMultiple(readFileSync('db/migrations/014_portfolio_projects.sql', 'utf8'));
+
+			expect((await db.execute('SELECT COUNT(*) AS total FROM portfolio_projects')).rows[0]?.total).toBe(6);
+			expect((await db.execute(
+				`SELECT show_home FROM portfolio_projects WHERE slug = 'versologia-metadrama'`
+			)).rows[0]?.show_home).toBe(0);
+			expect((await db.execute('SELECT portfolio_slug FROM portfolio_items')).rows).toMatchObject([
+				{ portfolio_slug: 'todos-a-una' }
+			]);
+			expect((await db.execute('PRAGMA foreign_key_check')).rows).toHaveLength(0);
+		} finally {
+			db.close();
+		}
+	});
+
 	it('separa fechas de evento y roles y representa intervalos abiertos con date_end NULL', async () => {
 		const db = createClient({ url: 'file::memory:' });
 		try {
@@ -80,6 +113,29 @@ describe('esquema posterior a la limpieza 013', () => {
 			expect(projectColumns.rows.map((row) => row.name)).not.toEqual(
 				expect.arrayContaining(['public', 'featured', 'show_home', 'sort_order'])
 			);
+
+			const portfolioProjects = await db.execute(
+				`SELECT slug, title_es, show_home FROM portfolio_projects ORDER BY sort_order`
+			);
+			expect(portfolioProjects.rows).toHaveLength(6);
+			expect(portfolioProjects.rows.find((row) => row.slug === 'versologia-metadrama')).toMatchObject({
+				title_es: 'Versología',
+				show_home: 0
+			});
+			await db.execute({
+				sql: `INSERT INTO portfolio_projects
+					(slug, title_es, title_en, kind_es, kind_en, kicker_es, kicker_en,
+					 summary_es, summary_en, status_es, status_en, period)
+					VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+				args: [
+					'proyecto-sin-narrativa', 'Proyecto básico', 'Basic project', 'Proyecto', 'Project',
+					'Proyecto', 'Project', 'Descripción', 'Description', 'En desarrollo', 'In development', '2026—'
+				]
+			});
+			expect((await db.execute(
+				`SELECT show_home, tags_json, links_json FROM portfolio_projects
+				 WHERE slug = 'proyecto-sin-narrativa'`
+			)).rows[0]).toMatchObject({ show_home: 1, tags_json: '[]', links_json: '[]' });
 			expect((await db.execute('PRAGMA foreign_key_check')).rows).toHaveLength(0);
 		} finally {
 			db.close();

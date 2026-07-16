@@ -18,7 +18,8 @@
 		locale,
 		onclose,
 		onprevious,
-		onnext
+		onnext,
+		canNavigate = true
 	}: {
 		project: PortfolioProject;
 		relatedItems: PortfolioRelatedItem[];
@@ -26,6 +27,7 @@
 		onclose: () => void;
 		onprevious: () => void;
 		onnext: () => void;
+		canNavigate?: boolean;
 	} = $props();
 
 	let shell = $state<HTMLElement | null>(null);
@@ -144,15 +146,19 @@
 			class="pointer-events-none absolute bottom-[clamp(12px,2vw,28px)] left-1/2 z-20 flex translate-x-[-50%] items-center gap-px rounded-full bg-[color-mix(in_srgb,var(--surface-glass)_24%,transparent)] p-1 [backdrop-filter:blur(18px)_saturate(1.04)] max-[700px]:bottom-2"
 			aria-label={locale === 'es' ? 'Navegar entre proyectos' : 'Navigate projects'}
 		>
-			<button class={modalControlClass} type="button" onclick={onprevious} aria-label={copy.previous} title={copy.previous}>
-				<ChevronLeft size={27} strokeWidth={1.5} />
-			</button>
+			{#if canNavigate}
+				<button class={modalControlClass} type="button" onclick={onprevious} aria-label={copy.previous} title={copy.previous}>
+					<ChevronLeft size={27} strokeWidth={1.5} />
+				</button>
+			{/if}
 			<button class={modalControlClass} bind:this={closeButton} type="button" onclick={onclose} aria-label={copy.close} title={copy.close}>
 				<XIcon size={27} strokeWidth={1.5} />
 			</button>
-			<button class={modalControlClass} type="button" onclick={onnext} aria-label={copy.next} title={copy.next}>
-				<ChevronRight size={27} strokeWidth={1.5} />
-			</button>
+			{#if canNavigate}
+				<button class={modalControlClass} type="button" onclick={onnext} aria-label={copy.next} title={copy.next}>
+					<ChevronRight size={27} strokeWidth={1.5} />
+				</button>
+			{/if}
 		</nav>
 
 		<div
