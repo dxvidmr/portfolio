@@ -201,7 +201,7 @@
 							<div class="tw:mb-1 tw:flex tw:flex-wrap tw:gap-x-3 tw:gap-y-1 tw:text-[0.62rem] tw:text-ink-faint">
 								<span>{item.entry.typeLabel}</span>
 								<span>{item.entry.sortDate ?? 'sin fecha'}</span>
-								{#if !item.entry.isPublic}<span class="tw:text-amber">Privada</span>{/if}
+								{#if !item.entry.isPublic}<span class="tw:text-warning">Privada</span>{/if}
 							</div>
 							<strong class="tw:block tw:text-xs tw:font-medium tw:leading-snug tw:text-ink">{item.entry.title}</strong>
 						</div>
@@ -214,7 +214,7 @@
 									type="submit"
 									variant="ghost"
 									size="icon"
-									class={item.relation.featured ? 'tw:text-amber tw:hover:text-amber' : 'tw:text-rule-strong'}
+									class={item.relation.featured ? 'tw:text-warning tw:hover:text-warning' : 'tw:text-rule-strong'}
 									disabled={isPending('featured', item.relation)}
 									aria-label={`${item.relation.featured ? 'Desactivar destacado de' : 'Destacar'} ${item.entry.title}`}
 									title={item.relation.featured ? 'Desactivar destacado' : 'Destacar en la ficha'}
@@ -268,7 +268,7 @@
 							<div class="tw:mb-1 tw:flex tw:flex-wrap tw:gap-x-3 tw:gap-y-1 tw:text-[0.62rem] tw:text-ink-faint">
 								<span>{entry.typeLabel}</span>
 								<span>{entry.sortDate ?? 'sin fecha'}</span>
-								{#if !entry.isPublic}<span class="tw:text-amber">Privada</span>{/if}
+								{#if !entry.isPublic}<span class="tw:text-warning">Privada</span>{/if}
 								{#if entryRelationCount(entry) > 0}
 									<span>{entryRelationCount(entry)} {entryRelationCount(entry) === 1 ? 'ficha' : 'fichas'}</span>
 								{/if}

@@ -87,13 +87,13 @@
 {/if}
 
 {#if entries.length === 0}
-	<div class="tw:border tw:border-amber tw:bg-admin-surface tw:px-4 tw:py-3 tw:text-ink" role="alert">
+	<div class="tw:border tw:border-warning tw:bg-admin-surface tw:px-4 tw:py-3 tw:text-ink" role="alert">
 		<strong class="tw:mb-1 tw:block">No hay entradas seleccionadas.</strong>
 		La web pública utilizará automáticamente el fallback de actividad reciente.
 	</div>
 {:else}
 	<div class="tw:flex tw:items-center tw:justify-between tw:gap-4 tw:border tw:border-rule tw:border-b-0 tw:bg-admin-surface tw:px-4 tw:py-3 tw:max-[680px]:flex-col tw:max-[680px]:items-start">
-		<span class={dirty ? 'tw:text-xs tw:text-amber' : 'tw:text-xs tw:text-ink-faint'}>
+		<span class={dirty ? 'tw:text-xs tw:text-warning' : 'tw:text-xs tw:text-ink-faint'}>
 			{dirty ? 'Hay cambios de orden sin guardar' : 'El orden está guardado'}
 		</span>
 		<form method="POST" action="?/saveOrder" use:enhance={saveOrder}>

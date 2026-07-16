@@ -103,39 +103,39 @@
 	);
 </script>
 
-<main class="cv-page wrap">
-	<header class="cv-head">
-		<div class="page-nav">
-			<a class="meta back" href={localizedPath('/', locale)}>{ui.back}</a>
+<main class="wrap tw:pt-[clamp(24px,5vh,56px)] tw:pb-[88px]">
+	<header class="tw:grid tw:min-h-[54vh] tw:content-center tw:gap-[18px] tw:border-b tw:border-rule">
+		<div class="tw:flex tw:flex-wrap tw:items-baseline tw:justify-between tw:gap-4">
+			<a class="meta tw:text-ink-dim" href={localizedPath('/', locale)}>{ui.back}</a>
 			<SiteControls />
 		</div>
 		<span class="meta tag">CV</span>
-		<h1>{ui.title}</h1>
-		<p>{ui.intro}</p>
+		<h1 class="tw:max-w-[10ch] tw:text-[clamp(3rem,9vw,7rem)] tw:leading-[0.95] tw:uppercase">{ui.title}</h1>
+		<p class="tw:m-0 tw:max-w-[72ch] tw:text-ink-dim">{ui.intro}</p>
 	</header>
 
-	<section class="filters" aria-label={ui.filters}>
-		<label>
+	<section class="tw:sticky tw:top-0 tw:z-[2] tw:grid tw:grid-cols-3 tw:gap-3 tw:border-b tw:border-rule tw:bg-canvas tw:py-[18px] tw:max-[840px]:grid-cols-1" aria-label={ui.filters}>
+		<label class="tw:grid tw:gap-2">
 			<span class="meta">{ui.section}</span>
-			<select bind:value={selectedSection}>
+			<select class="tw:min-h-[38px] tw:w-full tw:rounded-ui-sm tw:border tw:border-rule-strong tw:bg-panel tw:px-[10px] tw:py-[7px]" bind:value={selectedSection}>
 				<option value="all">{ui.allFem}</option>
 				{#each data.sections as section (section.key)}
 					<option value={section.key}>{sectionLabel(section.key, section.title)}</option>
 				{/each}
 			</select>
 		</label>
-		<label>
+		<label class="tw:grid tw:gap-2">
 			<span class="meta">{ui.year}</span>
-			<select bind:value={selectedYear}>
+			<select class="tw:min-h-[38px] tw:w-full tw:rounded-ui-sm tw:border tw:border-rule-strong tw:bg-panel tw:px-[10px] tw:py-[7px]" bind:value={selectedYear}>
 				<option value="all">{ui.allMasc}</option>
 				{#each data.years as year (year)}
 					<option value={year}>{year}</option>
 				{/each}
 			</select>
 		</label>
-		<label>
+		<label class="tw:grid tw:gap-2">
 			<span class="meta">{ui.type}</span>
-			<select bind:value={selectedType}>
+			<select class="tw:min-h-[38px] tw:w-full tw:rounded-ui-sm tw:border tw:border-rule-strong tw:bg-panel tw:px-[10px] tw:py-[7px]" bind:value={selectedType}>
 				<option value="all">{ui.allMasc}</option>
 				{#each types as type (type.value)}
 					<option value={type.value}>{type.label}</option>
@@ -144,20 +144,20 @@
 		</label>
 	</section>
 
-	<div class="cv-sections">
+	<div class="tw:grid tw:gap-[clamp(36px,6vw,72px)] tw:pt-[clamp(36px,6vw,72px)]">
 		{#each visibleSections as section (section.key)}
-			<section class="cv-section">
-				<div class="section-title">
+			<section class="tw:grid tw:grid-cols-[260px_minmax(0,1fr)] tw:gap-[clamp(18px,4vw,48px)] tw:max-[840px]:grid-cols-1">
+				<div class="tw:grid tw:content-start tw:gap-3">
 					<span class="meta tag">{section.items.length}</span>
-					<h2>{sectionLabel(section.key, section.title)}</h2>
+					<h2 class="tw:text-[clamp(1.3rem,3vw,2rem)] tw:leading-[1.1]">{sectionLabel(section.key, section.title)}</h2>
 				</div>
-				<ol>
+				<ol class="tw:m-0 tw:list-none tw:p-0">
 					{#each section.items as item (section.key + item.title + item.year)}
-						<li>
-							<div class="item-main">
-								<span class="year dense">{item.year ?? ui.noDate}</span>
+						<li class="tw:grid tw:grid-cols-[minmax(0,1fr)_180px] tw:gap-[18px] tw:border-b tw:border-rule tw:py-[18px] tw:max-[840px]:grid-cols-1">
+							<div class="tw:grid tw:grid-cols-[64px_minmax(0,1fr)] tw:gap-[18px] tw:max-[840px]:grid-cols-1">
+								<span class="tw:tabular-nums tw:text-ink-faint">{item.year ?? ui.noDate}</span>
 								<div>
-									<h3>
+									<h3 class="tw:text-base tw:leading-[1.35]">
 										{#if item.url}
 											<a href={item.url} target="_blank" rel="noreferrer">{item.title}</a>
 										{:else}
@@ -165,165 +165,44 @@
 										{/if}
 									</h3>
 									{#if item.detail}
-										<p>{item.detail}</p>
+										<p class="tw:mt-[7px] tw:mb-0 tw:text-ink-dim">{item.detail}</p>
 									{/if}
 									{#if item.links.length}
-										<div class="additional-links">
+										<div class="tw:mt-2 tw:flex tw:flex-wrap tw:gap-1.5">
 											{#each item.links as link (link.url)}
-												<a href={link.url} target="_blank" rel="noreferrer" class:primary={link.is_primary}>
+												<a
+													class={`tw:border tw:px-1.5 tw:py-[3px] tw:text-[0.68rem] ${
+														link.is_primary
+															? 'tw:border-accent tw:text-accent'
+															: 'tw:border-rule tw:text-ink-dim tw:hover:border-accent tw:hover:text-accent tw:focus-visible:border-accent tw:focus-visible:text-accent'
+													}`}
+													href={link.url}
+													target="_blank"
+													rel="noreferrer"
+												>
 													{linkLabel(link)}
 												</a>
 											{/each}
 										</div>
 									{/if}
 									{#if item.documents.length}
-										<div class="document-links">
+										<div class="tw:mt-2 tw:flex tw:flex-wrap tw:gap-1.5">
 											{#each item.documents as document (document.url)}
-												<a href={document.url} target="_blank" rel="noreferrer">↓ {documentLabel(document)}</a>
+												<a class="tw:text-[0.68rem] tw:text-ink-dim tw:hover:text-accent tw:focus-visible:text-accent" href={document.url} target="_blank" rel="noreferrer">↓ {documentLabel(document)}</a>
 											{/each}
 										</div>
 									{/if}
 								</div>
 							</div>
 							{#if typeLabel(item)}
-								<span class="type meta">{typeLabel(item)}</span>
+								<span class="meta tw:justify-self-end tw:text-right tw:text-ink-dim tw:max-[840px]:justify-self-start tw:max-[840px]:text-left">{typeLabel(item)}</span>
 							{/if}
 						</li>
 					{/each}
 				</ol>
 			</section>
 		{:else}
-			<p class="empty">{ui.empty}</p>
+			<p class="tw:text-ink-dim">{ui.empty}</p>
 		{/each}
 	</div>
 </main>
-
-<style>
-	.cv-page {
-		padding-block: clamp(24px, 5vh, 56px) 88px;
-	}
-	.back {
-		color: var(--fg-dim);
-	}
-	.page-nav {
-		display: flex;
-		justify-content: space-between;
-		align-items: baseline;
-		gap: 16px;
-		flex-wrap: wrap;
-	}
-	.cv-head {
-		min-height: 54vh;
-		display: grid;
-		align-content: center;
-		gap: 18px;
-		border-bottom: 1px solid var(--line);
-	}
-	.cv-head h1 {
-		max-width: 10ch;
-		font-size: clamp(3rem, 9vw, 7rem);
-		line-height: 0.95;
-		text-transform: uppercase;
-	}
-	.cv-head p {
-		max-width: 72ch;
-		margin: 0;
-		color: var(--fg-dim);
-	}
-	.filters {
-		position: sticky;
-		top: 0;
-		z-index: 2;
-		display: grid;
-		grid-template-columns: repeat(3, minmax(0, 1fr));
-		gap: 12px;
-		padding-block: 18px;
-		background: var(--bg);
-		border-bottom: 1px solid var(--line);
-	}
-	label {
-		display: grid;
-		gap: 8px;
-	}
-	select {
-		width: 100%;
-		min-height: 38px;
-		border: 1px solid var(--line-strong);
-		border-radius: var(--radius-sm);
-		background: var(--bg-panel);
-		padding: 7px 10px;
-	}
-	.cv-sections {
-		display: grid;
-		gap: clamp(36px, 6vw, 72px);
-		padding-top: clamp(36px, 6vw, 72px);
-	}
-	.cv-section {
-		display: grid;
-		grid-template-columns: 260px minmax(0, 1fr);
-		gap: clamp(18px, 4vw, 48px);
-	}
-	.section-title {
-		display: grid;
-		align-content: start;
-		gap: 12px;
-	}
-	.section-title h2 {
-		font-size: clamp(1.3rem, 3vw, 2rem);
-		line-height: 1.1;
-	}
-	ol {
-		margin: 0;
-		padding: 0;
-		list-style: none;
-	}
-	li {
-		display: grid;
-		grid-template-columns: minmax(0, 1fr) 180px;
-		gap: 18px;
-		padding: 18px 0;
-		border-bottom: 1px solid var(--line);
-	}
-	.item-main {
-		display: grid;
-		grid-template-columns: 64px minmax(0, 1fr);
-		gap: 18px;
-	}
-	.year {
-		color: var(--fg-faint);
-	}
-	h3 {
-		font-size: 1rem;
-		line-height: 1.35;
-	}
-	p {
-		margin: 7px 0 0;
-		color: var(--fg-dim);
-	}
-	.type {
-		justify-self: end;
-		text-align: right;
-		color: var(--fg-dim);
-	}
-	.empty {
-		color: var(--fg-dim);
-	}
-	.additional-links { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
-	.additional-links a { border: 1px solid var(--line); padding: 3px 6px; color: var(--fg-dim); font-size: 0.68rem; text-decoration: none; }
-	.additional-links a:hover, .additional-links a:focus-visible, .additional-links a.primary { border-color: var(--accent); color: var(--accent); }
-	.document-links { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
-	.document-links a { color: var(--fg-dim); font-size: 0.68rem; }
-	.document-links a:hover, .document-links a:focus-visible { color: var(--accent); }
-	@media (max-width: 840px) {
-		.filters,
-		.cv-section,
-		li,
-		.item-main {
-			grid-template-columns: 1fr;
-		}
-		.type {
-			justify-self: start;
-			text-align: left;
-		}
-	}
-</style>

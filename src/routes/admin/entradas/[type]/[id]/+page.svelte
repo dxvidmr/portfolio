@@ -237,7 +237,7 @@
 						{relation.featured ? '★ ' : ''}{relation.title}
 					</a>
 					{#if relation.featured}
-						<span class="tw:text-[0.65rem] tw:uppercase tw:tracking-[0.06em] tw:text-amber">Destacada</span>
+						<span class="tw:text-[0.65rem] tw:uppercase tw:tracking-[0.06em] tw:text-warning">Destacada</span>
 					{/if}
 				</li>
 			{/each}
