@@ -3,9 +3,18 @@
 	import type { Locale } from '$lib/paraglide/runtime';
 	import { createReveal } from '$lib/actions/reveal';
 	import ProjectFigure from './ProjectFigure.svelte';
+	import StageFigure from './StageFigure.svelte';
 
 	let { locale }: { locale: Locale } = $props();
 	const reveal = createReveal({ threshold: 0.1, rootMargin: '0px 0px -5% 0px' });
+	const headingClass = 'tw:m-0 tw:font-[450] tw:tracking-[-0.04em]';
+	const bodyClass = 'tw:text-ink-dim tw:leading-[1.68]';
+	const labelClass = 'meta tw:mt-0 tw:mb-4 tw:text-accent-strong';
+	const productionHeadingClass = `${headingClass} tw:text-[clamp(2.2rem,4.6vw,4.8rem)] tw:leading-[0.94]`;
+	const productionClass =
+		'tw:relative tw:grid tw:grid-cols-[72px_minmax(290px,.72fr)_minmax(0,1.28fr)] tw:gap-[clamp(28px,5vw,80px)] tw:border-t tw:border-rule-strong tw:pt-7 tw:max-[960px]:grid-cols-[52px_1fr] tw:max-[620px]:grid-cols-1';
+	const productionCopyClass =
+		'tw:max-w-[620px] tw:max-[960px]:col-start-2 tw:max-[620px]:col-start-1';
 
 	const copy = $derived(locale === 'es' ? {
 		researchLabel: 'Investigación escénica',
@@ -115,167 +124,88 @@
 
 </script>
 
-<section class="stage-story">
-	<article class="research" id="investigacion" use:reveal>
-		<div class="research-copy">
-			<p class="meta label">{copy.researchLabel}</p>
-			<h3>{copy.researchTitle}</h3>
-			<p>{copy.researchBody}</p>
-			<p class="publication meta">{copy.publication}</p>
+<section class="tw:grid tw:gap-[clamp(100px,15vw,220px)] tw:border-t tw:border-rule-strong tw:py-[clamp(76px,11vw,150px)]">
+	<article class="tw:grid tw:grid-cols-[minmax(300px,.85fr)_minmax(0,1.15fr)] tw:items-start tw:gap-[clamp(60px,10vw,150px)] tw:max-[960px]:grid-cols-1" id="investigacion" use:reveal>
+		<div class="tw:sticky tw:top-[120px] tw:max-w-[620px] tw:max-[960px]:static">
+			<p class={labelClass}>{copy.researchLabel}</p>
+			<h3 class="{headingClass} tw:text-[clamp(2.4rem,5.3vw,5.4rem)] tw:leading-[0.93]">{copy.researchTitle}</h3>
+			<p class="{bodyClass} tw:mt-[26px] tw:mb-0">{copy.researchBody}</p>
+			<p class="meta tw:mt-[34px] tw:mb-0 tw:border-t tw:border-rule tw:pt-[18px] tw:leading-[1.6] tw:text-ink-faint">{copy.publication}</p>
 		</div>
-		<ol class="method">
+		<ol class="tw:m-0 tw:list-none tw:border-t tw:border-rule-strong tw:p-0">
 			{#each copy.method as step, index (step.title)}
-				<li>
-					<span class="step-number meta">0{index + 1}</span>
+				<li class="tw:relative tw:grid tw:min-h-[104px] tw:grid-cols-[48px_minmax(0,1fr)] tw:gap-5 tw:border-b tw:border-rule tw:py-[22px] tw:max-[620px]:grid-cols-[42px_1fr] tw:max-[620px]:gap-3.5">
+					<span class="meta tw:grid tw:size-[35px] tw:place-items-center tw:rounded-full tw:border tw:border-[color-mix(in_srgb,var(--accent-strong)_45%,var(--line))] tw:text-accent-strong">0{index + 1}</span>
 					<div>
-						<strong>{step.title}</strong>
-						<p>{step.note}</p>
+						<strong class="tw:font-title tw:text-xl tw:font-medium">{step.title}</strong>
+						<p class="{bodyClass} tw:mt-[7px] tw:mb-0 tw:max-w-[48ch] tw:text-[0.77rem]">{step.note}</p>
 					</div>
 				</li>
 			{/each}
 		</ol>
 	</article>
 
-	<section class="productions">
-		<header class="productions-header" id="practica-escenica" use:reveal>
-			<p class="meta label">{copy.productionsLabel}</p>
-			<h3>{copy.productionsTitle}</h3>
+	<section class="tw:grid tw:gap-0">
+		<header class="tw:mb-[clamp(54px,8vw,110px)] tw:grid tw:grid-cols-[minmax(140px,.35fr)_minmax(0,1fr)] tw:items-end tw:gap-[clamp(30px,6vw,90px)] tw:border-b tw:border-rule-strong tw:pb-[clamp(28px,4vw,52px)] tw:max-[620px]:grid-cols-1 tw:max-[620px]:gap-[10px]" id="practica-escenica" use:reveal>
+			<p class="meta tw:mt-0 tw:mb-2 tw:text-accent-strong">{copy.productionsLabel}</p>
+			<h3 class="{headingClass} tw:max-w-[10ch] tw:text-[clamp(3rem,6vw,6.2rem)] tw:leading-[0.9]">{copy.productionsTitle}</h3>
 		</header>
-		<article class="production fuente" id="fuenteovejuna" use:reveal>
-			<div class="production-number meta">01 / 03</div>
-			<div class="production-copy">
-				<p class="meta production-meta">{copy.fuenteMeta}</p>
-				<h4>{copy.fuenteTitle}</h4>
-				<p>{copy.fuenteBody}</p>
-				<span class="role meta">{copy.fuenteRole}</span>
+		<article class="{productionClass} tw:border-t-0 tw:pt-0" id="fuenteovejuna" use:reveal>
+			<div class="meta tw:text-ink-faint">01 / 03</div>
+			<div class={productionCopyClass}>
+				<p class="meta tw:mt-0 tw:mb-[17px] tw:text-accent-strong">{copy.fuenteMeta}</p>
+				<h4 class={productionHeadingClass}>{copy.fuenteTitle}</h4>
+				<p class="{bodyClass} tw:mt-6 tw:mb-0">{copy.fuenteBody}</p>
+				<span class="meta tw:mt-[26px] tw:block tw:text-ink-faint">{copy.fuenteRole}</span>
 			</div>
-			<div class="fuente-lead" aria-label={copy.fuenteImages.sequenceCaption}>
-				<figure class="masonry-item item-conjunto"><img src="/images/projects/escena/fuenteovejuna-conjunto.webp" alt={copy.fuenteImages.conjuntoAlt} loading="lazy" decoding="async" /><figcaption><span class="meta">01</span><p>{copy.fuenteImages.conjuntoCaption}</p></figcaption></figure>
-				<figure class="masonry-item item-cartel"><img src="/images/projects/escena/fuenteovejuna-cartel.webp" alt={copy.fuenteImages.cartelAlt} loading="lazy" decoding="async" /><figcaption><span class="meta">02</span><p>{copy.fuenteImages.cartelCaption}</p></figcaption></figure>
+			<div class="tw:grid tw:min-w-0 tw:grid-cols-[minmax(0,1fr)_minmax(105px,.3fr)] tw:items-end tw:gap-[clamp(12px,2vw,28px)] tw:max-[960px]:col-start-2 tw:max-[960px]:mt-[22px] tw:max-[620px]:col-start-1 tw:max-[620px]:grid-cols-[minmax(0,1fr)_90px]" aria-label={copy.fuenteImages.sequenceCaption}>
+				<StageFigure src="/images/projects/escena/fuenteovejuna-conjunto.webp" alt={copy.fuenteImages.conjuntoAlt} caption={copy.fuenteImages.conjuntoCaption} number="01" />
+				<StageFigure class="tw:w-[min(100%,220px)] tw:justify-self-end" src="/images/projects/escena/fuenteovejuna-cartel.webp" alt={copy.fuenteImages.cartelAlt} caption={copy.fuenteImages.cartelCaption} number="02" />
 			</div>
-			<div class="fuente-gallery">
-				<figure class="masonry-item item-escena"><img src="/images/projects/escena/fuenteovejuna-escena.webp" alt={copy.fuenteImages.escenaAlt} loading="lazy" decoding="async" /><figcaption><span class="meta">03</span><p>{copy.fuenteImages.escenaCaption}</p></figcaption></figure>
-				<figure class="masonry-item item-accion"><img src="/images/projects/escena/fuenteovejuna-accion.webp" alt={copy.fuenteImages.accionAlt} loading="lazy" decoding="async" /><figcaption><span class="meta">04</span><p>{copy.fuenteImages.accionCaption}</p></figcaption></figure>
-				<figure class="masonry-item item-corral"><img src="/images/projects/escena/fuenteovejuna-corral.webp" alt={copy.fuenteImages.corralAlt} loading="lazy" decoding="async" /><figcaption><span class="meta">05</span><p>{copy.fuenteImages.corralCaption}</p></figcaption></figure>
-				<figure class="masonry-item item-frondoso"><img src="/images/projects/escena/fuenteovejuna-laurencia-frondoso.webp" alt={copy.fuenteImages.frondosoAlt} loading="lazy" decoding="async" /><figcaption><span class="meta">06</span><p>{copy.fuenteImages.frondosoCaption}</p></figcaption></figure>
-				<figure class="masonry-item item-reparto"><img src="/images/projects/escena/fuenteovejuna-reparto.webp" alt={copy.fuenteImages.repartoAlt} loading="lazy" decoding="async" /><figcaption><span class="meta">07</span><p>{copy.fuenteImages.repartoCaption}</p></figcaption></figure>
+			<div class="tw:col-span-full tw:mt-[clamp(44px,7vw,100px)] tw:grid tw:grid-cols-12 tw:items-start tw:gap-x-[clamp(12px,2vw,30px)] tw:gap-y-[clamp(28px,4vw,64px)] tw:max-[1180px]:min-[621px]:grid-cols-2 tw:max-[620px]:col-start-1 tw:max-[620px]:mt-[34px] tw:max-[620px]:block tw:max-[620px]:[columns:2] tw:max-[620px]:[column-gap:8px]">
+				<StageFigure masonry class="tw:col-start-1 tw:col-span-4 tw:max-[1180px]:min-[621px]:col-auto" src="/images/projects/escena/fuenteovejuna-escena.webp" alt={copy.fuenteImages.escenaAlt} caption={copy.fuenteImages.escenaCaption} number="03" />
+				<StageFigure masonry class="tw:col-start-5 tw:col-span-4 tw:max-[1180px]:min-[621px]:col-auto" src="/images/projects/escena/fuenteovejuna-accion.webp" alt={copy.fuenteImages.accionAlt} caption={copy.fuenteImages.accionCaption} number="04" />
+				<StageFigure masonry class="tw:col-start-9 tw:col-span-4 tw:max-[1180px]:min-[621px]:col-auto" src="/images/projects/escena/fuenteovejuna-corral.webp" alt={copy.fuenteImages.corralAlt} caption={copy.fuenteImages.corralCaption} number="05" />
+				<StageFigure masonry class="tw:col-start-1 tw:col-span-6 tw:max-[1180px]:min-[621px]:col-auto" src="/images/projects/escena/fuenteovejuna-laurencia-frondoso.webp" alt={copy.fuenteImages.frondosoAlt} caption={copy.fuenteImages.frondosoCaption} number="06" />
+				<StageFigure masonry class="tw:col-start-7 tw:col-span-6 tw:max-[1180px]:min-[621px]:col-span-full tw:max-[1180px]:min-[621px]:w-[64%] tw:max-[1180px]:min-[621px]:justify-self-center" src="/images/projects/escena/fuenteovejuna-reparto.webp" alt={copy.fuenteImages.repartoAlt} caption={copy.fuenteImages.repartoCaption} number="07" />
 			</div>
 		</article>
 
-		<article class="production cueva" id="cueva-salamanca" use:reveal>
-			<div class="production-number meta">02 / 03</div>
-			<div class="production-copy">
-				<p class="meta production-meta">{copy.cuevaMeta}</p>
-				<h4>{copy.cuevaTitle}</h4>
-				<p>{copy.cuevaBody}</p>
-				<ul class="stats meta">{#each copy.cuevaStats as stat (stat)}<li>{stat}</li>{/each}</ul>
-				<a class="project-link meta" href="https://www.ub.edu/metadrama/cueva/" target="_blank" rel="noreferrer">
+		<article class="{productionClass} tw:mt-[clamp(100px,15vw,210px)] tw:grid-cols-[72px_minmax(300px,.68fr)_minmax(0,1.32fr)] tw:max-[960px]:grid-cols-[52px_1fr] tw:max-[620px]:grid-cols-1" id="cueva-salamanca" use:reveal>
+			<div class="meta tw:text-ink-faint">02 / 03</div>
+			<div class={productionCopyClass}>
+				<p class="meta tw:mt-0 tw:mb-[17px] tw:text-accent-strong">{copy.cuevaMeta}</p>
+				<h4 class={productionHeadingClass}>{copy.cuevaTitle}</h4>
+				<p class="{bodyClass} tw:mt-6 tw:mb-0">{copy.cuevaBody}</p>
+				<ul class="meta tw:mt-7 tw:mb-0 tw:flex tw:list-none tw:flex-wrap tw:gap-[7px] tw:p-0">
+					{#each copy.cuevaStats as stat (stat)}<li class="tw:rounded-full tw:bg-[color-mix(in_srgb,var(--accent)_9%,transparent)] tw:px-[10px] tw:py-[7px] tw:text-ink-faint">{stat}</li>{/each}
+				</ul>
+				<a class="meta tw:mt-[26px] tw:inline-flex tw:items-center tw:gap-2 tw:text-ink tw:[&>span]:inline-flex tw:[&>span]:transition-[transform,color] tw:[&>span]:duration-[220ms] tw:hover:[&>span]:translate-x-[3px] tw:hover:[&>span]:translate-y-[-3px] tw:hover:[&>span]:text-accent-strong tw:focus-visible:[&>span]:translate-x-[3px] tw:focus-visible:[&>span]:translate-y-[-3px] tw:focus-visible:[&>span]:text-accent-strong" href="https://www.ub.edu/metadrama/cueva/" target="_blank" rel="noreferrer">
 					{copy.projectLink}<span><MoveUpRight size={18} strokeWidth={1.6} /></span>
 				</a>
 			</div>
-			<div class="cueva-media">
+			<div class="tw:grid tw:grid-cols-[minmax(0,1fr)_minmax(150px,.3fr)] tw:items-end tw:gap-[clamp(20px,3vw,42px)] tw:[&>figure:last-child]:mb-[-16%] tw:max-[960px]:col-start-2 tw:max-[960px]:mt-[22px] tw:max-[620px]:col-start-1 tw:max-[620px]:grid-cols-[minmax(0,1fr)_115px]">
 				<ProjectFigure src="/images/projects/escena/cueva-escena.webp" alt={copy.cuevaAlt} caption={copy.cuevaCaption} number="08" />
 				<ProjectFigure src="/images/projects/escena/cueva-cartel.webp" alt={copy.cuevaPosterAlt} caption={copy.cuevaPosterCaption} number="09" portrait />
 			</div>
 		</article>
 
-		<article class="production dido" id="dido-eneas" use:reveal>
-			<div class="production-number meta">03 / 03</div>
-			<div class="dido-media">
+		<article class="{productionClass} tw:mt-[clamp(100px,15vw,210px)] tw:grid-cols-[72px_minmax(0,1.25fr)_minmax(300px,.75fr)] tw:items-center tw:max-[960px]:grid-cols-[52px_1fr] tw:max-[620px]:grid-cols-1" id="dido-eneas" use:reveal>
+			<div class="meta tw:text-ink-faint">03 / 03</div>
+			<div class="tw:grid tw:grid-cols-[minmax(0,1fr)_minmax(150px,.36fr)] tw:items-start tw:gap-[clamp(20px,3vw,40px)] tw:[&>figure:last-child]:mt-[28%] tw:max-[960px]:col-start-2 tw:max-[960px]:row-start-3 tw:max-[960px]:mt-[22px] tw:max-[620px]:col-start-1 tw:max-[620px]:grid-cols-[minmax(0,1fr)_115px]">
 				<ProjectFigure src="/images/projects/escena/dido-escena.webp" alt={copy.didoAlt} caption={copy.didoCaption} number="10" />
 				<ProjectFigure src="/images/projects/escena/dido-cartel.webp" alt={copy.didoPosterAlt} caption={copy.didoPosterCaption} number="11" portrait />
 			</div>
-			<div class="production-copy">
-				<p class="meta production-meta">{copy.didoMeta}</p>
-				<h4>{copy.didoTitle}</h4>
-				<p>{copy.didoBody}</p>
-				<a class="project-link meta" href="https://www.ub.edu/metadrama/dido-y-eneas-no-hay-mal-que-por-bien-no-venga/" target="_blank" rel="noreferrer">
+			<div class="{productionCopyClass} tw:max-[960px]:row-start-2">
+				<p class="meta tw:mt-0 tw:mb-[17px] tw:text-accent-strong">{copy.didoMeta}</p>
+				<h4 class={productionHeadingClass}>{copy.didoTitle}</h4>
+				<p class="{bodyClass} tw:mt-6 tw:mb-0">{copy.didoBody}</p>
+				<a class="meta tw:mt-[26px] tw:inline-flex tw:items-center tw:gap-2 tw:text-ink tw:[&>span]:inline-flex tw:[&>span]:transition-[transform,color] tw:[&>span]:duration-[220ms] tw:hover:[&>span]:translate-x-[3px] tw:hover:[&>span]:translate-y-[-3px] tw:hover:[&>span]:text-accent-strong tw:focus-visible:[&>span]:translate-x-[3px] tw:focus-visible:[&>span]:translate-y-[-3px] tw:focus-visible:[&>span]:text-accent-strong" href="https://www.ub.edu/metadrama/dido-y-eneas-no-hay-mal-que-por-bien-no-venga/" target="_blank" rel="noreferrer">
 					{copy.projectLink}<span><MoveUpRight size={18} strokeWidth={1.6} /></span>
 				</a>
 			</div>
 		</article>
 	</section>
 
-	<p class="closing" use:reveal>{copy.closing}</p>
+	<p class="tw:mt-0 tw:mr-[6%] tw:mb-0 tw:ml-auto tw:w-[min(70%,850px)] tw:border-t tw:border-rule-strong tw:pt-[clamp(48px,7vw,90px)] tw:font-title tw:text-[clamp(1.5rem,3vw,2.7rem)] tw:leading-[1.25] tw:text-ink-dim tw:max-[620px]:mr-0 tw:max-[620px]:w-full" use:reveal>{copy.closing}</p>
 </section>
-
-<style>
-	.stage-story { display: grid; gap: clamp(100px, 15vw, 220px); padding-block: clamp(76px, 11vw, 150px); border-top: 1px solid var(--line-strong); }
-	.stage-story h3, .stage-story h4 { margin: 0; font-weight: 450; letter-spacing: -.04em; }
-	.stage-story p:not(.label, .publication, .production-meta) { color: var(--fg-dim); line-height: 1.68; }
-	.label { margin: 0 0 16px; color: var(--accent-strong); }
-	.research { display: grid; grid-template-columns: minmax(300px, .85fr) minmax(0, 1.15fr); gap: clamp(60px, 10vw, 150px); align-items: start; }
-	.research-copy { position: sticky; top: 120px; max-width: 620px; }
-	.research h3 { font-size: clamp(2.4rem, 5.3vw, 5.4rem); line-height: .93; }
-	.research-copy > p:not(.label, .publication) { margin: 26px 0 0; }
-	.publication { margin: 34px 0 0; padding-top: 18px; border-top: 1px solid var(--line); color: var(--fg-faint); line-height: 1.6; }
-	.method { margin: 0; padding: 0; border-top: 1px solid var(--line-strong); list-style: none; }
-	.method li { position: relative; display: grid; grid-template-columns: 48px minmax(0, 1fr); gap: 20px; min-height: 104px; padding: 22px 0; border-bottom: 1px solid var(--line); }
-	.step-number { display: grid; width: 35px; height: 35px; place-items: center; border: 1px solid color-mix(in srgb, var(--accent-strong) 45%, var(--line)); border-radius: 50%; color: var(--accent-strong); }
-	.method strong { font-family: var(--font-title); font-size: 1.25rem; font-weight: 500; }
-	.method p { max-width: 48ch; margin: 7px 0 0; font-size: .77rem; }
-	.productions { display: grid; gap: 0; }
-	.productions-header { display: grid; grid-template-columns: minmax(140px, .35fr) minmax(0, 1fr); gap: clamp(30px, 6vw, 90px); align-items: end; margin-bottom: clamp(54px, 8vw, 110px); padding-bottom: clamp(28px, 4vw, 52px); border-bottom: 1px solid var(--line-strong); }
-	.productions-header .label { margin: 0 0 8px; }
-	.productions-header h3 { max-width: 10ch; font-size: clamp(3rem, 6vw, 6.2rem); line-height: .9; }
-	.production { position: relative; display: grid; grid-template-columns: 72px minmax(290px, .72fr) minmax(0, 1.28fr); gap: clamp(28px, 5vw, 80px); padding-top: 28px; border-top: 1px solid var(--line-strong); }
-	.productions-header + .production { padding-top: 0; border-top: 0; }
-	.production + .production { margin-top: clamp(100px, 15vw, 210px); }
-	.production-number { color: var(--fg-faint); }
-	.production-copy { max-width: 620px; }
-	.production-meta { margin: 0 0 17px; color: var(--accent-strong); }
-	.production h4 { font-size: clamp(2.2rem, 4.6vw, 4.8rem); line-height: .94; }
-	.production-copy > p:not(.production-meta) { margin: 24px 0 0; }
-	.role { display: block; margin-top: 26px; color: var(--fg-faint); }
-	.fuente-lead { display: grid; grid-template-columns: minmax(0, 1fr) minmax(105px, .3fr); gap: clamp(12px, 2vw, 28px); min-width: 0; align-items: end; }
-	.fuente-lead .item-cartel { width: min(100%, 220px); justify-self: end; }
-	.fuente-gallery { grid-column: 1 / -1; display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); gap: clamp(28px, 4vw, 64px) clamp(12px, 2vw, 30px); align-items: start; margin-top: clamp(44px, 7vw, 100px); }
-	.masonry-item { min-width: 0; margin: 0; }
-	.masonry-item img { display: block; width: 100%; height: auto; border-radius: var(--radius-sm); background: var(--visual-bg); }
-	.masonry-item figcaption { display: grid; grid-template-columns: 28px minmax(0, 1fr); gap: 12px; margin-top: 11px; color: var(--fg-faint); }
-	.masonry-item figcaption span { padding-top: 3px; }.masonry-item figcaption p { margin: 0; font-size: .7rem; line-height: 1.5; }
-	.item-escena { grid-column: 1 / span 4; }
-	.item-accion { grid-column: 5 / span 4; }
-	.item-corral { grid-column: 9 / span 4; }
-	.item-frondoso { grid-column: 1 / span 6; }
-	.item-reparto { grid-column: 7 / span 6; }
-	.stats { display: flex; flex-wrap: wrap; gap: 7px; margin: 28px 0 0; padding: 0; list-style: none; }
-	.stats li { padding: 7px 10px; border-radius: 999px; background: color-mix(in srgb, var(--accent) 9%, transparent); color: var(--fg-faint); }
-	.project-link { display: inline-flex; gap: 8px; align-items: center; margin-top: 26px; color: var(--fg); text-decoration: none; }
-	.project-link span { display: inline-flex; transition: transform 220ms ease, color 220ms ease; }
-	.project-link:hover span, .project-link:focus-visible span { color: var(--accent-strong); transform: translate(3px, -3px); }
-	.cueva { grid-template-columns: 72px minmax(300px, .68fr) minmax(0, 1.32fr); }
-	.cueva-media { display: grid; grid-template-columns: minmax(0, 1fr) minmax(150px, .3fr); gap: clamp(20px, 3vw, 42px); align-items: end; }
-	.cueva-media > :global(figure:last-child) { margin-bottom: -16%; }
-	.dido { grid-template-columns: 72px minmax(0, 1.25fr) minmax(300px, .75fr); align-items: center; }
-	.dido-media { display: grid; grid-template-columns: minmax(0, 1fr) minmax(150px, .36fr); gap: clamp(20px, 3vw, 40px); align-items: start; }
-	.dido-media > :global(figure:last-child) { margin-top: 28%; }
-	.closing { width: min(70%, 850px); margin: 0 6% 0 auto; padding-top: clamp(48px, 7vw, 90px); border-top: 1px solid var(--line-strong); font-family: var(--font-title); font-size: clamp(1.5rem, 3vw, 2.7rem); line-height: 1.25 !important; }
-	@media (max-width: 960px) {
-		.research { grid-template-columns: 1fr; }
-		.research-copy { position: static; }
-		.production, .cueva, .dido { grid-template-columns: 52px 1fr; }
-		.production-copy, .cueva-media, .dido-media, .fuente-lead { grid-column: 2; }
-		.cueva-media, .dido-media { margin-top: 22px; }
-		.fuente-lead { margin-top: 22px; }
-		.fuente-gallery { grid-column: 1 / -1; }
-		.dido .dido-media { grid-row: 3; }.dido .production-copy { grid-row: 2; }
-	}
-	@media (max-width: 1180px) and (min-width: 621px) {
-		.fuente-gallery { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-		.fuente-gallery .masonry-item { grid-column: auto; }
-		.fuente-gallery .item-reparto { grid-column: 1 / -1; width: 64%; justify-self: center; }
-	}
-	@media (max-width: 620px) {
-		.closing { width: 100%; margin-left: 0; }
-		.productions-header { grid-template-columns: 1fr; gap: 10px; }
-		.method li { grid-template-columns: 42px 1fr; gap: 14px; }
-		.production, .cueva, .dido { grid-template-columns: 1fr; }
-		.production-number, .production-copy, .cueva-media, .dido-media, .fuente-lead, .fuente-gallery { grid-column: 1; }
-		.cueva-media, .dido-media { grid-template-columns: minmax(0, 1fr) 115px; }
-		.fuente-lead { grid-template-columns: minmax(0, 1fr) 90px; }
-		.fuente-gallery { display: block; columns: 2; column-gap: 8px; margin-top: 34px; }
-		.fuente-gallery .masonry-item { display: inline-block; width: 100%; margin: 0 0 8px; break-inside: avoid; }
-		.fuente-gallery .item-accion, .fuente-gallery .item-frondoso { margin-top: 0; }
-	}
-</style>
