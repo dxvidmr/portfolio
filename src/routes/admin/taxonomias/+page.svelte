@@ -4,9 +4,17 @@
 	import type { ActionData, PageData } from './$types';
 	import AdminToast from '$lib/components/AdminToast.svelte';
 	import AdminPageHeader from '$lib/components/admin/AdminPageHeader.svelte';
+	import AdminField from '$lib/components/admin/AdminField.svelte';
+	import Button from '$lib/components/ui/Button.svelte';
+	import Input from '$lib/components/ui/Input.svelte';
 
 	let { data, form }: { data: PageData; form: ActionData } = $props();
 	let pending = $state<string[]>([]);
+	const rowGridClass =
+		'tw:grid tw:grid-cols-[minmax(9rem,0.9fr)_1.2fr_1.2fr_4.5rem_3rem_6rem_6rem] tw:items-center tw:gap-2 tw:border-b tw:border-rule tw:px-3 tw:py-2 last:tw:border-b-0 tw:max-[900px]:block tw:max-[900px]:rounded-ui tw:max-[900px]:border tw:max-[900px]:bg-admin-surface tw:max-[900px]:p-4';
+	const cellClass = 'tw:min-w-0 tw:max-[900px]:grid tw:max-[900px]:content-end tw:max-[900px]:gap-1';
+	const mobileLabelClass =
+		'tw:hidden tw:text-[0.58rem] tw:uppercase tw:tracking-[0.1em] tw:text-ink-faint tw:max-[900px]:block';
 
 	// Igual que en los editores de enlaces/documentos: sin reset del formulario
 	// al terminar (el reset dejaría vacíos los campos, cuyo valor por defecto
@@ -39,353 +47,97 @@
 {/if}
 
 {#each data.domains as group (group.domain)}
-	<section class="taxonomy-group" aria-labelledby={`dominio-${group.domain}`}>
-		<h2 id={`dominio-${group.domain}`}>{group.label} <code>{group.domain}</code></h2>
+	<section class="tw:mb-8 tw:border-t tw:border-rule tw:pt-5" aria-labelledby={`dominio-${group.domain}`}>
+		<h2 class="tw:mb-3 tw:flex tw:items-baseline tw:gap-2 tw:text-base tw:text-ink" id={`dominio-${group.domain}`}>
+			{group.label}
+			<code class="tw:text-xs tw:font-normal tw:text-ink-faint">{group.domain}</code>
+		</h2>
 
 		{#if group.types.length > 0}
-			<div class="rows" role="table" aria-label={group.label}>
-				<div class="row head" role="row">
+			<div class="tw:grid tw:overflow-hidden tw:rounded-ui tw:border tw:border-rule tw:text-[0.82rem] tw:max-[900px]:gap-3 tw:max-[900px]:overflow-visible tw:max-[900px]:border-0" role="table" aria-label={group.label}>
+				<div class="tw:grid tw:grid-cols-[minmax(9rem,0.9fr)_1.2fr_1.2fr_4.5rem_3rem_6rem_6rem] tw:items-center tw:gap-2 tw:border-b tw:border-rule tw:bg-admin-surface-raised tw:px-3 tw:py-2 tw:text-ink-faint tw:max-[900px]:hidden" role="row">
 					<span role="columnheader">Código</span>
 					<span role="columnheader">Etiqueta ES</span>
 					<span role="columnheader">Etiqueta EN</span>
 					<span role="columnheader">Orden</span>
 					<span role="columnheader">Usos</span>
-					<span role="columnheader" class="visually-hidden">Guardar</span>
-					<span role="columnheader" class="visually-hidden">Eliminar</span>
+					<span role="columnheader" class="tw:sr-only">Guardar</span>
+					<span role="columnheader" class="tw:sr-only">Eliminar</span>
 				</div>
 				{#each group.types as type (type.code)}
-					<div class="row" role="row">
-						<form method="POST" action="?/guardar" use:enhance={enhancedSubmit(`save:${type.code}`)}>
+					<div class={rowGridClass} role="row">
+						<form class="tw:contents tw:max-[900px]:grid tw:max-[900px]:grid-cols-2 tw:max-[900px]:gap-3 tw:max-[560px]:grid-cols-1" method="POST" action="?/guardar" use:enhance={enhancedSubmit(`save:${type.code}`)}>
 							<input type="hidden" name="domain" value={group.domain} />
 							<input type="hidden" name="code" value={type.code} />
-							<span role="cell"><code>{type.code}</code></span>
-							<span role="cell">
-								<input name="label_es" value={type.labelEs} aria-label={`Etiqueta en español de ${type.code}`} />
+							<span class={`${cellClass} tw:max-[900px]:col-span-full`} role="cell">
+								<span class={mobileLabelClass}>Código</span>
+								<code class="tw:[overflow-wrap:anywhere] tw:text-[0.85em] tw:text-accent-strong">{type.code}</code>
 							</span>
-							<span role="cell">
-								<input name="label_en" value={type.labelEn} aria-label={`Etiqueta en inglés de ${type.code}`} />
+							<span class={cellClass} role="cell">
+								<span class={mobileLabelClass}>Etiqueta ES</span>
+								<Input name="label_es" value={type.labelEs} aria-label={`Etiqueta en español de ${type.code}`} />
 							</span>
-							<span role="cell">
-								<input name="sort_order" value={String(type.sortOrder)} inputmode="numeric" class="order" aria-label={`Orden de ${type.code}`} />
+							<span class={cellClass} role="cell">
+								<span class={mobileLabelClass}>Etiqueta EN</span>
+								<Input name="label_en" value={type.labelEn} aria-label={`Etiqueta en inglés de ${type.code}`} />
 							</span>
-							<span role="cell" class="usage">{type.usageCount}</span>
-							<span role="cell">
-								<button type="submit" disabled={pending.includes(`save:${type.code}`)}>Guardar</button>
+							<span class={cellClass} role="cell">
+								<span class={mobileLabelClass}>Orden</span>
+								<Input name="sort_order" value={String(type.sortOrder)} inputmode="numeric" class="tw:max-w-[4.5rem] tw:max-[560px]:max-w-none" aria-label={`Orden de ${type.code}`} />
+							</span>
+							<span class="tw:text-center tw:text-ink-faint tw:max-[900px]:grid tw:max-[900px]:content-end tw:max-[900px]:gap-1 tw:max-[900px]:text-left" role="cell">
+								<span class={mobileLabelClass}>Usos</span>
+								{type.usageCount}
+							</span>
+							<span class="tw:max-[900px]:self-end" role="cell">
+								<Button class="tw:w-full" size="sm" type="submit" disabled={pending.includes(`save:${type.code}`)}>Guardar</Button>
 							</span>
 						</form>
-						<form method="POST" action="?/eliminar" use:enhance={enhancedSubmit(`del:${type.code}`)}>
+						<form class="tw:contents tw:max-[900px]:mt-3 tw:max-[900px]:flex tw:max-[900px]:justify-end tw:max-[900px]:border-t tw:max-[900px]:border-rule tw:max-[900px]:pt-3" method="POST" action="?/eliminar" use:enhance={enhancedSubmit(`del:${type.code}`)}>
 							<input type="hidden" name="domain" value={group.domain} />
 							<input type="hidden" name="code" value={type.code} />
 							{#if type.usageCount === 0}
-								<button type="submit" class="danger" disabled={pending.includes(`del:${type.code}`)}>
-									Eliminar
-								</button>
+								<Button class="tw:w-full" size="sm" variant="danger" type="submit" disabled={pending.includes(`del:${type.code}`)}>Eliminar</Button>
 							{:else}
-								<span class="action-placeholder" aria-hidden="true">En uso</span>
+								<span class="tw:inline-flex tw:min-h-8 tw:w-full tw:items-center tw:justify-center tw:text-[0.65rem] tw:text-ink-faint" aria-hidden="true">En uso</span>
 							{/if}
 						</form>
 					</div>
 				{/each}
 			</div>
 		{:else}
-			<p class="empty">Sin tipos todavía.</p>
+			<p class="tw:text-[0.82rem] tw:text-ink-faint">Sin tipos todavía.</p>
 		{/if}
 
-		<form class="add" method="POST" action="?/crear" use:enhance={enhancedSubmit(`add:${group.domain}`, true)}>
+		<form class="tw:mt-3 tw:grid tw:grid-cols-[repeat(3,minmax(9rem,1fr))_5rem_auto] tw:items-end tw:gap-3 tw:rounded-ui tw:border tw:border-dashed tw:border-rule tw:bg-[color-mix(in_srgb,var(--bg-panel)_45%,transparent)] tw:p-3.5 tw:max-[900px]:grid-cols-2 tw:max-[560px]:grid-cols-1" method="POST" action="?/crear" use:enhance={enhancedSubmit(`add:${group.domain}`, true)}>
 			<input type="hidden" name="domain" value={group.domain} />
-			<label>
-				<span>Código nuevo</span>
-				<input
+			<AdminField label="Código nuevo">
+				<Input
 					name="code"
 					placeholder="minusculas_y_guion_bajo"
 					value={form?.domain === group.domain && !form?.success ? (form?.raw?.code ?? '') : ''}
 				/>
-			</label>
-			<label>
-				<span>Etiqueta ES</span>
-				<input
+			</AdminField>
+			<AdminField label="Etiqueta ES">
+				<Input
 					name="label_es"
 					value={form?.domain === group.domain && !form?.success ? (form?.raw?.label_es ?? '') : ''}
 				/>
-			</label>
-			<label>
-				<span>Etiqueta EN</span>
-				<input
+			</AdminField>
+			<AdminField label="Etiqueta EN">
+				<Input
 					name="label_en"
 					value={form?.domain === group.domain && !form?.success ? (form?.raw?.label_en ?? '') : ''}
 				/>
-			</label>
-			<label class="order-label">
-				<span>Orden</span>
-				<input
+			</AdminField>
+			<AdminField label="Orden">
+				<Input
 					name="sort_order"
 					inputmode="numeric"
-					class="order"
 					value={form?.domain === group.domain && !form?.success ? (form?.raw?.sort_order ?? '') : ''}
 				/>
-			</label>
-			<button type="submit" disabled={pending.includes(`add:${group.domain}`)}>Añadir tipo</button>
+			</AdminField>
+			<Button class="tw:w-full" variant="primary" type="submit" disabled={pending.includes(`add:${group.domain}`)}>Añadir tipo</Button>
 		</form>
 	</section>
 {/each}
-
-<style>
-	code {
-		color: var(--accent-strong);
-		font-size: 0.85em;
-		overflow-wrap: anywhere;
-	}
-
-	.taxonomy-group {
-		margin-bottom: 2rem;
-		padding-top: 1.25rem;
-		border-top: 1px solid var(--line);
-	}
-
-	h2 {
-		font-size: 0.95rem;
-		color: var(--fg);
-		margin: 0 0 0.8rem;
-		display: flex;
-		align-items: baseline;
-		gap: 0.6rem;
-	}
-
-	h2 code {
-		color: var(--fg-faint);
-		font-weight: 400;
-	}
-
-	.rows {
-		display: grid;
-		gap: 0;
-		border: 1px solid var(--line);
-		border-radius: var(--radius);
-		overflow: hidden;
-		font-size: 0.82rem;
-	}
-
-	.row {
-		display: grid;
-		grid-template-columns: minmax(9rem, 0.9fr) 1.2fr 1.2fr 4.5rem 3rem 6rem 6rem;
-		gap: 0.6rem;
-		align-items: center;
-		padding: 0.55rem 0.65rem;
-		border-bottom: 1px solid var(--line);
-	}
-
-	.row:last-child {
-		border-bottom: 0;
-	}
-
-	.row form {
-		display: contents;
-	}
-
-	.row.head {
-		color: var(--fg-faint);
-		border-bottom: 1px solid var(--line);
-		padding-block: 0.5rem;
-		background: var(--admin-surface-raised);
-	}
-
-	input {
-		font: inherit;
-		width: 100%;
-		background: var(--admin-surface);
-		color: var(--fg);
-		border: 1px solid var(--line);
-		padding: 0.35rem 0.5rem;
-	}
-
-	input.order {
-		width: 4.5rem;
-	}
-
-	input:focus-visible {
-		outline: 2px solid var(--accent-strong);
-		outline-offset: 2px;
-	}
-
-	.usage {
-		color: var(--fg-faint);
-		text-align: center;
-	}
-
-	button {
-		font: inherit;
-		font-size: 0.78rem;
-		background: none;
-		border: 1px solid var(--line);
-		color: var(--fg);
-		padding: 0.3rem 0.6rem;
-		cursor: pointer;
-		white-space: nowrap;
-	}
-
-	.row button,
-	.action-placeholder {
-		width: 6rem;
-	}
-
-	.action-placeholder {
-		display: inline-flex;
-		align-items: center;
-		justify-content: center;
-		min-height: 2.25rem;
-		color: var(--fg-faint);
-		font-size: 0.65rem;
-	}
-
-	button:hover {
-		border-color: var(--fg-faint);
-	}
-
-	button:focus-visible {
-		outline: 2px solid var(--accent-strong);
-		outline-offset: 2px;
-	}
-
-	button:disabled {
-		opacity: 0.5;
-		cursor: wait;
-	}
-
-	button.danger {
-		border-color: var(--admin-danger);
-		color: var(--admin-danger);
-	}
-
-	button.danger:hover {
-		border-color: var(--admin-danger);
-	}
-
-	.empty {
-		color: var(--fg-faint);
-		font-size: 0.82rem;
-	}
-
-	.add {
-		display: grid;
-		grid-template-columns: repeat(3, minmax(9rem, 1fr)) 5rem auto;
-		align-items: end;
-		gap: 0.75rem;
-		margin-top: 0.65rem;
-		padding: 0.85rem;
-		border: 1px dashed var(--line);
-		border-radius: var(--radius);
-		background: color-mix(in srgb, var(--bg-panel) 45%, transparent);
-	}
-
-	.add label {
-		display: grid;
-		gap: 0.3rem;
-		font-size: 0.72rem;
-		color: var(--fg-faint);
-	}
-
-	.add .order-label {
-		flex: 0 0 auto;
-	}
-
-	.add .order-label input {
-		width: 4.5rem;
-	}
-
-	.add button {
-		border-color: var(--accent-strong);
-		color: var(--accent-strong);
-	}
-
-	.visually-hidden {
-		position: absolute;
-		width: 1px;
-		height: 1px;
-		overflow: hidden;
-		clip: rect(0 0 0 0);
-	}
-
-	@media (max-width: 900px) {
-		.rows {
-			gap: 0.75rem;
-			border: 0;
-			border-radius: 0;
-			overflow: visible;
-			background: transparent;
-		}
-
-		.row {
-			display: block;
-			padding: 0.85rem;
-			border: 1px solid var(--line);
-			border-radius: var(--radius);
-			background: var(--admin-surface);
-		}
-
-		.row.head {
-			display: none;
-		}
-
-		.row form:first-of-type {
-			display: grid;
-			grid-template-columns: repeat(2, minmax(0, 1fr));
-			gap: 0.7rem;
-		}
-
-		.row form:first-of-type > span[role='cell'] {
-			display: grid;
-			align-content: end;
-			gap: 0.3rem;
-		}
-
-		.row form:first-of-type > span[role='cell']::before {
-			color: var(--fg-faint);
-			font-size: 0.58rem;
-			letter-spacing: 0.1em;
-			text-transform: uppercase;
-		}
-
-		.row form:first-of-type > span[role='cell']:nth-of-type(1) {
-			grid-column: 1 / -1;
-		}
-
-		.row form:first-of-type > span[role='cell']:nth-of-type(1)::before { content: 'Código'; }
-		.row form:first-of-type > span[role='cell']:nth-of-type(2)::before { content: 'Etiqueta ES'; }
-		.row form:first-of-type > span[role='cell']:nth-of-type(3)::before { content: 'Etiqueta EN'; }
-		.row form:first-of-type > span[role='cell']:nth-of-type(4)::before { content: 'Orden'; }
-		.row form:first-of-type > span[role='cell']:nth-of-type(5)::before { content: 'Usos'; }
-
-		.row form:last-of-type {
-			display: flex;
-			justify-content: flex-end;
-			margin-top: 0.7rem;
-			padding-top: 0.7rem;
-			border-top: 1px solid var(--line);
-		}
-
-		.row button,
-		.action-placeholder {
-			width: 100%;
-		}
-
-		.add {
-			grid-template-columns: repeat(2, minmax(0, 1fr));
-		}
-
-		.add button {
-			width: 100%;
-		}
-	}
-
-	@media (max-width: 560px) {
-		.row form:first-of-type,
-		.add {
-			grid-template-columns: 1fr;
-		}
-
-		.add .order-label input,
-		input.order {
-			width: 100%;
-		}
-	}
-</style>
