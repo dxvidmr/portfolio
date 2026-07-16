@@ -70,6 +70,10 @@
 					featured: 'Featured output'
 				}
 	);
+	const modalControlClass =
+		'tw:pointer-events-auto tw:relative tw:grid tw:h-[46px] tw:w-[46px] tw:cursor-pointer tw:place-items-center tw:rounded-ui-sm tw:border-0 tw:bg-transparent tw:text-ink tw:opacity-50 tw:[transition:color_180ms_ease,opacity_180ms_ease] tw:hover:bg-transparent tw:hover:text-accent-strong tw:hover:opacity-100 tw:focus-visible:bg-transparent tw:focus-visible:text-accent-strong tw:focus-visible:opacity-100 tw:motion-reduce:transition-none';
+	const sectionNavItemClass =
+		'meta tw:inline-flex tw:min-h-[30px] tw:items-center tw:rounded-full tw:border tw:border-rule tw:px-3 tw:text-ink-dim tw:no-underline tw:[transition:border-color_180ms_ease,color_180ms_ease] tw:hover:border-[color-mix(in_srgb,var(--accent-strong)_52%,var(--line))] tw:hover:text-accent-strong tw:focus-visible:border-[color-mix(in_srgb,var(--accent-strong)_52%,var(--line))] tw:focus-visible:text-accent-strong';
 
 	$effect(() => {
 		project.slug;
@@ -125,52 +129,72 @@
 
 </script>
 
-<div class="modal-layer" role="presentation">
+<div
+	class="tw:fixed tw:inset-0 tw:z-[10000] tw:bg-canvas tw:[animation:project-layer-in_260ms_ease_both] tw:motion-reduce:animate-none"
+	role="presentation"
+>
 	<div
-		class="modal-shell"
+		class="tw:relative tw:flex tw:h-dvh tw:w-full tw:flex-col tw:overflow-hidden tw:bg-canvas tw:[animation:project-modal-in_520ms_cubic-bezier(.16,1,.3,1)_both] tw:motion-reduce:animate-none"
 		bind:this={shell}
 		role="dialog"
 		aria-modal="true"
 		aria-labelledby="project-modal-title"
 	>
-		<nav class="modal-controls" aria-label={locale === 'es' ? 'Navegar entre proyectos' : 'Navigate projects'}>
-			<button class="modal-arrow modal-previous" type="button" onclick={onprevious} aria-label={copy.previous} title={copy.previous}>
+		<nav
+			class="tw:pointer-events-none tw:absolute tw:bottom-[clamp(12px,2vw,28px)] tw:left-1/2 tw:z-20 tw:flex tw:translate-x-[-50%] tw:items-center tw:gap-px tw:rounded-full tw:bg-[color-mix(in_srgb,var(--surface-glass)_24%,transparent)] tw:p-1 tw:[backdrop-filter:blur(18px)_saturate(1.04)] tw:max-[700px]:bottom-2"
+			aria-label={locale === 'es' ? 'Navegar entre proyectos' : 'Navigate projects'}
+		>
+			<button class={modalControlClass} type="button" onclick={onprevious} aria-label={copy.previous} title={copy.previous}>
 				<ChevronLeft size={27} strokeWidth={1.5} />
 			</button>
-			<button class="modal-close" bind:this={closeButton} type="button" onclick={onclose} aria-label={copy.close} title={copy.close}>
+			<button class={modalControlClass} bind:this={closeButton} type="button" onclick={onclose} aria-label={copy.close} title={copy.close}>
 				<XIcon size={27} strokeWidth={1.5} />
 			</button>
-			<button class="modal-arrow modal-next" type="button" onclick={onnext} aria-label={copy.next} title={copy.next}>
+			<button class={modalControlClass} type="button" onclick={onnext} aria-label={copy.next} title={copy.next}>
 				<ChevronRight size={27} strokeWidth={1.5} />
 			</button>
 		</nav>
 
-		<div class="modal-viewport" bind:this={viewport}>
-			<div class="modal-content">
-				<header class="project-intro">
+		<div
+			class="tw:flex-1 tw:overflow-y-auto tw:[overscroll-behavior:contain] tw:[scrollbar-gutter:stable]"
+			bind:this={viewport}
+		>
+			<div
+				class="tw:mx-auto tw:w-[min(100%_-_clamp(32px,7vw,112px),1380px)] tw:pt-[clamp(64px,8vw,112px)] tw:pb-[clamp(86px,11vw,150px)] tw:max-[700px]:w-[min(100%_-_30px,680px)] tw:max-[700px]:pt-[76px] tw:max-[700px]:pb-[120px]"
+			>
+				<header
+					class="tw:grid tw:min-h-[calc(100vh-190px)] tw:grid-cols-[minmax(0,1.05fr)_minmax(360px,.95fr)] tw:items-center tw:gap-[clamp(40px,7vw,100px)] tw:pb-[clamp(54px,8vw,110px)] tw:max-[980px]:grid-cols-[minmax(0,1fr)_minmax(300px,.8fr)] tw:max-[700px]:min-h-0 tw:max-[700px]:grid-cols-1 tw:max-[700px]:gap-[34px] tw:max-[700px]:pb-[70px]"
+				>
 					<div class="intro-copy">
-						<p class="meta kicker">{projectText(project.kicker, locale)}</p>
-						<h2 id="project-modal-title">{projectText(project.title, locale)}</h2>
-						<p class="summary">{projectText(project.summary, locale)}</p>
-						<dl class="project-facts">
-							<div><dt class="meta">{copy.status}</dt><dd>{projectText(project.status, locale)}</dd></div>
-							<div><dt class="meta">{copy.period}</dt><dd>{project.year}</dd></div>
+						<p class="meta tw:text-accent-strong">{projectText(project.kicker, locale)}</p>
+						<h2
+							class="tw:mt-[18px] tw:mb-0 tw:max-w-[10ch] tw:text-[clamp(3.2rem,8vw,7.8rem)] tw:leading-[.86] tw:tracking-[-.045em] tw:max-[700px]:text-[clamp(3rem,15vw,5.5rem)]"
+							id="project-modal-title"
+						>
+							{projectText(project.title, locale)}
+						</h2>
+						<p class="tw:mt-[30px] tw:mb-0 tw:max-w-[58ch] tw:text-[clamp(.92rem,1.35vw,1.12rem)] tw:leading-[1.55] tw:text-ink-dim">
+							{projectText(project.summary, locale)}
+						</p>
+						<dl class="tw:mt-[34px] tw:mb-0 tw:grid tw:max-w-[620px] tw:grid-cols-2 tw:gap-x-[34px] tw:gap-y-3.5 tw:border-t tw:border-rule tw:pt-[18px] tw:max-[700px]:grid-cols-1">
+							<div class="tw:grid tw:gap-1"><dt class="meta tw:text-ink-faint">{copy.status}</dt><dd class="tw:m-0 tw:text-[.78rem]">{projectText(project.status, locale)}</dd></div>
+							<div class="tw:grid tw:gap-1"><dt class="meta tw:text-ink-faint">{copy.period}</dt><dd class="tw:m-0 tw:text-[.78rem]">{project.year}</dd></div>
 							{#if project.tags.length}
-								<div class="is-wide">
-									<dt class="meta">{copy.topics}</dt>
-									<dd class="topic-list">
+								<div class="tw:col-span-full tw:grid tw:gap-1">
+									<dt class="meta tw:text-ink-faint">{copy.topics}</dt>
+									<dd class="tw:m-0 tw:flex tw:flex-wrap tw:gap-x-[14px] tw:gap-y-1.5 tw:text-[.78rem] tw:leading-[1.45] tw:text-ink-dim">
 										{#each project.tags as tag (tag)}
-											<span>{tag}</span>
+											<span class="tw:after:pl-[14px] tw:after:text-accent-strong tw:after:content-['/'] tw:last:after:content-none">{tag}</span>
 										{/each}
 									</dd>
 								</div>
 							{/if}
 							{#if project.links?.length}
-								<div class="is-wide">
-									<dt class="meta">{copy.links}</dt>
-									<dd class="header-links">
+								<div class="tw:col-span-full tw:grid tw:gap-1">
+									<dt class="meta tw:text-ink-faint">{copy.links}</dt>
+									<dd class="tw:m-0 tw:flex tw:flex-wrap tw:gap-x-[18px] tw:gap-y-[9px] tw:text-[.78rem]">
 										{#each project.links as link (link.url)}
-											<a href={link.url} target="_blank" rel="noreferrer">
+											<a class="tw:inline-flex tw:items-center tw:gap-1.5 tw:text-ink tw:no-underline tw:[transition:color_180ms_ease] tw:[&>svg]:text-accent-strong tw:[&>svg]:[transition:transform_180ms_ease] tw:hover:text-accent-strong tw:hover:[&>svg]:translate-x-[3px] tw:hover:[&>svg]:translate-y-[-3px] tw:focus-visible:text-accent-strong tw:focus-visible:[&>svg]:translate-x-[3px] tw:focus-visible:[&>svg]:translate-y-[-3px]" href={link.url} target="_blank" rel="noreferrer">
 												{projectText(link.label, locale)}
 												<MoveUpRight size={16} strokeWidth={1.8} aria-hidden="true" />
 											</a>
@@ -180,24 +204,24 @@
 							{/if}
 						</dl>
 						{#if project.sectionNav?.length}
-							<nav class="project-section-nav" aria-label={locale === 'es' ? 'Secciones del proyecto' : 'Project sections'}>
-								<span class="meta nav-label">{copy.sectionMenu}</span>
-								<div class="section-nav-items">
+							<nav class="tw:mt-[22px] tw:grid tw:max-w-[620px] tw:gap-2.5 tw:border-t tw:border-rule-strong tw:pt-3.5" aria-label={locale === 'es' ? 'Secciones del proyecto' : 'Project sections'}>
+								<span class="meta tw:text-accent-strong">{copy.sectionMenu}</span>
+								<div class="tw:flex tw:flex-wrap tw:items-start tw:gap-2">
 									{#each project.sectionNav as item (item.label.es)}
 										{#if item.children?.length}
-											<details class="section-nav-group">
-												<summary class="meta">
+											<details class="tw:group tw:relative">
+												<summary class={`${sectionNavItemClass} tw:cursor-pointer tw:gap-[7px] tw:list-none tw:[&::-webkit-details-marker]:hidden tw:[&>svg]:[transition:transform_180ms_ease] tw:group-open:[&>svg]:rotate-180`}>
 													{projectText(item.label, locale)}
 													<ChevronDown size={14} strokeWidth={1.7} aria-hidden="true" />
 												</summary>
-												<div class="section-submenu">
+												<div class="tw:absolute tw:top-[calc(100%+7px)] tw:left-0 tw:z-[5] tw:grid tw:min-w-max tw:rounded-ui tw:bg-[color-mix(in_srgb,var(--bg)_76%,transparent)] tw:p-1.5 tw:shadow-[0_16px_42px_color-mix(in_srgb,var(--fg)_10%,transparent)] tw:[backdrop-filter:blur(16px)]">
 													{#each item.children as child (child.href)}
-														<a class="meta" href={child.href}>{projectText(child.label, locale)}</a>
+														<a class={`${sectionNavItemClass} tw:min-h-8 tw:border-transparent`} href={child.href}>{projectText(child.label, locale)}</a>
 													{/each}
 												</div>
 											</details>
 										{:else if item.href}
-											<a class="meta" href={item.href}>{projectText(item.label, locale)}</a>
+											<a class={sectionNavItemClass} href={item.href}>{projectText(item.label, locale)}</a>
 										{/if}
 									{/each}
 								</div>
@@ -205,7 +229,7 @@
 						{/if}
 					</div>
 					{#key project.slug}
-						<div class="modal-visual">
+						<div class="tw:[animation:project-visual-in_620ms_100ms_cubic-bezier(.16,1,.3,1)_both] tw:motion-reduce:animate-none">
 							<ProjectVisual
 								visual={project.visual}
 								label={projectText(project.kind, locale)}
@@ -220,54 +244,54 @@
 				{/key}
 
 				{#if relatedItems.length}
-					<section class="related-section">
-						<header>
+					<section class="tw:border-t tw:border-rule-strong tw:pt-[clamp(58px,8vw,110px)]">
+						<header class="tw:mb-10 tw:grid tw:grid-cols-[minmax(0,1fr)_minmax(260px,.65fr)] tw:items-end tw:gap-9 tw:max-[700px]:grid-cols-1">
 							<div>
-								<h3>{copy.related}</h3>
+								<h3 class="tw:mt-3.5 tw:mb-0 tw:text-[clamp(2.2rem,5vw,4.8rem)] tw:leading-[.92]">{copy.related}</h3>
 							</div>
-							<p>{copy.relatedIntro}</p>
+							<p class="tw:m-0 tw:text-[.8rem] tw:text-ink-dim">{copy.relatedIntro}</p>
 						</header>
-						<ol class="related-list">
+						<ol class="tw:m-0 tw:list-none tw:border-t tw:border-rule tw:p-0">
 							{#each relatedItems as item, index (`${item.entity_type}-${item.entity_id}`)}
-								<li class:is-featured={item.featured}>
-									<div class="item-meta meta">
-									<span class="item-index">
+								<li class="tw:relative tw:grid tw:grid-cols-[minmax(190px,.65fr)_minmax(0,1.35fr)] tw:gap-[clamp(20px,4vw,60px)] tw:border-b tw:border-rule tw:py-[clamp(20px,3vw,34px)] tw:max-[700px]:grid-cols-1">
+									<div class="meta tw:grid tw:grid-cols-[28px_1fr_40px] tw:gap-3 tw:text-ink-faint">
+									<span class="tw:grid tw:content-start tw:gap-[7px]">
 										{String(index + 1).padStart(2, '0')}
 										{#if item.featured}
-											<span class="featured-mark" title={copy.featured} aria-label={copy.featured}>★</span>
+											<span class="tw:text-[.72rem] tw:leading-none tw:text-accent-strong" title={copy.featured} aria-label={copy.featured}>★</span>
 										{/if}
 									</span>
-										<span class="item-kind">
-											<span>{entityLabel(item.entity_type, locale)}</span>
+										<span class="tw:grid tw:gap-[5px]">
+											<span class="tw:text-accent-strong">{entityLabel(item.entity_type, locale)}</span>
 											{#if subtypeLabel(item)}
-												<span class="item-subtype">{subtypeLabel(item)}</span>
+												<span class="tw:text-left tw:text-[.62rem] tw:leading-[1.3] tw:text-ink-dim">{subtypeLabel(item)}</span>
 											{/if}
 										</span>
-										<span>{itemYear(item.sort_date)}</span>
+										<span class="tw:text-right">{itemYear(item.sort_date)}</span>
 									</div>
 									<div>
 										{#if item.url}
-											<a class="item-title" href={item.url} target="_blank" rel="noreferrer">
+											<a class="tw:group tw:m-0 tw:flex tw:justify-between tw:gap-[18px] tw:font-title tw:text-[clamp(1.15rem,2.2vw,1.8rem)] tw:leading-[1.1] tw:text-ink" href={item.url} target="_blank" rel="noreferrer">
 												{item.title}
-												<span class="external-icon" aria-hidden="true"><MoveUpRight size={22} strokeWidth={1.7} /></span>
+												<span class="tw:grid tw:h-[22px] tw:w-[22px] tw:flex-[0_0_22px] tw:place-items-center tw:text-accent-strong tw:[transition:transform_180ms_ease] tw:group-hover:translate-x-0.5 tw:group-hover:translate-y-[-2px]" aria-hidden="true"><MoveUpRight size={22} strokeWidth={1.7} /></span>
 											</a>
 										{:else}
-											<p class="item-title">{item.title}</p>
+											<p class="tw:m-0 tw:flex tw:justify-between tw:gap-[18px] tw:font-title tw:text-[clamp(1.15rem,2.2vw,1.8rem)] tw:leading-[1.1] tw:text-ink">{item.title}</p>
 										{/if}
-										{#if item.detail}<p class="item-detail">{item.detail}</p>{/if}
+										{#if item.detail}<p class="tw:mt-[9px] tw:mb-0 tw:max-w-[72ch] tw:text-[.72rem] tw:leading-[1.45] tw:text-ink-faint">{item.detail}</p>{/if}
 										{#if item.links.length}
-											<div class="item-links">
+											<div class="tw:mt-2.5 tw:flex tw:flex-wrap tw:gap-1.5">
 												{#each item.links as link (link.url)}
-													<a href={link.url} target="_blank" rel="noreferrer" class:primary={link.is_primary}>
+													<a class={`tw:border tw:px-[7px] tw:py-1 tw:text-[.64rem] tw:no-underline tw:hover:border-accent-strong tw:hover:text-accent-strong tw:focus-visible:border-accent-strong tw:focus-visible:text-accent-strong ${link.is_primary ? 'tw:border-accent-strong tw:text-accent-strong' : 'tw:border-rule tw:text-ink-faint'}`} href={link.url} target="_blank" rel="noreferrer">
 														{additionalLinkLabel(link)}
 													</a>
 												{/each}
 											</div>
 										{/if}
 										{#if item.documents.length}
-											<div class="item-documents">
+											<div class="tw:mt-2 tw:flex tw:flex-wrap tw:gap-2">
 												{#each item.documents as document (document.url)}
-													<a href={document.url} target="_blank" rel="noreferrer">↓ {documentLabel(document)}</a>
+													<a class="tw:text-[.64rem] tw:text-ink-faint tw:hover:text-accent-strong tw:focus-visible:text-accent-strong" href={document.url} target="_blank" rel="noreferrer">↓ {documentLabel(document)}</a>
 												{/each}
 											</div>
 										{/if}
@@ -281,335 +305,3 @@
 		</div>
 	</div>
 </div>
-
-<style>
-	.modal-layer {
-		position: fixed;
-		z-index: 10000;
-		inset: 0;
-		background: var(--bg);
-		animation: layer-in 260ms ease both;
-	}
-
-	.modal-shell {
-		position: relative;
-		display: flex;
-		width: 100%;
-		height: 100dvh;
-		flex-direction: column;
-		overflow: hidden;
-		background: var(--bg);
-		animation: modal-in 520ms cubic-bezier(0.16, 1, 0.3, 1) both;
-	}
-
-	.modal-controls {
-		position: absolute;
-		z-index: 20;
-		bottom: clamp(12px, 2vw, 28px);
-		left: 50%;
-		display: flex;
-		gap: 1px;
-		align-items: center;
-		padding: 4px;
-		border-radius: 999px;
-		background: color-mix(in srgb, var(--surface-glass) 24%, transparent);
-		transform: translateX(-50%);
-		pointer-events: none;
-		-webkit-backdrop-filter: blur(18px) saturate(1.04);
-		backdrop-filter: blur(18px) saturate(1.04);
-	}
-
-	.modal-controls button {
-		position: relative;
-		display: grid;
-		width: 46px;
-		height: 46px;
-		place-items: center;
-		border: 0;
-		border-radius: var(--radius-sm);
-		background: transparent;
-		color: var(--fg);
-		cursor: pointer;
-		opacity: 0.5;
-		pointer-events: auto;
-		transition: color 180ms ease, opacity 180ms ease;
-	}
-
-	.modal-controls button:hover,
-	.modal-controls button:focus-visible {
-		background: transparent;
-		color: var(--accent-strong);
-		opacity: 1;
-	}
-
-	:global(body.project-modal-open .site-header) {
-		opacity: 0 !important;
-		visibility: hidden !important;
-		pointer-events: none !important;
-	}
-
-	.modal-viewport {
-		flex: 1;
-		overflow-y: auto;
-		overscroll-behavior: contain;
-		scrollbar-gutter: stable;
-	}
-
-	.modal-content {
-		width: min(100% - clamp(32px, 7vw, 112px), 1380px);
-		margin-inline: auto;
-		padding-block: clamp(64px, 8vw, 112px) clamp(86px, 11vw, 150px);
-	}
-
-	.project-intro {
-		display: grid;
-		grid-template-columns: minmax(0, 1.05fr) minmax(360px, 0.95fr);
-		gap: clamp(40px, 7vw, 100px);
-		align-items: center;
-		min-height: calc(100vh - 190px);
-		padding-bottom: clamp(54px, 8vw, 110px);
-	}
-
-	.kicker { color: var(--accent-strong); }
-
-	.project-intro h2 {
-		max-width: 10ch;
-		margin: 18px 0 0;
-		font-size: clamp(3.2rem, 8vw, 7.8rem);
-		line-height: 0.86;
-		letter-spacing: -0.045em;
-	}
-
-	.summary {
-		max-width: 58ch;
-		margin: 30px 0 0;
-		color: var(--fg-dim);
-		font-size: clamp(0.92rem, 1.35vw, 1.12rem);
-		line-height: 1.55;
-	}
-
-	.project-facts {
-		display: grid;
-		grid-template-columns: repeat(2, minmax(0, 1fr));
-		gap: 14px 34px;
-		max-width: 620px;
-		margin: 34px 0 0;
-		padding-top: 18px;
-		border-top: 1px solid var(--line);
-	}
-
-	.project-facts div { display: grid; gap: 4px; }
-	.project-facts .is-wide { grid-column: 1 / -1; }
-	.project-facts dt { color: var(--fg-faint); }
-	.project-facts dd { margin: 0; font-size: 0.78rem; }
-
-	.topic-list {
-		display: flex;
-		flex-wrap: wrap;
-		gap: 6px 14px;
-		color: var(--fg-dim);
-		line-height: 1.45;
-	}
-
-	.topic-list span:not(:last-child)::after {
-		padding-left: 14px;
-		color: var(--accent-strong);
-		content: '/';
-	}
-
-	.header-links {
-		display: flex;
-		flex-wrap: wrap;
-		gap: 9px 18px;
-	}
-
-	.header-links a {
-		display: inline-flex;
-		gap: 6px;
-		align-items: center;
-		color: var(--fg);
-		text-decoration: none;
-		transition: color 180ms ease;
-	}
-
-	.header-links a :global(svg) {
-		color: var(--accent-strong);
-		transition: transform 180ms ease;
-	}
-
-	.header-links a:hover,
-	.header-links a:focus-visible {
-		color: var(--accent-strong);
-	}
-
-	.header-links a:hover :global(svg),
-	.header-links a:focus-visible :global(svg) {
-		transform: translate(3px, -3px);
-	}
-
-	.project-section-nav {
-		display: grid;
-		gap: 10px;
-		max-width: 620px;
-		margin-top: 22px;
-		padding: 14px 0 0;
-		border-top: 1px solid var(--line-strong);
-	}
-
-	.project-section-nav .nav-label {
-		color: var(--accent-strong);
-	}
-
-	.project-section-nav .section-nav-items {
-		display: flex;
-		flex-wrap: wrap;
-		gap: 8px;
-		align-items: flex-start;
-	}
-
-	.project-section-nav a,
-	.section-nav-group summary {
-		display: inline-flex;
-		min-height: 30px;
-		align-items: center;
-		padding: 0 12px;
-		border: 1px solid var(--line);
-		border-radius: 999px;
-		color: var(--fg-dim);
-		text-decoration: none;
-		transition: border-color 180ms ease, color 180ms ease;
-	}
-
-	.section-nav-group { position: relative; }
-	.section-nav-group summary { gap: 7px; cursor: pointer; list-style: none; }
-	.section-nav-group summary::-webkit-details-marker { display: none; }
-	.section-nav-group summary :global(svg) { transition: transform 180ms ease; }
-	.section-nav-group[open] summary :global(svg) { transform: rotate(180deg); }
-	.section-submenu {
-		position: absolute;
-		top: calc(100% + 7px);
-		left: 0;
-		z-index: 5;
-		display: grid;
-		min-width: max-content;
-		padding: 6px;
-		border-radius: var(--radius);
-		background: color-mix(in srgb, var(--bg) 76%, transparent);
-		box-shadow: 0 16px 42px color-mix(in srgb, var(--fg) 10%, transparent);
-		backdrop-filter: blur(16px);
-	}
-
-	.section-submenu a { min-height: 32px; border-color: transparent; }
-
-	.project-section-nav a:hover,
-	.project-section-nav a:focus-visible,
-	.section-nav-group summary:hover,
-	.section-nav-group summary:focus-visible {
-		border-color: color-mix(in srgb, var(--accent-strong) 52%, var(--line));
-		color: var(--accent-strong);
-	}
-
-	.modal-visual {
-		animation: visual-in 620ms 100ms cubic-bezier(0.16, 1, 0.3, 1) both;
-	}
-
-	.related-section { padding-top: clamp(58px, 8vw, 110px); border-top: 1px solid var(--line-strong); }
-	.related-section > header {
-		display: grid;
-		grid-template-columns: minmax(0, 1fr) minmax(260px, 0.65fr);
-		gap: 36px;
-		align-items: end;
-		margin-bottom: 40px;
-	}
-	.related-section h3 {
-		margin: 14px 0 0;
-		font-size: clamp(2.2rem, 5vw, 4.8rem);
-		line-height: 0.92;
-	}
-	.related-section > header > p { margin: 0; color: var(--fg-dim); font-size: 0.8rem; }
-
-	.related-list { margin: 0; padding: 0; border-top: 1px solid var(--line); list-style: none; }
-	.related-list li {
-		position: relative;
-		display: grid;
-		grid-template-columns: minmax(190px, 0.65fr) minmax(0, 1.35fr);
-		gap: clamp(20px, 4vw, 60px);
-		padding: clamp(20px, 3vw, 34px) 0;
-		border-bottom: 1px solid var(--line);
-	}
-	.item-meta { display: grid; grid-template-columns: 28px 1fr 40px; gap: 12px; color: var(--fg-faint); }
-	.item-index { display: grid; gap: 7px; align-content: start; }
-	.featured-mark { color: var(--accent-strong); font-size: 0.72rem; line-height: 1; }
-	.item-meta > span:last-child { text-align: right; }
-	.item-kind { display: grid; gap: 5px; }
-	.item-kind > span:first-child { color: var(--accent-strong); }
-	.item-kind .item-subtype { color: var(--fg-dim); font-size: 0.62rem; line-height: 1.3; text-align: left; }
-	.item-title {
-		display: flex;
-		justify-content: space-between;
-		gap: 18px;
-		margin: 0;
-		color: var(--fg);
-		font-family: var(--font-title);
-		font-size: clamp(1.15rem, 2.2vw, 1.8rem);
-		line-height: 1.1;
-	}
-	.item-title .external-icon {
-		display: grid;
-		flex: 0 0 22px;
-		width: 22px;
-		height: 22px;
-		place-items: center;
-		color: var(--accent-strong);
-		transition: transform 180ms ease;
-	}
-	.item-title:hover .external-icon { transform: translate(2px, -2px); }
-	.item-detail { max-width: 72ch; margin: 9px 0 0; color: var(--fg-faint); font-size: 0.72rem; line-height: 1.45; }
-	.item-links { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
-	.item-links a { border: 1px solid var(--line); padding: 4px 7px; color: var(--fg-faint); font-size: 0.64rem; text-decoration: none; }
-	.item-links a:hover, .item-links a:focus-visible, .item-links a.primary { border-color: var(--accent-strong); color: var(--accent-strong); }
-	.item-documents { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 8px; }
-	.item-documents a { color: var(--fg-faint); font-size: 0.64rem; }
-	.item-documents a:hover, .item-documents a:focus-visible { color: var(--accent-strong); }
-
-	@keyframes layer-in { from { opacity: 0; } }
-	@keyframes modal-in { from { opacity: 0; transform: translate3d(0, 20px, 0) scale(0.985); } }
-	@keyframes visual-in { from { opacity: 0; filter: blur(5px); transform: translate3d(22px, 0, 0); } }
-
-	@media (max-width: 980px) {
-		.project-intro { grid-template-columns: minmax(0, 1fr) minmax(300px, 0.8fr); }
-	}
-
-	@media (max-width: 700px) {
-		.modal-content {
-			width: min(100% - 30px, 680px);
-			padding-block: 76px 120px;
-		}
-
-		.project-intro {
-			grid-template-columns: 1fr;
-			gap: 34px;
-			min-height: 0;
-			padding-bottom: 70px;
-		}
-
-		.project-intro h2 {
-			font-size: clamp(3rem, 15vw, 5.5rem);
-		}
-
-		.project-facts,
-		.related-section > header,
-		.related-list li {
-			grid-template-columns: 1fr;
-		}
-
-		.modal-controls { bottom: 8px; }
-	}
-
-	@media (prefers-reduced-motion: reduce) {
-		.modal-layer,
-		.modal-shell,
-		.modal-visual { animation: none; }
-		.modal-controls button { transition: none; }
-	}
-</style>
