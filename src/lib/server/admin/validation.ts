@@ -13,7 +13,9 @@ export interface ParsedForm {
 	errors: Record<string, string>;
 }
 
-const DATE_RE = /^\d{4}(-(0[1-9]|1[0-2]))?(-(0[1-9]|[12]\d|3[01]))?$/;
+// El día solo puede aparecer si hay mes: con los grupos independientes,
+// «2024-13» colaba como año + día sin mes (detectado por los tests, 2026-07-16).
+const DATE_RE = /^\d{4}(-(0[1-9]|1[0-2])(-(0[1-9]|[12]\d|3[01]))?)?$/;
 const MAX_TEXT = 500;
 const MAX_TEXTAREA = 10_000;
 

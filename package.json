@@ -12,6 +12,8 @@
 		"check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch",
 		"backup": "tsx scripts/backup.ts",
 		"migrate": "tsx scripts/migrate.ts",
+		"test": "vitest run",
+		"integrity": "tsx scripts/integrity.ts",
 		"migrate:portfolio": "tsx scripts/migrate-portfolio-items.ts"
 	},
 	"devDependencies": {
@@ -25,7 +27,8 @@
 		"svelte-check": "^4.6.0",
 		"tsx": "^4.23.0",
 		"typescript": "^6.0.3",
-		"vite": "^8.0.16"
+		"vite": "^8.0.16",
+		"vitest": "^4.1.10"
 	},
 	"dependencies": {
 		"@auth/sveltekit": "^1.11.2",
