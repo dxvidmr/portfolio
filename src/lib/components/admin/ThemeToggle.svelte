@@ -2,6 +2,7 @@
 	import { onMount } from 'svelte';
 	import Moon from '@lucide/svelte/icons/moon';
 	import Sun from '@lucide/svelte/icons/sun';
+	import Button from '$lib/components/ui/Button.svelte';
 
 	type Theme = 'light' | 'dark';
 
@@ -19,12 +20,11 @@
 	}
 </script>
 
-<button class="theme-toggle" type="button" aria-label={label} title={label} onclick={toggleTheme}>
+<Button size="sm" aria-label={label} title={label} onclick={toggleTheme}>
 	{#if theme === 'light'}
 		<Moon size={15} strokeWidth={1.7} aria-hidden="true" />
 	{:else}
 		<Sun size={15} strokeWidth={1.7} aria-hidden="true" />
 	{/if}
-	<span>{theme === 'light' ? 'Oscuro' : 'Claro'}</span>
-</button>
-
+	<span class="tw:max-[620px]:hidden">{theme === 'light' ? 'Oscuro' : 'Claro'}</span>
+</Button>

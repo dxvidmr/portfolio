@@ -53,9 +53,12 @@
 	const wide = (kind: string) => kind === 'textarea';
 </script>
 
-<div class="grid" use:trackDirty>
+<div
+	class="tw:grid tw:grid-cols-2 tw:gap-x-6 tw:gap-y-[1.1rem] tw:max-[720px]:grid-cols-1"
+	use:trackDirty
+>
 	{#each fields as field (field.name)}
-		<div class:span-2={wide(field.kind)}>
+		<div class={wide(field.kind) ? 'tw:col-span-full' : ''}>
 			<FormField
 				{field}
 				value={values[field.name] ?? ''}
@@ -65,21 +68,3 @@
 		</div>
 	{/each}
 </div>
-
-<style>
-	.grid {
-		display: grid;
-		grid-template-columns: repeat(2, minmax(0, 1fr));
-		gap: 1.1rem 1.5rem;
-	}
-
-	.span-2 {
-		grid-column: 1 / -1;
-	}
-
-	@media (max-width: 720px) {
-		.grid {
-			grid-template-columns: 1fr;
-		}
-	}
-</style>

@@ -3,6 +3,8 @@
 	import type { SubmitFunction } from '@sveltejs/kit';
 	import { untrack } from 'svelte';
 	import AdminToast from '$lib/components/AdminToast.svelte';
+	import AdminPageHeader from '$lib/components/admin/AdminPageHeader.svelte';
+	import ButtonLink from '$lib/components/ui/ButtonLink.svelte';
 	import type { ActionData, PageData } from './$types';
 
 	let { data, form }: { data: PageData; form: ActionData } = $props();
@@ -65,17 +67,17 @@
 	<title>Portada · cv/admin</title>
 </svelte:head>
 
-<div class="heading">
-	<div>
-		<p>Curación editorial</p>
-		<h1>Actividad reciente</h1>
-	</div>
-	<a href="/admin/entradas?portada=no" data-sveltekit-preload-data="off">Añadir desde entradas</a>
-</div>
-
-<p class="intro">
-	Reordena las entradas en pantalla y guarda el conjunto de cambios cuando hayas terminado.
-</p>
+<AdminPageHeader
+	title="Actividad reciente"
+	eyebrow="Curación editorial"
+	description="Reordena las entradas en pantalla y guarda el conjunto de cambios cuando hayas terminado."
+>
+	{#snippet actions()}
+		<ButtonLink href="/admin/entradas?portada=no" data-sveltekit-preload-data="off"
+			>Añadir desde entradas</ButtonLink
+		>
+	{/snippet}
+</AdminPageHeader>
 
 {#if form?.message}
 	{#key form}
@@ -141,39 +143,6 @@
 {/if}
 
 <style>
-	.heading {
-		display: flex;
-		align-items: end;
-		justify-content: space-between;
-		gap: 1rem;
-	}
-
-	.heading p {
-		font-size: 0.7rem;
-		letter-spacing: 0.1em;
-		text-transform: uppercase;
-		color: var(--fg-faint);
-	}
-
-	h1 {
-		font-size: 1.5rem;
-		color: var(--fg);
-	}
-
-	.heading a {
-		border: 1px solid var(--line-strong);
-		padding: 0.5rem 0.75rem;
-		color: var(--fg);
-		font-size: 0.78rem;
-	}
-
-	.intro {
-		color: var(--fg-dim);
-		max-width: 70ch;
-		line-height: 1.6;
-		margin: 1rem 0 1.5rem;
-	}
-
 	.warning {
 		padding: 0.8rem 1rem;
 		background: var(--admin-surface);
@@ -265,7 +234,6 @@
 	.controls .remove { color: var(--admin-danger); }
 
 	@media (max-width: 680px) {
-		.heading { align-items: flex-start; flex-direction: column; }
 		.order-toolbar { align-items: flex-start; flex-direction: column; }
 		.home-list li { grid-template-columns: 2rem 1fr; }
 		.controls { grid-column: 2; }

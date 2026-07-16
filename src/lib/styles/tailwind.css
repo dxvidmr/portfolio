@@ -1,0 +1,42 @@
+/*
+ * Tailwind se incorpora de forma progresiva sobre una web existente.
+ *
+ * - Sin Preflight: el reset global alteraría el home antes de migrarlo.
+ * - Prefijo `tw:`: evita colisiones con las clases editoriales actuales.
+ * - Fuente explícita: solo se analizan los componentes de `src`.
+ *
+ * Cuando toda la web esté migrada podremos reevaluar Preflight y el prefijo,
+ * pero durante la transición son la garantía de equivalencia visual.
+ */
+@layer theme, base, components, utilities;
+
+@import 'tailwindcss/theme.css' layer(theme) prefix(tw);
+@import 'tailwindcss/utilities.css' layer(utilities) source('../../') prefix(tw);
+
+@theme inline {
+	--color-canvas: var(--bg);
+	--color-panel: var(--bg-panel);
+	--color-ink: var(--fg);
+	--color-ink-dim: var(--fg-dim);
+	--color-ink-faint: var(--fg-faint);
+	--color-rule: var(--line);
+	--color-rule-strong: var(--line-strong);
+	--color-accent: var(--accent);
+	--color-accent-strong: var(--accent-strong);
+	--color-accent-soft: var(--accent-soft);
+	--color-accent-wash: var(--accent-wash);
+	--color-danger: var(--admin-danger, #a54848);
+	--color-danger-soft: var(--admin-danger-soft, color-mix(in srgb, #a54848 12%, transparent));
+	--color-warning: var(--tone-amber);
+
+	--font-title: var(--font-title);
+	--font-mono: var(--font-mono);
+
+	--radius-ui: var(--radius);
+	--radius-ui-sm: var(--radius-sm);
+
+	--spacing-gutter: var(--gutter);
+	--text-meta: var(--fs-meta);
+	--text-body: var(--fs-body);
+	--tracking-meta: var(--tracking-meta);
+}

@@ -3,6 +3,7 @@
 	import type { SubmitFunction } from '@sveltejs/kit';
 	import type { ActionData, PageData } from './$types';
 	import AdminToast from '$lib/components/AdminToast.svelte';
+	import AdminPageHeader from '$lib/components/admin/AdminPageHeader.svelte';
 
 	let { data, form }: { data: PageData; form: ActionData } = $props();
 	let pending = $state<string[]>([]);
@@ -25,10 +26,11 @@
 
 <svelte:head><title>Taxonomías · cv/admin</title></svelte:head>
 
-<h1>Taxonomías</h1>
-<p class="intro">
-	Edita las etiquetas y el orden de los tipos. Los que están en uso se pueden modificar, pero no eliminar.
-</p>
+<AdminPageHeader
+	title="Taxonomías"
+	eyebrow="Control"
+	description="Edita las etiquetas y el orden de los tipos. Los que están en uso se pueden modificar, pero no eliminar."
+/>
 
 {#if form?.message}
 	{#key form}
@@ -128,20 +130,6 @@
 {/each}
 
 <style>
-	h1 {
-		font-size: 1.25rem;
-		font-weight: 700;
-		color: var(--fg);
-		margin: 0 0 1rem;
-	}
-
-	.intro {
-		max-width: 75ch;
-		color: var(--fg-dim);
-		line-height: 1.6;
-		margin: 0 0 2rem;
-	}
-
 	code {
 		color: var(--accent-strong);
 		font-size: 0.85em;

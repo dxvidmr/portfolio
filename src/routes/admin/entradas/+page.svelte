@@ -5,6 +5,8 @@
 	import { untrack } from 'svelte';
 	import ListFilter from '@lucide/svelte/icons/list-filter';
 	import AdminToast from '$lib/components/AdminToast.svelte';
+	import AdminPageHeader from '$lib/components/admin/AdminPageHeader.svelte';
+	import ButtonLink from '$lib/components/ui/ButtonLink.svelte';
 	import type { ActionData, PageData } from './$types';
 
 	let { data, form }: { data: PageData; form: ActionData } = $props();
@@ -119,16 +121,14 @@
 	<title>Entradas · cv/admin</title>
 </svelte:head>
 
-<div class="heading">
-	<div>
-		<p class="eyebrow">Índice transversal</p>
-		<h1>Entradas</h1>
-	</div>
-	<div class="heading-side">
-		<span>{filteredEntries.length} de {entries.length} entradas</span>
-		<a class="new" href="/admin/entradas/nueva" data-sveltekit-preload-data="off">Nueva entrada</a>
-	</div>
-</div>
+<AdminPageHeader title="Entradas" eyebrow="Índice transversal">
+	{#snippet actions()}
+		<span class="tw:text-xs tw:text-ink-faint">{filteredEntries.length} de {entries.length} entradas</span>
+		<ButtonLink variant="primary" href="/admin/entradas/nueva" data-sveltekit-preload-data="off"
+			>Nueva entrada</ButtonLink
+		>
+	{/snippet}
+</AdminPageHeader>
 
 {#if form?.message}
 	{#key form}
@@ -290,52 +290,11 @@
 {/if}
 
 <style>
-	.heading {
-		display: flex;
-		align-items: end;
-		justify-content: space-between;
-		gap: 1rem;
-		margin-bottom: 1.5rem;
-	}
-
-	.eyebrow,
 	.filters label span {
 		font-size: 0.7rem;
 		letter-spacing: 0.1em;
 		text-transform: uppercase;
 		color: var(--fg-faint);
-	}
-
-	h1 {
-		font-size: 1.5rem;
-		color: var(--fg);
-	}
-
-	.heading-side {
-		display: flex;
-		align-items: center;
-		gap: 1rem;
-	}
-
-	.heading-side > span {
-		font-size: 0.75rem;
-		color: var(--fg-faint);
-	}
-
-	.heading-side .new {
-		border: 1px solid var(--accent-strong);
-		color: var(--accent-strong);
-		padding: 0.45rem 0.9rem;
-		text-decoration: none;
-	}
-
-	.heading-side .new:hover {
-		background: var(--accent-wash);
-	}
-
-	.heading-side .new:focus-visible {
-		outline: 2px solid var(--accent-strong);
-		outline-offset: 3px;
 	}
 
 	.title-link {

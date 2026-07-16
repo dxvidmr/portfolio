@@ -24,6 +24,8 @@
 				? 'Switch to dark'
 				: 'Switch to light'
 	);
+	const controlClass =
+		'tw:inline-flex tw:h-6.5 tw:min-w-7 tw:cursor-pointer tw:items-center tw:justify-center tw:gap-[5px] tw:rounded-ui-sm tw:border-0 tw:bg-transparent tw:px-[7px] tw:font-[inherit] tw:text-meta tw:leading-none tw:tracking-[0.08em] tw:text-ink-dim tw:hover:bg-accent-wash tw:hover:text-accent-strong';
 
 	onMount(() => {
 		const current = document.documentElement.dataset.theme;
@@ -37,12 +39,26 @@
 	}
 </script>
 
-<div class="site-controls" aria-label={currentLocale === 'es' ? 'Controles del sitio' : 'Site controls'}>
-	<a class="control" href={localizedPath(baseHref, targetLocale)} aria-label={languageLabel} title={languageLabel}>
+<div
+	class="tw:inline-flex tw:items-center tw:gap-px tw:border-l tw:border-rule-strong tw:pl-2.5"
+	aria-label={currentLocale === 'es' ? 'Controles del sitio' : 'Site controls'}
+>
+	<a
+		class={controlClass}
+		href={localizedPath(baseHref, targetLocale)}
+		aria-label={languageLabel}
+		title={languageLabel}
+	>
 		<Languages size={14} strokeWidth={1.8} aria-hidden="true" />
 		<span>{targetLocale.toUpperCase()}</span>
 	</a>
-	<button class="control icon-only" type="button" aria-label={themeLabel} title={themeLabel} onclick={toggleTheme}>
+	<button
+		class="{controlClass} tw:w-7 tw:px-0"
+		type="button"
+		aria-label={themeLabel}
+		title={themeLabel}
+		onclick={toggleTheme}
+	>
 		{#if theme === 'light'}
 			<Moon size={14} strokeWidth={1.8} aria-hidden="true" />
 		{:else}
@@ -50,39 +66,3 @@
 		{/if}
 	</button>
 </div>
-
-<style>
-	.site-controls {
-		display: inline-flex;
-		align-items: center;
-		gap: 1px;
-		padding-left: 10px;
-		border-left: 1px solid var(--line-strong);
-	}
-	.control {
-		display: inline-flex;
-		align-items: center;
-		justify-content: center;
-		gap: 5px;
-		min-width: 28px;
-		height: 26px;
-		padding: 0 7px;
-		border: 0;
-		border-radius: var(--radius-sm);
-		background: transparent;
-		color: var(--fg-dim);
-		font: inherit;
-		font-size: var(--fs-meta);
-		letter-spacing: 0.08em;
-		line-height: 1;
-		cursor: pointer;
-	}
-	.icon-only {
-		width: 28px;
-		padding: 0;
-	}
-	.control:hover {
-		color: var(--accent-strong);
-		background: var(--accent-wash);
-	}
-</style>

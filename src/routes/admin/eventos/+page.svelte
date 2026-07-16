@@ -1,5 +1,7 @@
 <script lang="ts">
 	import ListFilter from '@lucide/svelte/icons/list-filter';
+	import AdminPageHeader from '$lib/components/admin/AdminPageHeader.svelte';
+	import ButtonLink from '$lib/components/ui/ButtonLink.svelte';
 	import type { PageData } from './$types';
 	let { data }: { data: PageData } = $props();
 	let query = $state('');
@@ -46,17 +48,15 @@
 
 <svelte:head><title>Eventos · cv/admin</title></svelte:head>
 
-<div class="heading">
-	<div>
-		<p>Identidad académica compartida</p>
-		<h1>Eventos</h1>
-	</div>
-	<a href="/admin/eventos/nuevo">+ Nuevo evento</a>
-</div>
-
-<p class="intro">
-	Un evento puede reunir varias contribuciones y roles. Las fechas de cada actividad se editan dentro de su ficha.
-</p>
+<AdminPageHeader
+	title="Eventos"
+	eyebrow="Identidad académica compartida"
+	description="Un evento puede reunir varias contribuciones y roles. Las fechas de cada actividad se editan dentro de su ficha."
+>
+	{#snippet actions()}
+		<ButtonLink variant="primary" href="/admin/eventos/nuevo">+ Nuevo evento</ButtonLink>
+	{/snippet}
+</AdminPageHeader>
 
 <section class="filters" aria-label="Filtros de eventos">
 	<div class="filter-search">
@@ -126,11 +126,6 @@
 </ul>
 
 <style>
-	.heading { display: flex; align-items: end; justify-content: space-between; gap: 1rem; }
-	.heading p { margin: 0; color: var(--fg-faint); font-size: 0.68rem; letter-spacing: 0.08em; text-transform: uppercase; }
-	h1 { margin: 0.25rem 0 0; color: var(--fg); font-size: 1.45rem; }
-	.heading > a { border: 1px solid var(--accent-strong); padding: 0.55rem 0.8rem; color: var(--accent-strong); font-size: 0.75rem; }
-	.intro { max-width: 78ch; color: var(--fg-dim); line-height: 1.6; }
 	.filters { display: grid; gap: 1rem; margin: 1.5rem 0; padding: clamp(0.8rem, 2vw, 1.15rem); border: 1px solid var(--line); background: var(--admin-surface); }
 	.filters label { display: grid; gap: 0.35rem; }
 	.filter-search { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: end; gap: 1rem; }

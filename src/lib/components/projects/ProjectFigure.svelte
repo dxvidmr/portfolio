@@ -16,52 +16,38 @@
 		priority?: boolean;
 		bare?: boolean;
 	} = $props();
+
+	const figureClasses = $derived(
+		`tw:m-0 tw:min-w-0 ${portrait ? 'tw:w-[min(100%,310px)]' : ''}`
+	);
+	const frameClasses = $derived(
+		bare
+			? 'tw:relative tw:overflow-visible tw:bg-transparent'
+			: 'tw:relative tw:overflow-hidden tw:rounded-ui tw:bg-[var(--visual-bg)]'
+	);
 </script>
 
-<figure class:is-portrait={portrait} class:is-bare={bare}>
-	<div class="image-frame">
+<figure class={figureClasses}>
+	<div class={frameClasses}>
 		<img
+			class="tw:block tw:h-auto tw:w-full"
 			{src}
 			{alt}
 			loading={priority ? 'eager' : 'lazy'}
 			fetchpriority={priority ? 'high' : 'auto'}
 			decoding="async"
 		/>
+		{#if !bare}
+			<span
+				class="tw:pointer-events-none tw:absolute tw:inset-0 tw:rounded-[inherit] tw:border tw:border-[color-mix(in_srgb,var(--fg)_8%,transparent)]"
+				aria-hidden="true"
+			></span>
+		{/if}
 	</div>
-	<figcaption>
-		<span class="meta">{number}</span>
-		<p>{caption}</p>
+	<figcaption
+		class="tw:mt-[13px] tw:grid tw:max-w-[76ch] tw:grid-cols-[28px_minmax(0,1fr)] tw:gap-3 tw:text-ink-faint"
+	>
+		<span class="meta tw:pt-[3px]">{number}</span>
+		<p class="tw:m-0 tw:text-[0.7rem] tw:leading-[1.5]">{caption}</p>
 	</figcaption>
 </figure>
-
-<style>
-	figure { min-width: 0; margin: 0; }
-	.image-frame {
-		position: relative;
-		overflow: hidden;
-		border-radius: var(--radius);
-		background: var(--visual-bg);
-	}
-	.image-frame::after {
-		position: absolute;
-		inset: 0;
-		border: 1px solid color-mix(in srgb, var(--fg) 8%, transparent);
-		border-radius: inherit;
-		content: '';
-		pointer-events: none;
-	}
-	.is-bare .image-frame { overflow: visible; background: transparent; }
-	.is-bare .image-frame::after { display: none; }
-	img { display: block; width: 100%; height: auto; }
-	.is-portrait { width: min(100%, 310px); }
-	figcaption {
-		display: grid;
-		grid-template-columns: 28px minmax(0, 1fr);
-		gap: 12px;
-		max-width: 76ch;
-		margin-top: 13px;
-		color: var(--fg-faint);
-	}
-	figcaption span { padding-top: 3px; }
-	figcaption p { margin: 0; font-size: 0.7rem; line-height: 1.5; }
-</style>

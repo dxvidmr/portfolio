@@ -5,36 +5,25 @@
 		padded = true,
 		class: klass = ''
 	}: { children: Snippet; padded?: boolean; class?: string } = $props();
+
+	const panelClasses = $derived(
+		`tw:relative tw:overflow-hidden tw:rounded-ui tw:border tw:border-rule tw:bg-panel ${padded ? 'tw:p-[clamp(16px,2.4vw,26px)]' : ''} ${klass}`
+	);
+	const corner = 'tw:pointer-events-none tw:absolute tw:size-[9px]';
 </script>
 
-<div class="panel {klass}" class:padded>
-	<span class="c c-tl"></span>
-	<span class="c c-tr"></span>
-	<span class="c c-bl"></span>
-	<span class="c c-br"></span>
+<div class={panelClasses}>
+	<span
+		class="{corner} tw:-top-px tw:-left-px tw:rounded-tl-ui-sm tw:border-t tw:border-l tw:border-ink"
+	></span>
+	<span
+		class="{corner} tw:-top-px tw:-right-px tw:rounded-tr-ui-sm tw:border-t tw:border-r tw:border-ink"
+	></span>
+	<span
+		class="{corner} tw:-bottom-px tw:-left-px tw:rounded-bl-ui-sm tw:border-b tw:border-l tw:border-ink"
+	></span>
+	<span
+		class="{corner} tw:-right-px tw:-bottom-px tw:rounded-br-ui-sm tw:border-r tw:border-b tw:border-ink"
+	></span>
 	{@render children()}
 </div>
-
-<style>
-	.panel {
-		position: relative;
-		border: 1px solid var(--line);
-		background: var(--bg-panel);
-		border-radius: var(--radius);
-		overflow: hidden;
-	}
-	.padded {
-		padding: clamp(16px, 2.4vw, 26px);
-	}
-	/* corchetes de escuadra */
-	.c {
-		position: absolute;
-		width: 9px;
-		height: 9px;
-		pointer-events: none;
-	}
-	.c-tl { top: -1px; left: -1px; border-top: 1px solid var(--fg); border-left: 1px solid var(--fg); border-top-left-radius: var(--radius-sm); }
-	.c-tr { top: -1px; right: -1px; border-top: 1px solid var(--fg); border-right: 1px solid var(--fg); border-top-right-radius: var(--radius-sm); }
-	.c-bl { bottom: -1px; left: -1px; border-bottom: 1px solid var(--fg); border-left: 1px solid var(--fg); border-bottom-left-radius: var(--radius-sm); }
-	.c-br { bottom: -1px; right: -1px; border-bottom: 1px solid var(--fg); border-right: 1px solid var(--fg); border-bottom-right-radius: var(--radius-sm); }
-</style>

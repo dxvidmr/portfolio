@@ -3,20 +3,10 @@
 	--admin-surface-raised: color-mix(in srgb, var(--bg-panel) 90%, var(--bg));
 	--admin-danger: #a54848;
 	--admin-danger-soft: color-mix(in srgb, var(--admin-danger) 12%, transparent);
-	min-height: 100vh;
-	background: var(--bg);
-	color: var(--fg);
-	font-family: var(--font-mono);
 }
 
 html[data-theme='dark'] .admin-shell {
 	--admin-danger: #e58c8c;
-}
-
-.admin-main {
-	width: min(88rem, 100% - 2 * var(--gutter));
-	margin-inline: auto;
-	padding-block: clamp(1.5rem, 4vw, 3.5rem);
 }
 
 .admin-main :where(h1, h2, h3, h4) {
@@ -172,11 +162,4 @@ html[data-theme='dark'] .admin-shell {
 .admin-main .star.active {
 	border-color: var(--tone-amber) !important;
 	box-shadow: none !important;
-}
-
-@media (max-width: 720px) {
-	.admin-main {
-		width: min(100% - 2rem, 88rem);
-		padding-block: 1.5rem;
-	}
 }

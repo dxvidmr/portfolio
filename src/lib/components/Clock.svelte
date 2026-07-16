@@ -23,24 +23,11 @@
 	});
 </script>
 
-<div class="clock">
+<div class="tw:flex tw:flex-col tw:items-center tw:gap-2.5">
 	<span class="meta meta--faint">{profile.timezone.label}</span>
-	<div class="time dense"><span>{hh}</span><span class="sep">{mm}</span></div>
+	<div
+		class="dense tw:flex tw:gap-5 tw:text-[clamp(2.4rem,6vw,3.4rem)] tw:font-bold tw:tracking-[0.04em]"
+	>
+		<span>{hh}</span><span>{mm}</span>
+	</div>
 </div>
-
-<style>
-	.clock {
-		display: flex;
-		flex-direction: column;
-		align-items: center;
-		gap: 10px;
-	}
-	.time {
-		display: flex;
-		gap: 20px;
-		font-size: clamp(2.4rem, 6vw, 3.4rem);
-		font-weight: 700;
-		letter-spacing: 0.04em;
-	}
-	.sep { position: relative; }
-</style>

@@ -1,5 +1,6 @@
 <script lang="ts">
 	import '../app.css';
+	import '$lib/styles/tailwind.css';
 	import { page } from '$app/state';
 	import { localizedPath } from '$lib/i18n';
 	import { deLocalizeHref, locales } from '$lib/paraglide/runtime';
@@ -14,7 +15,7 @@
 <EditorialCursor />
 
 <!-- Enlaces de idioma ocultos para rastreadores (hreflang lo añadiremos luego) -->
-<div style="display:none" aria-hidden="true">
+<div class="tw:hidden" aria-hidden="true">
 	{#each locales as locale (locale)}
 		<a href={localizedPath(canonicalHref, locale)}>{locale}</a>
 	{/each}

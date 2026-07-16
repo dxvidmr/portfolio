@@ -3,6 +3,8 @@
 	import type { SubmitFunction } from '@sveltejs/kit';
 	import { untrack } from 'svelte';
 	import AdminToast from '$lib/components/AdminToast.svelte';
+	import AdminPageHeader from '$lib/components/admin/AdminPageHeader.svelte';
+	import ButtonLink from '$lib/components/ui/ButtonLink.svelte';
 	import type { ActionData, PageData } from './$types';
 
 	let { data, form }: { data: PageData; form: ActionData } = $props();
@@ -144,19 +146,19 @@
 	{/key}
 {/if}
 
-<div class="heading">
-	<div>
-		<p class="eyebrow">Curación editorial</p>
-		<h1>Fichas del portfolio</h1>
-	</div>
-	{#if selectedProject}
-		<a href={`/es/proyectos/${selectedProject.slug}`} target="_blank" rel="noreferrer">Ver ficha pública ↗</a>
-	{/if}
-</div>
-
-<p class="intro">
-	Relaciona cada ficha narrativa con resultados del CV. La lista pública se ordena automáticamente por fecha.
-</p>
+<AdminPageHeader
+	title="Fichas del portfolio"
+	eyebrow="Curación editorial"
+	description="Relaciona cada ficha narrativa con resultados del CV. La lista pública se ordena automáticamente por fecha."
+>
+	{#snippet actions()}
+		{#if selectedProject}
+			<ButtonLink href={`/es/proyectos/${selectedProject.slug}`} target="_blank" rel="noreferrer"
+				>Ver ficha pública ↗</ButtonLink
+			>
+		{/if}
+	{/snippet}
+</AdminPageHeader>
 
 <section class="project-picker" aria-label="Seleccionar ficha del portfolio">
 	<label>
@@ -285,11 +287,7 @@
 </div>
 
 <style>
-	.heading { display: flex; align-items: end; justify-content: space-between; gap: 1rem; }
-	.heading h1 { margin: 0.2rem 0 0; font-size: 1.5rem; color: var(--fg); }
-	.heading a { border: 1px solid var(--line-strong); padding: 0.5rem 0.75rem; color: var(--fg); font-size: 0.75rem; }
 	.eyebrow, label span { margin: 0; color: var(--fg-faint); font-size: 0.68rem; letter-spacing: 0.1em; text-transform: uppercase; }
-	.intro { max-width: 76ch; margin: 1rem 0 1.5rem; color: var(--fg-dim); line-height: 1.6; }
 
 	.project-picker { display: grid; grid-template-columns: minmax(16rem, 34rem) minmax(0, 1fr); align-items: end; gap: 1rem; padding: 0 0 1.25rem; border-bottom: 1px solid var(--line); }
 	.project-picker label { display: grid; gap: 0.35rem; }
@@ -329,7 +327,6 @@
 	}
 
 	@media (max-width: 620px) {
-		.heading { align-items: flex-start; flex-direction: column; }
 		.project-picker, .filters { grid-template-columns: 1fr; }
 		.entry-list li { align-items: flex-start; flex-direction: column; }
 		.entry-list form:not(.row-actions form),

@@ -1,5 +1,6 @@
 <script lang="ts">
 	import type { PageData } from './$types';
+	import ButtonLink from '$lib/components/ui/ButtonLink.svelte';
 
 	let { data }: { data: PageData } = $props();
 </script>
@@ -8,188 +9,68 @@
 	<title>Resumen · cv/admin</title>
 </svelte:head>
 
-<h1>Panel de gestión del CV</h1>
-<p class="session-note">
+<h1 class="tw:mt-0 tw:mb-4 tw:text-[clamp(1.7rem,3vw,2.45rem)]! tw:leading-[1.05]">
+	Panel de gestión del CV
+</h1>
+<p class="tw:max-w-[60ch] tw:text-[0.85rem] tw:leading-[1.6] tw:text-ink-faint">
 	Sesión iniciada como {data.session?.user?.name ?? 'administrador'} (GitHub).
 </p>
 
-<section class="metrics" aria-label="Resumen editorial">
-	<article>
-		<strong>{data.summary.total}</strong>
-		<span>entradas totales</span>
+<section
+	class="tw:my-8 tw:grid tw:overflow-hidden tw:rounded-ui tw:border tw:border-rule tw:bg-rule tw:[grid-template-columns:repeat(auto-fit,minmax(9rem,1fr))] tw:gap-px"
+	aria-label="Resumen editorial"
+>
+	<article class="tw:grid tw:gap-[0.35rem] tw:bg-[var(--admin-surface)] tw:p-5">
+		<strong class="tw:text-[1.75rem] tw:text-ink">{data.summary.total}</strong>
+		<span class="tw:text-xs tw:text-ink-faint">entradas totales</span>
 	</article>
-	<article>
-		<strong>{data.summary.publicCount}</strong>
-		<span>públicas</span>
+	<article class="tw:grid tw:gap-[0.35rem] tw:bg-[var(--admin-surface)] tw:p-5">
+		<strong class="tw:text-[1.75rem] tw:text-ink">{data.summary.publicCount}</strong>
+		<span class="tw:text-xs tw:text-ink-faint">públicas</span>
 	</article>
-	<article>
-		<strong>{data.summary.draftCount}</strong>
-		<span>privadas</span>
+	<article class="tw:grid tw:gap-[0.35rem] tw:bg-[var(--admin-surface)] tw:p-5">
+		<strong class="tw:text-[1.75rem] tw:text-ink">{data.summary.draftCount}</strong>
+		<span class="tw:text-xs tw:text-ink-faint">privadas</span>
 	</article>
-	<article>
-		<strong>{data.summary.homeCount}</strong>
-		<span>en portada</span>
+	<article class="tw:grid tw:gap-[0.35rem] tw:bg-[var(--admin-surface)] tw:p-5">
+		<strong class="tw:text-[1.75rem] tw:text-ink">{data.summary.homeCount}</strong>
+		<span class="tw:text-xs tw:text-ink-faint">en portada</span>
 	</article>
-	<article>
-		<strong>{data.summary.relatedCount}</strong>
-		<span>con relaciones</span>
+	<article class="tw:grid tw:gap-[0.35rem] tw:bg-[var(--admin-surface)] tw:p-5">
+		<strong class="tw:text-[1.75rem] tw:text-ink">{data.summary.relatedCount}</strong>
+		<span class="tw:text-xs tw:text-ink-faint">con relaciones</span>
 	</article>
 </section>
 
-<section class="actions" aria-labelledby="quick-actions">
-	<h2 id="quick-actions">Acciones rápidas</h2>
-	<div>
-		<a href="/admin/entradas/nueva">+ Nueva entrada</a>
-		<a href="/admin/eventos/nuevo">+ Nuevo evento</a>
-		<a href="/admin/portada" class="secondary">Ordenar portada</a>
+<section class="tw:mt-8" aria-labelledby="quick-actions">
+	<h2 class="tw:mt-0 tw:mb-4 tw:text-base" id="quick-actions">Acciones rápidas</h2>
+	<div class="tw:flex tw:flex-wrap tw:gap-3">
+		<ButtonLink href="/admin/entradas/nueva">+ Nueva entrada</ButtonLink>
+		<ButtonLink href="/admin/eventos/nuevo">+ Nuevo evento</ButtonLink>
+		<ButtonLink href="/admin/portada">Ordenar portada</ButtonLink>
 	</div>
 </section>
 
-<section class="recent" aria-labelledby="recent-title">
-	<div class="section-heading">
-		<h2 id="recent-title">Últimos elementos modificados</h2>
-		<a href="/admin/entradas">Ver todas las entradas →</a>
+<section class="tw:mt-8" aria-labelledby="recent-title">
+	<div class="tw:flex tw:items-baseline tw:justify-between tw:gap-4 tw:max-[620px]:flex-col tw:max-[620px]:items-start">
+		<h2 class="tw:mt-0 tw:mb-4 tw:text-base" id="recent-title">Últimos elementos modificados</h2>
+		<a class="tw:text-[0.68rem] tw:text-ink-dim" href="/admin/entradas"
+			>Ver todas las entradas →</a
+		>
 	</div>
-	<ul>
+	<ul class="tw:m-0 tw:list-none tw:border-t tw:border-rule tw:p-0">
 		{#each data.summary.recent as entry (`${entry.entityType}:${entry.entityId}`)}
-			<li>
-				<a href={`/admin/entradas/${entry.entityType}/${entry.entityId}`} class="entry-link">
-					<span class="entry-title">{entry.title}</span>
-					<span>{entry.typeLabel} · {entry.updatedAt ?? entry.sortDate ?? 'sin fecha'}</span>
+			<li class="tw:border-b tw:border-rule tw:p-0">
+				<a
+					href={`/admin/entradas/${entry.entityType}/${entry.entityId}`}
+					class="tw:group tw:flex tw:w-full tw:items-baseline tw:justify-between tw:gap-4 tw:px-1 tw:py-[0.85rem] tw:max-[620px]:flex-col tw:max-[620px]:items-start"
+				>
+					<span class="tw:text-ink tw:group-hover:text-accent-strong">{entry.title}</span>
+					<span class="tw:text-xs tw:text-ink-faint"
+						>{entry.typeLabel} · {entry.updatedAt ?? entry.sortDate ?? 'sin fecha'}</span
+					>
 				</a>
 			</li>
 		{/each}
 	</ul>
 </section>
-
-<style>
-	h1 {
-		font-size: 1.25rem;
-		font-weight: 700;
-		color: var(--fg);
-		margin: 0 0 1rem;
-	}
-
-	.session-note {
-		color: var(--fg-faint);
-		font-size: 0.85rem;
-	}
-
-	p {
-		max-width: 60ch;
-		line-height: 1.6;
-	}
-
-	h2 {
-		font-family: inherit;
-		font-size: 0.85rem;
-		letter-spacing: 0.08em;
-		text-transform: uppercase;
-		color: var(--fg-dim);
-		margin: 0 0 1rem;
-	}
-
-	.metrics {
-		display: grid;
-		grid-template-columns: repeat(auto-fit, minmax(9rem, 1fr));
-		gap: 1px;
-		background: var(--line);
-		border: 1px solid var(--line);
-		border-radius: var(--radius);
-		overflow: hidden;
-		margin: 2rem 0;
-	}
-
-	.metrics article {
-		background: var(--admin-surface);
-		padding: 1.25rem;
-		display: grid;
-		gap: 0.35rem;
-	}
-
-	.metrics strong {
-		font-size: 1.75rem;
-		color: var(--fg);
-	}
-
-	.metrics span,
-	.recent li span:last-child {
-		font-size: 0.75rem;
-		color: var(--fg-faint);
-	}
-
-	.actions,
-	.recent {
-		margin-top: 2rem;
-	}
-
-	.actions div {
-		display: flex;
-		flex-wrap: wrap;
-		gap: 0.75rem;
-	}
-
-	.actions a {
-		border: 1px solid var(--line-strong);
-		padding: 0.55rem 0.8rem;
-		color: var(--fg);
-	}
-
-	.actions a:hover {
-		border-color: var(--accent-strong);
-		color: var(--accent-strong);
-	}
-
-	.actions .secondary {
-		color: var(--fg-dim);
-	}
-
-	.section-heading {
-		display: flex;
-		align-items: baseline;
-		justify-content: space-between;
-		gap: 1rem;
-	}
-
-	.section-heading > a {
-		color: var(--fg-dim);
-		font-size: 0.68rem;
-	}
-
-	.recent ul {
-		list-style: none;
-		padding: 0;
-		margin: 0;
-		border-top: 1px solid var(--line);
-	}
-
-	.recent li {
-		padding: 0;
-		border-bottom: 1px solid var(--line);
-	}
-
-	.entry-link {
-		display: flex;
-		align-items: baseline;
-		justify-content: space-between;
-		gap: 1rem;
-		width: 100%;
-		padding: 0.85rem 0.25rem;
-	}
-
-	.entry-link:hover .entry-title {
-		color: var(--accent-strong);
-	}
-
-	.entry-title {
-		color: var(--fg);
-	}
-
-	@media (max-width: 620px) {
-		.section-heading,
-		.entry-link {
-			align-items: flex-start;
-			flex-direction: column;
-		}
-	}
-</style>
