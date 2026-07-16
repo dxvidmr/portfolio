@@ -140,7 +140,7 @@
 										type="submit"
 										class="remove"
 										disabled={pending.includes(`remove:${relationKey(relation)}`)}
-									>Quitar</button>
+									>Eliminar</button>
 								</form>
 							</div>
 						</li>
@@ -209,34 +209,34 @@
 </section>
 
 <style>
-	section { margin-top: 2.5rem; padding-top: 1.5rem; border-top: 1px solid #262626; }
-	h2 { margin: 0 0 1rem; color: #a3a3a3; font-size: 0.85rem; letter-spacing: 0.08em; text-transform: uppercase; }
-	.intro { max-width: 68ch; margin: 0 0 1rem; color: #a3a3a3; line-height: 1.6; }
+	section { margin-top: 2.5rem; padding-top: 1.5rem; border-top: 1px solid var(--line); }
+	h2 { margin: 0 0 1rem; color: var(--fg-dim); font-size: 0.85rem; letter-spacing: 0.08em; text-transform: uppercase; }
+	.intro { max-width: 68ch; margin: 0 0 1rem; color: var(--fg-dim); line-height: 1.6; }
 	.workspace { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 1rem; align-items: start; }
-	.current-panel, .add-panel { min-width: 0; border: 1px solid #262626; background: #0d0d0d; }
-	.current-panel > header, .add-panel > header { display: flex; justify-content: space-between; padding: 0.9rem 1rem; border-bottom: 1px solid #262626; color: #d4d4d4; font-size: 0.78rem; }
-	.current-panel > header span { color: #00ff88; }
+	.current-panel, .add-panel { min-width: 0; border: 1px solid var(--line); background: var(--admin-surface); }
+	.current-panel > header, .add-panel > header { display: flex; justify-content: space-between; padding: 0.9rem 1rem; border-bottom: 1px solid var(--line); color: var(--fg); font-size: 0.78rem; }
+	.current-panel > header span { color: var(--accent-strong); }
 	.relation-list { margin: 0; padding: 0; list-style: none; }
-	.relation-list > li { display: flex; align-items: center; justify-content: space-between; gap: 0.9rem; padding: 0.85rem 1rem; border-bottom: 1px solid #262626; }
+	.relation-list > li { display: flex; align-items: center; justify-content: space-between; gap: 0.9rem; padding: 0.85rem 1rem; border-bottom: 1px solid var(--line); }
 	.relation-list > li:last-child { border-bottom: 0; }
 	.relation-copy { min-width: 0; }
-	.relation-copy > a, .relation-copy > strong { display: block; color: #d4d4d4; font-size: 0.76rem; line-height: 1.35; }
-	.relation-copy > a:hover { color: #00ff88; }
-	.relation-copy > small { display: block; margin-top: 0.3rem; color: #737373; font-size: 0.62rem; }
-	.meta { display: flex; flex-wrap: wrap; gap: 0.35rem 0.65rem; margin-bottom: 0.3rem; color: #737373; font-size: 0.61rem; }
-	.meta .public { color: #00ff88; }
+	.relation-copy > a, .relation-copy > strong { display: block; color: var(--fg); font-size: 0.76rem; line-height: 1.35; }
+	.relation-copy > a:hover { color: var(--accent-strong); }
+	.relation-copy > small { display: block; margin-top: 0.3rem; color: var(--fg-faint); font-size: 0.62rem; }
+	.meta { display: flex; flex-wrap: wrap; gap: 0.35rem 0.65rem; margin-bottom: 0.3rem; color: var(--fg-faint); font-size: 0.61rem; }
+	.meta .public { color: var(--accent-strong); }
 	.relation-actions { display: flex; flex: 0 0 auto; gap: 0.35rem; align-items: end; }
 	.relation-actions form { display: flex; gap: 0.3rem; align-items: end; }
 	.filters { display: grid; grid-template-columns: minmax(0, 1fr) 10rem; gap: 0.65rem; padding: 0.9rem 1rem 0; }
 	.filters label { display: grid; gap: 0.3rem; }
-	.filters label > span { color: #737373; font-size: 0.62rem; letter-spacing: 0.06em; text-transform: uppercase; }
-	input, select { min-width: 0; border: 1px solid #404040; background: #0a0a0a; color: #d4d4d4; padding: 0.48rem; font: inherit; font-size: 0.68rem; }
-	button { flex: 0 0 auto; border: 1px solid #525252; background: transparent; color: #d4d4d4; padding: 0.42rem 0.55rem; font: inherit; font-size: 0.65rem; cursor: pointer; }
-	button:hover:not(:disabled) { border-color: #00ff88; color: #00ff88; }
-	button.remove:hover:not(:disabled) { border-color: #f87171; color: #f87171; }
+	.filters label > span { color: var(--fg-faint); font-size: 0.62rem; letter-spacing: 0.06em; text-transform: uppercase; }
+	input, select { min-width: 0; border: 1px solid var(--line); background: var(--bg); color: var(--fg); padding: 0.48rem; font: inherit; font-size: 0.68rem; }
+	button { flex: 0 0 auto; border: 1px solid var(--line-strong); background: transparent; color: var(--fg); padding: 0.42rem 0.55rem; font: inherit; font-size: 0.65rem; cursor: pointer; }
+	button:hover:not(:disabled) { border-color: var(--accent-strong); color: var(--accent-strong); }
+	button.remove:hover:not(:disabled) { border-color: var(--admin-danger); color: var(--admin-danger); }
 	button:disabled { opacity: 0.4; cursor: wait; }
-	.count { margin: 0; padding: 0.55rem 1rem 0.85rem; color: #737373; font-size: 0.65rem; }
-	.empty { margin: 0; padding: 1rem; color: #737373; font-size: 0.75rem; }
+	.count { margin: 0; padding: 0.55rem 1rem 0.85rem; color: var(--fg-faint); font-size: 0.65rem; }
+	.empty { margin: 0; padding: 1rem; color: var(--fg-faint); font-size: 0.75rem; }
 	.sr-only { position: absolute; width: 1px; height: 1px; padding: 0; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0; }
 
 	@media (max-width: 900px) {

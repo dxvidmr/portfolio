@@ -52,17 +52,17 @@
 <style>
 	.back {
 		display: inline-block;
-		color: #a3a3a3;
+		color: var(--fg-dim);
 		text-decoration: none;
 		margin-bottom: 1rem;
 	}
 
 	.back:hover {
-		color: #00ff88;
+		color: var(--accent-strong);
 	}
 
 	.back:focus-visible {
-		outline: 2px solid #00ff88;
+		outline: 2px solid var(--accent-strong);
 		outline-offset: 3px;
 	}
 
@@ -70,37 +70,37 @@
 		display: flex;
 		gap: 0.5rem;
 		font-size: 0.8rem;
-		color: #737373;
+		color: var(--fg-faint);
 		margin-bottom: 1.5rem;
 	}
 
 	.breadcrumb a {
-		color: #a3a3a3;
+		color: var(--fg-dim);
 	}
 
 	h1 {
 		font-size: 1.25rem;
 		font-weight: 700;
-		color: #fafafa;
+		color: var(--fg);
 		margin: 0 0 0.75rem;
 	}
 
 	.intro {
-		color: #737373;
+		color: var(--fg-faint);
 		font-size: 0.85rem;
 		margin: 0 0 1.5rem;
 	}
 
 	.event-hint {
 		font-size: 0.8rem;
-		color: #a3a3a3;
-		border: 1px dashed #404040;
+		color: var(--fg-dim);
+		border: 1px dashed var(--line);
 		padding: 0.6rem 0.8rem;
 		margin: -0.5rem 0 1.5rem;
 	}
 
 	.event-hint a {
-		color: #00ff88;
+		color: var(--accent-strong);
 	}
 
 	.actions {
@@ -113,22 +113,22 @@
 	button {
 		font: inherit;
 		background: none;
-		border: 1px solid #00ff88;
-		color: #00ff88;
+		border: 1px solid var(--accent-strong);
+		color: var(--accent-strong);
 		padding: 0.55rem 1rem;
 		cursor: pointer;
 	}
 
 	button:hover {
-		background: rgba(0, 255, 136, 0.08);
+		background: var(--accent-wash);
 	}
 
 	button:focus-visible {
-		outline: 2px solid #00ff88;
+		outline: 2px solid var(--accent-strong);
 		outline-offset: 3px;
 	}
 
 	.cancel {
-		color: #a3a3a3;
+		color: var(--fg-dim);
 	}
 </style>

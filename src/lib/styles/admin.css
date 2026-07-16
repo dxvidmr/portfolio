@@ -1,0 +1,182 @@
+.admin-shell {
+	--admin-surface: color-mix(in srgb, var(--bg-panel) 78%, var(--bg));
+	--admin-surface-raised: color-mix(in srgb, var(--bg-panel) 90%, var(--bg));
+	--admin-danger: #a54848;
+	--admin-danger-soft: color-mix(in srgb, var(--admin-danger) 12%, transparent);
+	min-height: 100vh;
+	background: var(--bg);
+	color: var(--fg);
+	font-family: var(--font-mono);
+}
+
+html[data-theme='dark'] .admin-shell {
+	--admin-danger: #e58c8c;
+}
+
+.admin-main {
+	width: min(88rem, 100% - 2 * var(--gutter));
+	margin-inline: auto;
+	padding-block: clamp(1.5rem, 4vw, 3.5rem);
+}
+
+.admin-main :where(h1, h2, h3, h4) {
+	color: var(--fg) !important;
+	font-family: var(--font-title) !important;
+	font-weight: 500 !important;
+	letter-spacing: -0.025em !important;
+}
+
+.admin-main h1 {
+	font-size: clamp(1.7rem, 3vw, 2.45rem) !important;
+	line-height: 1.05;
+}
+
+.admin-main h2 {
+	font-size: 1rem;
+}
+
+.admin-main :where(.eyebrow, .meta, label > span, legend, th) {
+	color: var(--fg-dim) !important;
+	font-family: var(--font-mono);
+	font-size: var(--fs-meta) !important;
+	font-weight: 500;
+	letter-spacing: var(--tracking-meta) !important;
+	text-transform: uppercase;
+}
+
+.admin-main :where(.intro, .session-note, .count, .results-count, .date, small, .updated, .empty) {
+	color: var(--fg-dim) !important;
+}
+
+.admin-main :where(button, .button, a.new, .heading > a, .heading-side a, .actions a) {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	gap: 0.4rem;
+	min-height: 2.25rem;
+	border: 1px solid var(--line-strong) !important;
+	border-radius: var(--radius-sm) !important;
+	background: transparent !important;
+	color: var(--fg-dim) !important;
+	padding: 0.45rem 0.72rem !important;
+	font-family: var(--font-mono) !important;
+	font-size: 0.72rem !important;
+	line-height: 1.2;
+	cursor: pointer;
+	transition: border-color 120ms linear, color 120ms linear, background 120ms linear;
+}
+
+.admin-main :where(button, .button, a.new, .heading > a, .heading-side a, .actions a):hover:not(:disabled) {
+	border-color: var(--accent-strong) !important;
+	background: var(--accent-wash) !important;
+	color: var(--accent-strong) !important;
+}
+
+.admin-main :where(button, .button):disabled {
+	opacity: 0.42;
+	cursor: not-allowed !important;
+}
+
+.admin-main :where(button.active, .button.primary, a.new) {
+	border-color: var(--accent-strong) !important;
+	color: var(--accent-strong) !important;
+}
+
+.admin-main :where(button.danger, .remove, .danger button, .danger summary) {
+	border-color: color-mix(in srgb, var(--admin-danger) 55%, var(--line)) !important;
+	color: var(--admin-danger) !important;
+}
+
+.admin-main :where(button.danger, button.remove, .danger button, .danger summary):hover:not(:disabled) {
+	border-color: var(--admin-danger) !important;
+	background: var(--admin-danger-soft) !important;
+	color: var(--admin-danger) !important;
+}
+
+.admin-main :where(input:not([type='hidden']):not([type='checkbox']):not([type='radio']), select, textarea) {
+	width: 100%;
+	min-width: 0;
+	border: 1px solid var(--line) !important;
+	border-radius: var(--radius-sm) !important;
+	background: color-mix(in srgb, var(--bg) 82%, var(--bg-panel)) !important;
+	color: var(--fg) !important;
+	padding: 0.58rem 0.68rem !important;
+	font: inherit;
+	line-height: 1.35;
+}
+
+.admin-main textarea {
+	min-height: 7rem;
+	resize: vertical;
+}
+
+.admin-main :where(input:not([type='hidden']):not([type='checkbox']):not([type='radio']), select, textarea):focus {
+	border-color: var(--accent-strong) !important;
+	outline: 1px solid var(--accent-strong) !important;
+	outline-offset: 1px;
+}
+
+.admin-main :where(code) {
+	color: var(--accent-strong) !important;
+}
+
+.admin-main :where(.table-wrap, .rows, .home-list, .events, .related-panel, .add-panel, .order-toolbar, fieldset, details) {
+	border-color: var(--line) !important;
+	border-radius: var(--radius) !important;
+	background: var(--admin-surface) !important;
+}
+
+.admin-main :where(.table-wrap, .rows, .home-list, .related-panel, .add-panel) {
+	overflow: hidden;
+}
+
+.admin-main :where(table) {
+	border-collapse: collapse;
+	background: transparent;
+}
+
+.admin-main :where(th) {
+	background: var(--admin-surface-raised) !important;
+}
+
+.admin-main :where(th, td, .row, .home-list li, .events li, .entry-list li, .related-panel > header, .add-panel > header) {
+	border-color: var(--line) !important;
+}
+
+.admin-main :where(td strong, .entry-copy strong, .entry strong, .events strong) {
+	color: var(--fg) !important;
+}
+
+.admin-main :where(.title-link, .entry-link) {
+	color: var(--fg);
+}
+
+.admin-main :where(.title-link, .entry-link):hover {
+	color: var(--accent-strong) !important;
+}
+
+.admin-main :where(.filters, .order-toolbar, .warning, .metrics) {
+	border-color: var(--line) !important;
+	border-radius: var(--radius) !important;
+	background: var(--admin-surface) !important;
+}
+
+.admin-main :where(.metrics article, .home-list li, .related-panel, .add-panel) {
+	background: transparent !important;
+}
+
+.admin-main :where(.private, .pending-order, .star.active) {
+	color: var(--tone-amber) !important;
+}
+
+.admin-main .star.active {
+	border-color: var(--tone-amber) !important;
+	box-shadow: none !important;
+}
+
+@media (max-width: 720px) {
+	.admin-main {
+		width: min(100% - 2rem, 88rem);
+		padding-block: 1.5rem;
+	}
+}

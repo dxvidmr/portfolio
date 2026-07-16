@@ -96,22 +96,22 @@
 </form>
 
 <style>
-	.back { display: inline-block; margin-bottom: 1rem; color: #a3a3a3; }
-	h1 { margin: 0 0 0.6rem; color: #fafafa; font-size: 1.3rem; }
-	p { max-width: 70ch; color: #a3a3a3; line-height: 1.6; }
+	.back { display: inline-block; margin-bottom: 1rem; color: var(--fg-dim); }
+	h1 { margin: 0 0 0.6rem; color: var(--fg); font-size: 1.3rem; }
+	p { max-width: 70ch; color: var(--fg-dim); line-height: 1.6; }
 	form { margin-top: 1.5rem; display: grid; gap: 2rem; }
-	section h2 { margin: 0 0 0.8rem; color: #e5e5e5; font-size: 1rem; }
-	.hint { margin: 0 0 0.8rem; font-size: 0.78rem; color: #737373; }
-	.role { display: flex; align-items: baseline; gap: 0.6rem; margin: 0.8rem 0 0.4rem; color: #d4d4d4; cursor: pointer; }
-	.role input { width: 1.05rem; height: 1.05rem; accent-color: #00ff88; }
-	.role small { color: #737373; margin-left: 0.4rem; }
-	fieldset { margin: 0.4rem 0 1rem; padding: 1rem; border: 1px dashed #404040; }
-	legend { padding: 0 0.5rem; color: #a3a3a3; font-size: 0.8rem; }
+	section h2 { margin: 0 0 0.8rem; color: var(--fg); font-size: 1rem; }
+	.hint { margin: 0 0 0.8rem; font-size: 0.78rem; color: var(--fg-faint); }
+	.role { display: flex; align-items: baseline; gap: 0.6rem; margin: 0.8rem 0 0.4rem; color: var(--fg); cursor: pointer; }
+	.role input { width: 1.05rem; height: 1.05rem; accent-color: var(--accent-strong); }
+	.role small { color: var(--fg-faint); margin-left: 0.4rem; }
+	fieldset { margin: 0.4rem 0 1rem; padding: 1rem; border: 1px dashed var(--line); }
+	legend { padding: 0 0.5rem; color: var(--fg-dim); font-size: 0.8rem; }
 	.attendance-grid { display: grid; gap: 1rem; }
-	.attendance-grid label { display: grid; gap: 0.35rem; color: #a3a3a3; font-size: 0.75rem; }
-	.attendance-grid input, .attendance-grid textarea { border: 1px solid #404040; background: #111; color: #e5e5e5; padding: 0.55rem 0.65rem; font: inherit; }
-	.attendance-grid input:focus-visible, .attendance-grid textarea:focus-visible { outline: 2px solid #00ff88; outline-offset: 2px; }
+	.attendance-grid label { display: grid; gap: 0.35rem; color: var(--fg-dim); font-size: 0.75rem; }
+	.attendance-grid input, .attendance-grid textarea { border: 1px solid var(--line); background: var(--admin-surface); color: var(--fg); padding: 0.55rem 0.65rem; font: inherit; }
+	.attendance-grid input:focus-visible, .attendance-grid textarea:focus-visible { outline: 2px solid var(--accent-strong); outline-offset: 2px; }
 	.actions { display: flex; gap: 0.75rem; align-items: center; }
-	button, .actions a { border: 1px solid #525252; background: transparent; color: #d4d4d4; padding: 0.55rem 0.8rem; font: inherit; cursor: pointer; }
-	button { border-color: #00ff88; color: #00ff88; }
+	button, .actions a { border: 1px solid var(--line-strong); background: transparent; color: var(--fg); padding: 0.55rem 0.8rem; font: inherit; cursor: pointer; }
+	button { border-color: var(--accent-strong); color: var(--accent-strong); }
 </style>

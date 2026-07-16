@@ -7,6 +7,7 @@ export interface PortfolioOption {
 	slug: string;
 	title: string;
 	kind: string;
+	year: string;
 }
 
 export interface PortfolioCandidate {
@@ -26,7 +27,8 @@ export interface PortfolioRelation extends EntryKey {
 export const portfolioOptions: PortfolioOption[] = projects.map((project) => ({
 	slug: project.slug,
 	title: project.title.es,
-	kind: project.kind.es
+	kind: project.kind.es,
+	year: project.year
 }));
 
 const portfolioSlugs = new Set(portfolioOptions.map((project) => project.slug));

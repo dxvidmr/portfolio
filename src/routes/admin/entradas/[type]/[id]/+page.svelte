@@ -109,7 +109,7 @@
 				<p>Seleccionada en la portada.</p>
 				<form method="POST" action="?/portada">
 					<input type="hidden" name="enabled" value="0" />
-					<button type="submit" class="secondary">Quitar de portada</button>
+					<button type="submit" class="remove">Eliminar de portada</button>
 				</form>
 			{:else}
 				<p>
@@ -231,12 +231,12 @@
 		display: flex;
 		gap: 0.5rem;
 		font-size: 0.8rem;
-		color: #737373;
+		color: var(--fg-faint);
 		margin-bottom: 1.5rem;
 	}
 
 	.breadcrumb a {
-		color: #a3a3a3;
+		color: var(--fg-dim);
 	}
 
 	.head {
@@ -250,7 +250,7 @@
 	h1 {
 		font-size: 1.25rem;
 		font-weight: 700;
-		color: #fafafa;
+		color: var(--fg);
 		margin: 0;
 		max-width: 60ch;
 	}
@@ -259,43 +259,43 @@
 		font-size: 0.7rem;
 		text-transform: uppercase;
 		letter-spacing: 0.08em;
-		border: 1px solid #525252;
-		color: #a3a3a3;
+		border: 1px solid var(--line-strong);
+		color: var(--fg-dim);
 		padding: 0.15rem 0.5rem;
 	}
 
 	.state.public {
-		border-color: #00ff88;
-		color: #00ff88;
+		border-color: var(--accent-strong);
+		color: var(--accent-strong);
 	}
 
 	h2 {
 		font-size: 0.85rem;
 		letter-spacing: 0.08em;
 		text-transform: uppercase;
-		color: #a3a3a3;
+		color: var(--fg-dim);
 		margin: 0 0 1.25rem;
 	}
 
 	section {
 		margin-top: 2.5rem;
 		padding-top: 1.5rem;
-		border-top: 1px solid #262626;
+		border-top: 1px solid var(--line);
 	}
 
 	.back {
 		display: inline-block;
-		color: #a3a3a3;
+		color: var(--fg-dim);
 		text-decoration: none;
 		margin-bottom: 1rem;
 	}
 
 	.back:hover {
-		color: #00ff88;
+		color: var(--accent-strong);
 	}
 
 	.back:focus-visible {
-		outline: 2px solid #00ff88;
+		outline: 2px solid var(--accent-strong);
 		outline-offset: 3px;
 	}
 
@@ -306,7 +306,7 @@
 	}
 
 	.control-block {
-		border: 1px solid #262626;
+		border: 1px solid var(--line);
 		padding: 1rem 1.25rem;
 		display: grid;
 		gap: 0.75rem;
@@ -330,37 +330,37 @@
 	button {
 		font: inherit;
 		background: none;
-		border: 1px solid #00ff88;
-		color: #00ff88;
+		border: 1px solid var(--accent-strong);
+		color: var(--accent-strong);
 		padding: 0.55rem 1rem;
 		cursor: pointer;
 	}
 
 	button:hover {
-		background: rgba(0, 255, 136, 0.08);
+		background: var(--accent-wash);
 	}
 
 	button:focus-visible {
-		outline: 2px solid #00ff88;
+		outline: 2px solid var(--accent-strong);
 		outline-offset: 3px;
 	}
 
 	button.secondary {
-		border-color: #525252;
-		color: #d4d4d4;
+		border-color: var(--line-strong);
+		color: var(--fg);
 	}
 
 	button.secondary:hover {
-		background: rgba(255, 255, 255, 0.05);
+		background: var(--surface-tint);
 	}
 
 	.hint {
-		color: #737373;
+		color: var(--fg-faint);
 		font-size: 0.8rem;
 	}
 
 	.hint a {
-		color: #a3a3a3;
+		color: var(--fg-dim);
 	}
 
 	.portfolio-relations {
@@ -376,21 +376,21 @@
 		display: flex;
 		align-items: center;
 		gap: 0.5rem;
-		border: 1px solid #404040;
+		border: 1px solid var(--line);
 		padding: 0.45rem 0.65rem;
 	}
 
 	.portfolio-relations a,
 	.manage-portfolio {
-		color: #d4d4d4;
+		color: var(--fg);
 	}
 
 	.canonical-event-link {
-		color: #00ff88;
+		color: var(--accent-strong);
 	}
 
 	.portfolio-relations span {
-		color: #d6a84b;
+		color: var(--tone-amber);
 		font-size: 0.65rem;
 		text-transform: uppercase;
 		letter-spacing: 0.06em;
@@ -414,8 +414,8 @@
 
 	.relation-group {
 		min-width: 0;
-		border: 1px solid #262626;
-		background: #0d0d0d;
+		border: 1px solid var(--line);
+		background: var(--admin-surface);
 	}
 
 	.relation-group > header {
@@ -423,24 +423,24 @@
 		justify-content: space-between;
 		gap: 1rem;
 		padding: 1rem;
-		border-bottom: 1px solid #262626;
+		border-bottom: 1px solid var(--line);
 	}
 
 	.relation-group h3 {
 		margin: 0;
-		color: #e5e5e5;
+		color: var(--fg);
 		font-size: 0.82rem;
 	}
 
 	.relation-group header p {
 		margin: 0.35rem 0 0;
-		color: #737373;
+		color: var(--fg-faint);
 		font-size: 0.7rem;
 		line-height: 1.45;
 	}
 
 	.relation-group header strong {
-		color: #00ff88;
+		color: var(--accent-strong);
 		font-size: 0.8rem;
 		font-weight: 500;
 	}
@@ -457,7 +457,7 @@
 		justify-content: space-between;
 		gap: 0.75rem;
 		padding: 0.75rem 1rem;
-		border-bottom: 1px solid #262626;
+		border-bottom: 1px solid var(--line);
 	}
 
 	.structural-list li:last-child {
@@ -468,41 +468,41 @@
 		display: grid;
 		min-width: 0;
 		gap: 0.25rem;
-		color: #d4d4d4;
+		color: var(--fg);
 		font-size: 0.76rem;
 		line-height: 1.35;
 	}
 
 	.structural-list a:hover {
-		color: #00ff88;
+		color: var(--accent-strong);
 	}
 
 	.structural-list small {
-		color: #737373;
+		color: var(--fg-faint);
 		font-size: 0.65rem;
 	}
 
 	.relation-state {
 		flex: 0 0 auto;
-		color: #a3a3a3;
+		color: var(--fg-dim);
 		font-size: 0.6rem;
 		letter-spacing: 0.05em;
 		text-transform: uppercase;
 	}
 
 	.relation-state.public {
-		color: #00ff88;
+		color: var(--accent-strong);
 	}
 
 	.empty-relation {
 		margin: 0;
 		padding: 1rem;
-		color: #737373;
+		color: var(--fg-faint);
 		font-size: 0.75rem;
 	}
 
 	section p {
-		color: #a3a3a3;
+		color: var(--fg-dim);
 		max-width: 60ch;
 		line-height: 1.6;
 	}
@@ -515,20 +515,20 @@
 
 	.danger {
 		margin-top: 3rem;
-		border: 1px solid #7f1d1d;
+		border: 1px solid var(--admin-danger);
 		padding: 1rem 1.25rem;
 	}
 
 	.danger summary {
 		cursor: pointer;
-		color: #f87171;
+		color: var(--admin-danger);
 		font-size: 0.85rem;
 		text-transform: uppercase;
 		letter-spacing: 0.08em;
 	}
 
 	.danger p {
-		color: #a3a3a3;
+		color: var(--fg-dim);
 		max-width: 60ch;
 	}
 
@@ -536,22 +536,22 @@
 		display: flex;
 		align-items: center;
 		gap: 0.6rem;
-		color: #d4d4d4;
+		color: var(--fg);
 		margin-bottom: 1rem;
 	}
 
 	.confirm input {
 		width: 1.05rem;
 		height: 1.05rem;
-		accent-color: #f87171;
+		accent-color: var(--admin-danger);
 	}
 
 	button.delete {
-		border-color: #f87171;
-		color: #f87171;
+		border-color: var(--admin-danger);
+		color: var(--admin-danger);
 	}
 
 	button.delete:hover {
-		background: rgba(248, 113, 113, 0.08);
+		background: var(--admin-danger-soft);
 	}
 </style>

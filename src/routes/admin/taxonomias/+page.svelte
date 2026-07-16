@@ -27,10 +27,7 @@
 
 <h1>Taxonomías</h1>
 <p class="intro">
-	Vocabulario controlado de tipos (<code>type_vocab</code>). Los selectores del dashboard y las
-	etiquetas de la web pública leen de aquí: añadir un tipo nuevo no requiere desplegar código.
-	El código es inmutable una vez creado (lo referencian las entradas); un tipo solo puede
-	eliminarse si ninguna entrada lo usa.
+	Edita las etiquetas y el orden de los tipos. Los que están en uso se pueden modificar, pero no eliminar.
 </p>
 
 {#if form?.message}
@@ -40,7 +37,7 @@
 {/if}
 
 {#each data.domains as group (group.domain)}
-	<section aria-labelledby={`dominio-${group.domain}`}>
+	<section class="taxonomy-group" aria-labelledby={`dominio-${group.domain}`}>
 		<h2 id={`dominio-${group.domain}`}>{group.label} <code>{group.domain}</code></h2>
 
 		{#if group.types.length > 0}
@@ -51,7 +48,8 @@
 					<span role="columnheader">Etiqueta EN</span>
 					<span role="columnheader">Orden</span>
 					<span role="columnheader">Usos</span>
-					<span role="columnheader" class="visually-hidden">Acciones</span>
+					<span role="columnheader" class="visually-hidden">Guardar</span>
+					<span role="columnheader" class="visually-hidden">Eliminar</span>
 				</div>
 				{#each group.types as type (type.code)}
 					<div class="row" role="row">
@@ -80,6 +78,8 @@
 								<button type="submit" class="danger" disabled={pending.includes(`del:${type.code}`)}>
 									Eliminar
 								</button>
+							{:else}
+								<span class="action-placeholder" aria-hidden="true">En uso</span>
 							{/if}
 						</form>
 					</div>
@@ -131,30 +131,32 @@
 	h1 {
 		font-size: 1.25rem;
 		font-weight: 700;
-		color: #fafafa;
+		color: var(--fg);
 		margin: 0 0 1rem;
 	}
 
 	.intro {
 		max-width: 75ch;
-		color: #a3a3a3;
+		color: var(--fg-dim);
 		line-height: 1.6;
 		margin: 0 0 2rem;
 	}
 
 	code {
-		color: #00ff88;
+		color: var(--accent-strong);
 		font-size: 0.85em;
 		overflow-wrap: anywhere;
 	}
 
-	section {
-		margin-bottom: 2.5rem;
+	.taxonomy-group {
+		margin-bottom: 2rem;
+		padding-top: 1.25rem;
+		border-top: 1px solid var(--line);
 	}
 
 	h2 {
 		font-size: 0.95rem;
-		color: #e5e5e5;
+		color: var(--fg);
 		margin: 0 0 0.8rem;
 		display: flex;
 		align-items: baseline;
@@ -162,23 +164,30 @@
 	}
 
 	h2 code {
-		color: #737373;
+		color: var(--fg-faint);
 		font-weight: 400;
 	}
 
 	.rows {
 		display: grid;
-		gap: 0.25rem;
+		gap: 0;
+		border: 1px solid var(--line);
+		border-radius: var(--radius);
+		overflow: hidden;
 		font-size: 0.82rem;
 	}
 
 	.row {
 		display: grid;
-		grid-template-columns: minmax(10rem, 0.9fr) 1.2fr 1.2fr 4.5rem 3rem auto auto;
+		grid-template-columns: minmax(9rem, 0.9fr) 1.2fr 1.2fr 4.5rem 3rem 6rem 6rem;
 		gap: 0.6rem;
 		align-items: center;
-		padding: 0.25rem 0;
-		border-bottom: 1px solid #1a1a1a;
+		padding: 0.55rem 0.65rem;
+		border-bottom: 1px solid var(--line);
+	}
+
+	.row:last-child {
+		border-bottom: 0;
 	}
 
 	.row form {
@@ -186,17 +195,18 @@
 	}
 
 	.row.head {
-		color: #737373;
-		border-bottom: 1px solid #262626;
-		padding-bottom: 0.35rem;
+		color: var(--fg-faint);
+		border-bottom: 1px solid var(--line);
+		padding-block: 0.5rem;
+		background: var(--admin-surface-raised);
 	}
 
 	input {
 		font: inherit;
 		width: 100%;
-		background: #111;
-		color: #e5e5e5;
-		border: 1px solid #333;
+		background: var(--admin-surface);
+		color: var(--fg);
+		border: 1px solid var(--line);
 		padding: 0.35rem 0.5rem;
 	}
 
@@ -205,12 +215,12 @@
 	}
 
 	input:focus-visible {
-		outline: 2px solid #00ff88;
+		outline: 2px solid var(--accent-strong);
 		outline-offset: 2px;
 	}
 
 	.usage {
-		color: #737373;
+		color: var(--fg-faint);
 		text-align: center;
 	}
 
@@ -218,19 +228,33 @@
 		font: inherit;
 		font-size: 0.78rem;
 		background: none;
-		border: 1px solid #404040;
-		color: #d4d4d4;
+		border: 1px solid var(--line);
+		color: var(--fg);
 		padding: 0.3rem 0.6rem;
 		cursor: pointer;
 		white-space: nowrap;
 	}
 
+	.row button,
+	.action-placeholder {
+		width: 6rem;
+	}
+
+	.action-placeholder {
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		min-height: 2.25rem;
+		color: var(--fg-faint);
+		font-size: 0.65rem;
+	}
+
 	button:hover {
-		border-color: #737373;
+		border-color: var(--fg-faint);
 	}
 
 	button:focus-visible {
-		outline: 2px solid #00ff88;
+		outline: 2px solid var(--accent-strong);
 		outline-offset: 2px;
 	}
 
@@ -240,35 +264,36 @@
 	}
 
 	button.danger {
-		border-color: #7f1d1d;
-		color: #f87171;
+		border-color: var(--admin-danger);
+		color: var(--admin-danger);
 	}
 
 	button.danger:hover {
-		border-color: #f87171;
+		border-color: var(--admin-danger);
 	}
 
 	.empty {
-		color: #737373;
+		color: var(--fg-faint);
 		font-size: 0.82rem;
 	}
 
 	.add {
-		display: flex;
-		flex-wrap: wrap;
+		display: grid;
+		grid-template-columns: repeat(3, minmax(9rem, 1fr)) 5rem auto;
 		align-items: end;
 		gap: 0.75rem;
-		margin-top: 0.8rem;
-		padding: 0.8rem;
-		border: 1px dashed #333;
+		margin-top: 0.65rem;
+		padding: 0.85rem;
+		border: 1px dashed var(--line);
+		border-radius: var(--radius);
+		background: color-mix(in srgb, var(--bg-panel) 45%, transparent);
 	}
 
 	.add label {
 		display: grid;
 		gap: 0.3rem;
 		font-size: 0.72rem;
-		color: #737373;
-		flex: 1 1 12rem;
+		color: var(--fg-faint);
 	}
 
 	.add .order-label {
@@ -280,8 +305,8 @@
 	}
 
 	.add button {
-		border-color: #00ff88;
-		color: #00ff88;
+		border-color: var(--accent-strong);
+		color: var(--accent-strong);
 	}
 
 	.visually-hidden {
@@ -293,13 +318,86 @@
 	}
 
 	@media (max-width: 900px) {
+		.rows {
+			gap: 0.75rem;
+			border: 0;
+			border-radius: 0;
+			overflow: visible;
+			background: transparent;
+		}
+
 		.row {
-			grid-template-columns: 1fr 1fr;
-			padding: 0.6rem 0;
+			display: block;
+			padding: 0.85rem;
+			border: 1px solid var(--line);
+			border-radius: var(--radius);
+			background: var(--admin-surface);
 		}
 
 		.row.head {
 			display: none;
+		}
+
+		.row form:first-of-type {
+			display: grid;
+			grid-template-columns: repeat(2, minmax(0, 1fr));
+			gap: 0.7rem;
+		}
+
+		.row form:first-of-type > span[role='cell'] {
+			display: grid;
+			align-content: end;
+			gap: 0.3rem;
+		}
+
+		.row form:first-of-type > span[role='cell']::before {
+			color: var(--fg-faint);
+			font-size: 0.58rem;
+			letter-spacing: 0.1em;
+			text-transform: uppercase;
+		}
+
+		.row form:first-of-type > span[role='cell']:nth-of-type(1) {
+			grid-column: 1 / -1;
+		}
+
+		.row form:first-of-type > span[role='cell']:nth-of-type(1)::before { content: 'Código'; }
+		.row form:first-of-type > span[role='cell']:nth-of-type(2)::before { content: 'Etiqueta ES'; }
+		.row form:first-of-type > span[role='cell']:nth-of-type(3)::before { content: 'Etiqueta EN'; }
+		.row form:first-of-type > span[role='cell']:nth-of-type(4)::before { content: 'Orden'; }
+		.row form:first-of-type > span[role='cell']:nth-of-type(5)::before { content: 'Usos'; }
+
+		.row form:last-of-type {
+			display: flex;
+			justify-content: flex-end;
+			margin-top: 0.7rem;
+			padding-top: 0.7rem;
+			border-top: 1px solid var(--line);
+		}
+
+		.row button,
+		.action-placeholder {
+			width: 100%;
+		}
+
+		.add {
+			grid-template-columns: repeat(2, minmax(0, 1fr));
+		}
+
+		.add button {
+			width: 100%;
+		}
+	}
+
+	@media (max-width: 560px) {
+		.row form:first-of-type,
+		.add {
+			grid-template-columns: 1fr;
+		}
+
+		.add .order-label input,
+		input.order {
+			width: 100%;
 		}
 	}
 </style>

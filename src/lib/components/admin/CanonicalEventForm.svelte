@@ -62,15 +62,15 @@
 
 <style>
 	.grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1rem 1.25rem; }
-	label { display: grid; gap: 0.35rem; color: #a3a3a3; font-size: 0.75rem; }
+	label { display: grid; gap: 0.35rem; color: var(--fg-dim); font-size: 0.75rem; }
 	.wide { grid-column: 1 / -1; }
-	input, textarea { min-width: 0; border: 1px solid #404040; background: #111; color: #e5e5e5; padding: 0.55rem 0.65rem; font: inherit; }
+	input, textarea { min-width: 0; border: 1px solid var(--line); background: var(--admin-surface); color: var(--fg); padding: 0.55rem 0.65rem; font: inherit; }
 	textarea { resize: vertical; }
-	input:focus-visible, textarea:focus-visible { outline: 2px solid #00ff88; outline-offset: 2px; }
-	input[aria-invalid='true'] { border-color: #f87171; }
-	.error { color: #f87171; }
-	.help { color: #737373; line-height: 1.4; }
-	.private { padding: 0.8rem; border: 1px dashed #404040; }
-	.private small { color: #737373; }
+	input:focus-visible, textarea:focus-visible { outline: 2px solid var(--accent-strong); outline-offset: 2px; }
+	input[aria-invalid='true'] { border-color: var(--admin-danger); }
+	.error { color: var(--admin-danger); }
+	.help { color: var(--fg-faint); line-height: 1.4; }
+	.private { padding: 0.8rem; border: 1px dashed var(--line); }
+	.private small { color: var(--fg-faint); }
 	@media (max-width: 700px) { .grid { grid-template-columns: 1fr; } .wide { grid-column: auto; } }
 </style>

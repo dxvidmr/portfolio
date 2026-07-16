@@ -3,6 +3,7 @@
 	import { page } from '$app/state';
 	import type { SubmitFunction } from '@sveltejs/kit';
 	import { untrack } from 'svelte';
+	import ListFilter from '@lucide/svelte/icons/list-filter';
 	import AdminToast from '$lib/components/AdminToast.svelte';
 	import type { ActionData, PageData } from './$types';
 
@@ -24,6 +25,10 @@
 	const normalize = (value: string) => value.toLocaleLowerCase('es').normalize('NFD').replace(/[\u0300-\u036f]/g, '');
 
 	let sortBy = $state<'fecha' | 'nombre' | 'actualizacion'>('fecha');
+	let activeFilterCount = $derived(
+		[query.trim(), type, year.trim(), visibility !== 'all', home !== 'all', relations !== 'all']
+			.filter(Boolean).length
+	);
 
 	const comparators: Record<typeof sortBy, (a: Entry, b: Entry) => number> = {
 		// Fecha transversal descendente, sin fecha al final (orden del servidor).
@@ -134,60 +139,79 @@
 	<AdminToast message="Entrada eliminada." success={true} />
 {/if}
 
-<div class="filters" aria-label="Filtros de entradas">
-	<label>
-		<span>Buscar</span>
-		<input type="search" bind:value={query} placeholder="Título…" />
-	</label>
-	<label>
-		<span>Tipo</span>
-		<select bind:value={type}>
-			<option value="">Todos</option>
-			{#each data.entityTypes as type (type.value)}
-				<option value={type.value}>{type.label}</option>
-			{/each}
-		</select>
-	</label>
-	<label>
-		<span>Año</span>
-		<input bind:value={year} inputmode="numeric" pattern="[0-9]{4}" maxlength="4" />
-	</label>
-	<label>
-		<span>Estado</span>
-		<select bind:value={visibility}>
-			<option value="all">Todos</option>
-			<option value="public">Públicas</option>
-			<option value="draft">Privadas</option>
-		</select>
-	</label>
-	<label>
-		<span>Portada</span>
-		<select bind:value={home}>
-			<option value="all">Todas</option>
-			<option value="yes">Activas</option>
-			<option value="no">Inactivas</option>
-		</select>
-	</label>
-	<label>
-		<span>Relaciones</span>
-		<select bind:value={relations}>
-			<option value="all">Todas</option>
-			<option value="with">Con relaciones</option>
-			<option value="without">Sin relaciones</option>
-		</select>
-	</label>
-	<label>
-		<span>Ordenar por</span>
-		<select bind:value={sortBy}>
-			<option value="fecha">Fecha</option>
-			<option value="nombre">Nombre</option>
-			<option value="actualizacion">Actualización</option>
-		</select>
-	</label>
-	<div class="filter-actions">
-		<button type="button" onclick={resetFilters}>Limpiar filtros</button>
+<section class="filters" aria-label="Filtros de entradas">
+	<div class="filter-search">
+		<label>
+			<span>Buscar entradas</span>
+			<input type="search" bind:value={query} placeholder="Título de la entrada…" />
+		</label>
+		<div class="filter-summary" aria-live="polite">
+			<strong>{filteredEntries.length}</strong>
+			<span>resultados</span>
+		</div>
 	</div>
-</div>
+
+	<div class="filter-primary">
+		<label>
+			<span>Tipo</span>
+			<select bind:value={type}>
+				<option value="">Todos los tipos</option>
+				{#each data.entityTypes as type (type.value)}
+					<option value={type.value}>{type.label}</option>
+				{/each}
+			</select>
+		</label>
+		<label>
+			<span>Visibilidad</span>
+			<select bind:value={visibility}>
+				<option value="all">Públicas y privadas</option>
+				<option value="public">Solo públicas</option>
+				<option value="draft">Solo privadas</option>
+			</select>
+		</label>
+		<label>
+			<span>Orden</span>
+			<select bind:value={sortBy}>
+				<option value="fecha">Más recientes primero</option>
+				<option value="nombre">Nombre A–Z</option>
+				<option value="actualizacion">Última modificación</option>
+			</select>
+		</label>
+	</div>
+
+	<details class="filter-advanced" open={Boolean(year || home !== 'all' || relations !== 'all')}>
+		<summary><ListFilter size={14} strokeWidth={1.8} aria-hidden="true" /> Más filtros</summary>
+		<div>
+			<label>
+				<span>Año</span>
+				<input bind:value={year} inputmode="numeric" pattern="[0-9]{4}" maxlength="4" placeholder="AAAA" />
+			</label>
+			<label>
+				<span>Portada</span>
+				<select bind:value={home}>
+					<option value="all">En cualquier estado</option>
+					<option value="yes">En portada</option>
+					<option value="no">Fuera de portada</option>
+				</select>
+			</label>
+			<label>
+				<span>Relaciones</span>
+				<select bind:value={relations}>
+					<option value="all">Con o sin relaciones</option>
+					<option value="with">Con relaciones</option>
+					<option value="without">Sin relaciones</option>
+				</select>
+			</label>
+		</div>
+	</details>
+
+	<div class="filter-actions">
+		<span>{activeFilterCount === 0 ? 'Sin filtros activos' : `${activeFilterCount} filtros activos`}</span>
+		<button type="button" onclick={resetFilters} disabled={activeFilterCount === 0 && sortBy === 'fecha'}>
+			Limpiar
+		</button>
+	</div>
+</section>
 
 <div class="table-wrap">
 	<table>
@@ -248,7 +272,7 @@
 								value={entry.showHome ? '0' : '1'}
 								class:active={entry.showHome}
 								disabled={isPending(entry, 'home')}
-								aria-label={`${entry.showHome ? 'Quitar de' : 'Añadir a'} portada: ${entry.title}`}
+								aria-label={`${entry.showHome ? 'Eliminar de' : 'Añadir a'} portada: ${entry.title}`}
 							>
 								{entry.showHome ? 'Sí' : 'No'}
 							</button>
@@ -279,12 +303,12 @@
 		font-size: 0.7rem;
 		letter-spacing: 0.1em;
 		text-transform: uppercase;
-		color: #737373;
+		color: var(--fg-faint);
 	}
 
 	h1 {
 		font-size: 1.5rem;
-		color: #fafafa;
+		color: var(--fg);
 	}
 
 	.heading-side {
@@ -295,22 +319,22 @@
 
 	.heading-side > span {
 		font-size: 0.75rem;
-		color: #737373;
+		color: var(--fg-faint);
 	}
 
 	.heading-side .new {
-		border: 1px solid #00ff88;
-		color: #00ff88;
+		border: 1px solid var(--accent-strong);
+		color: var(--accent-strong);
 		padding: 0.45rem 0.9rem;
 		text-decoration: none;
 	}
 
 	.heading-side .new:hover {
-		background: rgba(0, 255, 136, 0.08);
+		background: var(--accent-wash);
 	}
 
 	.heading-side .new:focus-visible {
-		outline: 2px solid #00ff88;
+		outline: 2px solid var(--accent-strong);
 		outline-offset: 3px;
 	}
 
@@ -320,57 +344,112 @@
 	}
 
 	.title-link:hover strong {
-		color: #00ff88;
+		color: var(--accent-strong);
 	}
 
 	.title-link:focus-visible {
-		outline: 2px solid #00ff88;
+		outline: 2px solid var(--accent-strong);
 		outline-offset: 3px;
 	}
 
 	.filters {
 		display: grid;
-		grid-template-columns: minmax(12rem, 2fr) repeat(6, minmax(7rem, 1fr));
-		gap: 0.75rem;
-		padding: 1rem;
-		border: 1px solid #262626;
-		background: #111;
+		gap: 1rem;
+		padding: clamp(0.8rem, 2vw, 1.15rem);
+		border: 1px solid var(--line);
+		background: var(--admin-surface);
 		margin-bottom: 1.5rem;
 	}
 
-	.filters label {
+	.filters label,
+	.filter-search {
 		display: grid;
 		gap: 0.35rem;
+	}
+
+	.filter-search {
+		grid-template-columns: minmax(0, 1fr) auto;
+		align-items: end;
+	}
+
+	.filter-search label {
+		max-width: 48rem;
+	}
+
+	.filter-summary {
+		display: grid;
+		min-width: 6rem;
+		color: var(--fg-dim);
+		text-align: right;
+	}
+
+	.filter-summary strong {
+		color: var(--fg);
+		font-family: var(--font-title);
+		font-size: 1.35rem;
+		font-weight: 500;
+		line-height: 1;
+	}
+
+	.filter-summary span,
+	.filter-actions > span {
+		color: var(--fg-faint);
+		font-size: 0.65rem;
+	}
+
+	.filter-primary,
+	.filter-advanced > div {
+		display: grid;
+		grid-template-columns: repeat(3, minmax(0, 1fr));
+		gap: 0.75rem;
+	}
+
+	.filter-advanced {
+		padding: 0.75rem;
+		border: 1px solid var(--line);
+		background: color-mix(in srgb, var(--bg) 45%, transparent);
+	}
+
+	.filter-advanced summary {
+		display: inline-flex;
+		align-items: center;
+		gap: 0.4rem;
+		color: var(--fg-dim);
+		font-size: 0.7rem;
+		cursor: pointer;
+	}
+
+	.filter-advanced[open] summary {
+		margin-bottom: 0.75rem;
 	}
 
 	input,
 	select {
 		min-width: 0;
-		background: #0a0a0a;
-		border: 1px solid #404040;
+		background: var(--bg);
+		border: 1px solid var(--line);
 		padding: 0.5rem;
-		color: #d4d4d4;
+		color: var(--fg);
 	}
 
 	.filter-actions {
-		grid-column: 1 / -1;
 		display: flex;
+		align-items: center;
 		justify-content: flex-end;
 		gap: 0.75rem;
-		align-items: center;
 	}
 
 	.filter-actions button {
-		border: 1px solid #525252;
+		border: 1px solid var(--line-strong);
 		background: transparent;
 		padding: 0.45rem 0.75rem;
-		color: #d4d4d4;
+		color: var(--fg);
 		cursor: pointer;
 	}
 
 	.table-wrap {
 		overflow-x: auto;
-		border: 1px solid #262626;
+		border: 1px solid var(--line);
 	}
 
 	table {
@@ -382,7 +461,7 @@
 	th,
 	td {
 		padding: 0.75rem;
-		border-bottom: 1px solid #262626;
+		border-bottom: 1px solid var(--line);
 		text-align: left;
 		vertical-align: top;
 	}
@@ -391,8 +470,8 @@
 		font-size: 0.68rem;
 		letter-spacing: 0.08em;
 		text-transform: uppercase;
-		color: #737373;
-		background: #111;
+		color: var(--fg-faint);
+		background: var(--admin-surface);
 	}
 
 	td:first-child {
@@ -406,30 +485,30 @@
 
 	td strong {
 		font-weight: 500;
-		color: #e5e5e5;
+		color: var(--fg);
 		margin-bottom: 0.25rem;
 	}
 
 	td span,
 	.updated {
 		font-size: 0.7rem;
-		color: #737373;
+		color: var(--fg-faint);
 	}
 
 	td form { margin: 0; }
 
 	td button {
 		min-width: 3rem;
-		border: 1px solid #404040;
+		border: 1px solid var(--line);
 		background: transparent;
-		color: #737373;
+		color: var(--fg-faint);
 		padding: 0.3rem 0.55rem;
 		cursor: pointer;
 	}
 
 	td button.active {
-		border-color: #00a85a;
-		color: #00ff88;
+		border-color: var(--accent);
+		color: var(--accent-strong);
 	}
 
 	td button:disabled {
@@ -440,15 +519,19 @@
 	.empty {
 		padding: 2rem;
 		text-align: center;
-		color: #737373;
+		color: var(--fg-faint);
 	}
 
 	@media (max-width: 1100px) {
-		.filters { grid-template-columns: repeat(3, 1fr); }
+		.filter-primary,
+		.filter-advanced > div { grid-template-columns: repeat(2, 1fr); }
 	}
 
 	@media (max-width: 640px) {
-		.filters { grid-template-columns: 1fr; }
+		.filter-search,
+		.filter-primary,
+		.filter-advanced > div { grid-template-columns: 1fr; }
+		.filter-summary { display: none; }
 		td:first-child { min-width: 16rem; }
 	}
 </style>

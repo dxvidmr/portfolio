@@ -72,9 +72,6 @@
 			.sort(compareEntries);
 	});
 
-	const projectCount = (slug: string) =>
-		relations.filter((relation) => relation.portfolioSlug === slug).length;
-
 	const entryRelationCount = (entry: Entry) =>
 		relations.filter(
 			(relation) => relation.entityType === entry.entityType && relation.entityId === entry.entityId
@@ -161,29 +158,21 @@
 	Relaciona cada ficha narrativa con resultados del CV. La lista pública se ordena automáticamente por fecha.
 </p>
 
-<nav class="project-tabs" aria-label="Fichas del portfolio">
-	{#each data.projects as project (project.slug)}
-		<button
-			type="button"
-			class:active={selectedSlug === project.slug}
-			onclick={() => (selectedSlug = project.slug)}
-		>
-			<span>{project.title}</span>
-			<small>{projectCount(project.slug)}</small>
-		</button>
-	{/each}
-</nav>
-
-{#if selectedProject}
-	<section class="project-context" aria-live="polite">
-		<div>
-			<span>Ficha seleccionada</span>
-			<h2>{selectedProject.title}</h2>
-			<p>{selectedProject.kind}</p>
-		</div>
-		<strong>{currentRelations.length} relacionados</strong>
-	</section>
-{/if}
+<section class="project-picker" aria-label="Seleccionar ficha del portfolio">
+	<label>
+		<span>Ficha del portfolio · orden público</span>
+		<select bind:value={selectedSlug}>
+			{#each data.projects as project, index (project.slug)}
+				<option value={project.slug}>
+					{String(index + 1).padStart(2, '0')} · {project.title} · {project.year}
+				</option>
+			{/each}
+		</select>
+	</label>
+	{#if selectedProject}
+		<p>{selectedProject.kind} · {currentRelations.length} relacionados</p>
+	{/if}
+</section>
 
 <div class="workspace">
 	<section class="related-panel" aria-labelledby="related-title">
@@ -200,7 +189,7 @@
 		{:else}
 			<ol class="entry-list selected-list">
 				{#each currentRelations as item (`${item.relation.entityType}:${item.relation.entityId}`)}
-					<li class:featured={item.relation.featured}>
+					<li>
 						<div class="entry-copy">
 							<div class="entry-meta">
 								<span>{item.entry.typeLabel}</span>
@@ -219,8 +208,8 @@
 									class="star"
 									class:active={item.relation.featured}
 									disabled={isPending('featured', item.relation)}
-									aria-label={`${item.relation.featured ? 'Quitar destacado de' : 'Destacar'} ${item.entry.title}`}
-									title={item.relation.featured ? 'Quitar destacado' : 'Destacar en la ficha'}
+									aria-label={`${item.relation.featured ? 'Desactivar destacado de' : 'Destacar'} ${item.entry.title}`}
+									title={item.relation.featured ? 'Desactivar destacado' : 'Destacar en la ficha'}
 								>★</button>
 							</form>
 							<form method="POST" action="?/remove" use:enhance={removeSubmit(item.relation)}>
@@ -231,7 +220,7 @@
 									type="submit"
 									class="remove"
 									disabled={isPending('remove', item.relation)}
-								>Quitar</button>
+								>Eliminar</button>
 							</form>
 						</div>
 					</li>
@@ -297,61 +286,53 @@
 
 <style>
 	.heading { display: flex; align-items: end; justify-content: space-between; gap: 1rem; }
-	.heading h1 { margin: 0.2rem 0 0; font-size: 1.5rem; color: #fafafa; }
-	.heading a { border: 1px solid #525252; padding: 0.5rem 0.75rem; color: #d4d4d4; font-size: 0.75rem; }
-	.eyebrow, label span { margin: 0; color: #737373; font-size: 0.68rem; letter-spacing: 0.1em; text-transform: uppercase; }
-	.intro { max-width: 76ch; margin: 1rem 0 1.5rem; color: #a3a3a3; line-height: 1.6; }
+	.heading h1 { margin: 0.2rem 0 0; font-size: 1.5rem; color: var(--fg); }
+	.heading a { border: 1px solid var(--line-strong); padding: 0.5rem 0.75rem; color: var(--fg); font-size: 0.75rem; }
+	.eyebrow, label span { margin: 0; color: var(--fg-faint); font-size: 0.68rem; letter-spacing: 0.1em; text-transform: uppercase; }
+	.intro { max-width: 76ch; margin: 1rem 0 1.5rem; color: var(--fg-dim); line-height: 1.6; }
 
-	.project-tabs { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 1px; padding: 1px; background: #262626; }
-	.project-tabs button { display: flex; justify-content: space-between; gap: 0.75rem; border: 0; background: #111; color: #a3a3a3; padding: 0.8rem; text-align: left; cursor: pointer; }
-	.project-tabs button:hover, .project-tabs button.active { background: #171717; color: #fafafa; }
-	.project-tabs button.active { box-shadow: inset 0 -2px #00ff88; }
-	.project-tabs small { color: #737373; }
-
-	.project-context { display: flex; align-items: end; justify-content: space-between; gap: 1rem; padding: 1.1rem; border: 1px solid #262626; border-top: 0; }
-	.project-context span { color: #737373; font-size: 0.68rem; text-transform: uppercase; letter-spacing: 0.08em; }
-	.project-context h2 { margin: 0.35rem 0 0.2rem; color: #fafafa; font-size: 1rem; }
-	.project-context p { margin: 0; color: #737373; font-size: 0.72rem; }
-	.project-context strong { color: #00ff88; font-size: 0.75rem; font-weight: 500; }
+	.project-picker { display: grid; grid-template-columns: minmax(16rem, 34rem) minmax(0, 1fr); align-items: end; gap: 1rem; padding: 0 0 1.25rem; border-bottom: 1px solid var(--line); }
+	.project-picker label { display: grid; gap: 0.35rem; }
+	.project-picker p { margin: 0 0 0.55rem; color: var(--fg-faint); font-size: 0.68rem; }
 
 	.workspace { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 1.25rem; margin-top: 1.5rem; align-items: start; }
-	.related-panel, .add-panel { min-width: 0; border: 1px solid #262626; background: #0d0d0d; }
-	.related-panel > header, .add-panel > header { display: flex; justify-content: space-between; align-items: end; gap: 1rem; padding: 1rem; border-bottom: 1px solid #262626; }
-	h2 { margin: 0.25rem 0 0; color: #e5e5e5; font-size: 0.9rem; }
-	.related-panel > header > span { color: #737373; font-size: 0.68rem; }
+	.related-panel, .add-panel { min-width: 0; border: 1px solid var(--line); background: var(--admin-surface); }
+	.related-panel > header, .add-panel > header { display: flex; justify-content: space-between; align-items: end; gap: 1rem; padding: 1rem; border-bottom: 1px solid var(--line); }
+	h2 { margin: 0.25rem 0 0; color: var(--fg); font-size: 0.9rem; }
+	.related-panel > header > span { color: var(--fg-faint); font-size: 0.68rem; }
 
 	.filters { display: grid; grid-template-columns: minmax(0, 1fr) 10rem; gap: 0.75rem; padding: 1rem 1rem 0; }
 	.filters label { display: grid; gap: 0.35rem; }
-	input, select { min-width: 0; border: 1px solid #404040; background: #0a0a0a; color: #d4d4d4; padding: 0.55rem; }
-	.results-count { margin: 0; padding: 0.65rem 1rem 1rem; color: #737373; font-size: 0.68rem; }
+	input, select { min-width: 0; border: 1px solid var(--line); background: var(--bg); color: var(--fg); padding: 0.55rem; }
+	.results-count { margin: 0; padding: 0.65rem 1rem 1rem; color: var(--fg-faint); font-size: 0.68rem; }
 
 	.entry-list { list-style: none; margin: 0; padding: 0; }
-	.entry-list li { display: flex; align-items: center; justify-content: space-between; gap: 1rem; min-width: 0; padding: 0.85rem 1rem; border-bottom: 1px solid #262626; }
+	.entry-list li { display: flex; align-items: center; justify-content: space-between; gap: 1rem; min-width: 0; padding: 0.85rem 1rem; border-bottom: 1px solid var(--line); }
 	.entry-list li:last-child { border-bottom: 0; }
-	.selected-list li.featured { box-shadow: inset 3px 0 #d6a84b; }
 	.entry-copy { min-width: 0; }
-	.entry-copy strong { display: block; color: #e5e5e5; font-size: 0.78rem; font-weight: 500; line-height: 1.35; }
-	.entry-meta { display: flex; flex-wrap: wrap; gap: 0.45rem 0.7rem; margin-bottom: 0.35rem; color: #737373; font-size: 0.62rem; }
-	.entry-meta .private { color: #d6a84b; }
+	.entry-copy strong { display: block; color: var(--fg); font-size: 0.78rem; font-weight: 500; line-height: 1.35; }
+	.entry-meta { display: flex; flex-wrap: wrap; gap: 0.45rem 0.7rem; margin-bottom: 0.35rem; color: var(--fg-faint); font-size: 0.62rem; }
+	.entry-meta .private { color: var(--tone-amber); }
 	.row-actions { display: flex; flex: 0 0 auto; gap: 0.35rem; }
-	.entry-list form { margin: 0; }
-	.entry-list button { border: 1px solid #404040; background: transparent; color: #a3a3a3; padding: 0.38rem 0.55rem; font: inherit; font-size: 0.68rem; cursor: pointer; }
-	.entry-list button:hover:not(:disabled) { border-color: #737373; color: #fafafa; }
+	.entry-list form { flex: 0 0 auto; margin: 0; }
+	.entry-list button { min-width: 6rem; border: 1px solid var(--line); background: transparent; color: var(--fg-dim); padding: 0.38rem 0.55rem; font: inherit; font-size: 0.68rem; white-space: nowrap; cursor: pointer; }
+	.entry-list button:hover:not(:disabled) { border-color: var(--fg-faint); color: var(--fg); }
 	.entry-list button:disabled { opacity: 0.4; cursor: wait; }
-	.entry-list .star { min-width: 2rem; color: #525252; font-size: 0.9rem; }
-	.entry-list .star.active { border-color: #9b7934; color: #d6a84b; }
-	.entry-list .remove { color: #ff8b8b; }
-	.candidate-list { max-height: 55rem; overflow-y: auto; border-top: 1px solid #262626; }
-	.empty { margin: 0; padding: 2rem 1rem; color: #737373; text-align: center; font-size: 0.75rem; }
+	.entry-list .star { min-width: 2.25rem; width: 2.25rem; color: var(--line-strong); font-size: 0.9rem; }
+	.entry-list .star.active { border-color: var(--tone-amber); color: var(--tone-amber); }
+	.entry-list .remove { color: var(--admin-danger); }
+	.candidate-list { max-height: 55rem; overflow-y: auto; border-top: 1px solid var(--line); }
+	.empty { margin: 0; padding: 2rem 1rem; color: var(--fg-faint); text-align: center; font-size: 0.75rem; }
 
 	@media (max-width: 960px) {
 		.workspace { grid-template-columns: 1fr; }
-		.project-tabs { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 	}
 
 	@media (max-width: 620px) {
-		.heading, .project-context { align-items: flex-start; flex-direction: column; }
-		.project-tabs, .filters { grid-template-columns: 1fr; }
+		.heading { align-items: flex-start; flex-direction: column; }
+		.project-picker, .filters { grid-template-columns: 1fr; }
 		.entry-list li { align-items: flex-start; flex-direction: column; }
+		.entry-list form:not(.row-actions form),
+		.candidate-list button { width: 100%; }
 	}
 </style>

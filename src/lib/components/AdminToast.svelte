@@ -47,15 +47,15 @@
 		gap: 0.75rem;
 		width: min(26rem, calc(100vw - 2rem));
 		padding: 0.8rem 0.9rem;
-		border: 1px solid #404040;
+		border: 1px solid var(--line);
 		border-left: 3px solid;
-		background: #171717;
+		background: var(--admin-surface-raised);
 		box-shadow: 0 1rem 2.5rem rgb(0 0 0 / 55%);
-		color: #e5e5e5;
+		color: var(--fg);
 	}
 
-	div.success { border-left-color: #00ff88; }
-	div.error { border-left-color: #ff6b6b; }
+	div.success { border-left-color: var(--accent-strong); }
+	div.error { border-left-color: var(--admin-danger); }
 
 	.icon {
 		display: grid;
@@ -67,8 +67,8 @@
 		font-size: 0.72rem;
 	}
 
-	.success .icon { color: #00ff88; }
-	.error .icon { color: #ff8b8b; }
+	.success .icon { color: var(--accent-strong); }
+	.error .icon { color: var(--admin-danger); }
 
 	p {
 		margin: 0;
@@ -79,7 +79,7 @@
 	button {
 		border: 0;
 		background: transparent;
-		color: #a3a3a3;
+		color: var(--fg-dim);
 		padding: 0.2rem 0.35rem;
 		font: inherit;
 		font-size: 1.1rem;
@@ -87,10 +87,10 @@
 		cursor: pointer;
 	}
 
-	button:hover { color: #fafafa; }
+	button:hover { color: var(--fg); }
 
 	button:focus-visible {
-		outline: 2px solid #00ff88;
+		outline: 2px solid var(--accent-strong);
 		outline-offset: 2px;
 	}
 

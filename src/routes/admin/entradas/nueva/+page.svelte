@@ -46,17 +46,17 @@
 <style>
 	.back {
 		display: inline-block;
-		color: #a3a3a3;
+		color: var(--fg-dim);
 		text-decoration: none;
 		margin-bottom: 1rem;
 	}
 
 	.back:hover {
-		color: #00ff88;
+		color: var(--accent-strong);
 	}
 
 	.back:focus-visible {
-		outline: 2px solid #00ff88;
+		outline: 2px solid var(--accent-strong);
 		outline-offset: 3px;
 	}
 
@@ -64,24 +64,24 @@
 		display: flex;
 		gap: 0.5rem;
 		font-size: 0.8rem;
-		color: #737373;
+		color: var(--fg-faint);
 		margin-bottom: 1.5rem;
 	}
 
 	.breadcrumb a {
-		color: #a3a3a3;
+		color: var(--fg-dim);
 	}
 
 	h1 {
 		font-size: 1.25rem;
 		font-weight: 700;
-		color: #fafafa;
+		color: var(--fg);
 		margin: 0 0 1rem;
 	}
 
 	.intro {
 		max-width: 60ch;
-		color: #a3a3a3;
+		color: var(--fg-dim);
 		line-height: 1.6;
 	}
 
@@ -89,29 +89,29 @@
 		display: grid;
 		gap: 0.4rem;
 		margin-top: 2rem;
-		border: 1px solid #00ff88;
+		border: 1px solid var(--accent-strong);
 		padding: 1rem 1.1rem;
-		color: #fafafa;
+		color: var(--fg);
 		text-decoration: none;
 	}
 
 	.event-card strong {
-		color: #00ff88;
+		color: var(--accent-strong);
 	}
 
 	.event-card span {
 		font-size: 0.82rem;
-		color: #a3a3a3;
+		color: var(--fg-dim);
 		line-height: 1.5;
 		max-width: 70ch;
 	}
 
 	.event-card:hover {
-		background: rgba(0, 255, 136, 0.06);
+		background: var(--accent-wash);
 	}
 
 	.event-card:focus-visible {
-		outline: 2px solid #00ff88;
+		outline: 2px solid var(--accent-strong);
 		outline-offset: 3px;
 	}
 
@@ -126,9 +126,9 @@
 
 	.types a {
 		display: block;
-		border: 1px solid #404040;
+		border: 1px solid var(--line);
 		padding: 0.9rem 1rem;
-		color: #fafafa;
+		color: var(--fg);
 		text-decoration: none;
 	}
 
@@ -136,16 +136,16 @@
 		display: block;
 		margin-top: 0.25rem;
 		font-size: 0.7rem;
-		color: #737373;
+		color: var(--fg-faint);
 	}
 
 	.types a:hover {
-		border-color: #00ff88;
-		color: #00ff88;
+		border-color: var(--accent-strong);
+		color: var(--accent-strong);
 	}
 
 	.types a:focus-visible {
-		outline: 2px solid #00ff88;
+		outline: 2px solid var(--accent-strong);
 		outline-offset: 3px;
 	}
 </style>

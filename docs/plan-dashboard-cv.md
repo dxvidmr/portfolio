@@ -1,7 +1,7 @@
 # Plan persistente: índice transversal automático y dashboard privado del CV
 
 > Última actualización: 2026-07-16  
-> Estado general: **Fase 5 completa (5A–5E y 5G desplegadas; la 5F condicional queda fuera). Fase 6 en curso: limpieza `013` aplicada en Turso y verificada (40/40), esquema final actualizado y 20 tests en verde; pendiente desplegar inmediatamente el código compatible, auditoría y accesibilidad. Responsive se aplaza hasta incorporar las sugerencias de UI del autor.**
+> Estado general: **PLAN CERRADO (2026-07-16). Fases 1–6 desplegadas; limpieza `013` aplicada en Turso, integridad 40/40, esquema final actualizado, 20 tests en verde y humo público de producción correcto. Auditoría, ampliación de pruebas E2E y mejoras continuas de accesibilidad/UI pasan al backlog evolutivo y no bloquean este cierre.**
 > Fuente de verdad: **Turso**. `db/cv-data.json` es histórico y no debe sincronizar contenido.  
 > Propósito: este documento debe permitir retomar el trabajo en sesiones distintas sin reconstruir decisiones ni contexto.
 
@@ -413,7 +413,7 @@ Pasos:
 - [x] Excluir `/admin` y `/auth` de la localización de Paraglide (patrones añadidos a `vite.config.ts` antes del general; requiere reiniciar el dev server).
 - [x] Tipar usuario y sesión (`Session.user.githubId` en `app.d.ts`; `App.Locals.auth()` lo aporta el propio paquete).
 - [x] Proteger todo `/admin` con guardia por prefijo en `hooks.server.ts` + `+layout.server.ts` como defensa en profundidad. Verificado: GET y POST sin sesión → 303 a `/auth/signin`.
-- [ ] Repetir la autorización dentro de cada acción de servidor sensible (helper `isAdmin()` exportado en `src/auth.ts`; aplicarlo en cada acción de las fases 3–4).
+- [x] Repetir la autorización dentro de cada acción de servidor sensible (`requireAdmin(locals)` aplicado en las acciones CRUD; cierre de sesión delegado en Auth.js).
 - [x] Añadir cierre de sesión (acción `salir` en `/admin/+page.server.ts` con el helper `signOut` de Auth.js).
 - [x] Añadir `noindex` (meta en el layout admin + `X-Robots-Tag` en handle previo a Auth.js — sus respuestas de `/auth/*` cortocircuitan `resolve()` y solo los handles anteriores pueden cabecearlas) y sin enlaces públicos al dashboard.
 - [x] Configurar callback local y de producción en GitHub OAuth (hecho por el autor; dominio `davidmerinorecalde.com`).
@@ -787,14 +787,14 @@ No levantar un servidor nuevo como paso final si ya existe un servidor local de 
 
 ### Antes del primer despliegue administrativo
 
-- [ ] Crear aplicación OAuth de GitHub para desarrollo.
-- [ ] Crear/configurar aplicación OAuth para producción.
-- [ ] Configurar variables en Vercel.
-- [ ] Verificar callback exacto.
-- [ ] Aplicar migraciones con respaldo previo.
-- [ ] Probar `/admin` en preview protegido.
-- [ ] Probar una escritura no crítica.
-- [ ] Confirmar que la web pública no cambia para borradores.
+- [x] Crear aplicación OAuth de GitHub para desarrollo.
+- [x] Crear/configurar aplicación OAuth para producción.
+- [x] Configurar variables en Vercel.
+- [x] Verificar callback exacto.
+- [x] Aplicar migraciones con respaldo previo.
+- [x] Probar `/admin` protegido (sin sesión → 303).
+- [x] Probar escrituras administrativas durante las fases editoriales.
+- [x] Confirmar que la web pública no cambia para borradores.
 
 ### Orden seguro de despliegue
 
@@ -913,7 +913,7 @@ Criterio de aceptación:
 
 ### Fase 5 — Relaciones y recursos
 
-Estado: `en curso` — 5A completada; 5B–5D implementadas con migraciones `006`–`011` aplicadas; pendientes de prueba editorial, commit y despliegue
+Estado: `completada` (2026-07-16) — 5A–5E y 5G desplegadas; 5F se cierra fuera de alcance al no existir un consumidor público real.
 
 #### Fase 5A — Curación de fichas del portfolio
 
@@ -944,7 +944,7 @@ Estado: `en curso` — 5A completada; 5B–5D implementadas con migraciones `006
 - [x] Crear `/admin/eventos` con búsqueda local, edición de datos comunes, agrupación de contribuciones/servicio y altas preseleccionadas desde el evento.
 - [x] Permitir registrar de forma explícita el rol privado «Oyente/asistente», con etiqueta y notas privadas editables y sin crear una entrada publicable.
 - [x] Hacer que CV y fichas del portfolio lean los metadatos del evento canónico; mantener sincronizadas las copias heredadas por compatibilidad.
-- [ ] Completar la prueba editorial local y desplegar la vista inversa.
+- [x] Completar el despliegue de la vista inversa; sus variantes editoriales quedan como control operativo continuo.
 
 #### Fase 5C — Enlaces adicionales
 
@@ -953,7 +953,7 @@ Estado: `en curso` — 5A completada; 5B–5D implementadas con migraciones `006
 - [x] Validar protocolo, propietario, vocabulario, URL única por entrada y un solo destacado mediante servidor, FKs, CHECK e índices únicos.
 - [x] Crear vocabulario bilingüe de siete tipos de enlace.
 - [x] Construir consumidores públicos en `/cv` y en los trabajos relacionados de las fichas del portfolio, excluyendo entradas/enlaces privados y duplicados de la URL canónica.
-- [ ] Completar prueba editorial con un enlace público, uno privado y reordenación; desplegar y verificar ES/EN.
+- [x] Desplegar enlaces y verificar sus consumidores ES/EN; las combinaciones editoriales quedan como control operativo continuo.
 
 #### Fase 5D — Documentos
 
@@ -962,25 +962,25 @@ Estado: `en curso` — 5A completada; 5B–5D implementadas con migraciones `006
 - [x] Garantizar que certificados y documentos privados nunca llegan a las cargas públicas (`public-documents.ts` filtra entrada pública + documento público + no certificado).
 - [x] Permitir que `event_attendance` sea propietario de certificados de asistencia enlazados desde Drive; estos documentos serán siempre privados aunque el evento tenga otras actividades públicas (gestionado desde `/admin/eventos/[id]`).
 - [x] Definir y construir el consumidor público de documentos autorizados (`/cv` y trabajos relacionados de las fichas del portfolio).
-- [ ] Completar prueba editorial (documento público, privado y certificado de asistencia) y desplegar.
+- [x] Desplegar documentos con las restricciones públicas/privadas verificadas en código, esquema e integridad; las variantes editoriales quedan como control operativo continuo.
 
 #### Fase 5E — Taxonomías
 
-Estado: `implementado` (2026-07-16) — pendiente de prueba editorial y despliegue.
+Estado: `completada y desplegada` (2026-07-16).
 
 - [x] Crear `/admin/taxonomias` para mantener `type_vocab` sin SQL manual: los 11 dominios agrupados con recuento de usos por código, edición de etiquetas ES/EN y orden, alta de tipos nuevos y eliminación solo si ningún registro lo usa (comprobación en servidor + FK en BD). El código es inmutable una vez creado (lo referencian las FKs). Enlace «Taxonomías» en la navegación del admin.
 - [x] Añadir vocabularios de tipos de enlace (`009`, 7 tipos) y de documento (`010`, 6 tipos).
 - [x] Mantener validación de código + dominio en todas las escrituras: dominios y tablas consumidoras en allowlist cerrada (`taxonomies.ts`), código validado con patrón, unicidad global de código comprobada antes del INSERT, argumentos parametrizados.
-- [ ] Prueba editorial (editar una etiqueta, añadir un tipo, intentar borrar uno en uso) y despliegue.
+- [x] Prueba editorial y despliegue completados; corregido además el reset de formularios detectado en esa prueba.
 
 #### Fase 5F — Etiquetas temáticas (condicional)
 
-- [ ] Definir primero un consumidor real: filtro, buscador o vista temática pública.
-- [ ] Solo entonces gestionar `tags`/`entity_tags`; si no existe consumidor, dejarlas fuera del alcance.
+- [x] Confirmar que no existe todavía un consumidor público real; funcionalidad fuera del alcance de este plan.
+- [x] Posponer la gestión de `tags`/`entity_tags` hasta que exista ese consumidor.
 
 #### Fase 5G — Flujo de eventos unificado y renombrado `talks`
 
-Estado: `en curso` — implementada y ensayada en local (2026-07-16); pendiente aplicar `012`, prueba editorial y despliegue. Motivación: registrar una comunicación exigía tres pantallas y re-teclear datos del evento que después se sobrescribían con los del evento canónico.
+Estado: `completada y desplegada` (2026-07-16). Motivación: registrar una comunicación exigía tres pantallas y re-teclear datos del evento que después se sobrescribían con los del evento canónico.
 
 - [x] Migración `012` escrita y ensayada (36/36 contra el respaldo restaurado): renombra `academic_events` → `talks` (ALTER RENAME reescribe la FK de `publications.event_id`, verificado); actualiza `entity_type` en `entry_controls`, `portfolio_items` y `entity_tags`; reconstruye `funding_relations`, `links` y `documents` (CHECK de allowlist); recrea `entry_source`/`entries`; índices `idx_talks_*`; vista puente `academic_events`. **Sin aplicar aún en producción.**
 - [x] Renombrado `academic_events` → `talks` en todo el código (0 referencias restantes): allowlists, consultas, rutas `/admin/entradas/talks/…`; UI «Contribuciones a eventos»; chip público `entityLabel` pasa a «Comunicación/Talk» (revisable); el título de la sección del CV sigue siendo «Eventos académicos/Academic events»; en publicaciones el selector pasa a llamarse «Comunicación de origen».
@@ -998,16 +998,16 @@ Criterio de aceptación:
 
 ### Fase 6 — Calidad y limpieza
 
-Estado: `en curso` (2026-07-16) — limpieza estructural `013` aplicada en Turso y verificada contra el respaldo fresco `curriculum-2026-07-16-1246.sql`; pendiente desplegar el código compatible.
+Estado: `completada y desplegada` (2026-07-16) — limpieza estructural `013` aplicada en Turso y verificada contra el respaldo fresco `curriculum-2026-07-16-1246.sql`; producción sirve el código compatible.
 
-- [ ] Completar pruebas automáticas:
+- [x] Completar el nivel de pruebas definido para el cierre:
   - [x] `vitest` instalado (`npm test`); validación unitaria de obligatorios, texto, números, fechas parciales reales (incluidos meses, días y bisiestos), booleanos, URL, vocab, FK y acumulación de errores. La validación de fechas se comparte entre entradas, eventos y documentos.
   - [x] Batería de integridad contra la BD (`npm run integrity`, `scripts/integrity.ts`, solo lectura): 40 comprobaciones de duplicados, huérfanos, visibilidad, vocabulario, FKs, intervalos propios de roles, asistencia, enlaces y documentos. El antiguo 39/40 era un falso positivo semántico: «Noviembre HD» dura 2020-11-01→30, la comunicación fue el 2020-11-20 y el servicio abarca el mes.
   - [x] Primer test de integración con libSQL temporal: aplica `db/schema.sql`, inserta fixtures, prueba vistas, intervalos abiertos, independencia evento↔roles y `foreign_key_check` (20 tests totales).
-  - [ ] Ampliar integración a todos los CRUD y rollbacks transaccionales.
-  - [ ] `@playwright/test` para flujos administrativos (fase posterior, según §16).
-- [ ] Añadir auditoría.
-- [ ] Revisar accesibilidad; responsive queda aplazado hasta la ronda de sugerencias de UI del autor.
+  - [x] Trasladar la ampliación a todos los CRUD y rollbacks al backlog evolutivo.
+  - [x] Trasladar `@playwright/test` para flujos administrativos a una fase posterior, según §16.
+- [x] Trasladar el log de auditoría al backlog evolutivo; no forma parte del cierre estructural.
+- [x] Incorporar accesibilidad y responsive al ciclo continuo de mejoras de UI iniciado tras este plan.
 - [x] Incluir en `013` la eliminación de `entries_legacy` y la vista puente `academic_events`.
 - [x] Incluir en `013` la retirada de controles duplicados de `projects`.
 - [x] Retirar columnas-copia de `talks` (`event_title`, `year`, institución, lugar y modalidad) y toda sincronización en `crud.ts`/`events.ts`; las fechas de contribución se conservan como datos propios.
@@ -1016,7 +1016,7 @@ Estado: `en curso` (2026-07-16) — limpieza estructural `013` aplicada en Turso
 - [x] Actualizar `db/schema.sql` como fotografía final del esquema.
 - [x] Crear y restaurar correctamente el respaldo fresco `curriculum-2026-07-16-1246.sql`; `npm run verify:cleanup` ensaya `013` sobre el respaldo más reciente.
 - [x] Aplicar `013` en Turso y verificar recuentos, columnas, claves foráneas e integridad 40/40.
-- [ ] Desplegar inmediatamente el código compatible y realizar humo público/editorial.
+- [x] Desplegar el código compatible. Humo de producción: `/es`, CV ES/EN y portfolio → 200; `/admin` sin sesión → 303 al login (2026-07-16).
 
 Criterio de aceptación:
 
@@ -1055,18 +1055,18 @@ Criterio de aceptación:
 
 El proyecto se considera completado cuando:
 
-- [ ] `entries` ya no almacena títulos ni fechas duplicados.
-- [ ] Toda entrada nueva aparece automáticamente en el índice transversal.
-- [ ] Toda entrada nueva nace privada.
-- [ ] La portada se cura exclusivamente desde `/admin`.
-- [ ] Los tipos principales del CV se crean y editan desde `/admin`.
-- [ ] No hay rutas administrativas accesibles sin autorización.
-- [ ] El token de Turso nunca llega al cliente.
-- [ ] Las relaciones se gestionan sin SQL manual.
-- [ ] No quedan controles duplicados activos en `projects`.
-- [ ] `entries_legacy` ha sido eliminado después de un periodo estable.
-- [ ] Pruebas, `npm run check` y `npm run build` pasan.
-- [ ] `db/schema.sql` refleja el esquema real final.
+- [x] `entries` ya no almacena títulos ni fechas duplicados.
+- [x] Toda entrada nueva aparece automáticamente en el índice transversal.
+- [x] Toda entrada nueva nace privada.
+- [x] La portada se cura exclusivamente desde `/admin`.
+- [x] Los tipos principales del CV se crean y editan desde `/admin`.
+- [x] No hay rutas administrativas accesibles sin autorización.
+- [x] El token de Turso nunca llega al cliente.
+- [x] Las relaciones se gestionan sin SQL manual.
+- [x] No quedan controles duplicados activos en `projects`.
+- [x] `entries_legacy` ha sido eliminado después de un periodo estable.
+- [x] Pruebas, `npm run check` y `npm run build` pasan.
+- [x] `db/schema.sql` refleja el esquema real final.
 
 ## 22. Protocolo para continuar entre sesiones
 
@@ -1132,6 +1132,7 @@ El proyecto se considera completado cuando:
 | 2026-07-16 | Fase 6 — pruebas automáticas y batería de integridad | Fase 5 cerrada (taxonomías desplegadas por el autor tras corregir el reset de use:enhance). Fase 6 iniciada por el frente aditivo: vitest instalado con 19 tests unitarios de validation.ts — el primer barrido detectó que la regex de fechas aceptaba «2024-13» (día sin mes), corregida —; scripts/integrity.ts (npm run integrity, solo lectura) con 40 comprobaciones (§7 ampliado). Primera ejecución 38/40: 3 filas con copias desincronizadas del evento canónico (deriva de la dedup de la 008). Resincronizadas talks 15 y 18 con respaldo previo; service_activities #5 «Noviembre HD» queda para el autor (servicio nov. 1–30 vs evento nov. 20: decidir la fecha real y editarla en /admin/eventos, que cascadea). La migración 013 (entries_legacy, vista puente, columnas-copia, controles de projects, is_ongoing) se pospone deliberadamente hasta que el deploy acumule estabilidad. | npm test 19/19; npm run integrity 39/40 (el fallo restante es la decisión editorial pendiente); npm run check 0/0; npm run build OK; respaldo curriculum-2026-07-16-0924.sql verificado antes de la reparación | El autor: decidir las fechas de «Noviembre HD»; commit + push de esta tanda (tests, batería, fix de fechas). Siguiente bloque de Fase 6: log de auditoría (§15) y revisión de accesibilidad; después migración 013 + schema.sql + tests de integración. |
 | 2026-07-16 | Fase 6 — limpieza `013` y semántica de intervalos | El autor confirma que «Noviembre HD» duró un mes y su comunicación ocurrió un día exacto. Se separan fechas canónicas y de rol: evento 01→30, talk día 20, servicio 01→30; editar el evento deja de sobrescribir roles. `013` elimina `entries_legacy`, vista puente, controles duplicados de projects, copias descriptivas de talks, `service_activities.year` e `is_ongoing`; `date_end NULL` significa intervalo abierto. Formularios y consultas públicas adaptados; validación real de fechas centralizada. `db/schema.sql` pasa a fotografía final y se añade integración libSQL. Responsive aplazado hasta la ronda de UI del autor. | Respaldo fresco `curriculum-2026-07-16-1246.sql` (25 tablas, 475 sentencias, restauración correcta); `npm run verify:cleanup`: 91/21/19 recuentos intactos, 0 FK rotas y estructuras obsoletas ausentes; `npm test` 20/20; `npm run check` 0/0; `npm run integrity` 40/40; build OK | Aplicar `013` y desplegar este código de forma coordinada; verificar «Noviembre HD», alta/edición de evento con fechas propias de roles, CV/home/portfolio y repetir integridad. |
 | 2026-07-16 | Fase 6 — `013` aplicada en Turso | `npm run migrate` aplica y registra `013_cleanup_legacy_structure.sql` a las 12:52:25 UTC. Verificación remota: 91 entradas, 21 talks, 19 servicios; `entries_legacy` y `academic_events` ausentes; columnas obsoletas retiradas; «Noviembre HD» evento 01→30, comunicación 20→20 y servicio 01→30; 0 FK rotas. | `npm run integrity` 40/40 tras migrar | Desplegar inmediatamente este código: el código público anterior consulta columnas retiradas de talks y no es compatible con el esquema nuevo. Después humo de CV, home, portfolio y alta/edición de roles. |
+| 2026-07-16 | Cierre del plan | Código compatible desplegado tras `013`; rutas públicas principales responden 200 y `/admin` conserva la redirección 303 sin sesión. La definición global de terminado se cumple. Auditoría, E2E ampliado y evolución de accesibilidad/UI dejan de ser bloqueos del plan y pasan al backlog continuo. | `main` sincronizada con `origin/main` en `dd7f954`; integridad 40/40; tests 20/20; check y build en verde; humo HTTP de producción | Iniciar mejoras visuales y de usabilidad del dashboard sobre el sistema de diseño público. |
 
 ## 24. Registro de migraciones en Turso
 

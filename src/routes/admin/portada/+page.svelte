@@ -129,9 +129,9 @@
 							type="submit"
 							class="remove"
 							disabled={removing.includes(entryKey(entry))}
-							aria-label={`Quitar ${entry.title} de portada`}
+							aria-label={`Eliminar ${entry.title} de portada`}
 						>
-							Quitar
+							Eliminar
 						</button>
 					</form>
 				</div>
@@ -152,23 +152,23 @@
 		font-size: 0.7rem;
 		letter-spacing: 0.1em;
 		text-transform: uppercase;
-		color: #737373;
+		color: var(--fg-faint);
 	}
 
 	h1 {
 		font-size: 1.5rem;
-		color: #fafafa;
+		color: var(--fg);
 	}
 
 	.heading a {
-		border: 1px solid #525252;
+		border: 1px solid var(--line-strong);
 		padding: 0.5rem 0.75rem;
-		color: #d4d4d4;
+		color: var(--fg);
 		font-size: 0.78rem;
 	}
 
 	.intro {
-		color: #a3a3a3;
+		color: var(--fg-dim);
 		max-width: 70ch;
 		line-height: 1.6;
 		margin: 1rem 0 1.5rem;
@@ -176,11 +176,11 @@
 
 	.warning {
 		padding: 0.8rem 1rem;
-		background: #111;
+		background: var(--admin-surface);
 		border-left: 2px solid;
 	}
 
-	.warning { border-color: #d6a84b; color: #d4d4d4; }
+	.warning { border-color: var(--tone-amber); color: var(--fg); }
 	.warning strong { display: block; margin-bottom: 0.35rem; }
 
 	.order-toolbar {
@@ -189,30 +189,30 @@
 		justify-content: space-between;
 		gap: 1rem;
 		padding: 0.75rem 1rem;
-		border: 1px solid #262626;
+		border: 1px solid var(--line);
 		border-bottom: 0;
-		background: #111;
+		background: var(--admin-surface);
 	}
 
 	.order-toolbar span {
 		font-size: 0.75rem;
-		color: #737373;
+		color: var(--fg-faint);
 	}
 
-	.order-toolbar .pending-order { color: #d6a84b; }
+	.order-toolbar .pending-order { color: var(--tone-amber); }
 	.order-toolbar form { margin: 0; }
 
 	.order-toolbar button {
-		border: 1px solid #00a85a;
+		border: 1px solid var(--accent);
 		background: transparent;
-		color: #00ff88;
+		color: var(--accent-strong);
 		padding: 0.45rem 0.8rem;
 		cursor: pointer;
 	}
 
 	.order-toolbar button:disabled {
-		border-color: #404040;
-		color: #737373;
+		border-color: var(--line);
+		color: var(--fg-faint);
 		cursor: not-allowed;
 	}
 
@@ -220,7 +220,7 @@
 		list-style: none;
 		padding: 0;
 		margin: 0;
-		border: 1px solid #262626;
+		border: 1px solid var(--line);
 	}
 
 	.home-list li {
@@ -229,21 +229,21 @@
 		gap: 1rem;
 		align-items: center;
 		padding: 1rem;
-		border-bottom: 1px solid #262626;
-		background: #0d0d0d;
+		border-bottom: 1px solid var(--line);
+		background: var(--admin-surface);
 	}
 
 	.home-list li:last-child { border-bottom: 0; }
 
 	.position {
 		font-size: 1.1rem;
-		color: #525252;
+		color: var(--line-strong);
 	}
 
 	.entry strong,
 	.entry span { display: block; }
-	.entry strong { color: #e5e5e5; font-weight: 500; }
-	.entry span { color: #737373; font-size: 0.72rem; margin-top: 0.3rem; }
+	.entry strong { color: var(--fg); font-weight: 500; }
+	.entry span { color: var(--fg-faint); font-size: 0.72rem; margin-top: 0.3rem; }
 
 	.controls {
 		display: flex;
@@ -253,16 +253,16 @@
 	.controls form { margin: 0; }
 
 	.controls button {
-		border: 1px solid #404040;
+		border: 1px solid var(--line);
 		background: transparent;
-		color: #d4d4d4;
+		color: var(--fg);
 		padding: 0.35rem 0.6rem;
 		cursor: pointer;
 	}
 
-	.controls button:hover:not(:disabled) { border-color: #737373; }
+	.controls button:hover:not(:disabled) { border-color: var(--fg-faint); }
 	.controls button:disabled { opacity: 0.25; cursor: not-allowed; }
-	.controls .remove { color: #ff8b8b; }
+	.controls .remove { color: var(--admin-danger); }
 
 	@media (max-width: 680px) {
 		.heading { align-items: flex-start; flex-direction: column; }

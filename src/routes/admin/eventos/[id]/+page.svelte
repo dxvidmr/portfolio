@@ -84,7 +84,7 @@
 	</form>
 	{#if data.event.attendance}
 		<form method="POST" action="?/quitarAsistencia" use:enhance={enhanceAttendance}>
-			<button type="submit" class="secondary" disabled={pendingAttendance}>Quitar rol de oyente y sus certificados</button>
+			<button type="submit" class="remove" disabled={pendingAttendance}>Eliminar rol de oyente y sus certificados</button>
 		</form>
 	{/if}
 </section>
@@ -100,40 +100,39 @@
 </details>
 
 <style>
-	.back { display: inline-block; margin-bottom: 1rem; color: #a3a3a3; }
+	.back { display: inline-block; margin-bottom: 1rem; color: var(--fg-dim); }
 	.heading { display: flex; justify-content: space-between; gap: 1rem; align-items: end; }
-	.heading p { margin: 0; color: #737373; font-size: 0.68rem; text-transform: uppercase; }
-	h1 { max-width: 70ch; margin: 0.3rem 0 0; color: #fafafa; font-size: 1.2rem; }
-	.heading > span { color: #737373; font-size: 0.68rem; }
-	section { margin-top: 2rem; padding-top: 1.5rem; border-top: 1px solid #262626; }
-	h2 { margin: 0 0 1rem; color: #a3a3a3; font-size: 0.82rem; letter-spacing: 0.07em; text-transform: uppercase; }
+	.heading p { margin: 0; color: var(--fg-faint); font-size: 0.68rem; text-transform: uppercase; }
+	h1 { max-width: 70ch; margin: 0.3rem 0 0; color: var(--fg); font-size: 1.2rem; }
+	.heading > span { color: var(--fg-faint); font-size: 0.68rem; }
+	section { margin-top: 2rem; padding-top: 1.5rem; border-top: 1px solid var(--line); }
+	h2 { margin: 0 0 1rem; color: var(--fg-dim); font-size: 0.82rem; letter-spacing: 0.07em; text-transform: uppercase; }
 	section > form > button { margin-top: 1.25rem; }
-	button, .new-links a { border: 1px solid #525252; background: transparent; color: #d4d4d4; padding: 0.5rem 0.7rem; font: inherit; font-size: 0.7rem; cursor: pointer; }
-	button:hover, .new-links a:hover { border-color: #00ff88; color: #00ff88; }
+	button, .new-links a { border: 1px solid var(--line-strong); background: transparent; color: var(--fg); padding: 0.5rem 0.7rem; font: inherit; font-size: 0.7rem; cursor: pointer; }
+	button:hover, .new-links a:hover { border-color: var(--accent-strong); color: var(--accent-strong); }
 	button:disabled { opacity: 0.45; }
 	.section-heading, .private-heading { display: flex; justify-content: space-between; gap: 1rem; align-items: start; }
-	.section-heading p, .private-heading p { margin: -0.6rem 0 1rem; max-width: 70ch; color: #737373; font-size: 0.75rem; line-height: 1.5; }
+	.section-heading p, .private-heading p { margin: -0.6rem 0 1rem; max-width: 70ch; color: var(--fg-faint); font-size: 0.75rem; line-height: 1.5; }
 	.new-links { display: flex; flex-wrap: wrap; gap: 0.5rem; }
 	.activity-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1rem; }
-	.activity-grid article { border: 1px solid #262626; }
-	.activity-grid header { display: flex; justify-content: space-between; padding: 0.85rem 1rem; border-bottom: 1px solid #262626; font-size: 0.75rem; }
-	.activity-grid header span { color: #00ff88; }
+	.activity-grid article { border: 1px solid var(--line); }
+	.activity-grid header { display: flex; justify-content: space-between; padding: 0.85rem 1rem; border-bottom: 1px solid var(--line); font-size: 0.75rem; }
+	.activity-grid header span { color: var(--accent-strong); }
 	.activity-grid ul { margin: 0; padding: 0; list-style: none; }
-	.activity-grid li { display: grid; gap: 0.3rem; padding: 0.75rem 1rem; border-bottom: 1px solid #262626; }
+	.activity-grid li { display: grid; gap: 0.3rem; padding: 0.75rem 1rem; border-bottom: 1px solid var(--line); }
 	.activity-grid li:last-child { border-bottom: 0; }
-	.activity-grid a { color: #d4d4d4; font-size: 0.75rem; line-height: 1.35; }
-	.activity-grid small { color: #737373; font-size: 0.62rem; }
-	.empty { margin: 0; padding: 1rem; color: #737373; font-size: 0.72rem; }
-	.attendance { padding: 1.2rem; border: 1px solid #6b532b; }
-	.private-heading > span { border: 1px solid #6b532b; padding: 0.25rem 0.45rem; color: #d6a84b; font-size: 0.62rem; text-transform: uppercase; }
+	.activity-grid a { color: var(--fg); font-size: 0.75rem; line-height: 1.35; }
+	.activity-grid small { color: var(--fg-faint); font-size: 0.62rem; }
+	.empty { margin: 0; padding: 1rem; color: var(--fg-faint); font-size: 0.72rem; }
+	.attendance { padding: 1.2rem; border: 1px solid var(--tone-amber); }
+	.private-heading > span { border: 1px solid var(--tone-amber); padding: 0.25rem 0.45rem; color: var(--tone-amber); font-size: 0.62rem; text-transform: uppercase; }
 	.attendance form { display: grid; gap: 0.8rem; }
-	.attendance label { display: grid; gap: 0.35rem; color: #a3a3a3; font-size: 0.7rem; }
-	.attendance input, .attendance textarea { border: 1px solid #404040; background: #111; color: #e5e5e5; padding: 0.5rem; font: inherit; }
+	.attendance label { display: grid; gap: 0.35rem; color: var(--fg-dim); font-size: 0.7rem; }
+	.attendance input, .attendance textarea { border: 1px solid var(--line); background: var(--admin-surface); color: var(--fg); padding: 0.5rem; font: inherit; }
 	.attendance form + form { margin-top: 0.6rem; }
-	.secondary { justify-self: start; }
-	.danger { margin-top: 2.5rem; padding: 1rem; border: 1px solid #7f1d1d; color: #a3a3a3; }
-	.danger summary { color: #f87171; cursor: pointer; }
+	.danger { margin-top: 2.5rem; padding: 1rem; border: 1px solid var(--admin-danger); color: var(--fg-dim); }
+	.danger summary { color: var(--admin-danger); cursor: pointer; }
 	.danger form { display: grid; justify-items: start; gap: 0.8rem; }
-	.danger button { border-color: #f87171; color: #f87171; }
+	.danger button { border-color: var(--admin-danger); color: var(--admin-danger); }
 	@media (max-width: 750px) { .activity-grid { grid-template-columns: 1fr; } .heading, .section-heading, .private-heading { align-items: start; flex-direction: column; } }
 </style>

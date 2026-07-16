@@ -115,11 +115,11 @@
 
 	.field-label {
 		font-size: 0.8rem;
-		color: #a3a3a3;
+		color: var(--fg-dim);
 	}
 
 	.required {
-		color: #00ff88;
+		color: var(--accent-strong);
 		margin-left: 0.15rem;
 	}
 
@@ -128,8 +128,8 @@
 		font-size: 0.65rem;
 		text-transform: uppercase;
 		letter-spacing: 0.08em;
-		color: #737373;
-		border: 1px solid #404040;
+		color: var(--fg-faint);
+		border: 1px solid var(--line);
 		padding: 0.05rem 0.35rem;
 	}
 
@@ -139,9 +139,9 @@
 	select {
 		font: inherit;
 		width: 100%;
-		background: #111;
-		color: #e5e5e5;
-		border: 1px solid #404040;
+		background: var(--admin-surface);
+		color: var(--fg);
+		border: 1px solid var(--line);
 		padding: 0.5rem 0.65rem;
 	}
 
@@ -153,38 +153,38 @@
 	input:focus-visible,
 	textarea:focus-visible,
 	select:focus-visible {
-		outline: 2px solid #00ff88;
+		outline: 2px solid var(--accent-strong);
 		outline-offset: 2px;
 	}
 
 	.has-error input,
 	.has-error textarea,
 	.has-error select {
-		border-color: #f87171;
+		border-color: var(--admin-danger);
 	}
 
 	.check {
 		display: flex;
 		align-items: center;
 		gap: 0.6rem;
-		color: #d4d4d4;
+		color: var(--fg);
 	}
 
 	.check input {
 		width: 1.05rem;
 		height: 1.05rem;
-		accent-color: #00ff88;
+		accent-color: var(--accent-strong);
 	}
 
 	.help {
 		margin: 0;
 		font-size: 0.72rem;
-		color: #737373;
+		color: var(--fg-faint);
 	}
 
 	.error {
 		margin: 0;
 		font-size: 0.78rem;
-		color: #f87171;
+		color: var(--admin-danger);
 	}
 </style>
