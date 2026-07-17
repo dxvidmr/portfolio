@@ -29,9 +29,9 @@
 						: 'La entrada ahora es privada.',
 				success: true
 			};
-		if (form.portada !== undefined)
+		if (form.actividad !== undefined)
 			return {
-				message: form.portada ? 'Añadida a la portada.' : 'Retirada de la portada.',
+				message: form.actividad ? 'Añadida a la actividad.' : 'Retirada de la actividad.',
 				 success: true
 			};
 		if (form.relationMessage)
@@ -78,7 +78,7 @@
 		</span>
 		{#if data.control.showHome}
 			<span class="border border-accent px-2 py-1 text-[0.7rem] uppercase tracking-[0.08em] text-accent">
-				En portada
+				En actividad
 			</span>
 		{/if}
 	{/snippet}
@@ -109,19 +109,19 @@
 </section>
 
 <section class={sectionClass} aria-labelledby="visibilidad-title">
-	<h2 class={sectionTitleClass} id="visibilidad-title">Visibilidad y portada</h2>
+	<h2 class={sectionTitleClass} id="visibilidad-title">Visibilidad y actividad</h2>
 	<div class="grid gap-6 md:grid-cols-2">
 		<div class="grid content-start gap-3 border border-rule p-5">
 			{#if data.control.isPublic}
 				<p class="m-0 max-w-[60ch] leading-relaxed text-ink-dim">
-					Visible en la web pública. Al pasarla a privada también se retira de la portada.
+					Visible en la web pública. Al pasarla a privada también se retira de la actividad.
 				</p>
 				<form method="POST" action="?/despublicar">
 					<Button type="submit" variant="secondary">Hacer privada</Button>
 				</form>
 			{:else}
 				<p class="m-0 max-w-[60ch] leading-relaxed text-ink-dim">
-					Entrada privada: no aparece en el CV ni en la portada.
+					Entrada privada: no aparece en el CV ni en la actividad.
 				</p>
 				<form method="POST" action="?/publicar">
 					<Button type="submit">Publicar</Button>
@@ -130,24 +130,24 @@
 		</div>
 		<div class="grid content-start gap-3 border border-rule p-5">
 			{#if data.control.showHome}
-				<p class="m-0 text-ink-dim">Seleccionada en la portada.</p>
-				<form method="POST" action="?/portada">
+				<p class="m-0 text-ink-dim">Seleccionada en la actividad.</p>
+				<form method="POST" action="?/actividad">
 					<input type="hidden" name="enabled" value="0" />
-					<Button type="submit" variant="danger">Eliminar de portada</Button>
+					<Button type="submit" variant="danger">Eliminar de actividad</Button>
 				</form>
 			{:else}
 				<p class="m-0 max-w-[60ch] leading-relaxed text-ink-dim">
-					No aparece en la portada.
-					{#if !data.control.isPublic}Mostrarla en portada también la hará pública.{/if}
+					No aparece en la actividad.
+					{#if !data.control.isPublic}Mostrarla en actividad también la hará pública.{/if}
 				</p>
-				<form method="POST" action="?/portada">
+				<form method="POST" action="?/actividad">
 					<input type="hidden" name="enabled" value="1" />
-					<Button type="submit">Mostrar en portada</Button>
+					<Button type="submit">Mostrar en actividad</Button>
 				</form>
 			{/if}
 			<p class="m-0 text-xs text-ink-faint">
-				El orden de la portada se gestiona en
-				<a class="text-ink-dim hover:text-accent" href="/admin/portada">Portada</a>.
+				El orden se gestiona en
+				<a class="text-ink-dim hover:text-accent" href="/admin/actividad">Actividad</a>.
 			</p>
 		</div>
 	</div>

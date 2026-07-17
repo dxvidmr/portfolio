@@ -149,7 +149,7 @@ export function parseEntryFilters(searchParams: URLSearchParams): EntryFilters {
 		type: isEntityType(rawType) ? rawType : '',
 		year: /^\d{4}$/.test(rawYear) ? rawYear : '',
 		visibility: oneOf(searchParams.get('estado'), ['all', 'public', 'draft'], 'all'),
-		home: oneOf(searchParams.get('portada'), ['all', 'yes', 'no'], 'all'),
+		home: oneOf(searchParams.get('actividad') ?? searchParams.get('portada'), ['all', 'yes', 'no'], 'all'),
 		relations: oneOf(searchParams.get('relaciones'), ['all', 'with', 'without'], 'all')
 	};
 }

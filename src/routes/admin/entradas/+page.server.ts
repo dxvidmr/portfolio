@@ -40,7 +40,7 @@ export const actions: Actions = {
 
 		try {
 			const entry = await updateEntryControl(key, control, enabled);
-			const label = control === 'public' ? 'visibilidad pública' : 'aparición en portada';
+			const label = control === 'public' ? 'visibilidad pública' : 'aparición en actividad';
 			return {
 				success: true,
 				message: `Se actualizó la ${label}.`,

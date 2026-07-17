@@ -188,11 +188,11 @@
 			<AdminField label="Año">
 				<Input bind:value={year} inputmode="numeric" pattern="[0-9]{4}" maxlength={4} placeholder="AAAA" />
 			</AdminField>
-			<AdminField label="Portada">
+			<AdminField label="Actividad">
 				<Select bind:value={home}>
 					<option value="all">En cualquier estado</option>
-					<option value="yes">En portada</option>
-					<option value="no">Fuera de portada</option>
+					<option value="yes">En actividad</option>
+					<option value="no">Fuera de actividad</option>
 				</Select>
 			</AdminField>
 			<AdminField label="Relaciones">
@@ -219,7 +219,7 @@
 				<th class={tableHeadingClass}>Fecha</th>
 				<th class={tableHeadingClass}>Rel.</th>
 				<th class={tableHeadingClass}>Pública</th>
-				<th class={tableHeadingClass}>Portada</th>
+				<th class={tableHeadingClass}>Actividad</th>
 				<th class={tableHeadingClass}>Actualización</th>
 			</tr>
 		</thead>
@@ -274,7 +274,7 @@
 								name="enabled"
 								value={entry.showHome ? '0' : '1'}
 								disabled={isPending(entry, 'home')}
-								aria-label={`${entry.showHome ? 'Eliminar de' : 'Añadir a'} portada: ${entry.title}`}
+								aria-label={`${entry.showHome ? 'Eliminar de' : 'Añadir a'} actividad: ${entry.title}`}
 							>
 								{entry.showHome ? 'Sí' : 'No'}
 							</Button>

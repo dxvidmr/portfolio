@@ -150,7 +150,7 @@ export async function saveHomeOrder(order: EntryKey[]): Promise<void> {
 		currentKeys.length !== submittedKeys.length ||
 		currentKeys.some((key, index) => key !== submittedKeys[index])
 	) {
-		throw new Error('La selección de portada cambió; recarga antes de guardar el orden');
+		throw new Error('La selección de actividad cambió; recarga antes de guardar el orden');
 	}
 
 	if (order.length === 0) return;

@@ -142,12 +142,12 @@ export const actions: Actions = {
 		return { visibilidad: state.isPublic ? 'publicada' : 'privada' };
 	},
 
-	portada: async ({ locals, params, request }) => {
+	actividad: async ({ locals, params, request }) => {
 		await requireAdmin(locals);
 		const { entityType, entityId } = parseParams(params);
 		const enabled = (await request.formData()).get('enabled') === '1';
 		const state = await updateEntryControl({ entityType, entityId }, 'home', enabled);
-		return { portada: state.showHome };
+		return { actividad: state.showHome };
 	},
 
 	relacionarFinanciacion: async ({ locals, params, request }) => {

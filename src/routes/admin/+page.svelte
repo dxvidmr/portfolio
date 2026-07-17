@@ -34,7 +34,7 @@
 	</article>
 	<article class="grid gap-[0.35rem] bg-[var(--admin-surface)] p-5">
 		<strong class="text-[1.75rem] text-ink">{data.summary.homeCount}</strong>
-		<span class="text-xs text-ink-faint">en portada</span>
+		<span class="text-xs text-ink-faint">en actividad</span>
 	</article>
 	<article class="grid gap-[0.35rem] bg-[var(--admin-surface)] p-5">
 		<strong class="text-[1.75rem] text-ink">{data.summary.relatedCount}</strong>
@@ -47,7 +47,7 @@
 	<div class="flex flex-wrap gap-3">
 		<ButtonLink href="/admin/entradas/nueva">+ Nueva entrada</ButtonLink>
 		<ButtonLink href="/admin/eventos/nuevo">+ Nuevo evento</ButtonLink>
-		<ButtonLink href="/admin/portada">Ordenar portada</ButtonLink>
+		<ButtonLink href="/admin/actividad">Ordenar actividad</ButtonLink>
 	</div>
 </section>
 

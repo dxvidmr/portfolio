@@ -13,7 +13,7 @@
 			label: 'Gestión',
 			links: [
 				{ href: '/admin', label: 'Resumen' },
-				{ href: '/admin/portada', label: 'Portada' },
+				{ href: '/admin/actividad', label: 'Actividad' },
 				{ href: '/admin/portfolio', label: 'Portfolio' }
 			]
 		},
