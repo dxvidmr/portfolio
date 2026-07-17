@@ -38,6 +38,5 @@ export type PortfolioProjectMetadata = {
 	tags: string[];
 	links: Array<{ label: { es: string; en: string }; url: string }>;
 	publicationStatus: PortfolioPublicationStatus;
-	showHome: boolean;
 	sortOrder: number;
 };

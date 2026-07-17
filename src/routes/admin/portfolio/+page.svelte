@@ -95,7 +95,6 @@
 					</span>
 					<span class="flex flex-wrap gap-x-3 gap-y-1 font-mono text-[0.62rem]">
 						<span class={statusClass[project.publicationStatus]}>{statusLabel[project.publicationStatus]}</span>
-						<span class="text-ink-faint">{project.showHome ? 'En portada' : 'Fuera de portada'}</span>
 						<span class="text-ink-faint">{project.relationCount} relacionados</span>
 						<span class={project.hasNarrative ? 'text-accent-strong' : 'text-ink-faint'}>{project.hasNarrative ? 'Narrativa especial' : 'Plantilla básica'}</span>
 					</span>
@@ -105,15 +104,6 @@
 						<Button type="button" variant="ghost" size="icon" disabled={index === 0} onclick={() => moveProject(project.slug, index - 1)} aria-label={`Subir ${project.title.es}`} title="Subir"><ChevronUp size={16} /></Button>
 						<Button type="button" variant="ghost" size="icon" disabled={index === projects.length - 1} onclick={() => moveProject(project.slug, index + 1)} aria-label={`Bajar ${project.title.es}`} title="Bajar"><ChevronDown size={16} /></Button>
 					</div>
-					{#if project.publicationStatus === 'published'}
-						<form method="POST" action="?/visibility" use:enhance>
-							<input type="hidden" name="portfolioSlug" value={project.slug} />
-							<input type="hidden" name="showHome" value={project.showHome ? '0' : '1'} />
-							<Button type="submit" variant={project.showHome ? 'danger' : 'secondary'} size="sm">
-								{project.showHome ? 'Ocultar' : 'Mostrar'}
-							</Button>
-						</form>
-					{/if}
 					<ButtonLink href={`/admin/portfolio/${project.slug}`} size="sm">Editar</ButtonLink>
 				</div>
 			</li>

@@ -46,7 +46,6 @@ const metadataFromRow = (row: Record<string, unknown>): PortfolioProjectMetadata
 		}
 	})(),
 	publicationStatus: publicationStatus(row.publication_status),
-	showHome: Number(row.show_home) === 1,
 	sortOrder: Number(row.sort_order)
 });
 
@@ -54,7 +53,7 @@ export async function getPortfolioProjects(options: { publicOnly?: boolean } = {
 	const result = await db.execute(`
 		SELECT slug, title_es, title_en, kind_es, kind_en, kicker_es, kicker_en,
 		       summary_es, summary_en, status_es, status_en, period, tags_json,
-		       links_json, publication_status, show_home, sort_order
+		       links_json, publication_status, sort_order
 		FROM portfolio_projects
 		${options.publicOnly ? "WHERE publication_status = 'published'" : ''}
 		ORDER BY sort_order ASC, title_es COLLATE NOCASE ASC`);

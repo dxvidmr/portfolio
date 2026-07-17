@@ -71,7 +71,6 @@ export function parsePortfolioProjectInput(formData: FormData): PortfolioProject
 		rawPublicationStatus === 'published' || rawPublicationStatus === 'archived'
 			? rawPublicationStatus
 			: 'draft';
-	const showHome = publicationStatus === 'published' && formData.get('showHome') === '1';
 
 	if (!slug || !titleEs || !kindEs || !summaryEs || !period) return null;
 	if (sortOrder !== null && (!Number.isInteger(sortOrder) || sortOrder < 0 || sortOrder > 999999)) return null;
@@ -95,7 +94,6 @@ export function parsePortfolioProjectInput(formData: FormData): PortfolioProject
 		tags,
 		links: linkUrl ? [{ label: { es: linkLabelEs || titleEs, en: linkLabelEn || titleEn }, url: linkUrl }] : [],
 		publicationStatus,
-		showHome,
 		sortOrder
 	};
 }
@@ -268,7 +266,6 @@ const projectArgs = (project: PortfolioProjectInput, sortOrder: number) => [
 		url: link.url
 	}))),
 	project.publicationStatus,
-	project.showHome ? 1 : 0,
 	sortOrder
 ];
 
@@ -282,8 +279,8 @@ export async function createPortfolioProject(project: PortfolioProjectInput): Pr
 		sql: `INSERT INTO portfolio_projects
 			(slug, title_es, title_en, kind_es, kind_en, kicker_es, kicker_en,
 			 summary_es, summary_en, status_es, status_en, period, tags_json,
-			 links_json, publication_status, show_home, sort_order)
-			VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+			 links_json, publication_status, sort_order)
+			VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
 		args: projectArgs(project, sortOrder)
 	});
 }
@@ -296,21 +293,10 @@ export async function updatePortfolioProject(project: PortfolioProjectInput): Pr
 		sql: `UPDATE portfolio_projects SET
 			title_es = ?, title_en = ?, kind_es = ?, kind_en = ?, kicker_es = ?, kicker_en = ?,
 			summary_es = ?, summary_en = ?, status_es = ?, status_en = ?, period = ?,
-			tags_json = ?, links_json = ?, publication_status = ?, show_home = ?, sort_order = ?,
+			tags_json = ?, links_json = ?, publication_status = ?, sort_order = ?,
 			updated_at = datetime('now')
 			WHERE slug = ?`,
 		args: [...args.slice(1), project.slug]
-	});
-	if (result.rowsAffected === 0) throw new Error('La ficha del portfolio no existe');
-}
-
-export async function setPortfolioProjectVisibility(slug: string, showHome: boolean): Promise<void> {
-	const result = await db.execute({
-		sql: `UPDATE portfolio_projects
-			SET show_home = CASE WHEN publication_status = 'published' THEN ? ELSE 0 END,
-			    updated_at = datetime('now')
-			WHERE slug = ?`,
-		args: [showHome ? 1 : 0, slug]
 	});
 	if (result.rowsAffected === 0) throw new Error('La ficha del portfolio no existe');
 }

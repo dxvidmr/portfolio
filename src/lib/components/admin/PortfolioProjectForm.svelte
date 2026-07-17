@@ -19,13 +19,8 @@
 
 	const initialProject = untrack(() => project);
 	let publicationStatus = $state(initialProject?.publicationStatus ?? 'draft');
-	let showHome = $state(initialProject?.showHome ?? false);
 	const tags = initialProject?.tags.join(', ') ?? '';
 	const primaryLink = initialProject?.links[0];
-
-	$effect(() => {
-		if (publicationStatus !== 'published') showHome = false;
-	});
 </script>
 
 <form class="grid grid-cols-2 gap-4 max-[760px]:grid-cols-1" method="POST" {action}>
@@ -41,7 +36,7 @@
 	<AdminField label="Estado editorial">
 		<Select name="publicationStatus" bind:value={publicationStatus}>
 			<option value="draft">Borrador · solo dashboard</option>
-			<option value="published">Publicado · URL pública</option>
+			<option value="published">Publicado · visible en la web</option>
 			<option value="archived">Archivado · retirado</option>
 		</Select>
 	</AdminField>
@@ -61,12 +56,5 @@
 	<AdminField label="Enlace principal"><Input name="linkUrl" type="url" value={primaryLink?.url ?? ''} /></AdminField>
 	<AdminField label="Etiqueta del enlace (ES)"><Input name="linkLabelEs" value={primaryLink?.label.es ?? ''} /></AdminField>
 	<AdminField label="Etiqueta del enlace (EN)"><Input name="linkLabelEn" value={primaryLink?.label.en ?? ''} /></AdminField>
-	<label class="flex items-center gap-2 self-end pb-2 font-mono text-xs text-ink-dim">
-		<input name="showHome" type="checkbox" value="1" bind:checked={showHome} disabled={publicationStatus !== 'published'} />
-		Visible en portada
-	</label>
-	{#if publicationStatus !== 'published'}
-		<p class="col-span-full m-0 text-[0.68rem] text-ink-faint">Solo los proyectos publicados pueden aparecer en portada.</p>
-	{/if}
 	<div class="col-span-full flex justify-end"><Button type="submit" variant="primary">{submitLabel}</Button></div>
 </form>

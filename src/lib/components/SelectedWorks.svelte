@@ -21,9 +21,7 @@
 	let activeIndex = $state(0);
 	let lastTrigger: HTMLElement | null = null;
 	const allProjects = $derived(projectIndex.map((metadata) => projectFromMetadata(metadata)));
-	const visibleProjects = $derived(
-		projectIndex.filter((metadata) => metadata.showHome).map((metadata) => projectFromMetadata(metadata))
-	);
+	const visibleProjects = $derived(projectIndex.map((metadata) => projectFromMetadata(metadata)));
 	const activeProject = $derived(visibleProjects[activeIndex] ?? visibleProjects[0] ?? null);
 	const shallowProjectSlug = $derived(
 		typeof (page.state as Record<string, unknown>)?.portfolioModal === 'string'

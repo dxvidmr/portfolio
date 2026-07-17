@@ -23,11 +23,13 @@ describe('esquema posterior a la limpieza 013', () => {
 			`);
 			await db.executeMultiple(readFileSync('db/migrations/014_portfolio_projects.sql', 'utf8'));
 			await db.executeMultiple(readFileSync('db/migrations/015_portfolio_publication_status.sql', 'utf8'));
+			await db.executeMultiple(readFileSync('db/migrations/016_simplify_portfolio_publication.sql', 'utf8'));
 
 			expect((await db.execute('SELECT COUNT(*) AS total FROM portfolio_projects')).rows[0]?.total).toBe(6);
 			expect((await db.execute(
-				`SELECT show_home, publication_status FROM portfolio_projects WHERE slug = 'versologia-metadrama'`
-			)).rows[0]).toMatchObject({ show_home: 0, publication_status: 'published' });
+				`SELECT publication_status FROM portfolio_projects WHERE slug = 'versologia-metadrama'`
+			)).rows[0]).toMatchObject({ publication_status: 'draft' });
+			expect((await db.execute('PRAGMA table_info(portfolio_projects)')).rows.map((row) => row.name)).not.toContain('show_home');
 			expect((await db.execute('SELECT portfolio_slug FROM portfolio_items')).rows).toMatchObject([
 				{ portfolio_slug: 'todos-a-una' }
 			]);
@@ -116,12 +118,12 @@ describe('esquema posterior a la limpieza 013', () => {
 			);
 
 			const portfolioProjects = await db.execute(
-				`SELECT slug, title_es, show_home FROM portfolio_projects ORDER BY sort_order`
+				`SELECT slug, title_es, publication_status FROM portfolio_projects ORDER BY sort_order`
 			);
 			expect(portfolioProjects.rows).toHaveLength(6);
 			expect(portfolioProjects.rows.find((row) => row.slug === 'versologia-metadrama')).toMatchObject({
 				title_es: 'Versología',
-				show_home: 0
+				publication_status: 'draft'
 			});
 			await db.execute({
 				sql: `INSERT INTO portfolio_projects
@@ -134,9 +136,9 @@ describe('esquema posterior a la limpieza 013', () => {
 				]
 			});
 			expect((await db.execute(
-				`SELECT show_home, publication_status, tags_json, links_json FROM portfolio_projects
+				`SELECT publication_status, tags_json, links_json FROM portfolio_projects
 				 WHERE slug = 'proyecto-sin-narrativa'`
-			)).rows[0]).toMatchObject({ show_home: 1, publication_status: 'published', tags_json: '[]', links_json: '[]' });
+			)).rows[0]).toMatchObject({ publication_status: 'published', tags_json: '[]', links_json: '[]' });
 			expect((await db.execute('PRAGMA foreign_key_check')).rows).toHaveLength(0);
 		} finally {
 			db.close();
