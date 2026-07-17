@@ -47,27 +47,27 @@
 	const copy = $derived(
 		locale === 'es'
 			? {
-					close: 'Cerrar proyecto',
-					previous: 'Proyecto anterior',
-					next: 'Proyecto siguiente',
+					close: 'Cerrar ficha',
+					previous: 'Ficha anterior',
+					next: 'Ficha siguiente',
 					status: 'Estado',
 					period: 'Periodo',
 					topics: 'Temas',
 					links: 'Enlaces',
-					sectionMenu: 'Menú del proyecto',
+					sectionMenu: 'Menú de la ficha',
 					related: 'Resultados relacionados',
 					relatedIntro: 'Publicaciones, proyectos y otras actividades vinculadas.',
 					featured: 'Resultado destacado'
 				}
 			: {
-					close: 'Close project',
-					previous: 'Previous project',
-					next: 'Next project',
+					close: 'Close entry',
+					previous: 'Previous entry',
+					next: 'Next entry',
 					status: 'Status',
 					period: 'Period',
 					topics: 'Topics',
 					links: 'Links',
-					sectionMenu: 'Project menu',
+					sectionMenu: 'Entry menu',
 					related: 'Related outputs',
 					relatedIntro: 'Related publications, projects, and other activities.',
 					featured: 'Featured output'
@@ -145,7 +145,7 @@
 	>
 		<nav
 			class="pointer-events-none absolute bottom-[clamp(12px,2vw,28px)] left-1/2 z-20 flex translate-x-[-50%] items-center gap-px rounded-full bg-[color-mix(in_srgb,var(--surface-glass)_24%,transparent)] p-1 [backdrop-filter:blur(18px)_saturate(1.04)] max-[700px]:bottom-2"
-			aria-label={locale === 'es' ? 'Navegar entre proyectos' : 'Navigate projects'}
+			aria-label={locale === 'es' ? 'Navegar por el portfolio' : 'Navigate portfolio'}
 		>
 			{#if canNavigate}
 				<button class={modalControlClass} type="button" onclick={onprevious} aria-label={copy.previous} title={copy.previous}>
@@ -211,7 +211,7 @@
 							{/if}
 						</dl>
 						{#if project.sectionNav?.length}
-							<nav class="mt-[22px] grid max-w-[620px] gap-2.5 border-t border-rule-strong pt-3.5" aria-label={locale === 'es' ? 'Secciones del proyecto' : 'Project sections'}>
+							<nav class="mt-[22px] grid max-w-[620px] gap-2.5 border-t border-rule-strong pt-3.5" aria-label={locale === 'es' ? 'Secciones de la ficha' : 'Entry sections'}>
 								<span class="meta text-accent-strong">{copy.sectionMenu}</span>
 								<div class="flex flex-wrap items-start gap-2">
 									{#each project.sectionNav as item (item.label.es)}

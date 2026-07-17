@@ -41,10 +41,10 @@
 
 <AdminPageHeader
 	title="Portfolio"
-	eyebrow="Proyectos públicos"
+	eyebrow="Elementos del portfolio"
 	description="Gestiona el estado editorial, el orden y las relaciones de cada ficha."
 >
-	{#snippet actions()}<ButtonLink href="/admin/portfolio/nuevo" variant="primary">+ Nuevo proyecto</ButtonLink>{/snippet}
+	{#snippet actions()}<ButtonLink href="/admin/portfolio/nuevo" variant="primary">+ Nuevo elemento</ButtonLink>{/snippet}
 </AdminPageHeader>
 
 <form class="hidden" method="POST" action="?/reorder" use:enhance={reorderSubmit} bind:this={orderForm}>
@@ -52,7 +52,7 @@
 </form>
 
 {#if projects.length === 0}
-	<p class="m-0 border-y border-rule px-4 py-10 text-center text-xs text-ink-faint">Todavía no hay proyectos.</p>
+	<p class="m-0 border-y border-rule px-4 py-10 text-center text-xs text-ink-faint">Todavía no hay elementos.</p>
 {:else}
 	<SortableList
 		bind:items={projects}

@@ -364,14 +364,14 @@
 		const updateScrollScene = () => {
 			scrollFrame = 0;
 			const marker = window.scrollY + window.innerHeight * 0.42;
-			const projectsTop = document.querySelector<HTMLElement>('#proyectos')?.offsetTop ?? Infinity;
+			const portfolioTop = document.querySelector<HTMLElement>('#portfolio')?.offsetTop ?? Infinity;
 			const aboutTop = document.querySelector<HTMLElement>('#about')?.offsetTop ?? Infinity;
 			const cvTop = document.querySelector<HTMLElement>('#cv')?.offsetTop ?? Infinity;
 			let nextScene: Scene = 'hero';
 
 			if (marker >= cvTop) nextScene = 'cv';
 			else if (marker >= aboutTop) nextScene = 'about';
-			else if (marker >= projectsTop) nextScene = 'projects';
+			else if (marker >= portfolioTop) nextScene = 'projects';
 
 			if (nextScene === currentScene) return;
 			currentScene = nextScene;

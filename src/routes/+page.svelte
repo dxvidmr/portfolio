@@ -18,7 +18,7 @@
 	const locale = $derived(localeFromPathname(page.url.pathname));
 	const projectModalOpen = $derived(
 		typeof (page.state as Record<string, unknown>)?.portfolioModal === 'string' ||
-			/\/proyectos\/[^/]+\/?$/.test(page.url.pathname)
+			/\/portfolio\/[^/]+\/?$/.test(page.url.pathname)
 	);
 
 	const completeIntro = () => {
@@ -43,7 +43,7 @@
 	const sectionTitleClass = 'max-w-[760px] text-[clamp(1.45rem,4vw,3rem)] leading-[1.05]';
 	const ui = $derived({
 		es: {
-			navProjects: 'Proyectos',
+			navPortfolio: 'Portfolio',
 			navAbout: 'Sobre mí',
 			selectedWork: 'Trabajos seleccionados',
 			aboutLabel: 'Perfil',
@@ -70,7 +70,7 @@
 			scrollHint: 'DESPLAZAR PARA LEER'
 		},
 		en: {
-			navProjects: 'Projects',
+			navPortfolio: 'Portfolio',
 			navAbout: 'About',
 			selectedWork: 'Selected work',
 			aboutLabel: 'Profile',
@@ -156,7 +156,7 @@
 				</strong>
 			</a>
 			<nav class="meta flex items-center gap-[clamp(14px,2.3vw,30px)] max-[780px]:gap-2.5 max-[520px]:gap-2" aria-label="Principal">
-				<a class="inline-flex items-baseline gap-[7px] text-ink-dim max-[780px]:gap-0 max-[780px]:text-[.62rem] max-[520px]:text-[.57rem] max-[520px]:tracking-[.08em]" href="#proyectos"><span class="text-[.58rem] tracking-normal text-accent max-[780px]:hidden">01</span>{ui.navProjects}</a>
+				<a class="inline-flex items-baseline gap-[7px] text-ink-dim max-[780px]:gap-0 max-[780px]:text-[.62rem] max-[520px]:text-[.57rem] max-[520px]:tracking-[.08em]" href="#portfolio"><span class="text-[.58rem] tracking-normal text-accent max-[780px]:hidden">01</span>{ui.navPortfolio}</a>
 				<a class="inline-flex items-baseline gap-[7px] text-ink-dim max-[780px]:gap-0 max-[780px]:text-[.62rem] max-[520px]:text-[.57rem] max-[520px]:tracking-[.08em]" href="#about"><span class="text-[.58rem] tracking-normal text-accent max-[780px]:hidden">02</span>{ui.navAbout}</a>
 				<a class="inline-flex items-baseline gap-[7px] text-ink-dim max-[780px]:gap-0 max-[780px]:text-[.62rem] max-[520px]:text-[.57rem] max-[520px]:tracking-[.08em]" href="#cv"><span class="text-[.58rem] tracking-normal text-accent max-[780px]:hidden">03</span>CV</a>
 				<SiteControls />
@@ -185,16 +185,16 @@
 		</div>
 
 		<div class={`grid place-items-center ${introReady ? '[animation:home-intro-from-bottom_1050ms_cubic-bezier(.16,1,.3,1)_620ms_backwards] motion-reduce:animate-none' : 'invisible'}`}>
-			<a class="grid h-[42px] w-[42px] place-items-center text-ink-faint [animation:home-scroll-cue_1700ms_ease-in-out_infinite] hover:text-accent-strong motion-reduce:animate-none" href="#proyectos" aria-label={ui.scrollHint} title={ui.scrollHint}>
+			<a class="grid h-[42px] w-[42px] place-items-center text-ink-faint [animation:home-scroll-cue_1700ms_ease-in-out_infinite] hover:text-accent-strong motion-reduce:animate-none" href="#portfolio" aria-label={ui.scrollHint} title={ui.scrollHint}>
 				<ChevronDown size={30} strokeWidth={1.4} aria-hidden="true" />
 			</a>
 		</div>
 	</section>
 
 	<main class="relative z-[1] pb-[88px]">
-		<section id="proyectos" class={sectionClass}>
+		<section id="portfolio" class={sectionClass}>
 			<div class={sectionHeadClass}>
-				<span class="meta tag">{ui.navProjects}</span>
+				<span class="meta tag">{ui.navPortfolio}</span>
 				<h2 class={sectionTitleClass}>{ui.selectedWork}</h2>
 			</div>
 			<SelectedWorks {locale} relatedItems={data.portfolioItems} projectIndex={data.portfolioProjects} />

@@ -8,20 +8,20 @@
 	let { form }: { form: ActionData } = $props();
 </script>
 
-<svelte:head><title>Nuevo proyecto · cv/admin</title></svelte:head>
+<svelte:head><title>Nuevo elemento · cv/admin</title></svelte:head>
 
 {#if form?.message}
 	{#key form}<AdminToast message={form.message} success={form.success} />{/key}
 {/if}
 
 <AdminPageHeader
-	title="Nuevo proyecto"
+	title="Nuevo elemento"
 	eyebrow="Portfolio"
-	description="La ficha básica se genera desde estos datos. El proyecto nace como borrador salvo que elijas publicarlo."
+	description="La ficha básica se genera desde estos datos. El elemento nace como borrador salvo que elijas publicarlo."
 >
 	{#snippet actions()}<ButtonLink href="/admin/portfolio">← Portfolio</ButtonLink>{/snippet}
 </AdminPageHeader>
 
 <section class="border-t border-rule pt-5">
-	<PortfolioProjectForm action="?/create" submitLabel="Crear proyecto" />
+	<PortfolioProjectForm action="?/create" submitLabel="Crear elemento" />
 </section>

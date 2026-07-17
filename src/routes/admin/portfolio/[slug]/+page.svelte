@@ -23,7 +23,7 @@
 	{#snippet actions()}
 		<ButtonLink href="/admin/portfolio">← Portfolio</ButtonLink>
 		{#if data.project.publicationStatus === 'published'}
-			<ButtonLink href={`/es/proyectos/${data.project.slug}`} target="_blank" rel="noreferrer">Ver ficha ↗</ButtonLink>
+			<ButtonLink href={`/es/portfolio/${data.project.slug}`} target="_blank" rel="noreferrer">Ver ficha ↗</ButtonLink>
 		{/if}
 	{/snippet}
 </AdminPageHeader>

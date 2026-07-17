@@ -338,7 +338,7 @@ src/lib/server/db.ts
 src/lib/server/home-data.ts
 src/lib/server/portfolio-items.ts
 src/routes/cv/+page.server.ts
-src/routes/proyectos/[slug]/+page.server.ts
+src/routes/portfolio/[slug]/+page.server.ts
 ```
 
 ### Reglas
@@ -927,7 +927,7 @@ Estado: `completada` (2026-07-16) — 5A–5E y 5G desplegadas; 5F se cierra fue
 - [x] Añadir desde la ficha de edición la vista inversa «Aparece en estas fichas del portfolio».
 - [x] Previsualizar o enlazar la ficha pública desde la pantalla de curación.
 - [x] Completar la prueba editorial local y confirmar el funcionamiento de la curación.
-- [x] Desplegar y verificar una ficha pública en producción (`/es/proyectos/todos-a-una` 200 con trabajos relacionados, 2026-07-16).
+- [x] Desplegar y verificar una ficha pública en producción (`/es/portfolio/todos-a-una` 200 con trabajos relacionados, 2026-07-16).
 
 #### Fase 5B — Relaciones estructurales e interentidad
 

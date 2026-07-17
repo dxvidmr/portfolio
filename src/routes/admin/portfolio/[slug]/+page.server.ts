@@ -16,9 +16,9 @@ import {
 export const load: PageServerLoad = async ({ params, setHeaders }) => {
 	setHeaders({ 'cache-control': 'private, no-store' });
 	const slug = parsePortfolioSlug(params.slug);
-	if (!slug) error(404, 'Proyecto no encontrado');
+	if (!slug) error(404, 'Elemento no encontrado');
 	const data = await getPortfolioAdminData(slug);
-	if (!data.project) error(404, 'Proyecto no encontrado');
+	if (!data.project) error(404, 'Elemento no encontrado');
 	return { ...data, project: data.project, hasNarrative: hasProjectStory(slug) };
 };
 
@@ -34,16 +34,16 @@ export const actions: Actions = {
 		const formData = await request.formData();
 		const project = parsePortfolioProjectInput(formData);
 		if (!routeSlug || !project || project.slug !== routeSlug) {
-			return fail(400, { success: false, message: 'Revisa los datos del proyecto.' });
+			return fail(400, { success: false, message: 'Revisa los datos del elemento.' });
 		}
 		try {
 			await updatePortfolioProject(project);
-			return { success: true, message: 'Datos del proyecto actualizados.' };
+			return { success: true, message: 'Datos del elemento actualizados.' };
 		} catch (cause) {
-			console.error('[admin] Error al actualizar un proyecto del portfolio', {
+			console.error('[admin] Error al actualizar un elemento del portfolio', {
 				message: cause instanceof Error ? cause.message : 'Error desconocido'
 			});
-			return fail(500, { success: false, message: 'No se pudo actualizar el proyecto.' });
+			return fail(500, { success: false, message: 'No se pudo actualizar el elemento.' });
 		}
 	},
 	add: async ({ request, locals, params }) => {

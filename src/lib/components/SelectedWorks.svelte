@@ -29,7 +29,7 @@
 			? String((page.state as Record<string, unknown>).portfolioModal)
 			: null
 	);
-	const routeProjectSlug = $derived(page.url.pathname.match(/\/proyectos\/([^/]+)\/?$/)?.[1] ?? null);
+	const routeProjectSlug = $derived(page.url.pathname.match(/\/portfolio\/([^/]+)\/?$/)?.[1] ?? null);
 	const requestedProjectSlug = $derived(shallowProjectSlug ?? routeProjectSlug);
 	const modalIndex = $derived(
 		requestedProjectSlug
@@ -51,14 +51,14 @@
 	const copy = $derived(
 		locale === 'es'
 			? {
-					open: 'Explorar proyecto completo',
+					open: 'Explorar ficha completa',
 					contents: 'Índice de trabajos seleccionados',
-					preview: 'Proyecto seleccionado'
+					preview: 'Elemento seleccionado'
 				}
 			: {
-					open: 'Explore full project',
+					open: 'Explore full entry',
 					contents: 'Selected work index',
-					preview: 'Selected project'
+					preview: 'Selected entry'
 				}
 	);
 
@@ -81,7 +81,7 @@
 		const project = visibleProjects[index];
 		if (!project) return;
 		const baseUrl = `${window.location.pathname}${window.location.search}${window.location.hash}`;
-		pushState(localizedPath(`/proyectos/${project.slug}`, locale), {
+		pushState(localizedPath(`/portfolio/${project.slug}`, locale), {
 			portfolioModal: project.slug,
 			portfolioBase: baseUrl
 		});
@@ -101,7 +101,7 @@
 		const project = visibleProjects[index];
 		if (!project) return;
 		const state = page.state as Record<string, unknown>;
-		replaceState(localizedPath(`/proyectos/${project.slug}`, locale), {
+		replaceState(localizedPath(`/portfolio/${project.slug}`, locale), {
 			...state,
 			portfolioModal: project.slug
 		});
@@ -130,7 +130,7 @@
 			<li class="border-b border-rule">
 				<a
 					class="grid grid-cols-[36px_minmax(0,1fr)_auto] items-center gap-[clamp(12px,2vw,24px)] py-[clamp(18px,2.5vw,31px)] text-inherit no-underline max-[900px]:grid-cols-[30px_minmax(0,1fr)]"
-					href={localizedPath(`/proyectos/${project.slug}`, locale)}
+					href={localizedPath(`/portfolio/${project.slug}`, locale)}
 					aria-current={activeIndex === index ? 'true' : undefined}
 					onmouseenter={() => (activeIndex = index)}
 					onfocus={() => (activeIndex = index)}
@@ -166,7 +166,7 @@
 		<div class="sticky top-[clamp(82px,11vh,118px)] max-[700px]:static">
 			<a
 				class="group block text-inherit no-underline"
-				href={localizedPath(`/proyectos/${activeProject.slug}`, locale)}
+				href={localizedPath(`/portfolio/${activeProject.slug}`, locale)}
 				onclick={(event) => openProject(event, activeIndex)}
 			>
 				{#key activeProject.slug}
@@ -214,7 +214,7 @@
 </div>
 {:else}
 	<p class="m-0 border-y border-rule py-8 text-sm text-ink-faint">
-		{locale === 'es' ? 'No hay proyectos visibles en este momento.' : 'There are no visible projects at the moment.'}
+		{locale === 'es' ? 'No hay elementos del portfolio visibles en este momento.' : 'There are no visible portfolio entries at the moment.'}
 	</p>
 {/if}
 
