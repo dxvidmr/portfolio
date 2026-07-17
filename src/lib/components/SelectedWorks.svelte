@@ -5,6 +5,7 @@
 	import type { Locale } from '$lib/paraglide/runtime';
 	import { localizedPath } from '$lib/i18n';
 	import { projectFromMetadata, projectText } from '$lib/content/projects';
+	import { renderInlineMarkup } from '$lib/content/inline-markup';
 	import type { PortfolioProjectMetadata, PortfolioRelatedItem } from '$lib/types/portfolio';
 	import ProjectModal from '$lib/components/ProjectModal.svelte';
 	import ProjectVisual from '$lib/components/ProjectVisual.svelte';
@@ -182,10 +183,8 @@
 							period={activeProject.year}
 						/>
 						<p
-							class="mt-[18px] mb-0 max-w-[58ch] text-[clamp(.78rem,1.1vw,.9rem)] leading-[1.6] text-ink-dim"
-						>
-							{projectText(activeProject.summary, locale)}
-						</p>
+							class="mt-[18px] mb-0 max-w-[58ch] text-[clamp(.78rem,1.1vw,.9rem)] leading-[1.6] text-ink-dim [&_b]:font-bold [&_em]:italic [&_i]:italic [&_strong]:font-bold"
+						>{@html renderInlineMarkup(projectText(activeProject.summary, locale))}</p>
 						<ul
 							class="mt-4 mb-0 flex list-none flex-wrap gap-x-[14px] gap-y-1.5 p-0 text-ink-faint"
 							aria-label={locale === 'es' ? 'Temas' : 'Topics'}
