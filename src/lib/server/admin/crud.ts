@@ -80,9 +80,18 @@ async function getFkOptions(entity: FkEntity): Promise<SelectOption[]> {
 		}));
 	}
 	const res = await db.execute(
-		`SELECT id, title, COALESCE(substr(date_start, 1, 4), CAST(year AS TEXT), '') AS y
-		 FROM talks
-		 ORDER BY (date_start IS NULL) ASC, date_start DESC, title COLLATE NOCASE`
+		`SELECT talk.id, talk.title,
+		        COALESCE(
+		          substr(talk.date_start, 1, 4),
+		          substr(event.date_start, 1, 4),
+		          CAST(event.year AS TEXT),
+		          ''
+		        ) AS y
+		 FROM talks AS talk
+		 LEFT JOIN events AS event ON event.id = talk.canonical_event_id
+		 ORDER BY (COALESCE(talk.date_start, event.date_start, CAST(event.year AS TEXT)) IS NULL) ASC,
+		          COALESCE(talk.date_start, event.date_start, CAST(event.year AS TEXT)) DESC,
+		          talk.title COLLATE NOCASE`
 	);
 	return res.rows.map((row) => ({
 		value: String(row.id),
@@ -122,6 +131,64 @@ export async function validateReferences(
 			if (res.rows.length === 0) {
 				parsed.errors[field.name] = 'La referencia seleccionada no existe';
 			}
+		}
+	}
+}
+
+// Reglas editoriales que relacionan varios campos. Se aplican tras comprobar
+// vocabulario y referencias, tanto en las altas independientes como en la
+// pantalla unificada de eventos.
+export function validateEntitySemantics(type: FormEntityType, parsed: ParsedForm): void {
+	if (type === 'publications') {
+		const publicationType = parsed.values.publication_type;
+		const myRole = parsed.values.my_role;
+		const authors = parsed.values.authors_text;
+		const editors = parsed.values.editors_text;
+		const containerType = parsed.values.container_type;
+		const conferenceFormat = parsed.values.conference_publication_format;
+		const conferenceContainers = [
+			'container_conference_proceedings',
+			'container_book_of_abstracts'
+		];
+
+		if (publicationType === 'publication_edited_volume') {
+			if (myRole !== 'publication_editor' && myRole !== 'publication_coeditor') {
+				parsed.errors.my_role = 'Un libro editado debe indicar edición o coedición';
+			}
+			if (editors == null || editors === '') {
+				parsed.errors.editors_text = 'Indica las personas responsables de la edición';
+			}
+		}
+
+		if (
+			(myRole === 'publication_editor' || myRole === 'publication_coeditor') &&
+			(editors == null || editors === '')
+		) {
+			parsed.errors.editors_text = 'Indica las personas responsables de la edición';
+		}
+		if (myRole === 'publication_author' && (authors == null || authors === '')) {
+			parsed.errors.authors_text = 'Indica la autoría de la publicación';
+		}
+		if (conferenceFormat != null && !conferenceContainers.includes(String(containerType))) {
+			parsed.errors.container_type =
+				'El formato de congreso requiere actas o un libro de resúmenes como contenedor';
+		}
+	}
+
+	if (type === 'talks') {
+		const contributionType = parsed.values.contribution_type;
+		const selectionMode = parsed.values.selection_mode;
+		const sessionFormat = parsed.values.session_format;
+		const sessionTitle = parsed.values.session_title;
+
+		if (contributionType === 'contribution_lecture' && selectionMode !== 'selection_invited') {
+			parsed.errors.selection_mode = 'Las ponencias son siempre por invitación';
+		}
+		if (sessionFormat === 'session_panel' && contributionType !== 'contribution_communication') {
+			parsed.errors.session_format = 'Un panel reúne comunicaciones';
+		}
+		if (sessionTitle != null && sessionTitle !== '' && sessionFormat !== 'session_panel') {
+			parsed.errors.session_format = 'Selecciona «Panel» para indicar el título de una sesión';
 		}
 	}
 }

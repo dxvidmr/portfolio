@@ -7,7 +7,12 @@ import {
 	isFormEntityType
 } from '$lib/server/admin/entity-definitions';
 import { parseEntityForm } from '$lib/server/admin/validation';
-import { createEntity, getFieldOptions, validateReferences } from '$lib/server/admin/crud';
+import {
+	createEntity,
+	getFieldOptions,
+	validateEntitySemantics,
+	validateReferences
+} from '$lib/server/admin/crud';
 import { getCanonicalEventDefaults } from '$lib/server/admin/events';
 
 export const load: PageServerLoad = async ({ locals, params, url }) => {
@@ -37,6 +42,7 @@ export const actions: Actions = {
 
 		const parsed = parseEntityForm(entityForms[params.type], await request.formData());
 		await validateReferences(params.type, parsed);
+		validateEntitySemantics(params.type, parsed);
 		if (Object.keys(parsed.errors).length > 0) {
 			return fail(400, { errors: parsed.errors, raw: parsed.raw });
 		}

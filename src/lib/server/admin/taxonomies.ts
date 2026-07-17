@@ -22,9 +22,39 @@ export const TAXONOMY_DOMAINS: TaxonomyDomainDef[] = [
 		consumers: [{ table: 'publications', column: 'publication_type' }]
 	},
 	{
+		domain: 'publication_role',
+		label: 'Responsabilidades en publicaciones',
+		consumers: [{ table: 'publications', column: 'my_role' }]
+	},
+	{
+		domain: 'publication_container_type',
+		label: 'Tipos de contenedor bibliográfico',
+		consumers: [{ table: 'publications', column: 'container_type' }]
+	},
+	{
+		domain: 'conference_publication_format',
+		label: 'Formatos de publicación en congreso',
+		consumers: [{ table: 'publications', column: 'conference_publication_format' }]
+	},
+	{
+		domain: 'publication_review_status',
+		label: 'Evaluación editorial de publicaciones',
+		consumers: [{ table: 'publications', column: 'review_status' }]
+	},
+	{
 		domain: 'contribution_type',
 		label: 'Tipos de contribución a evento',
 		consumers: [{ table: 'talks', column: 'contribution_type' }]
+	},
+	{
+		domain: 'contribution_selection',
+		label: 'Vías de acceso a contribuciones',
+		consumers: [{ table: 'talks', column: 'selection_mode' }]
+	},
+	{
+		domain: 'session_format',
+		label: 'Formatos de sesión',
+		consumers: [{ table: 'talks', column: 'session_format' }]
 	},
 	{
 		domain: 'teaching_type',

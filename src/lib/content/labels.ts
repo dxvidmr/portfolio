@@ -13,7 +13,7 @@ const entityTypeLabels: Record<string, { es: string; en: string }> = {
 	research_stays: { es: 'Estancia', en: 'Research stay' },
 	courses: { es: 'Curso', en: 'Course' },
 	education: { es: 'Formación', en: 'Education' },
-	memberships: { es: 'Asociación', en: 'Membership' },
+	memberships: { es: 'Asociación científica', en: 'Scientific association' },
 	skills: { es: 'Competencias', en: 'Skills' },
 	languages: { es: 'Idiomas', en: 'Languages' }
 };

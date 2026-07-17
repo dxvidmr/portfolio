@@ -958,11 +958,10 @@ Estado: `completada` (2026-07-16) — 5A–5E y 5G desplegadas; 5F se cierra fue
 #### Fase 5D — Documentos
 
 - [x] Gestionar metadatos y URL de documentos, sin subida directa de archivos (migración `010`; editor `DocumentsEditor` en la ficha de cada entrada).
-- [x] Aplicar reglas explícitas para documentos públicos, privados y certificados (CHECKs en BD: un certificado nunca puede ser público; propietario = entrada transversal **o** asistencia, nunca ambos).
-- [x] Garantizar que certificados y documentos privados nunca llegan a las cargas públicas (`public-documents.ts` filtra entrada pública + documento público + no certificado).
+- [x] Mantener todos los documentos como recursos privados: el editor no ofrece publicación y el servidor fuerza `is_public = 0` en cada alta o edición.
+- [x] Garantizar que ningún documento llega a las cargas públicas: no existe consumidor público ni se usan documentos como destino implícito de enlaces.
 - [x] Permitir que `event_attendance` sea propietario de certificados de asistencia enlazados desde Drive; estos documentos serán siempre privados aunque el evento tenga otras actividades públicas (gestionado desde `/admin/eventos/[id]`).
-- [x] Definir y construir el consumidor público de documentos autorizados (`/cv` y trabajos relacionados de las fichas del portfolio).
-- [x] Desplegar documentos con las restricciones públicas/privadas verificadas en código, esquema e integridad; las variantes editoriales quedan como control operativo continuo.
+- [x] Conservar la gestión privada en el dashboard sin exponer documentos en `/cv`, actividad reciente ni trabajos relacionados del portfolio.
 
 #### Fase 5E — Taxonomías
 
@@ -1151,6 +1150,7 @@ El proyecto se considera completado cuando:
 | `011_documents_legacy_column_names.sql` | **aplicada** | 2026-07-15 21:08 | producción | renombra `entry_type`/`entry_id` → `entity_type`/`entity_id` para que el dashboard desplegado (código antiguo) siga funcionando hasta el próximo deploy; columnas verificadas en Turso el 16/07 | `ALTER TABLE documents RENAME COLUMN` inverso |
 | `012_rename_academic_events_to_talks.sql` | **aplicada** | 2026-07-16 | producción | ensayo local 36/36 + humo de INSERTs 7/7; tras aplicarla el autor: verificación remota de solo lectura (tabla `talks` 21 filas, 21 controles, 0 restos de `academic_events`, vista puente activa, FK de `publications` → `talks`, `entries` 91) y humo del dev server contra la BD migrada (`/es/cv` y `/en/cv` 200 con contribuciones, home con chips «Comunicación», `/admin` protegido 303) | restaurar `backups/curriculum-2026-07-16-0756.sql` **y** revertir el commit del código renombrado |
 | `013_cleanup_legacy_structure.sql` | **aplicada** | 2026-07-16 12:52:25 UTC | producción | 91 entradas, 21 talks y 19 servicios conservados; 0 FK rotas; elimina `entries_legacy`/vista puente, controles de projects, copias de talks e `is_ongoing`; «Noviembre HD» queda evento 1→30, comunicación día 20, servicio 1→30; integridad 40/40 | restaurar `backups/curriculum-2026-07-16-1246.sql` y desplegar el código anterior si falla la ventana coordinada |
+| `017_research_stay_funding.sql` | **aplicada** | 2026-07-17 | producción | respaldo verificado `curriculum-2026-07-17-1226.sql`; estancia Oxford con dos ayudas públicas `supports` (AGAUR 3.000 EUR y Faculty 4.000 GBP); columna legado `funding_text` eliminada; integridad 45/45 | restaurar `backups/curriculum-2026-07-17-1226.sql` y revertir el código que consume metadatos de financiación estructurados |
 
 ## 25. Preguntas que deben resolverse durante la Fase 0
 

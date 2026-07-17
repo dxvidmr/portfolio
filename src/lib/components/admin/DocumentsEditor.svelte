@@ -35,7 +35,7 @@
 	<p class="max-w-[72ch] leading-[1.6] text-ink-dim">
 		{attendance
 			? 'Enlaza el certificado de Drive u otra ubicación. Estos archivos son siempre privados y nunca llegan a la web pública.'
-			: 'Gestiona archivos enlazados sin subirlos a la aplicación. Los certificados son siempre privados; los demás solo se publican con autorización explícita.'}
+			: 'Gestiona archivos enlazados sin subirlos a la aplicación. Todos los documentos son privados y nunca llegan a la web pública.'}
 	</p>
 
 	<div class="grid gap-3">
@@ -67,7 +67,6 @@
 						{#if !attendance}
 							<div class="flex flex-wrap items-center gap-2">
 								<label class="flex items-center gap-1.5 text-[0.68rem] text-ink-dim"><Checkbox name="isCertificate" value="1" checked={document.isCertificate} /> Certificado (siempre privado)</label>
-								<label class="flex items-center gap-1.5 text-[0.68rem] text-ink-dim"><Checkbox name="isPublic" value="1" checked={document.isPublic} disabled={document.isCertificate} /> Público</label>
 							</div>
 						{/if}
 						<Button type="submit" disabled={pending.includes(`save:${document.id}`)}>Guardar documento</Button>
@@ -111,7 +110,6 @@
 			{#if !attendance}
 				<div class="flex flex-wrap items-center gap-2">
 					<label class="flex items-center gap-1.5 text-[0.68rem] text-ink-dim"><Checkbox name="isCertificate" value="1" /> Certificado (siempre privado)</label>
-					<label class="flex items-center gap-1.5 text-[0.68rem] text-ink-dim"><Checkbox name="isPublic" value="1" /> Público</label>
 				</div>
 			{/if}
 			<Button type="submit" disabled={pending.includes('create')}>{attendance ? 'Enlazar certificado' : 'Añadir documento'}</Button>

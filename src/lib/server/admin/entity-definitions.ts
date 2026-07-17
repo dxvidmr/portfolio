@@ -9,7 +9,7 @@ export const entityDefinitions = {
 	research_stays: 'Estancias de investigación',
 	courses: 'Cursos',
 	education: 'Formación',
-	memberships: 'Asociaciones',
+	memberships: 'Asociaciones científicas',
 	skills: 'Competencias',
 	languages: 'Idiomas'
 } as const;
@@ -31,7 +31,13 @@ export const entityTypeOptions = entityTypes.map((value) => ({
 
 export type VocabDomain =
 	| 'publication_type'
+	| 'publication_role'
+	| 'publication_container_type'
+	| 'conference_publication_format'
+	| 'publication_review_status'
 	| 'contribution_type'
+	| 'contribution_selection'
+	| 'session_format'
 	| 'teaching_type'
 	| 'activity_type'
 	| 'award_type'
@@ -83,8 +89,24 @@ export const entityForms = {
 				required: true,
 				vocabDomain: 'publication_type'
 			}),
-			f('authors_text', 'Autores', 'text', { required: true, help: 'Tal como deben citarse' }),
-			f('editors_text', 'Editores', 'text'),
+			f('my_role', 'Mi responsabilidad', 'vocab', {
+				required: true,
+				vocabDomain: 'publication_role'
+			}),
+			f('authors_text', 'Autores', 'text', { help: 'Tal como deben citarse; déjalo vacío si editas la obra' }),
+			f('editors_text', 'Editores', 'text', { help: 'Obligatorio para un libro editado o coeditado' }),
+			f('container_type', 'Tipo de contenedor', 'vocab', {
+				vocabDomain: 'publication_container_type',
+				help: 'Dónde aparece la publicación: revista, volumen colectivo, actas o libro de resúmenes'
+			}),
+			f('conference_publication_format', 'Formato en congreso', 'vocab', {
+				vocabDomain: 'conference_publication_format',
+				help: 'Solo para publicaciones vinculadas a un evento; deja vacío si no está documentado'
+			}),
+			f('review_status', 'Evaluación editorial', 'vocab', {
+				vocabDomain: 'publication_review_status',
+				help: 'Solo si consta el proceso de evaluación; vacío significa que no se ha documentado'
+			}),
 			f('journal_title', 'Revista', 'text'),
 			f('book_title', 'Libro (para capítulos)', 'text'),
 			f('publisher', 'Editorial', 'text'),
@@ -121,6 +143,18 @@ export const entityForms = {
 				vocabDomain: 'contribution_type'
 			}),
 			f('authors_text', 'Autores', 'text', { required: true }),
+			f('selection_mode', 'Vía de acceso', 'vocab', {
+				required: true,
+				vocabDomain: 'contribution_selection',
+				help: 'Invitación o convocatoria abierta (CfP)'
+			}),
+			f('session_format', 'Formato de sesión', 'vocab', {
+				vocabDomain: 'session_format',
+				help: 'Solo si la comunicación forma parte de un panel'
+			}),
+			f('session_title', 'Título de la sesión', 'text', {
+				help: 'Identifica el panel si reúne varias comunicaciones'
+			}),
 			f('date_start', 'Fecha de la contribución', 'date', {
 				help: 'Puede ser un día exacto aunque el evento dure varios días'
 			}),
@@ -200,7 +234,6 @@ export const entityForms = {
 			f('country', 'País', 'text'),
 			f('date_start', 'Fecha de inicio', 'date'),
 			f('date_end', 'Fecha de fin', 'date'),
-			f('funding_text', 'Financiación', 'text'),
 			f('url', 'URL', 'url'),
 			f('notes_private', 'Notas privadas', 'textarea', { isPrivate: true })
 		]

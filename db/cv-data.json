@@ -270,7 +270,6 @@
       "country": null,
       "date_start": "2026-01-18",
       "date_end": "2026-04-19",
-      "funding_text": "AGAUR (3.000 €)",
       "url": null,
       "notes_private": null
     }
@@ -340,6 +339,18 @@
   ],
 
   "funding_awards": [
+	{
+	  "title": "Ayuda AGAUR para la estancia de investigación en la University of Oxford",
+	  "award_type": "scholarship",
+	  "awarding_body": "Agència de Gestió d'Ajuts Universitaris i de Recerca (AGAUR)",
+	  "amount": 3000,
+	  "currency": "EUR",
+	  "year": 2026,
+	  "related_context": "Estancia de investigación en la University of Oxford (enero-abril 2026)",
+	  "project_ref": null,
+	  "url": null,
+	  "notes_private": null
+	},
     {
       "title": "Beca (bursary) de la Faculty of Medieval and Modern Languages para la realización de la estancia en la University of Oxford",
       "award_type": "scholarship",

@@ -1,6 +1,7 @@
 import { createClient } from '@libsql/client';
 import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
+import { publicFundingMetadataSql } from '$lib/server/public-entry-metadata';
 
 describe('esquema posterior a la limpieza 013', () => {
 	it('migra el portfolio estático a un catálogo editable sin relaciones huérfanas', async () => {
@@ -140,6 +141,78 @@ describe('esquema posterior a la limpieza 013', () => {
 				 WHERE slug = 'proyecto-sin-narrativa'`
 			)).rows[0]).toMatchObject({ publication_status: 'published', tags_json: '[]', links_json: '[]' });
 			expect((await db.execute('PRAGMA foreign_key_check')).rows).toHaveLength(0);
+		} finally {
+			db.close();
+		}
+	});
+
+	it('normaliza las dos ayudas de la estancia y elimina funding_text', async () => {
+		const db = createClient({ url: 'file::memory:' });
+		try {
+			await db.executeMultiple(`
+				CREATE TABLE type_vocab (
+					code TEXT PRIMARY KEY, label_es TEXT, label_en TEXT
+				);
+				INSERT INTO type_vocab VALUES ('scholarship', 'Beca', 'Scholarship');
+				CREATE TABLE research_stays (
+					id INTEGER PRIMARY KEY, institution TEXT NOT NULL, funding_text TEXT
+				);
+				INSERT INTO research_stays VALUES (1, 'University of Oxford', 'AGAUR (3.000 €)');
+				CREATE TABLE funding_awards (
+					id INTEGER PRIMARY KEY AUTOINCREMENT, title TEXT NOT NULL,
+					award_type TEXT REFERENCES type_vocab(code), awarding_body TEXT,
+					amount REAL, currency TEXT, year INTEGER, related_context TEXT,
+					project_id INTEGER, url TEXT, notes_private TEXT
+				);
+				INSERT INTO funding_awards
+					(title, award_type, awarding_body, amount, currency, year, related_context)
+				VALUES (
+					'Beca Faculty para la estancia de Oxford', 'scholarship',
+					'Faculty of Medieval and Modern Languages, University of Oxford',
+					4000, 'GBP', 2026, 'Estancia de Oxford'
+				);
+				CREATE TABLE entry_controls (
+					entity_type TEXT NOT NULL, entity_id INTEGER NOT NULL,
+					is_public INTEGER DEFAULT 1, show_home INTEGER DEFAULT 0,
+					home_order INTEGER DEFAULT 0, featured_cv INTEGER DEFAULT 0,
+					cv_order INTEGER DEFAULT 0, updated_at TEXT DEFAULT (datetime('now')),
+					PRIMARY KEY (entity_type, entity_id)
+				);
+				INSERT INTO entry_controls (entity_type, entity_id) VALUES ('funding_awards', 1);
+				CREATE TABLE funding_relations (
+					funding_award_id INTEGER NOT NULL, entity_type TEXT NOT NULL,
+					entity_id INTEGER NOT NULL, relation_kind TEXT NOT NULL,
+					created_at TEXT DEFAULT (datetime('now')),
+					PRIMARY KEY (funding_award_id, entity_type, entity_id)
+				);
+				INSERT INTO funding_relations
+					(funding_award_id, entity_type, entity_id, relation_kind)
+				VALUES (1, 'research_stays', 1, 'supports');
+				CREATE VIEW entries AS
+					SELECT entity_type, entity_id, is_public AS public FROM entry_controls;
+			`);
+
+			await db.executeMultiple(readFileSync('db/migrations/017_research_stay_funding.sql', 'utf8'));
+
+			expect((await db.execute('PRAGMA table_info(research_stays)')).rows.map((row) => row.name))
+				.not.toContain('funding_text');
+			expect((await db.execute(
+				`SELECT funding.title, funding.amount, funding.currency, relation.relation_kind,
+				        control.is_public
+				 FROM funding_relations AS relation
+				 JOIN funding_awards AS funding ON funding.id = relation.funding_award_id
+				 JOIN entry_controls AS control
+				   ON control.entity_type = 'funding_awards' AND control.entity_id = funding.id
+				 WHERE relation.entity_type = 'research_stays' AND relation.entity_id = 1
+				 ORDER BY funding.id`
+			)).rows).toMatchObject([
+				{ amount: 4000, currency: 'GBP', relation_kind: 'supports', is_public: 1 },
+				{ amount: 3000, currency: 'EUR', relation_kind: 'supports', is_public: 1 }
+			]);
+			const metadata = await db.execute(
+				`SELECT ${publicFundingMetadataSql('r')} AS funding FROM research_stays AS r WHERE r.id = 1`
+			);
+			expect(JSON.parse(String(metadata.rows[0]?.funding))).toHaveLength(2);
 		} finally {
 			db.close();
 		}

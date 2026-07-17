@@ -105,7 +105,7 @@ export function parseDocumentValues(formData: FormData, ownerKind: DocumentOwner
 		title,
 		driveFileId,
 		url,
-		isPublic: !isCertificate && formData.get('isPublic') === '1',
+		isPublic: false,
 		isCertificate,
 		issuedBy,
 		issuedDate,

@@ -14,6 +14,7 @@ import {
 	getEntityFormValues,
 	getFieldOptions,
 	updateEntity,
+	validateEntitySemantics,
 	validateReferences
 } from '$lib/server/admin/crud';
 import { updateEntryControl } from '$lib/server/admin/controls';
@@ -120,6 +121,7 @@ export const actions: Actions = {
 
 		const parsed = parseEntityForm(entityForms[entityType], await request.formData());
 		await validateReferences(entityType, parsed);
+		validateEntitySemantics(entityType, parsed);
 		if (Object.keys(parsed.errors).length > 0) {
 			return fail(400, { errors: parsed.errors, raw: parsed.raw });
 		}

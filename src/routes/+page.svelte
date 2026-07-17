@@ -2,11 +2,13 @@
 	import { onMount } from 'svelte';
 	import ArrowRight from '@lucide/svelte/icons/arrow-right';
 	import ChevronDown from '@lucide/svelte/icons/chevron-down';
+	import MoveUpRight from '@lucide/svelte/icons/move-up-right';
 	import { page } from '$app/state';
 	import { localeFromPathname, localizedPath } from '$lib/i18n';
 	import { profile, t } from '$lib/content/profile';
 	import { entityLabel } from '$lib/content/labels';
 	import AcademicPath from '$lib/components/AcademicPath.svelte';
+	import EntryMetadata from '$lib/components/EntryMetadata.svelte';
 	import SelectedWorks from '$lib/components/SelectedWorks.svelte';
 	import SiteControls from '$lib/components/SiteControls.svelte';
 	import EditorialBackground from '$lib/components/EditorialBackground.svelte';
@@ -27,6 +29,14 @@
 	};
 
 	const yr = (s: string | null) => (s ? s.slice(0, 4) : '—');
+	const activitySubtypeLabel = (item: {
+		subtype: string | null;
+		subtype_label_es: string | null;
+		subtype_label_en: string | null;
+	}) =>
+		(locale === 'en' ? item.subtype_label_en : item.subtype_label_es) ??
+		item.subtype?.replaceAll('_', ' ') ??
+		null;
 	const academicIcons: Record<string, string> = {
 		orcid: 'ai-orcid',
 		scholar: 'ai-google-scholar',
@@ -54,11 +64,10 @@
 			portraitCaption: 'Investigador · creador escénico',
 			contactTitle: 'Contacto',
 			profilesLabel: 'Perfiles y redes',
+			cvTitle: 'CV',
 			recentLabel: 'Actualidad',
 			recentTitle: 'Actividad reciente',
-			cvLabel: 'Currículum completo',
-			cvCta: 'Ver la trayectoria completa',
-			cvSummary: 'Publicaciones, investigación, docencia y actividad académica.',
+			cvCta: 'Ver el CV completo',
 			tags: 'Etiquetas',
 			affiliation: 'Universitat Autònoma de Barcelona',
 			thesisLine1Before: 'Estudio el ',
@@ -81,11 +90,10 @@
 			portraitCaption: 'Researcher · theatre practitioner',
 			contactTitle: 'Contact',
 			profilesLabel: 'Profiles and networks',
+			cvTitle: 'CV',
 			recentLabel: 'Now',
 			recentTitle: 'Recent activity',
-			cvLabel: 'Full curriculum vitae',
-			cvCta: 'View the complete trajectory',
-			cvSummary: 'Publications, research, teaching, and academic activity.',
+			cvCta: 'View the full CV',
 			tags: 'Tags',
 			affiliation: 'Universitat Autònoma de Barcelona',
 			thesisLine1Before: 'I study ',
@@ -273,29 +281,50 @@
 		</section>
 
 		<section id="cv" class={sectionClass}>
-			<div class={sectionHeadClass}>
-				<span class="meta tag">{ui.recentLabel}</span>
-				<h2 class={sectionTitleClass}>{ui.recentTitle}</h2>
+			<div class={`${sectionHeadClass} mb-[clamp(42px,6vw,72px)]`}>
+				<h2 class={sectionTitleClass}>{ui.cvTitle}</h2>
 			</div>
-			<div class="rule"></div>
-			<ol class="dense m-0 list-none p-0">
+			<section aria-labelledby="recent-activity-title">
+				<header class="mb-[26px] grid gap-3">
+					<span class="meta tag">{ui.recentLabel}</span>
+					<h3 class="max-w-[760px] text-[clamp(1.35rem,3vw,2.25rem)] leading-[1.05]" id="recent-activity-title">{ui.recentTitle}</h3>
+				</header>
+				<ol class="m-0 list-none border-t border-rule p-0">
 				{#each data.recentActivity as e, i (e.entity_type + e.entity_id)}
-					<li class="group grid grid-cols-[34px_150px_1fr_56px] items-baseline gap-4 border-b border-rule py-[11px] max-[780px]:grid-cols-[26px_1fr_46px]">
-						<span class="meta--faint group-hover:text-accent">{String(i + 1).padStart(2, '0')}</span>
-						<span class="meta text-ink-dim group-hover:text-accent max-[780px]:hidden">{entityLabel(e.entity_type, locale)}</span>
-						<span class="overflow-hidden text-ellipsis whitespace-nowrap text-ink group-hover:text-accent">{e.title}</span>
-						<span class="meta--faint dense text-right group-hover:text-accent">{yr(e.sort_date)}</span>
+					<li class="relative grid grid-cols-[minmax(190px,.62fr)_minmax(0,1.38fr)] gap-[clamp(20px,4vw,60px)] border-b border-rule py-[clamp(20px,3vw,32px)] max-[700px]:grid-cols-1 max-[700px]:gap-4">
+						<div class="meta grid grid-cols-[28px_minmax(0,1fr)_42px] gap-3 text-ink-faint">
+							<span>{String(i + 1).padStart(2, '0')}</span>
+							<span class="grid gap-[5px]">
+								<span class="text-accent-strong">{entityLabel(e.entity_type, locale)}</span>
+								{#if activitySubtypeLabel(e)}
+									<span class="text-left text-[.62rem] leading-[1.3] text-ink-dim">{activitySubtypeLabel(e)}</span>
+								{/if}
+							</span>
+							<span class="text-right">{yr(e.sort_date)}</span>
+						</div>
+						<div class="min-w-0">
+							{#if e.target_url}
+								<a class="group m-0 flex items-start justify-between gap-[18px] font-title text-[clamp(1.15rem,2.2vw,1.8rem)] leading-[1.1] text-ink no-underline" href={e.target_url} target="_blank" rel="noreferrer">
+									<span>{e.title}</span>
+									<span class="mt-[2px] grid h-[22px] w-[22px] flex-[0_0_22px] place-items-center text-accent-strong [transition:transform_180ms_ease] group-hover:translate-x-0.5 group-hover:translate-y-[-2px] group-focus-visible:translate-x-0.5 group-focus-visible:translate-y-[-2px] motion-reduce:transition-none" aria-hidden="true">
+										<MoveUpRight size={22} strokeWidth={1.7} />
+									</span>
+								</a>
+							{:else}
+								<p class="m-0 font-title text-[clamp(1.15rem,2.2vw,1.8rem)] leading-[1.1] text-ink">{e.title}</p>
+							{/if}
+							{#if e.metadata}
+								<p class="mt-[9px] mb-0 max-w-[72ch] text-[.72rem] leading-[1.45] text-ink-faint"><EntryMetadata metadata={e.metadata} {locale} /></p>
+							{/if}
+						</div>
 					</li>
 				{/each}
-			</ol>
-			<a class="group mt-[clamp(30px,5vw,54px)] grid grid-cols-[minmax(0,1fr)_auto] items-center gap-6 rounded-ui border border-rule-strong bg-[color-mix(in_srgb,var(--bg-panel)_72%,transparent)] p-[clamp(22px,3.4vw,38px)] [transition:border-color_180ms_ease,background-color_180ms_ease] hover:border-accent-strong hover:bg-accent-wash hover:text-ink" href={localizedPath('/cv', locale)}>
-				<span class="grid min-w-0 justify-items-start gap-[7px]">
-					<span class="meta tag">{ui.cvLabel}</span>
-					<strong class="font-title text-[clamp(1.65rem,3.8vw,3.2rem)] font-medium leading-none tracking-[-.035em]">{ui.cvCta}</strong>
-					<small class="text-[.72rem] text-ink-dim">{ui.cvSummary}</small>
-				</span>
-				<span class="grid aspect-square w-[clamp(48px,6vw,66px)] place-items-center rounded-full bg-accent [background-image:var(--accent-grain)] [background-size:150px_150px] text-[var(--on-accent)] [&>svg]:[transition:transform_220ms_cubic-bezier(.22,1,.36,1)] group-hover:[&>svg]:translate-x-1" aria-hidden="true">
-					<ArrowRight size={32} strokeWidth={1.4} />
+				</ol>
+			</section>
+			<a class="group mt-[clamp(34px,5vw,58px)] flex items-center justify-between gap-6 border-y border-rule-strong py-[18px] text-ink no-underline [transition:color_180ms_ease,border-color_180ms_ease] hover:border-accent-strong hover:text-accent-strong focus-visible:border-accent-strong focus-visible:text-accent-strong" href={localizedPath('/cv', locale)}>
+				<strong class="font-title text-[clamp(1.2rem,2.2vw,1.65rem)] font-medium leading-[1.1]">{ui.cvCta}</strong>
+				<span class="grid h-8 w-8 flex-[0_0_2rem] place-items-center text-accent-strong [transition:transform_220ms_cubic-bezier(.22,1,.36,1)] group-hover:translate-x-1 group-focus-visible:translate-x-1 motion-reduce:transition-none" aria-hidden="true">
+					<ArrowRight size={24} strokeWidth={1.5} />
 				</span>
 			</a>
 		</section>

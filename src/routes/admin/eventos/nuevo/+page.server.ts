@@ -10,7 +10,12 @@ import {
 } from '$lib/server/admin/events';
 import type { FieldDef, FormEntityType } from '$lib/server/admin/entity-definitions';
 import { parseEntityForm, type ParsedForm } from '$lib/server/admin/validation';
-import { getFieldOptions, validateReferences, type SelectOption } from '$lib/server/admin/crud';
+import {
+	getFieldOptions,
+	validateEntitySemantics,
+	validateReferences,
+	type SelectOption
+} from '$lib/server/admin/crud';
 
 // Alta unificada (decisión 23): el evento canónico y sus roles (contribución,
 // servicio, asistencia privada) se crean en una sola pantalla y transacción.
@@ -46,6 +51,7 @@ async function parseRoleSection(
 		)
 	};
 	await validateReferences(type, stripped);
+	validateEntitySemantics(type, stripped);
 	Object.assign(errors, prefixKeys(stripped.errors, prefix));
 	Object.assign(raw, parsed.raw);
 	return stripped.values;

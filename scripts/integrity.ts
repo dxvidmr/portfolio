@@ -109,11 +109,50 @@ await expectZero(
 	      WHERE s.entity_type = r.entity_type AND s.entity_id = r.entity_id))`
 );
 
+await expectZero(
+	'research_stays sin la columna legado funding_text',
+	`SELECT COUNT(*) FROM pragma_table_info('research_stays') WHERE name = 'funding_text'`
+);
+
+await expectZero(
+	'la estancia de Oxford tiene exactamente dos ayudas públicas que la financian',
+	`SELECT ABS(COUNT(*) - 2)
+	 FROM funding_relations AS relation
+	 JOIN research_stays AS stay
+	   ON relation.entity_type = 'research_stays' AND relation.entity_id = stay.id
+	 JOIN entries AS funding
+	   ON funding.entity_type = 'funding_awards'
+	  AND funding.entity_id = relation.funding_award_id
+	  AND funding.public = 1
+	 WHERE stay.institution = 'University of Oxford'
+	   AND relation.relation_kind = 'supports'`
+);
+
+await expectZero(
+	'las ayudas Oxford son AGAUR 3.000 EUR y Faculty 4.000 GBP',
+	`SELECT ABS(COUNT(*) - 2)
+	 FROM funding_relations AS relation
+	 JOIN research_stays AS stay
+	   ON relation.entity_type = 'research_stays' AND relation.entity_id = stay.id
+	 JOIN funding_awards AS funding ON funding.id = relation.funding_award_id
+	 WHERE stay.institution = 'University of Oxford'
+	   AND relation.relation_kind = 'supports'
+	   AND ((funding.awarding_body LIKE '%(AGAUR)' AND funding.amount = 3000 AND funding.currency = 'EUR')
+	     OR (funding.awarding_body = 'Faculty of Medieval and Modern Languages, University of Oxford'
+	         AND funding.amount = 4000 AND funding.currency = 'GBP'))`
+);
+
 // ── Vocabulario controlado: código + dominio correcto por tabla (§5.5) ──────
 
 const vocabConsumers: Array<{ table: string; column: string; domain: string; nullable: boolean }> = [
 	{ table: 'publications', column: 'publication_type', domain: 'publication_type', nullable: false },
+	{ table: 'publications', column: 'my_role', domain: 'publication_role', nullable: true },
+	{ table: 'publications', column: 'container_type', domain: 'publication_container_type', nullable: true },
+	{ table: 'publications', column: 'conference_publication_format', domain: 'conference_publication_format', nullable: true },
+	{ table: 'publications', column: 'review_status', domain: 'publication_review_status', nullable: true },
 	{ table: 'talks', column: 'contribution_type', domain: 'contribution_type', nullable: false },
+	{ table: 'talks', column: 'selection_mode', domain: 'contribution_selection', nullable: true },
+	{ table: 'talks', column: 'session_format', domain: 'session_format', nullable: true },
 	{ table: 'teaching', column: 'teaching_type', domain: 'teaching_type', nullable: false },
 	{ table: 'service_activities', column: 'activity_type', domain: 'activity_type', nullable: false },
 	{ table: 'funding_awards', column: 'award_type', domain: 'award_type', nullable: true },

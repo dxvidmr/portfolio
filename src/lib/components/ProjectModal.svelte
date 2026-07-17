@@ -12,6 +12,7 @@
 	import type { PortfolioRelatedItem } from '$lib/types/portfolio';
 	import ProjectVisual from '$lib/components/ProjectVisual.svelte';
 	import ProjectStory from '$lib/components/projects/ProjectStory.svelte';
+	import EntryMetadata from '$lib/components/EntryMetadata.svelte';
 
 	let {
 		project,
@@ -42,8 +43,6 @@
 		null;
 	const additionalLinkLabel = (link: PortfolioRelatedItem['links'][number]) =>
 		locale === 'en' ? link.label_en : link.label_es;
-	const documentLabel = (document: PortfolioRelatedItem['documents'][number]) =>
-		document.title ?? (locale === 'en' ? document.label_en : document.label_es);
 	const copy = $derived(
 		locale === 'es'
 			? {
@@ -285,20 +284,13 @@
 										{:else}
 											<p class="m-0 flex justify-between gap-[18px] font-title text-[clamp(1.15rem,2.2vw,1.8rem)] leading-[1.1] text-ink">{item.title}</p>
 										{/if}
-										{#if item.detail}<p class="mt-[9px] mb-0 max-w-[72ch] text-[.72rem] leading-[1.45] text-ink-faint">{item.detail}</p>{/if}
+										{#if item.metadata}<p class="mt-[9px] mb-0 max-w-[72ch] text-[.72rem] leading-[1.45] text-ink-faint"><EntryMetadata metadata={item.metadata} {locale} /></p>{/if}
 										{#if item.links.length}
 											<div class="mt-2.5 flex flex-wrap gap-1.5">
 												{#each item.links as link (link.url)}
 													<a class={`border px-[7px] py-1 text-[.64rem] no-underline hover:border-accent-strong hover:text-accent-strong focus-visible:border-accent-strong focus-visible:text-accent-strong ${link.is_primary ? 'border-accent-strong text-accent-strong' : 'border-rule text-ink-faint'}`} href={link.url} target="_blank" rel="noreferrer">
 														{additionalLinkLabel(link)}
 													</a>
-												{/each}
-											</div>
-										{/if}
-										{#if item.documents.length}
-											<div class="mt-2 flex flex-wrap gap-2">
-												{#each item.documents as document (document.url)}
-													<a class="text-[.64rem] text-ink-faint hover:text-accent-strong focus-visible:text-accent-strong" href={document.url} target="_blank" rel="noreferrer">↓ {documentLabel(document)}</a>
 												{/each}
 											</div>
 										{/if}

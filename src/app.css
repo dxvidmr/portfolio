@@ -126,7 +126,8 @@ body.home-intro {
 }
 
 body.home-page,
-body:has(.home) {
+body:has(.home),
+body:has(.cv-page) {
 	background-image: none;
 }
 
