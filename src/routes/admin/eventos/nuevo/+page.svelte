@@ -49,11 +49,11 @@
 
 		<label class="mt-3 mb-1.5 flex cursor-pointer items-baseline gap-2.5 text-ink">
 			<Checkbox name="rol_contribucion" value="1" bind:checked={withTalk} />
-			<span>Contribución <small class="ml-1.5 text-ink-faint">comunicación, ponencia, póster…</small></span>
+			<span>Comunicación <small class="ml-1.5 text-ink-faint">comunicación, ponencia, póster…</small></span>
 		</label>
 		{#if withTalk}
 			<fieldset class="mt-1.5 mb-4 rounded-ui border border-dashed border-rule p-4">
-				<legend class="px-2 text-[0.8rem] text-ink-dim">Contribución</legend>
+				<legend class="px-2 text-[0.8rem] text-ink-dim">Comunicación</legend>
 				<EntityForm
 					fields={data.talkFields}
 					values={form?.raw ?? {}}

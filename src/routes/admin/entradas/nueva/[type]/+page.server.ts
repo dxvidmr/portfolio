@@ -4,7 +4,8 @@ import { requireAdmin } from '$lib/server/admin/auth';
 import {
 	entityDefinitions,
 	entityForms,
-	isFormEntityType
+	isFormEntityType,
+	type EntityFormDef
 } from '$lib/server/admin/entity-definitions';
 import { parseEntityForm } from '$lib/server/admin/validation';
 import {
@@ -25,11 +26,13 @@ export const load: PageServerLoad = async ({ locals, params, url }) => {
 		(params.type === 'talks' || params.type === 'service_activities')
 			? await getCanonicalEventDefaults(eventId, params.type)
 			: {};
+	const formDefinition: EntityFormDef = entityForms[params.type];
 
 	return {
 		entityType: params.type,
 		typeLabel: entityDefinitions[params.type],
-		fields: entityForms[params.type].fields,
+		fields: formDefinition.fields,
+		groups: formDefinition.groups ?? [],
 		options: await getFieldOptions(params.type),
 		initialValues
 	};

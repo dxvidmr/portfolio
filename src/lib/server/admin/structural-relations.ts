@@ -33,7 +33,7 @@ const projectGroups: Array<Omit<StructuralRelationGroup, 'items'>> = [
 	},
 	{
 		entityType: 'talks',
-		label: 'Contribuciones a eventos',
+		label: 'Comunicaciones',
 		description: 'Comunicaciones y ponencias vinculadas a este proyecto de investigación.'
 	},
 	{

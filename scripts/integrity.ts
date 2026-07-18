@@ -207,7 +207,18 @@ await expectZero(
 await expectZero(
 	'los intervalos de contribuciones no terminan antes de empezar',
 	`SELECT COUNT(*) FROM talks
-	 WHERE date_start IS NOT NULL AND date_end IS NOT NULL AND date_end < date_start`
+	 WHERE date_override IS NOT NULL
+	   AND date_end_override IS NOT NULL
+	   AND date_end_override <= date_override`
+);
+
+await expectZero(
+	'las comunicaciones no duplican las fechas de su evento',
+	`SELECT COUNT(*)
+	 FROM talks AS talk
+	 JOIN events AS event ON event.id = talk.canonical_event_id
+	 WHERE (talk.date_override IS NOT NULL AND talk.date_override = event.date_start)
+	    OR (talk.date_end_override IS NOT NULL AND talk.date_end_override = event.date_end)`
 );
 
 await expectZero(

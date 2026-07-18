@@ -1,5 +1,4 @@
 import { db } from '$lib/server/db';
-import type { EntryKey } from './controls';
 import { isValidPartialDate } from './date-validation';
 import { entityForms, type FieldDef } from './entity-definitions';
 import type { FieldValue } from './validation';
@@ -256,7 +255,7 @@ const SERVICE_EVENT_OMITTED = new Set([
 ]);
 
 export const unifiedTalkFields: FieldDef[] = entityForms.talks.fields.filter(
-	(field) => field.name !== 'canonical_event_id'
+	(field) => field.name !== 'canonical_event_id' && field.persist !== false
 );
 
 export const unifiedServiceFields: FieldDef[] = entityForms.service_activities.fields.filter(
@@ -371,23 +370,9 @@ export async function deleteCanonicalEvent(id: number): Promise<void> {
 		args: [id, id, id]
 	});
 	if (Number(usage.rows[0].total) > 0) {
-		throw new Error('Desvincula primero las contribuciones, servicios y asistencias');
+		throw new Error('Desvincula primero las comunicaciones, servicios y asistencias');
 	}
 	await db.execute({ sql: 'DELETE FROM events WHERE id = ?', args: [id] });
-}
-
-export async function getCanonicalEventForEntry(entry: EntryKey): Promise<{ id: number; title: string } | null> {
-	if (entry.entityType !== 'talks' && entry.entityType !== 'service_activities') return null;
-	const result = await db.execute({
-		sql: `SELECT event.id, event.title
-		      FROM ${entry.entityType} source
-		      JOIN events event ON event.id = source.canonical_event_id
-		      WHERE source.id = ?`,
-		args: [entry.entityId]
-	});
-	return result.rows[0]
-		? { id: Number(result.rows[0].id), title: String(result.rows[0].title) }
-		: null;
 }
 
 export async function getCanonicalEventDefaults(
@@ -397,7 +382,7 @@ export async function getCanonicalEventDefaults(
 	const result = await db.execute({ sql: 'SELECT * FROM events WHERE id = ?', args: [eventId] });
 	if (result.rows.length === 0) return {};
 	const row = result.rows[0];
-	// El formulario de talks ya no pide datos del evento: basta preseleccionarlo.
+	// El formulario de comunicaciones ya no duplica datos del evento: basta preseleccionarlo.
 	if (entityType === 'talks') return { canonical_event_id: String(eventId) };
 	return {
 		canonical_event_id: String(eventId),

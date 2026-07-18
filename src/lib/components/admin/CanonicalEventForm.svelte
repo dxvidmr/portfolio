@@ -28,7 +28,7 @@
 			name: 'date_start',
 			label: 'Inicio del evento',
 			placeholder: 'AAAA-MM-DD',
-			help: 'Duración general; cada contribución o servicio conserva sus propias fechas'
+			help: 'Duración general; cada comunicación o servicio conserva sus propias fechas'
 		},
 		{ name: 'date_end', label: 'Fin del evento', placeholder: 'AAAA-MM-DD' },
 		{ name: 'year', label: 'Año', placeholder: 'AAAA' },

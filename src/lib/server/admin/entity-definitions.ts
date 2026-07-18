@@ -2,7 +2,7 @@ export const entityDefinitions = {
 	projects: 'Proyectos',
 	publications: 'Publicaciones',
 	academic_works: 'Trabajos académicos',
-	talks: 'Contribuciones a eventos',
+	talks: 'Comunicaciones',
 	teaching: 'Docencia',
 	service_activities: 'Actividades de servicio',
 	funding_awards: 'Financiación y premios',
@@ -68,10 +68,26 @@ export interface FieldDef {
 	fkEntity?: FkEntity;
 	help?: string;
 	isPrivate?: boolean;
+	showWhen?: {
+		all?: Array<{ field: string; values?: string[]; notValues?: string[] }>;
+		any?: Array<{ field: string; values?: string[]; notValues?: string[] }>;
+	};
+	wide?: boolean;
+	advanced?: boolean;
+	persist?: boolean;
+}
+
+export interface FieldGroupDef {
+	id: string;
+	title: string;
+	description?: string;
+	advancedLabel?: string;
+	fields: string[];
 }
 
 export interface EntityFormDef {
 	fields: FieldDef[];
+	groups?: FieldGroupDef[];
 }
 
 const f = (
@@ -83,8 +99,52 @@ const f = (
 
 export const entityForms = {
 	publications: {
+		groups: [
+			{
+				id: 'publication-main',
+				title: 'Datos principales',
+				description: 'Identifica la publicación y tu responsabilidad bibliográfica.',
+				fields: ['title', 'publication_type', 'my_role']
+			},
+			{
+				id: 'publication-authorship',
+				title: 'Autoría y edición',
+				description: 'Registra las menciones de responsabilidad tal como deben aparecer en la cita.',
+				fields: ['authors_text', 'editors_text']
+			},
+			{
+				id: 'publication-container',
+				title: 'Publicación y contenedor',
+				description: 'Los campos se adaptan al tipo de publicación y al lugar donde se publicó.',
+				fields: [
+					'container_type',
+					'journal_title',
+					'book_title',
+					'publisher',
+					'year',
+					'volume',
+					'issue',
+					'pages',
+					'conference_publication_format',
+					'review_status',
+					'event_id'
+				]
+			},
+			{
+				id: 'publication-identifiers',
+				title: 'Identificadores y acceso',
+				description: 'Añade solo los identificadores que correspondan a esta publicación o a su contenedor.',
+				fields: ['doi', 'isbn', 'issn', 'url']
+			},
+			{
+				id: 'publication-context',
+				title: 'Contenido y relaciones',
+				description: 'Información complementaria para describir y conectar la publicación.',
+				fields: ['project_id', 'abstract', 'bibtex_override']
+			}
+		],
 		fields: [
-			f('title', 'Título', 'text', { required: true }),
+			f('title', 'Título', 'text', { required: true, wide: true }),
 			f('publication_type', 'Tipo de publicación', 'vocab', {
 				required: true,
 				vocabDomain: 'publication_type'
@@ -93,80 +153,272 @@ export const entityForms = {
 				required: true,
 				vocabDomain: 'publication_role'
 			}),
-			f('authors_text', 'Autores', 'text', { help: 'Tal como deben citarse; déjalo vacío si editas la obra' }),
-			f('editors_text', 'Editores', 'text', { help: 'Obligatorio para un libro editado o coeditado' }),
+			f('authors_text', 'Autores', 'text', {
+				help: 'Tal como deben citarse; déjalo vacío si editas la obra',
+				wide: true
+			}),
+			f('editors_text', 'Editores', 'text', {
+				help: 'Tal como deben citarse; obligatorio si editas o coeditas la obra',
+				wide: true,
+				showWhen: {
+					any: [
+						{ field: 'my_role', values: ['publication_editor', 'publication_coeditor'] },
+						{
+							field: 'container_type',
+							values: [
+								'container_edited_book',
+								'container_conference_proceedings',
+								'container_book_of_abstracts',
+								'container_reference_work'
+							]
+						}
+					]
+				}
+			}),
 			f('container_type', 'Tipo de contenedor', 'vocab', {
 				vocabDomain: 'publication_container_type',
 				help: 'Dónde aparece la publicación: revista, volumen colectivo, actas o libro de resúmenes'
 			}),
-			f('conference_publication_format', 'Formato en congreso', 'vocab', {
+			f('conference_publication_format', 'Subtipo de artículo en congreso', 'vocab', {
 				vocabDomain: 'conference_publication_format',
-				help: 'Solo para publicaciones vinculadas a un evento; deja vacío si no está documentado'
+				help: 'Solo si el artículo se publica expresamente como short paper o full paper',
+				showWhen: {
+					all: [
+						{
+							field: 'container_type',
+							values: ['container_conference_proceedings', 'container_book_of_abstracts']
+						},
+						{ field: 'publication_type', values: ['publication_article'] }
+					]
+				}
 			}),
 			f('review_status', 'Evaluación editorial', 'vocab', {
 				vocabDomain: 'publication_review_status',
-				help: 'Solo si consta el proceso de evaluación; vacío significa que no se ha documentado'
+				help: 'Solo si consta el proceso de evaluación; vacío significa que no se ha documentado',
+				showWhen: {
+					any: [
+						{
+							field: 'container_type',
+							values: ['container_journal_issue', 'container_conference_proceedings', 'container_book_of_abstracts']
+						}
+					]
+				}
 			}),
-			f('journal_title', 'Revista', 'text'),
-			f('book_title', 'Libro (para capítulos)', 'text'),
-			f('publisher', 'Editorial', 'text'),
+			f('journal_title', 'Revista', 'text', {
+				wide: true,
+				showWhen: { all: [{ field: 'container_type', values: ['container_journal_issue'] }] }
+			}),
+			f('book_title', 'Título del contenedor', 'text', {
+				wide: true,
+				showWhen: {
+					all: [
+						{
+							field: 'container_type',
+							values: [
+								'container_edited_book',
+								'container_conference_proceedings',
+								'container_book_of_abstracts',
+								'container_reference_work'
+							]
+						}
+					]
+				}
+			}),
+			f('publisher', 'Editorial', 'text', {
+				showWhen: {
+					any: [
+						{
+							field: 'publication_type',
+							values: [
+								'publication_book',
+								'publication_critical_edition',
+								'publication_digital_edition',
+								'publication_translation'
+							]
+						},
+						{
+							field: 'container_type',
+							values: [
+								'container_edited_book',
+								'container_conference_proceedings',
+								'container_book_of_abstracts',
+								'container_reference_work'
+							]
+						}
+					]
+				}
+			}),
 			f('year', 'Año', 'integer'),
-			f('volume', 'Volumen', 'text'),
-			f('issue', 'Número', 'text'),
-			f('pages', 'Páginas', 'text'),
+			f('volume', 'Volumen', 'text', {
+				showWhen: { all: [{ field: 'container_type', values: ['container_journal_issue'] }] }
+			}),
+			f('issue', 'Número', 'text', {
+				showWhen: { all: [{ field: 'container_type', values: ['container_journal_issue'] }] }
+			}),
+			f('pages', 'Páginas', 'text', {
+				showWhen: {
+					any: [
+						{
+							field: 'publication_type',
+							values: [
+								'publication_article',
+								'publication_chapter',
+								'publication_abstract',
+								'publication_review',
+								'publication_reference_entry',
+								'publication_front_matter'
+							]
+						},
+						{
+							field: 'container_type',
+							values: [
+								'container_journal_issue',
+								'container_edited_book',
+								'container_conference_proceedings',
+								'container_book_of_abstracts',
+								'container_reference_work'
+							]
+						}
+					]
+				}
+			}),
 			f('doi', 'DOI', 'text'),
-			f('isbn', 'ISBN', 'text'),
-			f('issn', 'ISSN', 'text'),
+			f('isbn', 'ISBN', 'text', {
+				showWhen: {
+					any: [
+						{
+							field: 'publication_type',
+							values: [
+								'publication_book',
+								'publication_critical_edition',
+								'publication_digital_edition',
+								'publication_translation'
+							]
+						},
+						{
+							field: 'container_type',
+							values: [
+								'container_edited_book',
+								'container_conference_proceedings',
+								'container_book_of_abstracts',
+								'container_reference_work'
+							]
+						}
+					]
+				}
+			}),
+			f('issn', 'ISSN', 'text', {
+				showWhen: { all: [{ field: 'container_type', values: ['container_journal_issue'] }] }
+			}),
 			f('abstract', 'Resumen', 'textarea'),
-			f('bibtex_override', 'BibTeX manual', 'textarea', { help: 'Solo si la cita automática no basta' }),
+			f('bibtex_override', 'BibTeX manual', 'textarea', {
+				help: 'Solo si la cita automática no basta',
+				advanced: true
+			}),
 			f('event_id', 'Comunicación de origen', 'fk', {
 				fkEntity: 'talks',
-				help: 'Contribución a evento de la que deriva esta publicación'
+				help: 'Contribución a evento de la que deriva esta publicación',
+				showWhen: {
+					all: [
+						{
+							field: 'container_type',
+							values: ['container_conference_proceedings', 'container_book_of_abstracts']
+						}
+					]
+				}
 			}),
 			f('project_id', 'Proyecto de investigación', 'fk', { fkEntity: 'projects' }),
-			f('url', 'URL', 'url')
+			f('url', 'URL', 'url', { wide: true })
 		]
 	},
 	talks: {
 		// Los datos del evento (nombre, fechas, lugar, modalidad) viven en la
 		// ficha canónica `events`; las fechas de abajo pertenecen a la
-		// contribución concreta y pueden diferir de la duración del evento.
+		// comunicación concreta y pueden diferir de la duración del evento.
+		groups: [
+			{
+				id: 'talk-main',
+				title: 'Datos principales',
+				description: 'Identifica la comunicación y su autoría.',
+				fields: ['title', 'contribution_type', 'authors_text']
+			},
+			{
+				id: 'talk-event',
+				title: 'Evento y acceso',
+				description: 'La fecha se hereda del evento. Precísala solo si la comunicación ocurrió en un día o intervalo más concreto.',
+				advancedLabel: 'Fecha (avanzado)',
+				fields: [
+					'canonical_event_id',
+					'selection_mode',
+					'date_override',
+					'date_range_enabled',
+					'date_end_override'
+				]
+			},
+			{
+				id: 'talk-session',
+				title: 'Sesión',
+				description: 'Solo para comunicaciones integradas en una sesión colectiva.',
+				fields: ['session_format', 'session_title']
+			},
+			{
+				id: 'talk-relations',
+				title: 'Relaciones e identificadores',
+				description: 'Conecta la comunicación con un proyecto y añade sus destinos públicos.',
+				fields: ['project_id', 'doi', 'url']
+			}
+		],
 		fields: [
-			f('title', 'Título de la contribución', 'text', { required: true }),
+			f('title', 'Título de la comunicación', 'text', { required: true, wide: true }),
 			f('canonical_event_id', 'Evento', 'fk', {
 				required: true,
 				fkEntity: 'events',
-				help: 'Nombre, fechas y lugar se toman de la ficha del evento'
+				help: 'Nombre, fechas y lugar se heredan de la ficha del evento.',
+				wide: true
 			}),
-			f('contribution_type', 'Tipo de contribución', 'vocab', {
+			f('contribution_type', 'Tipo de comunicación', 'vocab', {
 				required: true,
 				vocabDomain: 'contribution_type'
 			}),
-			f('authors_text', 'Autores', 'text', { required: true }),
+			f('authors_text', 'Autores', 'text', { required: true, wide: true }),
 			f('selection_mode', 'Vía de acceso', 'vocab', {
-				required: true,
 				vocabDomain: 'contribution_selection',
-				help: 'Invitación o convocatoria abierta (CfP)'
+				help: 'Invitación o convocatoria abierta (CfP); las ponencias son siempre invitadas',
+				showWhen: { all: [{ field: 'contribution_type', notValues: ['contribution_lecture'] }] }
 			}),
 			f('session_format', 'Formato de sesión', 'vocab', {
 				vocabDomain: 'session_format',
-				help: 'Solo si la comunicación forma parte de un panel'
+				help: 'Solo si la comunicación forma parte de un panel',
+				showWhen: {
+					all: [{ field: 'contribution_type', values: ['contribution_communication'] }]
+				}
 			}),
 			f('session_title', 'Título de la sesión', 'text', {
-				help: 'Identifica el panel si reúne varias comunicaciones'
+				help: 'Identifica el panel si reúne varias comunicaciones',
+				wide: true,
+				showWhen: { all: [{ field: 'session_format', values: ['session_panel'] }] }
 			}),
-			f('date_start', 'Fecha de la contribución', 'date', {
-				help: 'Puede ser un día exacto aunque el evento dure varios días'
+			f('date_override', 'Día de la comunicación', 'date', {
+				help: 'Día concreto dentro del evento.',
+				advanced: true
 			}),
-			f('date_end', 'Fin de la contribución', 'date', {
-				help: 'Déjala vacía si tuvo lugar en un solo día'
+			f('date_range_enabled', '¿La comunicación duró más de un día?', 'boolean', {
+				advanced: true,
+				persist: false,
+				showWhen: { all: [{ field: 'date_override', notValues: [''] }] }
 			}),
-			f('role', 'Rol', 'text', {
-				help: 'Solo si tu papel no es el implícito del tipo (p. ej. conferencia invitada)'
+			f('date_end_override', 'Último día', 'date', {
+				help: 'Debe ser posterior al día inicial.',
+				advanced: true,
+				showWhen: { all: [{ field: 'date_range_enabled', values: ['1'] }] }
 			}),
 			f('doi', 'DOI', 'text'),
-			f('project_id', 'Proyecto de investigación', 'fk', { fkEntity: 'projects' }),
-			f('url', 'URL', 'url')
+			f('project_id', 'Proyecto de investigación', 'fk', {
+				fkEntity: 'projects',
+				help: 'Relación opcional con el proyecto del que forma parte la comunicación',
+				wide: true
+			}),
+			f('url', 'URL', 'url', { wide: true })
 		]
 	},
 	teaching: {

@@ -14,10 +14,11 @@ import type { FieldValue, ParsedForm } from './validation';
 export interface SelectOption {
 	value: string;
 	label: string;
+	meta?: string;
 }
 
 const fieldNames = (type: FormEntityType): string[] =>
-	entityForms[type].fields.map((field) => field.name);
+	entityForms[type].fields.filter((field) => field.persist !== false).map((field) => field.name);
 
 // Opciones de selectores: vocabulario filtrado por dominio y lookups FK.
 export async function getFieldOptions(
@@ -69,28 +70,35 @@ async function getFkOptions(entity: FkEntity): Promise<SelectOption[]> {
 	}
 	if (entity === 'events') {
 		const res = await db.execute(
-			`SELECT id, title, COALESCE(CAST(year AS TEXT), substr(date_start, 1, 4), '') AS y
+			`SELECT id, title, date_start, date_end,
+			        COALESCE(CAST(year AS TEXT), substr(date_start, 1, 4), '') AS y
 			 FROM events
 			 ORDER BY (year IS NULL AND date_start IS NULL) ASC,
 			          COALESCE(CAST(year AS TEXT), date_start) DESC, title COLLATE NOCASE`
 		);
-		return res.rows.map((row) => ({
-			value: String(row.id),
-			label: row.y ? `${row.y} — ${row.title}` : String(row.title)
-		}));
+		return res.rows.map((row) => {
+			const start = row.date_start ? String(row.date_start) : '';
+			const end = row.date_end ? String(row.date_end) : '';
+			const date = start ? (end && end !== start ? `${start} — ${end}` : start) : String(row.y ?? '');
+			return {
+				value: String(row.id),
+				label: row.y ? `${row.y} — ${row.title}` : String(row.title),
+				meta: date ? `Fecha del evento: ${date}` : 'Evento sin fecha registrada'
+			};
+		});
 	}
 	const res = await db.execute(
 		`SELECT talk.id, talk.title,
 		        COALESCE(
-		          substr(talk.date_start, 1, 4),
+		          substr(talk.date_override, 1, 4),
 		          substr(event.date_start, 1, 4),
 		          CAST(event.year AS TEXT),
 		          ''
 		        ) AS y
 		 FROM talks AS talk
 		 LEFT JOIN events AS event ON event.id = talk.canonical_event_id
-		 ORDER BY (COALESCE(talk.date_start, event.date_start, CAST(event.year AS TEXT)) IS NULL) ASC,
-		          COALESCE(talk.date_start, event.date_start, CAST(event.year AS TEXT)) DESC,
+		 ORDER BY (COALESCE(talk.date_override, event.date_start, CAST(event.year AS TEXT)) IS NULL) ASC,
+		          COALESCE(talk.date_override, event.date_start, CAST(event.year AS TEXT)) DESC,
 		          talk.title COLLATE NOCASE`
 	);
 	return res.rows.map((row) => ({
@@ -151,15 +159,6 @@ export function validateEntitySemantics(type: FormEntityType, parsed: ParsedForm
 			'container_book_of_abstracts'
 		];
 
-		if (publicationType === 'publication_edited_volume') {
-			if (myRole !== 'publication_editor' && myRole !== 'publication_coeditor') {
-				parsed.errors.my_role = 'Un libro editado debe indicar edición o coedición';
-			}
-			if (editors == null || editors === '') {
-				parsed.errors.editors_text = 'Indica las personas responsables de la edición';
-			}
-		}
-
 		if (
 			(myRole === 'publication_editor' || myRole === 'publication_coeditor') &&
 			(editors == null || editors === '')
@@ -171,7 +170,11 @@ export function validateEntitySemantics(type: FormEntityType, parsed: ParsedForm
 		}
 		if (conferenceFormat != null && !conferenceContainers.includes(String(containerType))) {
 			parsed.errors.container_type =
-				'El formato de congreso requiere actas o un libro de resúmenes como contenedor';
+				'El subtipo de artículo requiere actas o un libro de resúmenes como contenedor';
+		}
+		if (conferenceFormat != null && publicationType !== 'publication_article') {
+			parsed.errors.conference_publication_format =
+				'Los subtipos short paper y full paper solo se aplican a publicaciones de tipo «Artículo»';
 		}
 	}
 
@@ -180,15 +183,27 @@ export function validateEntitySemantics(type: FormEntityType, parsed: ParsedForm
 		const selectionMode = parsed.values.selection_mode;
 		const sessionFormat = parsed.values.session_format;
 		const sessionTitle = parsed.values.session_title;
+		const dateOverride = parsed.values.date_override;
+		const dateEndOverride = parsed.values.date_end_override;
 
-		if (contributionType === 'contribution_lecture' && selectionMode !== 'selection_invited') {
-			parsed.errors.selection_mode = 'Las ponencias son siempre por invitación';
+		if (contributionType === 'contribution_lecture') {
+			parsed.values.selection_mode = 'selection_invited';
+			delete parsed.errors.selection_mode;
+		} else if (selectionMode == null || selectionMode === '') {
+			parsed.errors.selection_mode = 'Indica si fue por invitación o mediante convocatoria abierta';
 		}
 		if (sessionFormat === 'session_panel' && contributionType !== 'contribution_communication') {
 			parsed.errors.session_format = 'Un panel reúne comunicaciones';
 		}
 		if (sessionTitle != null && sessionTitle !== '' && sessionFormat !== 'session_panel') {
 			parsed.errors.session_format = 'Selecciona «Panel» para indicar el título de una sesión';
+		}
+		if (dateEndOverride != null && dateEndOverride !== '') {
+			if (dateOverride == null || dateOverride === '') {
+				parsed.errors.date_end_override = 'Indica primero el día de la comunicación';
+			} else if (String(dateEndOverride) <= String(dateOverride)) {
+				parsed.errors.date_end_override = 'El último día debe ser posterior; no repitas el día inicial';
+			}
 		}
 	}
 }
@@ -299,6 +314,7 @@ export async function getEntityFormValues(
 		else if (field.kind === 'boolean') values[field.name] = Number(value) === 1 ? '1' : '';
 		else values[field.name] = String(value);
 	}
+	if (type === 'talks') values.date_range_enabled = values.date_end_override ? '1' : '';
 	return values;
 }
 

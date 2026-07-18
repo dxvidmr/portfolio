@@ -51,7 +51,7 @@
 	<div class="flex items-start justify-between gap-4 max-[750px]:flex-col">
 		<div><h2 class="mt-0 mb-4 text-base">Roles y actividades</h2><p class="-mt-2.5 mb-4 max-w-[70ch] text-xs leading-[1.5] text-ink-faint">Un mismo evento puede reunir varios roles independientes.</p></div>
 		<div class="flex flex-wrap gap-2">
-			<ButtonLink href={`/admin/entradas/nueva/talks?eventId=${data.event.id}`}>+ Contribución</ButtonLink>
+			<ButtonLink href={`/admin/entradas/nueva/talks?eventId=${data.event.id}`}>+ Comunicación</ButtonLink>
 			<ButtonLink href={`/admin/entradas/nueva/service_activities?eventId=${data.event.id}`}>+ Servicio</ButtonLink>
 		</div>
 	</div>

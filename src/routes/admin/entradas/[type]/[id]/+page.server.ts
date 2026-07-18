@@ -5,6 +5,7 @@ import {
 	entityDefinitions,
 	entityForms,
 	isFormEntityType,
+	type EntityFormDef,
 	type FormEntityType
 } from '$lib/server/admin/entity-definitions';
 import { parseEntityForm } from '$lib/server/admin/validation';
@@ -32,7 +33,6 @@ import {
 	updateFundingRelationKind
 } from '$lib/server/admin/funding-relations';
 import { parseEntryKey } from '$lib/server/admin/controls';
-import { getCanonicalEventForEntry } from '$lib/server/admin/events';
 import {
 	addLink,
 	moveLink,
@@ -76,13 +76,13 @@ export const load: PageServerLoad = async ({ locals, params, setHeaders }) => {
 
 	const headingKey = HEADING_KEYS.find((key) => values[key]);
 	const entry = { entityType, entityId };
-	const [options, control, portfolioRelations, structuralRelations, fundingRelations, canonicalEvent, links, documents] = await Promise.all([
+	const formDefinition: EntityFormDef = entityForms[entityType];
+	const [options, control, portfolioRelations, structuralRelations, fundingRelations, links, documents] = await Promise.all([
 		getFieldOptions(entityType),
 		getControlState(entityType, entityId),
 		getEntryPortfolioRelations({ entityType, entityId }),
 		getStructuralRelations({ entityType, entityId }),
 		getFundingRelationEditor({ entityType, entityId }),
-		getCanonicalEventForEntry(entry),
 		getLinkEditor(entry),
 		getDocumentEditor({ kind: 'entry', entry })
 	]);
@@ -92,7 +92,8 @@ export const load: PageServerLoad = async ({ locals, params, setHeaders }) => {
 		entityId,
 		typeLabel: entityDefinitions[entityType],
 		heading: headingKey ? values[headingKey] : `#${entityId}`,
-		fields: entityForms[entityType].fields,
+		fields: formDefinition.fields,
+		groups: formDefinition.groups ?? [],
 		options,
 		values,
 		control,
@@ -100,7 +101,6 @@ export const load: PageServerLoad = async ({ locals, params, setHeaders }) => {
 		structuralRelations,
 		hasStructuralRelations: supportsStructuralRelations(entityType),
 		fundingRelations,
-		canonicalEvent,
 		links,
 		documents
 	};

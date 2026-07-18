@@ -27,7 +27,7 @@
 <a class="mt-8 grid gap-1.5 rounded-ui border border-accent-strong px-[1.1rem] py-4 text-ink hover:bg-accent-wash focus-visible:outline-2 focus-visible:outline-offset-3 focus-visible:outline-accent-strong" href="/admin/eventos/nuevo">
 	<strong class="text-accent-strong">Evento académico</strong>
 	<span class="max-w-[70ch] text-[0.82rem] leading-[1.5] text-ink-dim">
-		Congreso, seminario, jornada… Crea el evento y, en el mismo paso, tu contribución,
+		Congreso, seminario, jornada… Crea el evento y, en el mismo paso, tu comunicación,
 		servicio o asistencia. Es el camino recomendado para comunicaciones y organización.
 	</span>
 </a>

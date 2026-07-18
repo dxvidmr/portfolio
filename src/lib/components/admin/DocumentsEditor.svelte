@@ -8,6 +8,11 @@
 	import Input from '$lib/components/ui/Input.svelte';
 	import Select from '$lib/components/ui/Select.svelte';
 	import Textarea from '$lib/components/ui/Textarea.svelte';
+	import Save from '@lucide/svelte/icons/save';
+	import ChevronUp from '@lucide/svelte/icons/chevron-up';
+	import ChevronDown from '@lucide/svelte/icons/chevron-down';
+	import Trash2 from '@lucide/svelte/icons/trash-2';
+	import Plus from '@lucide/svelte/icons/plus';
 
 	let { editor }: { editor: DocumentEditor } = $props();
 	let pending = $state<string[]>([]);
@@ -24,26 +29,25 @@
 </script>
 
 <section
-	class="mt-10 border-t border-rule pt-6 {attendance
+	id="documents-section"
+	class="scroll-mt-36 mt-10 border-t border-rule pt-6 {attendance
 		? 'rounded-ui border border-warning p-5'
 		: ''}"
 	aria-labelledby="documents-title"
 >
-	<h2 class="mt-0 mb-4 text-base" id="documents-title">
+	<h2 class="mt-0 mb-5 text-sm font-medium tracking-[0.08em] text-ink-dim uppercase" id="documents-title">
 		{attendance ? 'Certificados de asistencia' : 'Documentos'}
 	</h2>
-	<p class="max-w-[72ch] leading-[1.6] text-ink-dim">
-		{attendance
-			? 'Enlaza el certificado de Drive u otra ubicación. Estos archivos son siempre privados y nunca llegan a la web pública.'
-			: 'Gestiona archivos enlazados sin subirlos a la aplicación. Todos los documentos son privados y nunca llegan a la web pública.'}
-	</p>
+	{#if editor.documents.length > 0}
+		<p class="max-w-[72ch] leading-[1.6] text-ink-dim">
+			{attendance
+				? 'Estos certificados son siempre privados y nunca llegan a la web pública.'
+				: 'Todos los documentos son privados y nunca llegan a la web pública.'}
+		</p>
+	{/if}
 
 	<div class="grid gap-3">
-		{#if editor.documents.length === 0}
-			<p class="m-0 border border-dashed border-rule p-4 text-xs text-ink-faint">
-				{attendance ? 'No hay certificado enlazado.' : 'No hay documentos enlazados.'}
-			</p>
-		{:else}
+		{#if editor.documents.length > 0}
 			{#each editor.documents as document, index (document.id)}
 				<article
 					class="grid grid-cols-[minmax(0,1fr)_auto] items-end gap-[0.9rem] rounded-ui border border-rule bg-[var(--admin-surface)] p-4 max-[850px]:grid-cols-1"
@@ -69,20 +73,20 @@
 								<label class="flex items-center gap-1.5 text-[0.68rem] text-ink-dim"><Checkbox name="isCertificate" value="1" checked={document.isCertificate} /> Certificado (siempre privado)</label>
 							</div>
 						{/if}
-						<Button type="submit" disabled={pending.includes(`save:${document.id}`)}>Guardar documento</Button>
+						<Button type="submit" disabled={pending.includes(`save:${document.id}`)}><Save size={14} strokeWidth={1.7} aria-hidden="true" />Guardar documento</Button>
 					</form>
 					<div class="flex flex-wrap items-center justify-end gap-2 max-[850px]:justify-start">
 						<form method="POST" action="?/moverDocumento" use:enhance={enhancedSubmit(`up:${document.id}`)}>
 							<input type="hidden" name="documentId" value={document.id} /><input type="hidden" name="direction" value="up" />
-							<Button size="icon" type="submit" aria-label="Subir documento" disabled={index === 0 || pending.includes(`up:${document.id}`)}>↑</Button>
+							<Button size="icon" type="submit" aria-label="Subir documento" title="Subir" disabled={index === 0 || pending.includes(`up:${document.id}`)}><ChevronUp size={15} aria-hidden="true" /></Button>
 						</form>
 						<form method="POST" action="?/moverDocumento" use:enhance={enhancedSubmit(`down:${document.id}`)}>
 							<input type="hidden" name="documentId" value={document.id} /><input type="hidden" name="direction" value="down" />
-							<Button size="icon" type="submit" aria-label="Bajar documento" disabled={index === editor.documents.length - 1 || pending.includes(`down:${document.id}`)}>↓</Button>
+							<Button size="icon" type="submit" aria-label="Bajar documento" title="Bajar" disabled={index === editor.documents.length - 1 || pending.includes(`down:${document.id}`)}><ChevronDown size={15} aria-hidden="true" /></Button>
 						</form>
 						<form method="POST" action="?/eliminarDocumento" use:enhance={enhancedSubmit(`remove:${document.id}`)}>
 							<input type="hidden" name="documentId" value={document.id} />
-							<Button variant="danger" type="submit" disabled={pending.includes(`remove:${document.id}`)}>Eliminar</Button>
+							<Button variant="danger" type="submit" disabled={pending.includes(`remove:${document.id}`)}><Trash2 size={14} strokeWidth={1.7} aria-hidden="true" />Eliminar</Button>
 						</form>
 					</div>
 				</article>
@@ -91,7 +95,15 @@
 	</div>
 
 	<details class="mt-3 rounded-ui border border-rule bg-[var(--admin-surface)] p-4">
-		<summary class="cursor-pointer text-xs text-accent-strong">+ {attendance ? 'Enlazar certificado' : 'Añadir documento'}</summary>
+		<summary class="flex cursor-pointer list-none items-center gap-1.5 text-xs text-accent-strong marker:hidden">
+			<Plus size={14} strokeWidth={1.7} aria-hidden="true" />{attendance
+				? editor.documents.length === 0
+					? 'Enlazar certificado'
+					: 'Enlazar otro certificado'
+				: editor.documents.length === 0
+					? 'Añadir el primer documento'
+					: 'Añadir documento'}
+		</summary>
 		<form class="mt-4 grid gap-[0.8rem]" method="POST" action="?/crearDocumento" use:enhance={enhancedSubmit('create')}>
 			<div class="grid grid-cols-3 gap-[0.65rem] max-[650px]:grid-cols-1">
 				{#if attendance}
@@ -112,7 +124,7 @@
 					<label class="flex items-center gap-1.5 text-[0.68rem] text-ink-dim"><Checkbox name="isCertificate" value="1" /> Certificado (siempre privado)</label>
 				</div>
 			{/if}
-			<Button type="submit" disabled={pending.includes('create')}>{attendance ? 'Enlazar certificado' : 'Añadir documento'}</Button>
+			<Button type="submit" disabled={pending.includes('create')}><Plus size={14} strokeWidth={1.7} aria-hidden="true" />{attendance ? 'Enlazar certificado' : 'Añadir documento'}</Button>
 		</form>
 	</details>
 </section>

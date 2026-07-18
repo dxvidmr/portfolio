@@ -1,4 +1,5 @@
 <script lang="ts">
+	import SearchableSelect from './SearchableSelect.svelte';
 	interface FieldSpec {
 		name: string;
 		label: string;
@@ -11,6 +12,7 @@
 	interface Option {
 		value: string;
 		label: string;
+		meta?: string;
 	}
 
 	let {
@@ -37,7 +39,7 @@
 				: undefined)
 	);
 	const controlClass =
-		'w-full border border-rule bg-[var(--admin-surface)] px-[0.65rem] py-2 font-[inherit] text-ink focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent-strong';
+		'w-full rounded-ui-sm border border-rule bg-[var(--admin-surface)] px-[0.65rem] py-2 font-[inherit] text-ink focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent-strong';
 	const invalidControlClass = $derived(error ? 'border-danger!' : '');
 </script>
 
@@ -76,7 +78,17 @@
 					aria-invalid={error ? 'true' : undefined}
 					aria-describedby={describedBy}
 					aria-required={field.required || undefined}>{value}</textarea>
-			{:else if field.kind === 'vocab' || field.kind === 'fk'}
+			{:else if field.kind === 'fk'}
+				<SearchableSelect
+					id={inputId}
+					name={field.name}
+					{value}
+					{options}
+					required={field.required === true}
+					describedBy={describedBy}
+					invalid={Boolean(error)}
+				/>
+			{:else if field.kind === 'vocab'}
 				<select
 					class="{controlClass} {invalidControlClass}"
 					id={inputId}

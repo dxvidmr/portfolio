@@ -62,8 +62,8 @@ describe('esquema posterior a la limpieza 013', () => {
 				},
 				{
 					sql: `INSERT INTO talks
-					      (id, title, contribution_type, authors_text, date_start, date_end, canonical_event_id)
-					      VALUES (18, 'Comunicación', 'conference_paper', 'Autor', '2020-11-20', '2020-11-20', 18)`,
+					      (id, title, contribution_type, authors_text, date_override, date_end_override, canonical_event_id)
+					      VALUES (18, 'Comunicación', 'conference_paper', 'Autor', '2020-11-20', NULL, 18)`,
 					args: []
 				},
 				{
@@ -103,7 +103,7 @@ describe('esquema posterior a la limpieza 013', () => {
 			);
 			const roles = await db.execute(
 				`SELECT
-				   (SELECT date_start FROM talks WHERE id = 18) AS talk_date,
+				   (SELECT date_override FROM talks WHERE id = 18) AS talk_date,
 				   (SELECT date_start FROM service_activities WHERE id = 5) AS service_date`
 			);
 			expect(roles.rows[0]).toMatchObject({

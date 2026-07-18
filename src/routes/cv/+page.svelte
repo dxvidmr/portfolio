@@ -28,7 +28,7 @@
 			empty: 'No hay resultados para esos filtros.',
 			sectionLabels: {
 				publications: 'Publicaciones',
-				talks: 'Eventos académicos',
+				talks: 'Comunicaciones',
 				teaching: 'Docencia',
 				projects: 'Proyectos de investigación',
 				education: 'Formación',
@@ -56,7 +56,7 @@
 			empty: 'No results for those filters.',
 			sectionLabels: {
 				publications: 'Publications',
-				talks: 'Academic events',
+				talks: 'Talks',
 				teaching: 'Teaching',
 				projects: 'Research projects',
 				education: 'Education',

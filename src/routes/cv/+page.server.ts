@@ -29,10 +29,10 @@ const sections = [
 	},
 	{
 		key: 'talks',
-		title: 'Eventos académicos',
+		title: 'Comunicaciones',
 		sql: `SELECT a.id AS entity_id, a.title, a.contribution_type AS type, tv.label_es AS type_label_es, tv.label_en AS type_label_en,
 		             canonical.title AS detail,
-		             substr(COALESCE(a.date_start, canonical.date_start, CAST(canonical.year AS TEXT)), 1, 4) AS year,
+		             substr(COALESCE(a.date_override, canonical.date_start, CAST(canonical.year AS TEXT)), 1, 4) AS year,
 		             a.doi, COALESCE(a.url, canonical.url) AS url,
 		             a.authors_text AS metadata_authors, canonical.title AS metadata_event_title,
 		             canonical.institution AS metadata_institution, canonical.city AS metadata_city,
@@ -46,7 +46,7 @@ const sections = [
 		      LEFT JOIN type_vocab selection ON selection.code = a.selection_mode
 		      LEFT JOIN type_vocab session ON session.code = a.session_format
 		      LEFT JOIN events canonical ON canonical.id = a.canonical_event_id
-		      ORDER BY COALESCE(a.date_start, canonical.date_start, CAST(canonical.year AS TEXT)) DESC,
+		      ORDER BY COALESCE(a.date_override, canonical.date_start, CAST(canonical.year AS TEXT)) DESC,
 		               a.title ASC`
 	},
 	{

@@ -6,10 +6,18 @@
 	import AdditionalLinks from '$lib/components/admin/AdditionalLinks.svelte';
 	import DocumentsEditor from '$lib/components/admin/DocumentsEditor.svelte';
 	import AdminPageHeader from '$lib/components/admin/AdminPageHeader.svelte';
+	import AdminFormNav from '$lib/components/admin/AdminFormNav.svelte';
 	import AdminToast from '$lib/components/AdminToast.svelte';
 	import Button from '$lib/components/ui/Button.svelte';
 	import ButtonLink from '$lib/components/ui/ButtonLink.svelte';
 	import Checkbox from '$lib/components/ui/Checkbox.svelte';
+	import Save from '@lucide/svelte/icons/save';
+	import Eye from '@lucide/svelte/icons/eye';
+	import EyeOff from '@lucide/svelte/icons/eye-off';
+	import Plus from '@lucide/svelte/icons/plus';
+	import X from '@lucide/svelte/icons/x';
+	import ExternalLink from '@lucide/svelte/icons/external-link';
+	import Trash2 from '@lucide/svelte/icons/trash-2';
 
 	let { data, form }: { data: PageData; form: ActionData } = $props();
 
@@ -17,6 +25,40 @@
 	const sectionClass = 'mt-10 border-t border-rule pt-6';
 	const sectionTitleClass =
 		'mt-0 mb-5 text-sm font-medium uppercase tracking-[0.08em] text-ink-dim';
+	const isPublication = $derived(data.entityType === 'publications');
+	const hasStructuralRelationItems = $derived(
+		data.structuralRelations.some((group) => group.items.length > 0)
+	);
+	const navItems = $derived.by(() => {
+		const items: Array<{
+			href: string;
+			label: string;
+			meta?: string | number;
+			group?: 'content' | 'management';
+		}> = isPublication
+			? data.groups.map((group) => ({ href: `#${group.id}`, label: group.title }))
+			: [{ href: '#content-section', label: 'Contenido' }];
+
+		items.push({ href: '#presence-section', label: 'Presencia pública', group: 'management' });
+		if (hasStructuralRelationItems)
+			items.push({ href: '#structural-section', label: 'Relaciones estructurales', group: 'management' });
+		if (data.fundingRelations)
+			items.push({
+				href: '#funding-section',
+				label: 'Financiación y premios',
+				meta: data.fundingRelations.relations.length,
+				group: 'management'
+			});
+		items.push(
+			{
+				href: '#links-section',
+				label: 'Recursos y archivos',
+				meta: data.links.links.length + data.documents.documents.length,
+				group: 'management'
+			}
+		);
+		return items;
+	});
 
 	const toast = $derived.by(() => {
 		if (!form) return null;
@@ -70,14 +112,14 @@
 <AdminPageHeader title={data.heading} eyebrow={data.typeLabel}>
 	{#snippet actions()}
 		<span
-			class={`border px-2 py-1 text-[0.7rem] uppercase tracking-[0.08em] ${
+			class={`rounded-ui-sm border px-2 py-1 text-[0.7rem] uppercase tracking-[0.08em] ${
 				data.control.isPublic ? 'border-accent text-accent' : 'border-rule-strong text-ink-dim'
 			}`}
 		>
 			{data.control.isPublic ? 'Pública' : 'Privada'}
 		</span>
 		{#if data.control.showHome}
-			<span class="border border-accent px-2 py-1 text-[0.7rem] uppercase tracking-[0.08em] text-accent">
+			<span class="rounded-ui-sm border border-accent px-2 py-1 text-[0.7rem] uppercase tracking-[0.08em] text-accent">
 				En actividad
 			</span>
 		{/if}
@@ -93,89 +135,121 @@
 	{/key}
 {/if}
 
-<section class={sectionClass} aria-labelledby="contenido-title">
-	<h2 class={sectionTitleClass} id="contenido-title">Contenido</h2>
-	<form method="POST" action="?/guardar">
+<div class="grid items-start gap-10 min-[1100px]:grid-cols-[12rem_minmax(0,1fr)]">
+	<AdminFormNav items={navItems} formId="entry-content-form" />
+	<div class="min-w-0">
+<section class="scroll-mt-36 {sectionClass}" id="content-section" aria-labelledby="contenido-title">
+	<h2 class={sectionTitleClass} id="contenido-title">
+		{isPublication ? 'Información bibliográfica' : 'Contenido'}
+	</h2>
+	<form id="entry-content-form" method="POST" action="?/guardar">
 		<EntityForm
 			fields={data.fields}
+			groups={data.groups}
 			options={data.options}
 			values={form?.raw ?? data.values}
 			errors={form?.errors ?? {}}
 		/>
 		<div class="mt-8">
-			<Button type="submit">Guardar cambios</Button>
+			<Button type="submit"><Save size={15} strokeWidth={1.7} aria-hidden="true" />Guardar cambios</Button>
 		</div>
 	</form>
 </section>
 
-<section class={sectionClass} aria-labelledby="visibilidad-title">
-	<h2 class={sectionTitleClass} id="visibilidad-title">Visibilidad y actividad</h2>
-	<div class="grid gap-6 md:grid-cols-2">
-		<div class="grid content-start gap-3 border border-rule p-5">
+<section class="scroll-mt-36 {sectionClass}" id="presence-section" aria-labelledby="presence-title">
+	<h2 class={sectionTitleClass} id="presence-title">Presencia pública</h2>
+	<div class="grid gap-4 lg:grid-cols-3">
+		<div class="grid content-start gap-3 rounded-ui border border-rule p-5">
+			<div>
+				<p class="m-0 text-[0.6rem] tracking-[0.1em] text-ink-faint uppercase">Publicación</p>
+				<h3 class="mt-1 mb-0 text-sm font-medium text-ink">Web pública</h3>
+			</div>
 			{#if data.control.isPublic}
-				<p class="m-0 max-w-[60ch] leading-relaxed text-ink-dim">
+				<p class="m-0 max-w-[60ch] text-sm leading-relaxed text-ink-dim">
 					Visible en la web pública. Al pasarla a privada también se retira de la actividad.
 				</p>
 				<form method="POST" action="?/despublicar">
-					<Button type="submit" variant="secondary">Hacer privada</Button>
+					<Button type="submit" variant="secondary"><EyeOff size={15} strokeWidth={1.7} aria-hidden="true" />Hacer privada</Button>
 				</form>
 			{:else}
-				<p class="m-0 max-w-[60ch] leading-relaxed text-ink-dim">
+				<p class="m-0 max-w-[60ch] text-sm leading-relaxed text-ink-dim">
 					Entrada privada: no aparece en el CV ni en la actividad.
 				</p>
 				<form method="POST" action="?/publicar">
-					<Button type="submit">Publicar</Button>
+					<Button type="submit"><Eye size={15} strokeWidth={1.7} aria-hidden="true" />Publicar</Button>
 				</form>
 			{/if}
 		</div>
-		<div class="grid content-start gap-3 border border-rule p-5">
+		<div class="grid content-start gap-3 rounded-ui border border-rule p-5">
+			<div>
+				<p class="m-0 text-[0.6rem] tracking-[0.1em] text-ink-faint uppercase">Selección</p>
+				<h3 class="mt-1 mb-0 text-sm font-medium text-ink">Actividad reciente</h3>
+			</div>
 			{#if data.control.showHome}
-				<p class="m-0 text-ink-dim">Seleccionada en la actividad.</p>
+				<p class="m-0 text-sm leading-relaxed text-ink-dim">Seleccionada en la actividad.</p>
 				<form method="POST" action="?/actividad">
 					<input type="hidden" name="enabled" value="0" />
-					<Button type="submit" variant="danger">Eliminar de actividad</Button>
+					<Button type="submit" variant="danger"><X size={15} strokeWidth={1.7} aria-hidden="true" />Eliminar de actividad</Button>
 				</form>
 			{:else}
-				<p class="m-0 max-w-[60ch] leading-relaxed text-ink-dim">
+				<p class="m-0 max-w-[60ch] text-sm leading-relaxed text-ink-dim">
 					No aparece en la actividad.
 					{#if !data.control.isPublic}Mostrarla en actividad también la hará pública.{/if}
 				</p>
 				<form method="POST" action="?/actividad">
 					<input type="hidden" name="enabled" value="1" />
-					<Button type="submit">Mostrar en actividad</Button>
+					<Button type="submit"><Plus size={15} strokeWidth={1.7} aria-hidden="true" />Mostrar en actividad</Button>
 				</form>
 			{/if}
-			<p class="m-0 text-xs text-ink-faint">
-				El orden se gestiona en
-				<a class="text-ink-dim hover:text-accent" href="/admin/actividad">Actividad</a>.
-			</p>
+		</div>
+		<div class="grid content-start gap-3 rounded-ui border border-rule p-5">
+			<div>
+				<p class="m-0 text-[0.6rem] tracking-[0.1em] text-ink-faint uppercase">Relación</p>
+				<h3 class="mt-1 mb-0 text-sm font-medium text-ink">Fichas del portfolio</h3>
+			</div>
+			{#if data.portfolioRelations.length > 0}
+				<ul class="m-0 grid list-none gap-2 p-0">
+					{#each data.portfolioRelations as relation (relation.slug)}
+						<li>
+							<a class="text-xs leading-snug text-ink hover:text-accent" href={`/admin/portfolio/${relation.slug}`}>
+								{relation.featured ? '★ ' : ''}{relation.title}
+							</a>
+						</li>
+					{/each}
+				</ul>
+			{:else}
+				<p class="m-0 text-sm leading-relaxed text-ink-dim">No aparece en ninguna ficha narrativa.</p>
+			{/if}
+			<a class="mt-auto inline-flex items-center gap-1.5 pt-2 text-xs text-ink hover:text-accent" href="/admin/portfolio">
+				Gestionar en Portfolio <ExternalLink size={13} strokeWidth={1.7} aria-hidden="true" />
+			</a>
 		</div>
 	</div>
 </section>
 
-{#if data.hasStructuralRelations}
-	<section class={sectionClass} aria-labelledby="structural-title">
+{#if hasStructuralRelationItems}
+	<section class="scroll-mt-36 {sectionClass}" id="structural-section" aria-labelledby="structural-title">
 		<h2 class={sectionTitleClass} id="structural-title">Relaciones estructurales</h2>
-		<p class="-mt-2 mb-4 max-w-[60ch] leading-relaxed text-ink-dim">
+		<p class="-mt-2 mb-6 max-w-[82ch] text-sm leading-[1.7] text-ink-dim">
 			Estas relaciones proceden de los campos del contenido relacionado. Para cambiarlas, edita
 			la entrada correspondiente y modifica su selector.
 		</p>
-		<div class="grid gap-4 md:grid-cols-2">
+		<div class="grid max-w-[76rem] gap-5 md:grid-cols-2">
 			{#each data.structuralRelations as group (group.entityType)}
-				<article class="min-w-0 border border-rule bg-admin-surface">
-					<header class="flex justify-between gap-4 border-b border-rule p-4">
+				{#if group.items.length > 0}
+				<article class="min-w-0 overflow-hidden rounded-ui border border-rule bg-admin-surface">
+					<header class="flex justify-between gap-6 border-b border-rule px-5 py-4">
 						<div>
-							<h3 class="m-0 text-sm text-ink">{group.label}</h3>
-							<p class="mt-1 mb-0 text-xs leading-relaxed text-ink-faint">
+							<h3 class="m-0 text-sm font-medium text-ink">{group.label}</h3>
+							<p class="mt-1.5 mb-0 max-w-[58ch] text-xs leading-[1.6] text-ink-faint">
 								{group.description}
 							</p>
 						</div>
-						<strong class="text-sm font-medium text-accent">{group.items.length}</strong>
+						<strong class="shrink-0 text-sm font-medium text-accent">{group.items.length}</strong>
 					</header>
-					{#if group.items.length > 0}
-						<ul class="m-0 list-none p-0">
+					<ul class="m-0 list-none p-0">
 							{#each group.items as item (`${item.entityType}:${item.entityId}`)}
-								<li class="flex items-center justify-between gap-3 border-b border-rule px-4 py-3 last:border-b-0">
+								<li class="flex items-center justify-between gap-4 border-b border-rule px-5 py-4 last:border-b-0">
 									<a
 										class="grid min-w-0 gap-1 text-xs leading-snug text-ink hover:text-accent"
 										href={`/admin/entradas/${item.entityType}/${item.entityId}`}
@@ -192,26 +266,11 @@
 									</span>
 								</li>
 							{/each}
-						</ul>
-					{:else}
-						<p class="m-0 p-4 text-xs text-ink-faint">No hay entradas vinculadas.</p>
-					{/if}
+					</ul>
 				</article>
+				{/if}
 			{/each}
 		</div>
-	</section>
-{/if}
-
-{#if data.canonicalEvent}
-	<section class={sectionClass} aria-labelledby="canonical-event-title">
-		<h2 class={sectionTitleClass} id="canonical-event-title">Evento compartido</h2>
-		<p class="max-w-[60ch] leading-relaxed text-ink-dim">
-			Esta actividad pertenece a
-			<a class="text-accent hover:underline" href={`/admin/eventos/${data.canonicalEvent.id}`}>
-				{data.canonicalEvent.title}
-			</a>.
-			Desde su ficha puedes ver los demás roles, incluida la asistencia privada.
-		</p>
 	</section>
 {/if}
 
@@ -223,39 +282,7 @@
 
 <DocumentsEditor editor={data.documents} />
 
-<section class={sectionClass} aria-labelledby="portfolio-title">
-	<h2 class={sectionTitleClass} id="portfolio-title">Fichas del portfolio</h2>
-	{#if data.portfolioRelations.length > 0}
-		<p class="max-w-[60ch] leading-relaxed text-ink-dim">Esta entrada aparece en:</p>
-		<ul class="my-3 flex list-none flex-wrap gap-2 p-0">
-			{#each data.portfolioRelations as relation (relation.slug)}
-				<li class="flex items-center gap-2 border border-rule px-3 py-2">
-					<a
-						class="text-ink hover:text-accent"
-						href={`/admin/portfolio/${relation.slug}`}
-					>
-						{relation.featured ? '★ ' : ''}{relation.title}
-					</a>
-					{#if relation.featured}
-						<span class="text-[0.65rem] uppercase tracking-[0.06em] text-warning">Destacada</span>
-					{/if}
-				</li>
-			{/each}
-		</ul>
-	{:else}
-		<p class="max-w-[60ch] leading-relaxed text-ink-dim">
-			No está relacionada con ninguna ficha narrativa.
-		</p>
-	{/if}
-	<a
-		class="mt-2 inline-block text-xs text-ink hover:text-accent"
-		href="/admin/portfolio"
-	>
-		Gestionar relaciones del portfolio →
-	</a>
-</section>
-
-<details class="mt-12 border border-danger p-5 [&[open]>summary]:mb-3">
+<details id="danger-section" class="scroll-mt-36 mt-12 border border-danger p-5 [&[open]>summary]:mb-3">
 	<summary class="cursor-pointer text-sm uppercase tracking-[0.08em] text-danger">
 		Zona peligrosa
 	</summary>
@@ -268,6 +295,8 @@
 			<Checkbox name="confirmar" value="1" class="accent-danger" />
 			<span>Entiendo que la eliminación es definitiva</span>
 		</label>
-		<Button type="submit" variant="danger">Eliminar entrada</Button>
+		<Button type="submit" variant="danger"><Trash2 size={15} strokeWidth={1.7} aria-hidden="true" />Eliminar entrada</Button>
 	</form>
 </details>
+	</div>
+</div>

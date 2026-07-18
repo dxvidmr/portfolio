@@ -34,7 +34,7 @@ try {
 
 	const november = (await db.execute(
 		`SELECT event.date_start AS event_start, event.date_end AS event_end,
-		        talk.date_start AS talk_start, talk.date_end AS talk_end,
+		        talk.date_override AS talk_start, talk.date_end_override AS talk_end,
 		        service.date_start AS service_start, service.date_end AS service_end
 		 FROM events AS event
 		 JOIN talks AS talk ON talk.id = 18 AND talk.canonical_event_id = event.id
@@ -45,7 +45,7 @@ try {
 		event_start: '2020-11-01',
 		event_end: '2020-11-30',
 		talk_start: '2020-11-20',
-		talk_end: '2020-11-20',
+		talk_end: null,
 		service_start: '2020-11-01',
 		service_end: '2020-11-30'
 	};

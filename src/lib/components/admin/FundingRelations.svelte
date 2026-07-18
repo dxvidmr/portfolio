@@ -10,6 +10,9 @@
 	import Button from '$lib/components/ui/Button.svelte';
 	import Input from '$lib/components/ui/Input.svelte';
 	import Select from '$lib/components/ui/Select.svelte';
+	import Save from '@lucide/svelte/icons/save';
+	import Trash2 from '@lucide/svelte/icons/trash-2';
+	import Plus from '@lucide/svelte/icons/plus';
 
 	let { editor }: { editor: FundingRelationEditor } = $props();
 
@@ -78,8 +81,8 @@
 		};
 </script>
 
-<section class="mt-10 border-t border-rule pt-6" aria-labelledby="funding-relations-title">
-	<h2 class="mt-0 mb-4 text-base" id="funding-relations-title">
+<section id="funding-section" class="scroll-mt-36 mt-10 border-t border-rule pt-6" aria-labelledby="funding-relations-title">
+	<h2 class="mt-0 mb-5 text-sm font-medium tracking-[0.08em] text-ink-dim uppercase" id="funding-relations-title">
 		{editor.mode === 'funding' ? 'Actividad relacionada' : 'Financiación y premios'}
 	</h2>
 	<p class="mt-0 mb-4 max-w-[68ch] leading-[1.6] text-ink-dim">
@@ -88,76 +91,63 @@
 			: 'Vincula esta entrada con las ayudas, contratos o premios relacionados.'}
 	</p>
 
-	<div class="grid grid-cols-2 items-start gap-4 max-[900px]:grid-cols-1">
+	{#if editor.relations.length === 0}
+		<p class="m-0 rounded-ui border border-dashed border-rule px-4 py-3 text-xs text-ink-faint">
+			No hay financiación ni premios relacionados.
+		</p>
+	{:else}
 		<div class="min-w-0 overflow-hidden rounded-ui border border-rule bg-[var(--admin-surface)]">
 			<header class="flex justify-between border-b border-rule px-4 py-[0.9rem] text-[0.78rem] text-ink">
 				<strong>Relaciones actuales</strong>
 				<span class="text-accent-strong">{editor.relations.length}</span>
 			</header>
-			{#if editor.relations.length === 0}
-				<p class="m-0 p-4 text-xs text-ink-faint">Todavía no hay financiación o premios relacionados.</p>
-			{:else}
-				<ul class="m-0 list-none p-0">
-					{#each editor.relations as relation (relationKey(relation))}
-						<li class="flex items-center justify-between gap-[0.9rem] border-b border-rule px-4 py-[0.85rem] last:border-b-0 max-[620px]:flex-col max-[620px]:items-stretch">
-							<div class="min-w-0">
-								<div class="mb-[0.3rem] flex flex-wrap gap-x-[0.65rem] gap-y-[0.35rem] text-[0.61rem] text-ink-faint">
-									<span>{relationType(relation)}</span>
-									<span>{relationDate(relation) ?? 'Sin fecha'}</span>
-									<span class={relationPublic(relation) ? 'text-accent-strong' : ''}>
-										{relationPublic(relation) ? 'Pública' : 'Privada'}
-									</span>
-								</div>
-								<a class="block text-[0.76rem] leading-[1.35] text-ink hover:text-accent-strong" href={relationHref(relation)}>{relationTitle(relation)}</a>
+			<ul class="m-0 list-none p-0">
+				{#each editor.relations as relation (relationKey(relation))}
+					<li class="flex items-center justify-between gap-[0.9rem] border-b border-rule px-4 py-[0.85rem] last:border-b-0 max-[620px]:flex-col max-[620px]:items-stretch">
+						<div class="min-w-0">
+							<div class="mb-[0.3rem] flex flex-wrap gap-x-[0.65rem] gap-y-[0.35rem] text-[0.61rem] text-ink-faint">
+								<span>{relationType(relation)}</span>
+								<span>{relationDate(relation) ?? 'Sin fecha'}</span>
+								<span class={relationPublic(relation) ? 'text-accent-strong' : ''}>
+									{relationPublic(relation) ? 'Pública' : 'Privada'}
+								</span>
 							</div>
-							<div class="flex flex-none items-end gap-1.5 max-[620px]:flex-col max-[620px]:items-stretch">
-								<form
-									class="flex items-end gap-1.5 max-[620px]:w-full"
-									method="POST"
-									action="?/tipoFinanciacion"
-									use:enhance={enhancedSubmit(`kind:${relationKey(relation)}`)}
-								>
-									<input type="hidden" name="fundingAwardId" value={relation.fundingAwardId} />
-									<input type="hidden" name="entityType" value={relation.entityType} />
-									<input type="hidden" name="entityId" value={relation.entityId} />
-									<label>
-										<span class="sr-only">Tipo de relación con {relationTitle(relation)}</span>
-										<Select class="text-[0.68rem]" name="relationKind" value={relation.relationKind}>
-											{#each editor.kinds as kind (kind.value)}
-												<option value={kind.value}>{kind.label}</option>
-											{/each}
-										</Select>
-									</label>
-									<Button
-										size="sm"
-										type="submit"
-										disabled={pending.includes(`kind:${relationKey(relation)}`)}
-									>Guardar tipo</Button>
-								</form>
-								<form
-									method="POST"
-									action="?/quitarFinanciacion"
-									use:enhance={enhancedSubmit(`remove:${relationKey(relation)}`)}
-								>
-									<input type="hidden" name="fundingAwardId" value={relation.fundingAwardId} />
-									<input type="hidden" name="entityType" value={relation.entityType} />
-									<input type="hidden" name="entityId" value={relation.entityId} />
-									<Button
-										variant="danger"
-										size="sm"
-										type="submit"
-										disabled={pending.includes(`remove:${relationKey(relation)}`)}
-									>Eliminar</Button>
-								</form>
-							</div>
-						</li>
-					{/each}
-				</ul>
-			{/if}
+							<a class="block text-[0.76rem] leading-[1.35] text-ink hover:text-accent-strong" href={relationHref(relation)}>{relationTitle(relation)}</a>
+						</div>
+						<div class="flex flex-none items-end gap-1.5 max-[620px]:flex-col max-[620px]:items-stretch">
+							<form class="flex items-end gap-1.5 max-[620px]:w-full" method="POST" action="?/tipoFinanciacion" use:enhance={enhancedSubmit(`kind:${relationKey(relation)}`)}>
+								<input type="hidden" name="fundingAwardId" value={relation.fundingAwardId} />
+								<input type="hidden" name="entityType" value={relation.entityType} />
+								<input type="hidden" name="entityId" value={relation.entityId} />
+								<label>
+									<span class="sr-only">Tipo de relación con {relationTitle(relation)}</span>
+									<Select class="text-[0.68rem]" name="relationKind" value={relation.relationKind}>
+										{#each editor.kinds as kind (kind.value)}
+											<option value={kind.value}>{kind.label}</option>
+										{/each}
+									</Select>
+								</label>
+								<Button size="sm" type="submit" disabled={pending.includes(`kind:${relationKey(relation)}`)}><Save size={13} strokeWidth={1.7} aria-hidden="true" />Guardar tipo</Button>
+							</form>
+							<form method="POST" action="?/quitarFinanciacion" use:enhance={enhancedSubmit(`remove:${relationKey(relation)}`)}>
+								<input type="hidden" name="fundingAwardId" value={relation.fundingAwardId} />
+								<input type="hidden" name="entityType" value={relation.entityType} />
+								<input type="hidden" name="entityId" value={relation.entityId} />
+								<Button variant="danger" size="sm" type="submit" disabled={pending.includes(`remove:${relationKey(relation)}`)}><Trash2 size={13} strokeWidth={1.7} aria-hidden="true" />Eliminar</Button>
+							</form>
+						</div>
+					</li>
+				{/each}
+			</ul>
 		</div>
+	{/if}
 
-		<div class="min-w-0 overflow-hidden rounded-ui border border-rule bg-[var(--admin-surface)]">
-			<header class="flex justify-between border-b border-rule px-4 py-[0.9rem] text-[0.78rem] text-ink"><strong>Añadir relación</strong></header>
+	<details class="mt-4 overflow-hidden rounded-ui border border-rule bg-[var(--admin-surface)]">
+		<summary class="flex cursor-pointer list-none items-center justify-between gap-4 px-4 py-3 text-[0.76rem] text-accent-strong marker:hidden">
+			<span class="inline-flex items-center gap-1.5"><Plus size={14} strokeWidth={1.7} aria-hidden="true" />Añadir relación</span>
+			<span class="text-[0.62rem] text-ink-faint">{availableCandidates.length} disponibles</span>
+		</summary>
+		<div class="border-t border-rule">
 			<div class="grid grid-cols-[minmax(0,1fr)_10rem] gap-[0.65rem] px-4 pt-[0.9rem] max-[620px]:grid-cols-1">
 				<AdminField label="Buscar">
 					<Input type="search" bind:value={query} placeholder="Título o tipo…" />
@@ -177,7 +167,7 @@
 			{#if availableCandidates.length === 0}
 				<p class="m-0 p-4 text-xs text-ink-faint">No hay entradas disponibles con estos filtros.</p>
 			{:else}
-				<ul class="m-0 list-none p-0">
+				<ul class="m-0 max-h-[32rem] list-none overflow-y-auto border-t border-rule p-0">
 					{#each availableCandidates as candidate (relationKey(candidate))}
 						<li class="flex items-center justify-between gap-[0.9rem] border-b border-rule px-4 py-[0.85rem] last:border-b-0 max-[620px]:flex-col max-[620px]:items-stretch">
 							<div class="min-w-0">
@@ -205,12 +195,12 @@
 									size="sm"
 									type="submit"
 									disabled={pending.includes(`add:${relationKey(candidate)}`)}
-								>+ Añadir</Button>
+								><Plus size={13} strokeWidth={1.7} aria-hidden="true" />Añadir</Button>
 							</form>
 						</li>
 					{/each}
 				</ul>
 			{/if}
 		</div>
-	</div>
+	</details>
 </section>

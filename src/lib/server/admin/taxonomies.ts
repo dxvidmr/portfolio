@@ -33,7 +33,7 @@ export const TAXONOMY_DOMAINS: TaxonomyDomainDef[] = [
 	},
 	{
 		domain: 'conference_publication_format',
-		label: 'Formatos de publicación en congreso',
+		label: 'Subtipos de artículo en congreso',
 		consumers: [{ table: 'publications', column: 'conference_publication_format' }]
 	},
 	{
@@ -43,7 +43,7 @@ export const TAXONOMY_DOMAINS: TaxonomyDomainDef[] = [
 	},
 	{
 		domain: 'contribution_type',
-		label: 'Tipos de contribución a evento',
+		label: 'Tipos de comunicación',
 		consumers: [{ table: 'talks', column: 'contribution_type' }]
 	},
 	{

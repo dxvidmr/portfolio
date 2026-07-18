@@ -121,19 +121,21 @@ CREATE TABLE talks (
   title TEXT NOT NULL,
   contribution_type TEXT NOT NULL REFERENCES type_vocab(code),
   authors_text TEXT NOT NULL,
-  role TEXT,
   selection_mode TEXT REFERENCES type_vocab(code),
   session_format TEXT REFERENCES type_vocab(code),
   session_title TEXT,
-  date_start TEXT,
-  date_end TEXT,
+  date_override TEXT,
+  date_end_override TEXT,
   doi TEXT,
   project_id INTEGER REFERENCES projects(id),
   url TEXT,
-  canonical_event_id INTEGER NOT NULL REFERENCES events(id)
+  canonical_event_id INTEGER NOT NULL REFERENCES events(id),
+  CHECK (date_end_override IS NULL OR (
+    date_override IS NOT NULL AND date_end_override > date_override
+  ))
 );
 
-CREATE INDEX idx_talks_date ON talks(date_start);
+CREATE INDEX idx_talks_date_override ON talks(date_override);
 CREATE INDEX idx_talks_project ON talks(project_id);
 CREATE INDEX idx_talks_canonical ON talks(canonical_event_id);
 
@@ -459,7 +461,7 @@ SELECT 'academic_works', id, title, CAST(year AS TEXT) FROM academic_works
 UNION ALL
 SELECT 'talks', talk.id, talk.title,
        COALESCE(
-         talk.date_start,
+         talk.date_override,
          (SELECT event.date_start FROM events AS event WHERE event.id = talk.canonical_event_id),
          CAST((SELECT event.year FROM events AS event WHERE event.id = talk.canonical_event_id) AS TEXT)
        )
