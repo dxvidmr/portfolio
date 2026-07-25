@@ -74,8 +74,6 @@
 	);
 	const modalControlClass =
 		'pointer-events-auto relative grid h-[46px] w-[46px] cursor-pointer place-items-center rounded-ui-sm border-0 bg-transparent text-ink opacity-50 [transition:color_180ms_ease,opacity_180ms_ease] hover:bg-transparent hover:text-accent-strong hover:opacity-100 focus-visible:bg-transparent focus-visible:text-accent-strong focus-visible:opacity-100 motion-reduce:transition-none';
-	const sectionNavItemClass =
-		'meta inline-flex min-h-[30px] items-center rounded-full border border-rule px-3 text-ink-dim no-underline [transition:border-color_180ms_ease,color_180ms_ease] hover:border-[color-mix(in_srgb,var(--accent-strong)_52%,var(--line))] hover:text-accent-strong focus-visible:border-[color-mix(in_srgb,var(--accent-strong)_52%,var(--line))] focus-visible:text-accent-strong';
 
 	$effect(() => {
 		project.slug;
@@ -210,27 +208,46 @@
 							{/if}
 						</dl>
 						{#if project.sectionNav?.length}
-							<nav class="mt-[22px] grid max-w-[620px] gap-2.5 border-t border-rule-strong pt-3.5" aria-label={locale === 'es' ? 'Secciones de la ficha' : 'Entry sections'}>
+							<nav class="mt-[26px] grid max-w-[620px] gap-2.5" aria-label={locale === 'es' ? 'Secciones de la ficha' : 'Entry sections'}>
 								<span class="meta text-accent-strong">{copy.sectionMenu}</span>
-								<div class="flex flex-wrap items-start gap-2 max-[520px]:grid max-[520px]:grid-cols-2">
-									{#each project.sectionNav as item (item.label.es)}
+								<ol class="m-0 list-none border-t border-rule-strong p-0">
+									{#each project.sectionNav as item, index (item.label.es)}
 										{#if item.children?.length}
-											<details class="group relative max-[520px]:col-span-full max-[520px]:w-full">
-												<summary class={`${sectionNavItemClass} cursor-pointer gap-[7px] list-none [&::-webkit-details-marker]:hidden [&>svg]:[transition:transform_180ms_ease] group-open:[&>svg]:rotate-180`}>
-													{projectText(item.label, locale)}
-													<ChevronDown size={14} strokeWidth={1.7} aria-hidden="true" />
-												</summary>
-												<div class="absolute top-[calc(100%+7px)] left-0 z-[5] grid min-w-max rounded-ui bg-[color-mix(in_srgb,var(--bg)_76%,transparent)] p-1.5 shadow-[0_16px_42px_color-mix(in_srgb,var(--fg)_10%,transparent)] [backdrop-filter:blur(16px)] max-[520px]:relative max-[520px]:top-auto max-[520px]:mt-1.5 max-[520px]:w-full max-[520px]:min-w-0 max-[520px]:shadow-none">
-													{#each item.children as child (child.href)}
-														<a class={`${sectionNavItemClass} min-h-8 border-transparent`} href={child.href}>{projectText(child.label, locale)}</a>
-													{/each}
-												</div>
-											</details>
+											<li class="border-b border-rule">
+												<details class="group">
+													<summary class="grid min-h-[48px] cursor-pointer grid-cols-[34px_minmax(0,1fr)_24px] items-center gap-3 py-2.5 text-ink-dim [transition:color_180ms_ease] hover:text-accent-strong focus-visible:text-accent-strong [&::-webkit-details-marker]:hidden [&>svg]:[transition:transform_180ms_ease] group-open:text-accent-strong group-open:[&>svg]:rotate-180">
+														<span class="meta text-accent-strong">{String(index + 1).padStart(2, '0')}</span>
+														<span class="font-title text-[1.08rem] leading-[1.1]">{projectText(item.label, locale)}</span>
+														<ChevronDown class="justify-self-end" size={17} strokeWidth={1.6} aria-hidden="true" />
+													</summary>
+													<ol class="m-0 list-none border-t border-rule p-0">
+														{#each item.children as child, childIndex (child.href)}
+															<li>
+																<a
+																	class="grid min-h-[42px] grid-cols-[50px_minmax(0,1fr)] items-center gap-3 py-2 pl-[34px] text-ink-dim no-underline [transition:color_180ms_ease] hover:text-accent-strong focus-visible:text-accent-strong"
+																	href={child.href}
+																>
+																	<span class="meta text-ink-faint">{String(index + 1).padStart(2, '0')}.{childIndex + 1}</span>
+																	<span class="text-[.76rem] leading-[1.3]">{projectText(child.label, locale)}</span>
+																</a>
+															</li>
+														{/each}
+													</ol>
+												</details>
+											</li>
 										{:else if item.href}
-											<a class={sectionNavItemClass} href={item.href}>{projectText(item.label, locale)}</a>
+											<li class="border-b border-rule">
+												<a
+													class="grid min-h-[48px] grid-cols-[34px_minmax(0,1fr)] items-center gap-3 py-2.5 text-ink-dim no-underline [transition:color_180ms_ease] hover:text-accent-strong focus-visible:text-accent-strong"
+													href={item.href}
+												>
+													<span class="meta text-accent-strong">{String(index + 1).padStart(2, '0')}</span>
+													<span class="font-title text-[1.08rem] leading-[1.1]">{projectText(item.label, locale)}</span>
+												</a>
+											</li>
 										{/if}
 									{/each}
-								</div>
+								</ol>
 							</nav>
 						{/if}
 					</div>
