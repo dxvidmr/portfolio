@@ -17,7 +17,7 @@
 		es: {
 			back: 'Volver',
 			title: 'Currículum completo',
-			intro: 'Vista web del CV con filtrado por sección, año y tipo.',
+			intro: '',
 			filters: 'Filtros del CV',
 			section: 'Sección',
 			year: 'Año',
@@ -45,7 +45,7 @@
 		en: {
 			back: 'Back',
 			title: 'Full curriculum vitae',
-			intro: 'Web CV view with filters by section, year, and type.',
+			intro: '',
 			filters: 'CV filters',
 			section: 'Section',
 			year: 'Year',

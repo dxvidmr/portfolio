@@ -422,6 +422,12 @@
 			<div class={`${sectionHeadClass} mb-[clamp(42px,6vw,72px)]`}>
 				<h2 class={sectionTitleClass}>{ui.cvTitle}</h2>
 			</div>
+			<a class="group mb-[clamp(42px,6vw,72px)] flex items-center justify-between gap-6 border-y border-rule-strong py-[18px] text-ink no-underline [transition:color_180ms_ease,border-color_180ms_ease] hover:border-accent-strong hover:text-accent-strong focus-visible:border-accent-strong focus-visible:text-accent-strong" href={localizedPath('/cv', locale)}>
+				<strong class="font-title text-[clamp(1.2rem,2.2vw,1.65rem)] font-medium leading-[1.1]">{ui.cvCta}</strong>
+				<span class="grid h-8 w-8 flex-[0_0_2rem] place-items-center text-accent-strong [transition:transform_220ms_cubic-bezier(.22,1,.36,1)] group-hover:translate-x-1 group-focus-visible:translate-x-1 motion-reduce:transition-none" aria-hidden="true">
+					<ArrowRight size={24} strokeWidth={1.5} />
+				</span>
+			</a>
 			<section aria-labelledby="recent-activity-title">
 				<header class="mb-[26px] grid gap-3">
 					<span class="meta tag">{ui.recentLabel}</span>
@@ -459,12 +465,6 @@
 				{/each}
 				</ol>
 			</section>
-			<a class="group mt-[clamp(34px,5vw,58px)] flex items-center justify-between gap-6 border-y border-rule-strong py-[18px] text-ink no-underline [transition:color_180ms_ease,border-color_180ms_ease] hover:border-accent-strong hover:text-accent-strong focus-visible:border-accent-strong focus-visible:text-accent-strong" href={localizedPath('/cv', locale)}>
-				<strong class="font-title text-[clamp(1.2rem,2.2vw,1.65rem)] font-medium leading-[1.1]">{ui.cvCta}</strong>
-				<span class="grid h-8 w-8 flex-[0_0_2rem] place-items-center text-accent-strong [transition:transform_220ms_cubic-bezier(.22,1,.36,1)] group-hover:translate-x-1 group-focus-visible:translate-x-1 motion-reduce:transition-none" aria-hidden="true">
-					<ArrowRight size={24} strokeWidth={1.5} />
-				</span>
-			</a>
 		</section>
 	</main>
 </div>
