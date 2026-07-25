@@ -2,6 +2,7 @@
 	import { onMount } from 'svelte';
 	import ArrowRight from '@lucide/svelte/icons/arrow-right';
 	import ChevronDown from '@lucide/svelte/icons/chevron-down';
+	import Menu from '@lucide/svelte/icons/menu';
 	import MoveUpRight from '@lucide/svelte/icons/move-up-right';
 	import { page } from '$app/state';
 	import { localeFromPathname, localizedPath } from '$lib/i18n';
@@ -9,6 +10,7 @@
 	import { entityLabel } from '$lib/content/labels';
 	import AcademicPath from '$lib/components/AcademicPath.svelte';
 	import EntryMetadata from '$lib/components/EntryMetadata.svelte';
+	import MobileMenu from '$lib/components/MobileMenu.svelte';
 	import SelectedWorks from '$lib/components/SelectedWorks.svelte';
 	import SiteControls from '$lib/components/SiteControls.svelte';
 	import EditorialBackground from '$lib/components/EditorialBackground.svelte';
@@ -18,6 +20,9 @@
 	let headerScrolled = $state(false);
 	let introStarted = $state(false);
 	let introReady = $state(false);
+	let mobileMenuOpen = $state(false);
+	let mobileMenuButton = $state<HTMLButtonElement | null>(null);
+	let portraitMode = $state<'researcher' | 'performer'>('researcher');
 	let heroProgress = $state(0);
 	let heroSection = $state<HTMLElement | null>(null);
 	let heroName = $state<HTMLElement | null>(null);
@@ -266,21 +271,44 @@
 				bind:this={headerBrand}
 				style:opacity={headerBrandOpacity}
 			>
-				<strong class="inline-flex gap-[.28em] whitespace-nowrap font-title text-[1.02rem] font-normal leading-[1.1] max-[520px]:text-[.9rem] max-[420px]:gap-[.18em] max-[420px]:text-[.72rem]">
+				<strong class="inline-flex gap-[.28em] whitespace-nowrap font-title text-[1.02rem] font-normal leading-[1.1] max-[520px]:text-[.9rem]">
 					{#each profile.name.split(' ') as word (word)}
 						<span class="header-name-word">{word}</span>
 					{/each}
 				</strong>
 			</a>
-			<nav class="meta flex items-center gap-[clamp(14px,2.3vw,30px)] max-[780px]:gap-2.5 max-[520px]:gap-2 max-[420px]:gap-1" aria-label="Principal">
+			<nav class="meta flex items-center gap-[clamp(14px,2.3vw,30px)] max-[780px]:hidden" aria-label="Principal">
 				<a class="inline-flex items-baseline gap-[7px] text-ink-dim max-[780px]:gap-0 max-[780px]:text-[.62rem] max-[520px]:text-[.57rem] max-[520px]:tracking-[.08em] max-[420px]:text-[.52rem] max-[420px]:tracking-[.05em]" href="#portfolio"><span class="text-[.58rem] tracking-normal text-accent max-[780px]:hidden">01</span>{ui.navPortfolio}</a>
 				<a class="inline-flex items-baseline gap-[7px] text-ink-dim max-[780px]:gap-0 max-[780px]:text-[.62rem] max-[520px]:text-[.57rem] max-[520px]:tracking-[.08em] max-[420px]:text-[.52rem] max-[420px]:tracking-[.05em]" href="#about"><span class="text-[.58rem] tracking-normal text-accent max-[780px]:hidden">02</span>{ui.navAbout}</a>
 				<a class="inline-flex items-baseline gap-[7px] text-ink-dim max-[780px]:gap-0 max-[780px]:text-[.62rem] max-[520px]:text-[.57rem] max-[520px]:tracking-[.08em] max-[420px]:text-[.52rem] max-[420px]:tracking-[.05em]" href="#cv"><span class="text-[.58rem] tracking-normal text-accent max-[780px]:hidden">03</span>CV</a>
 				<SiteControls />
 			</nav>
+			<button
+				class="hidden h-[38px] w-[38px] cursor-pointer place-items-center rounded-full border-0 bg-[color-mix(in_srgb,var(--surface-glass)_48%,transparent)] text-ink [backdrop-filter:blur(18px)_saturate(1.04)] [transition:color_180ms_ease,background-color_180ms_ease] hover:text-accent-strong focus-visible:text-accent-strong motion-reduce:transition-none max-[780px]:grid"
+				bind:this={mobileMenuButton}
+				type="button"
+				onclick={() => (mobileMenuOpen = true)}
+				aria-label={locale === 'es' ? 'Abrir menú' : 'Open menu'}
+				aria-expanded={mobileMenuOpen}
+			>
+				<Menu size={24} strokeWidth={1.5} aria-hidden="true" />
+			</button>
 		</div>
 	</header>
 	{/if}
+
+	<MobileMenu
+		open={mobileMenuOpen}
+		onclose={() => (mobileMenuOpen = false)}
+		returnFocus={mobileMenuButton}
+		{locale}
+		name={profile.name}
+		links={[
+			{ href: '#portfolio', label: ui.navPortfolio, number: '01' },
+			{ href: '#about', label: ui.navAbout, number: '02' },
+			{ href: '#cv', label: 'CV', number: '03' }
+		]}
+	/>
 
 	<section class="relative z-[1] h-[220svh]" bind:this={heroSection}>
 		<div class="wrap sticky top-0 grid h-svh grid-rows-[1fr_auto] gap-[clamp(32px,6vh,64px)] overflow-hidden pt-[clamp(112px,16vh,168px)] pb-[clamp(22px,4vh,42px)] max-[780px]:pt-[104px]">
@@ -355,10 +383,15 @@
 			</div>
 
 			<div class="relative grid grid-cols-[minmax(240px,4fr)_minmax(0,7fr)] items-start gap-[clamp(34px,7vw,112px)] before:pointer-events-none before:absolute before:inset-[-5vw] before:z-[-1] before:bg-[color-mix(in_srgb,var(--bg)_44%,transparent)] before:[backdrop-filter:blur(7px)] before:[mask-image:radial-gradient(ellipse_at_center,#000_38%,transparent_78%)] before:content-[''] max-[780px]:grid-cols-1 max-[780px]:gap-[42px]">
-				<figure class="group sticky top-[104px] m-0 max-[780px]:relative max-[780px]:top-auto max-[780px]:w-full">
-					<div class="relative overflow-hidden rounded-ui border border-rule-strong bg-[#777]">
+				<figure class="sticky top-[104px] m-0 max-[780px]:relative max-[780px]:top-auto max-[780px]:w-full">
+					<button
+						class="relative block w-full cursor-pointer overflow-hidden rounded-ui border border-rule-strong bg-[#777] p-0 text-left"
+						type="button"
+						onclick={() => (portraitMode = portraitMode === 'researcher' ? 'performer' : 'researcher')}
+						aria-label={portraitMode === 'researcher' ? ui.portraitPerformer : ui.portraitResearcher}
+					>
 						<img
-							class="block h-auto w-full"
+							class={`block h-auto w-full [transition:opacity_700ms_ease] motion-reduce:transition-none ${portraitMode === 'researcher' ? 'opacity-100' : 'opacity-0'}`}
 							src="/images/about/david-merino-recalde-researcher.jpg"
 							alt={ui.portraitAlt}
 							width="820"
@@ -366,7 +399,7 @@
 							loading="lazy"
 						/>
 						<img
-							class="pointer-events-none absolute inset-0 h-full w-full object-cover object-[72%_50%] opacity-0 [transition:opacity_700ms_ease] group-hover:opacity-100 group-active:opacity-100 motion-reduce:transition-none"
+							class={`pointer-events-none absolute inset-0 h-full w-full object-cover object-[72%_50%] [transition:opacity_700ms_ease] motion-reduce:transition-none ${portraitMode === 'performer' ? 'opacity-100' : 'opacity-0'}`}
 							src="/images/about/david-merino-recalde-stage.jpg"
 							alt=""
 							width="1368"
@@ -374,22 +407,32 @@
 							loading="lazy"
 							aria-hidden="true"
 						/>
-					</div>
-					<figcaption class="mt-2.5 flex items-baseline justify-between gap-x-[18px] gap-y-2 max-[520px]:flex-wrap">
-						<span class="flex items-center gap-2 font-mono text-[.62rem] tracking-meta uppercase">
-							<span class="border-b border-accent-strong pb-0.5 font-semibold text-accent-strong [transition:color_700ms_ease,border-color_700ms_ease] group-hover:border-transparent group-hover:text-ink-faint group-active:border-transparent group-active:text-ink-faint">{ui.portraitResearcher}</span>
+					</button>
+					<figcaption class="mt-2.5 grid grid-cols-[minmax(0,1fr)_auto] items-start gap-4">
+						<span class="flex min-w-0 items-center gap-2 font-mono text-[.62rem] tracking-meta uppercase">
+							<button
+								class={`border-0 border-b bg-transparent p-0 pb-0.5 font-mono font-semibold tracking-meta uppercase [transition:color_700ms_ease,border-color_700ms_ease] ${portraitMode === 'researcher' ? 'border-accent-strong text-accent-strong' : 'border-transparent text-ink-faint'}`}
+								type="button"
+								onclick={() => (portraitMode = 'researcher')}
+								aria-pressed={portraitMode === 'researcher'}
+							>{ui.portraitResearcher}</button>
 							<span class="text-ink-faint opacity-50" aria-hidden="true">/</span>
-							<span class="border-b border-transparent pb-0.5 font-semibold text-ink-faint [transition:color_700ms_ease,border-color_700ms_ease] group-hover:border-accent-strong group-hover:text-accent-strong group-active:border-accent-strong group-active:text-accent-strong">{ui.portraitPerformer}</span>
+							<button
+								class={`border-0 border-b bg-transparent p-0 pb-0.5 font-mono font-semibold tracking-meta uppercase [transition:color_700ms_ease,border-color_700ms_ease] ${portraitMode === 'performer' ? 'border-accent-strong text-accent-strong' : 'border-transparent text-ink-faint'}`}
+								type="button"
+								onclick={() => (portraitMode = 'performer')}
+								aria-pressed={portraitMode === 'performer'}
+							>{ui.portraitPerformer}</button>
 						</span>
-						<span class="font-mono text-[.56rem] tracking-[.14em] text-ink-faint uppercase opacity-80">Barcelona</span>
+						<span class="pt-px text-right font-mono text-[.56rem] tracking-[.14em] whitespace-nowrap text-ink-faint uppercase opacity-80 max-[520px]:hidden">Barcelona</span>
 					</figcaption>
 				</figure>
 
 				<div class="min-w-0 pt-[clamp(8px,2vw,28px)] max-[780px]:pt-0">
 					<p class="mt-0 mb-[clamp(26px,4vw,48px)] max-w-[36ch] font-title text-[clamp(1.35rem,2.2vw,2rem)] leading-[1.32] text-ink">{ui.aboutText}</p>
-					<ul class="mt-0 mb-[clamp(48px,7vw,84px)] flex list-none flex-wrap gap-x-3 gap-y-[7px] p-0">
+					<ul class="mt-0 mb-[clamp(48px,7vw,84px)] flex list-none flex-wrap gap-x-3 gap-y-[7px] p-0 max-[520px]:gap-1.5">
 						{#each t(profile.areas, locale) as area (area)}
-							<li class="inline-flex items-center gap-3 text-[.7rem] tracking-[.06em] text-ink-dim uppercase after:text-accent-strong after:content-['/'] last:after:content-none">{area}</li>
+							<li class="inline-flex items-center gap-3 text-[.7rem] tracking-[.06em] text-ink-dim uppercase after:text-accent-strong after:content-['/'] last:after:content-none max-[520px]:rounded-full max-[520px]:border max-[520px]:border-rule max-[520px]:px-2.5 max-[520px]:py-1.5 max-[520px]:text-[.58rem] max-[520px]:after:hidden">{area}</li>
 						{/each}
 					</ul>
 					<AcademicPath {locale} />

@@ -11,8 +11,15 @@
 		visual,
 		label,
 		period,
-		compact = false
-	}: { visual: ProjectVisual; label: string; period: string; compact?: boolean } = $props();
+		compact = false,
+		mobileTall = false
+	}: {
+		visual: ProjectVisual;
+		label: string;
+		period: string;
+		compact?: boolean;
+		mobileTall?: boolean;
+	} = $props();
 
 	const visualTone: Record<ProjectVisual, string> = {
 		generic: 'bg-[color-mix(in_srgb,var(--accent)_7%,var(--visual-bg))] text-ink',
@@ -26,7 +33,7 @@
 </script>
 
 <div
-	class={`relative isolate w-full overflow-hidden rounded-ui border border-rule before:absolute before:inset-0 before:z-[-2] before:bg-[linear-gradient(90deg,var(--visual-grid)_1px,transparent_1px),linear-gradient(0deg,var(--visual-grid)_1px,transparent_1px)] before:[background-size:28px_28px] before:opacity-[.55] before:content-[''] after:pointer-events-none after:absolute after:inset-0 after:z-[8] after:[background-image:var(--visual-grain)] after:opacity-[.12] after:[mix-blend-mode:multiply] after:content-[''] ${compact ? 'aspect-[4/5] max-[840px]:aspect-[16/11]' : 'aspect-[16/11]'} ${visualTone[visual]}`}
+	class={`relative isolate w-full overflow-hidden rounded-ui border border-rule before:absolute before:inset-0 before:z-[-2] before:bg-[linear-gradient(90deg,var(--visual-grid)_1px,transparent_1px),linear-gradient(0deg,var(--visual-grid)_1px,transparent_1px)] before:[background-size:28px_28px] before:opacity-[.55] before:content-[''] after:pointer-events-none after:absolute after:inset-0 after:z-[8] after:[background-image:var(--visual-grain)] after:opacity-[.12] after:[mix-blend-mode:multiply] after:content-[''] ${compact ? 'aspect-[4/5] max-[840px]:aspect-[16/11]' : mobileTall ? 'aspect-[16/11] max-[700px]:aspect-[5/4]' : 'aspect-[16/11]'} ${visualTone[visual]}`}
 	aria-hidden="true"
 >
 	<div class="meta absolute top-4 right-[18px] left-[18px] z-10 flex justify-between gap-4 text-current">
