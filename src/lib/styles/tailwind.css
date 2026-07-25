@@ -46,22 +46,6 @@
 	}
 }
 
-@keyframes academic-cube-next {
-	from {
-		opacity: 0;
-		filter: blur(4px);
-		transform: translate3d(0, 32px, 0) rotateX(-72deg);
-	}
-}
-
-@keyframes academic-cube-previous {
-	from {
-		opacity: 0;
-		filter: blur(4px);
-		transform: translate3d(0, -32px, 0) rotateX(72deg);
-	}
-}
-
 @keyframes project-layer-in {
 	from {
 		opacity: 0;

@@ -14,8 +14,18 @@ export const profile = {
 	location: { es: 'Barcelona, España', en: 'Barcelona, Spain' } as Bi<string>,
 	timezone: { label: 'BARCELONA GMT+1', tz: 'Europe/Madrid' },
 	areas: {
-		es: ['Teatro, escena y recepción', 'Archivos y edición digital', 'Modelado de datos', 'Métodos digitales a gran escala'],
-		en: ['Theatre, performance & reception', 'Archives & digital editing', 'Data modelling', 'Large-scale digital methods']
+		es: [
+			'Teatro clásico: escena y recepción',
+			'Archivos, corpus y edición digital',
+			'Modelado y análisis de datos',
+			'Infraestructuras digitales sostenibles'
+		],
+		en: [
+			'Classical theatre: performance & reception',
+			'Archives, corpora & digital editing',
+			'Data modelling & analysis',
+			'Sustainable digital infrastructures'
+		]
 	} as Bi<string[]>,
 	contact: {
 		mail: 'david.merino@uab.cat',

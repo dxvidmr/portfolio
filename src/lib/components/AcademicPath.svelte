@@ -6,18 +6,11 @@
 	let { locale }: { locale: Locale } = $props();
 	let root = $state<HTMLElement | null>(null);
 	let selected = $state(0);
-	let direction = $state(1);
 	const entries = $derived([...profile.education[locale]].reverse());
-	const active = $derived(entries[selected] ?? entries[0]);
-	const copy = $derived(
-		locale === 'es'
-			? { label: 'Recorrido académico', title: 'De la escena a los datos' }
-			: { label: 'Academic path', title: 'From stage to data' }
-	);
+	const label = $derived(locale === 'es' ? 'Recorrido académico' : 'Academic path');
 
 	const selectEntry = (next: number) => {
 		if (next === selected) return;
-		direction = next > selected ? 1 : -1;
 		selected = next;
 	};
 
@@ -32,11 +25,7 @@
 			const start = viewport * 0.58;
 			const travel = Math.max(1, rect.height - viewport * 0.1);
 			const progress = Math.min(1, Math.max(0, (start - rect.top) / travel));
-			const thresholds = [0, 0.22, 0.45, 0.86];
-			const next = Math.min(
-				entries.length - 1,
-				thresholds.reduce((index, threshold, candidate) => (progress >= threshold ? candidate : index), 0)
-			);
+			const next = Math.min(entries.length - 1, Math.floor(progress * entries.length));
 			selectEntry(next);
 		};
 
@@ -57,81 +46,70 @@
 </script>
 
 <section
-	class="min-h-[max(680px,125vh)] border-t border-rule-strong pt-[clamp(24px,4vw,44px)]"
+	class="min-h-[max(720px,140vh)] border-t border-rule-strong pt-[clamp(24px,4vw,44px)]"
 	bind:this={root}
 >
 	<div class="sticky top-[clamp(88px,13vh,126px)]">
-		<header
-			class="flex items-baseline justify-between gap-[18px] max-[520px]:flex-col max-[520px]:items-start"
-		>
-			<span class="meta">{copy.label}</span>
-			<h3
-				class="font-title text-[clamp(1.25rem,2.2vw,1.8rem)] font-normal leading-none text-right max-[520px]:text-left"
-			>
-				{copy.title}
-			</h3>
-		</header>
+		<header><span class="meta">{label}</span></header>
 
 		<div
-			class="grid grid-cols-[minmax(210px,.9fr)_minmax(0,1.1fr)] gap-[clamp(26px,4vw,54px)] pt-[clamp(26px,4vw,42px)] max-[940px]:grid-cols-1"
+			class="pt-[clamp(26px,4vw,42px)]"
 		>
 			<ol
-				class="relative m-0 grid list-none gap-[3px] pt-0 pr-0 pb-0 pl-[14px] before:absolute before:top-[11px] before:bottom-[11px] before:left-[3px] before:w-px before:bg-rule before:content-['']"
+				class="relative m-0 grid max-w-[760px] list-none gap-[3px] pt-0 pr-0 pb-0 pl-[14px] before:absolute before:top-[11px] before:bottom-[11px] before:left-[3px] before:w-px before:bg-rule before:content-['']"
 			>
 				{#each entries as entry, index (entry.period)}
 					<li
-						class={`relative before:absolute before:top-[13px] before:left-[-14px] before:h-[7px] before:w-[7px] before:rounded-full before:border before:bg-canvas before:content-[''] before:[transition:background-color_180ms_ease,transform_180ms_ease] ${selected === index ? 'before:scale-[1.45] before:border-accent-strong before:bg-accent' : 'before:border-rule-strong'}`}
+						class={`relative [transition:margin_480ms_cubic-bezier(.16,1,.3,1)] before:absolute before:top-[13px] before:left-[-14px] before:h-[7px] before:w-[7px] before:rounded-full before:border before:bg-canvas before:content-[''] before:[transition:background-color_220ms_ease,transform_420ms_cubic-bezier(.16,1,.3,1)] ${
+							selected === index
+								? 'my-3 before:scale-[1.65] before:border-accent-strong before:bg-accent'
+								: 'my-0 before:border-rule-strong'
+						}`}
 					>
 						<button
-							class="group grid w-full cursor-pointer grid-cols-[82px_minmax(0,1fr)] gap-2.5 rounded-ui-sm border-0 bg-transparent py-2 pr-0 pl-2.5 text-left [transition:color_160ms_ease] max-[520px]:grid-cols-[76px_minmax(0,1fr)]"
+							class={`group grid w-full cursor-pointer grid-cols-[92px_minmax(0,1fr)] items-start gap-3 rounded-ui-sm border-0 py-2.5 pr-3 pl-3 text-left [transition:background-color_320ms_ease,padding_420ms_cubic-bezier(.16,1,.3,1)] max-[520px]:grid-cols-[76px_minmax(0,1fr)] ${
+								selected === index
+									? 'bg-[color-mix(in_srgb,var(--accent)_6%,transparent)] py-4'
+									: 'bg-transparent'
+							}`}
 							type="button"
 							aria-pressed={selected === index}
 							onclick={() => selectEntry(index)}
 						>
 							<span
-								class="text-[0.68rem] text-ink-faint uppercase [font-variant-numeric:tabular-nums]"
+								class={`pt-[2px] text-[0.68rem] uppercase [font-variant-numeric:tabular-nums] [transition:color_220ms_ease] ${selected === index ? 'text-accent-strong' : 'text-ink-faint'}`}
 							>
 								{entry.period}
 							</span>
-							<span
-								class={`text-[0.76rem] leading-[1.35] group-hover:text-accent-strong ${selected === index ? 'text-accent-strong' : 'text-ink-dim'}`}
-							>
-								{entry.degree}
+							<span class="grid min-w-0 gap-0">
+								<span
+									class={`leading-[1.35] [transition:color_220ms_ease,font-size_420ms_cubic-bezier(.16,1,.3,1),transform_420ms_cubic-bezier(.16,1,.3,1)] group-hover:text-accent-strong ${
+										selected === index
+											? 'text-[clamp(.9rem,1.5vw,1.08rem)] text-accent-strong'
+											: 'text-[.76rem] text-ink-dim'
+									}`}
+								>
+									{entry.degree}
+								</span>
+								<span
+									class={`grid [transition:grid-template-rows_480ms_cubic-bezier(.16,1,.3,1),opacity_300ms_ease] ${
+										selected === index
+											? 'grid-rows-[1fr] opacity-100'
+											: 'grid-rows-[0fr] opacity-0'
+									}`}
+									aria-hidden={selected !== index}
+								>
+									<span class="overflow-hidden">
+										<span class="mt-1.5 block text-[.72rem] leading-[1.45] text-ink-faint">
+											{entry.institution}
+										</span>
+									</span>
+								</span>
 							</span>
 						</button>
 					</li>
 				{/each}
 			</ol>
-
-			<div
-				class="relative min-h-[138px] overflow-hidden pl-6 [perspective:760px]"
-			>
-				<span
-					class="pointer-events-none absolute top-0.5 bottom-0.5 left-0 z-[2] w-0.5 rounded-[2px] bg-accent"
-					aria-hidden="true"
-				></span>
-				{#key active.period}
-					<article
-						class={`relative z-[1] min-h-[138px] py-0.5 [backface-visibility:hidden] motion-reduce:animate-none ${direction < 0 ? 'origin-[50%_0] [animation:academic-cube-previous_900ms_cubic-bezier(.16,1,.3,1)_both]' : 'origin-[50%_100%] [animation:academic-cube-next_900ms_cubic-bezier(.16,1,.3,1)_both]'}`}
-					>
-						<p class="meta m-0 block text-[0.74rem] leading-[1.45] text-ink-dim">
-							{active.period}
-						</p>
-						<h4
-							class="mt-[5px] mb-2 font-title text-[clamp(1.1rem,1.7vw,1.35rem)] font-medium leading-[1.2]"
-						>
-							{active.degree}
-						</h4>
-						<p class="m-0 block text-[0.74rem] leading-[1.45] text-ink-dim">
-							{active.institution}
-						</p>
-						<small
-							class="mt-[7px] block text-[0.74rem] leading-[1.45] text-ink-faint"
-							>{active.detail}</small
-						>
-					</article>
-				{/key}
-			</div>
 		</div>
 	</div>
 </section>
