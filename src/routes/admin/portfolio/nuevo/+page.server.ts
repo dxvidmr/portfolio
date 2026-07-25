@@ -3,12 +3,13 @@ import type { Actions, PageServerLoad } from './$types';
 import { requireAdmin } from '$lib/server/admin/auth';
 import {
 	createPortfolioProject,
+	getPortfolioTaxonomyOptions,
 	parsePortfolioProjectInput
 } from '$lib/server/admin/portfolio';
 
 export const load: PageServerLoad = async ({ setHeaders }) => {
 	setHeaders({ 'cache-control': 'private, no-store' });
-	return {};
+	return { taxonomy: await getPortfolioTaxonomyOptions() };
 };
 
 export const actions: Actions = {

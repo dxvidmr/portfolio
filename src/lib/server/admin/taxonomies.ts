@@ -100,6 +100,16 @@ export const TAXONOMY_DOMAINS: TaxonomyDomainDef[] = [
 		domain: 'document_type',
 		label: 'Tipos de documento',
 		consumers: [{ table: 'documents', column: 'document_type' }]
+	},
+	{
+		domain: 'portfolio_kind',
+		label: 'Tipos estructurales del portfolio',
+		consumers: [{ table: 'portfolio_projects', column: 'kind_code' }]
+	},
+	{
+		domain: 'portfolio_tag',
+		label: 'Etiquetas del portfolio',
+		consumers: [{ table: 'portfolio_project_tags', column: 'tag_code' }]
 	}
 ];
 

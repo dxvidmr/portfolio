@@ -30,7 +30,15 @@
 
 <details class="mb-8 rounded-ui border border-rule bg-surface px-4 py-3">
 	<summary class="cursor-pointer font-mono text-xs text-ink">Datos básicos y publicación</summary>
-	<div class="mt-5"><PortfolioProjectForm project={data.project} action="?/update" submitLabel="Guardar datos" /></div>
+		<div class="mt-5">
+			<PortfolioProjectForm
+				project={data.project}
+				kindOptions={data.taxonomy.kinds}
+				tagOptions={data.taxonomy.tags}
+				action="?/update"
+				submitLabel="Guardar datos"
+			/>
+		</div>
 </details>
 
 <PortfolioRelationsEditor

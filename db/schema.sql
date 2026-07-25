@@ -291,21 +291,31 @@ CREATE TABLE entity_tags (
 CREATE INDEX idx_entity_tags_entity
   ON entity_tags(entity_type, entity_id);
 
+INSERT INTO type_vocab (code, domain, label_es, label_en, sort_order) VALUES
+  ('portfolio_project', 'portfolio_kind', 'Proyecto', 'Project', 10),
+  ('portfolio_line', 'portfolio_kind', 'Línea de trabajo', 'Line of work', 20),
+  ('portfolio_infrastructure', 'portfolio_kind', 'Infraestructura', 'Infrastructure', 30),
+  ('portfolio_research', 'portfolio_tag', 'Investigación', 'Research', 10),
+  ('portfolio_digital_editing', 'portfolio_tag', 'Edición digital', 'Digital editing', 20),
+  ('portfolio_data_modelling', 'portfolio_tag', 'Modelado de datos', 'Data modelling', 30),
+  ('portfolio_computational_analysis', 'portfolio_tag', 'Análisis computacional', 'Computational analysis', 40),
+  ('portfolio_data_visualization', 'portfolio_tag', 'Visualización de datos', 'Data visualization', 50),
+  ('portfolio_web_development', 'portfolio_tag', 'Desarrollo web', 'Web development', 60),
+  ('portfolio_digital_corpora', 'portfolio_tag', 'Corpus digitales', 'Digital corpora', 70),
+  ('portfolio_knowledge_transfer', 'portfolio_tag', 'Transferencia', 'Knowledge transfer', 80),
+  ('portfolio_teaching', 'portfolio_tag', 'Docencia', 'Teaching', 90),
+  ('portfolio_performance_practice', 'portfolio_tag', 'Práctica escénica', 'Performance practice', 100);
+
 CREATE TABLE portfolio_projects (
   slug TEXT PRIMARY KEY,
   title_es TEXT NOT NULL,
   title_en TEXT NOT NULL,
-  kind_es TEXT NOT NULL,
-  kind_en TEXT NOT NULL,
-  kicker_es TEXT NOT NULL,
-  kicker_en TEXT NOT NULL,
+  kind_code TEXT NOT NULL REFERENCES type_vocab(code),
   summary_es TEXT NOT NULL,
   summary_en TEXT NOT NULL,
   status_es TEXT NOT NULL,
   status_en TEXT NOT NULL,
   period TEXT NOT NULL,
-  tags_json TEXT NOT NULL DEFAULT '[]'
-    CHECK (json_valid(tags_json) AND json_type(tags_json) = 'array'),
   links_json TEXT NOT NULL DEFAULT '[]'
     CHECK (json_valid(links_json) AND json_type(links_json) = 'array'),
   publication_status TEXT NOT NULL DEFAULT 'published'
@@ -319,14 +329,47 @@ CREATE INDEX idx_portfolio_projects_publication
   ON portfolio_projects(publication_status, sort_order);
 
 INSERT INTO portfolio_projects
-  (slug, title_es, title_en, kind_es, kind_en, kicker_es, kicker_en, summary_es, summary_en, status_es, status_en, period, tags_json, links_json, publication_status, sort_order)
+  (slug, title_es, title_en, kind_code, summary_es, summary_en, status_es, status_en, period, links_json, publication_status, sort_order)
 VALUES
-  ('todos-a-una', 'Todos a una', 'Todos a una', 'Tesis doctoral y proyecto digital', 'Doctoral research & digital project', 'recepción · modelado de datos · edición participativa', 'reception · data modelling · participatory edition', 'Una investigación sobre cómo Fuenteovejuna llegó a ser un clásico, desarrollada como modelo de datos, edición digital, archivo documental y plataforma de participación pública.', 'Research into how Fuenteovejuna became a classic, developed as a data model, digital edition, documentary archive, and platform for public participation.', 'Investigación doctoral en curso', 'Ongoing doctoral research', '2023—', '["historia de la recepción","XML-TEI","modelado de datos","humanidades públicas"]', '[{"label_es":"Visitar Todos a una","label_en":"Visit Todos a una","url":"https://todosauna.vercel.app/"}]', 'published', 10),
-  ('versologia-metadrama', 'Versología', 'Versología', 'Base de datos y herramientas de análisis', 'Database & analysis toolkit', 'METADRAMA · estilometría estrófica · modelado de datos', 'METADRAMA · stanzaic stylometry · data modelling', 'Una infraestructura editorial y analítica para describir, comparar y explorar la arquitectura métrica del teatro en verso.', 'An editorial and analytical infrastructure for describing, comparing, and exploring the metrical architecture of verse drama.', 'En desarrollo', 'In development', '2025—', '["SvelteKit","Supabase","estilometría estrófica","visualización"]', '[]', 'draft', 20),
-  ('etso-plataforma-web', 'Nueva plataforma ETSO', 'New ETSO platform', 'Rediseño, arquitectura y desarrollo web', 'Redesign, architecture & web development', 'SvelteKit · SQLite · R2 · búsqueda textual', 'SvelteKit · SQLite · R2 · full-text search', 'Reconstrucción completa del portal de Estilometría Aplicada al Teatro del Siglo de Oro y de su sistema de actualización, búsqueda y publicación.', 'Complete rebuild of the Stylometry Applied to Spanish Golden Age Theatre portal and its update, search, and publication system.', 'Publicado', 'Published', '2026', '["SvelteKit","SQLite","Cloudflare R2","ETL"]', '[{"label_es":"Visitar ETSO","label_en":"Visit ETSO","url":"https://etso.es/"}]', 'published', 30),
-  ('redes-personajes-teatrales', 'Redes de personajes teatrales', 'Theatrical character networks', 'Investigación y transferencia pedagógica', 'Research & pedagogical transfer', 'TFM · redes · visualización · transferencia', 'MA thesis · networks · visualisation · knowledge transfer', 'Una línea sobre análisis de redes teatrales que reúne investigación metodológica sobre Lope, tutoriales abiertos y una aplicación pedagógica con dramaturgas de la Edad de Plata.', 'A line of work on theatrical network analysis spanning methodological research on Lope, open tutorials, and a pedagogical application with women playwrights of Spain’s Silver Age.', 'Línea desarrollada · resultados publicados', 'Developed line · published outputs', '2022—2025', '["grafos","Lope de Vega","Edad de Plata","Programming Historian","pedagogía"]', '[]', 'published', 40),
-  ('edicion-digital-corpus', 'Edición digital e infraestructuras textuales', 'Digital editions & textual infrastructures', 'Línea de trabajo', 'Line of work', 'XML-TEI · herramientas · corpus', 'XML-TEI · tools · corpora', 'Herramientas, ediciones y corpus para transformar documentos editoriales en textos publicables, analizables y reutilizables.', 'Tools, editions, and corpora that transform editorial documents into publishable, analysable, and reusable texts.', 'Línea activa', 'Active line of work', '2020—', '["XML-TEI","FeniX-ML","edición digital","corpus"]', '[]', 'published', 50),
-  ('documento-escena', 'Práctica escénica', 'Performance practice', 'Investigación y creación escénica', 'Performance research & stage creation', 'interpretación · investigación-creación · teatro clásico', 'acting · practice-based research · classical theatre', 'La escena como práctica y método de investigación: una trayectoria que reúne formación actoral, interpretación, montajes de teatro clásico y estudio de la técnica actoral del Siglo de Oro.', 'Performance as both practice and research method: a body of work bringing together actor training, performance, classical theatre productions, and the study of Golden Age acting technique.', 'Línea activa', 'Active line of work', '2018—', '["interpretación","investigación escénica","teatro clásico","METADRAMA"]', '[]', 'published', 60);
+  ('todos-a-una', 'Todos a una', 'Todos a una', 'portfolio_project', 'Una investigación sobre cómo <i>Fuenteovejuna</i> llegó a ser un clásico, articulada a través de un modelo de datos, una edición digital, un archivo documental y una plataforma de divulgación y participación pública.', 'Research into how <i>Fuenteovejuna</i> became a classic, articulated through a data model, a digital edition, a documentary archive, and a platform for public engagement and participation.', 'Investigación doctoral en curso', 'Ongoing doctoral research', '2023—', '[{"label_es":"Visitar Todos a una","label_en":"Visit Todos a una","url":"https://todosauna.vercel.app/"}]', 'published', 10),
+  ('versologia-metadrama', 'Versología', 'Versología', 'portfolio_infrastructure', 'Desarrollo de una base de datos y herramientas digitales para describir, visualizar y comparar la organización métrica del teatro en verso y su relación con la estructura dramática.', 'Development of a database and digital tools for describing, visualising, and comparing the metrical organisation of verse drama and its relationship to dramatic structure.', 'En desarrollo', 'In development', '2025—', '[]', 'draft', 20),
+  ('etso-plataforma-web', 'Nueva plataforma ETSO', 'New ETSO platform', 'portfolio_project', 'Rediseño y reconstrucción técnica del portal web y la base de datos de ETSO para facilitar la consulta, la búsqueda y la actualización del corpus más grande de teatro del Siglo de Oro.', 'Redesign and technical reconstruction of the ETSO website and database to facilitate access to, searching, and updating the largest corpus of Spanish Golden Age theatre.', 'Publicado', 'Published', '2026', '[{"label_es":"Visitar ETSO","label_en":"Visit ETSO","url":"https://etso.es/"}]', 'published', 30),
+  ('redes-personajes-teatrales', 'Redes de personajes teatrales', 'Theatrical character networks', 'portfolio_line', 'Investigación, creación de recursos abiertos y aplicaciones docentes alrededor del análisis de redes sociales aplicado al teatro y sus personajes.', 'Research, open-resource development, and teaching applications of social network analysis to theatre and its characters.', 'Línea desarrollada · resultados publicados', 'Developed line · published outputs', '2022—2025', '[]', 'published', 40),
+  ('edicion-digital-corpus', 'Edición digital e infraestructuras textuales', 'Digital editions & textual infrastructures', 'portfolio_line', 'Desarrollo de herramientas, ediciones y corpus que conectan la edición filológica con la publicación web sostenible, el análisis computacional y la reutilización de textos y datos.', 'Development of tools, editions, and corpora connecting scholarly editing with sustainable web publishing, computational analysis, and the reuse of texts and data.', 'Línea activa', 'Active line of work', '2020—', '[]', 'published', 50),
+  ('documento-escena', 'Práctica escénica', 'Performance practice', 'portfolio_line', 'Interpretación y creación escénica como investigación, concebidas como formas de conocimiento en sí mismas, con especial atención al teatro clásico.', 'Acting and stage creation as research, conceived as forms of knowledge in themselves, with particular attention to classical theatre.', 'Línea activa', 'Active line of work', '2018—', '[]', 'published', 60);
+
+CREATE TABLE portfolio_project_tags (
+  portfolio_slug TEXT NOT NULL REFERENCES portfolio_projects(slug) ON DELETE CASCADE,
+  tag_code TEXT NOT NULL REFERENCES type_vocab(code),
+  sort_order INTEGER NOT NULL DEFAULT 0,
+  PRIMARY KEY (portfolio_slug, tag_code)
+);
+
+CREATE INDEX idx_portfolio_project_tags_slug
+  ON portfolio_project_tags(portfolio_slug, sort_order);
+
+INSERT INTO portfolio_project_tags (portfolio_slug, tag_code, sort_order) VALUES
+  ('todos-a-una', 'portfolio_research', 10),
+  ('todos-a-una', 'portfolio_digital_editing', 20),
+  ('todos-a-una', 'portfolio_data_modelling', 30),
+  ('todos-a-una', 'portfolio_knowledge_transfer', 40),
+  ('documento-escena', 'portfolio_research', 10),
+  ('documento-escena', 'portfolio_performance_practice', 20),
+  ('versologia-metadrama', 'portfolio_research', 10),
+  ('versologia-metadrama', 'portfolio_data_modelling', 20),
+  ('versologia-metadrama', 'portfolio_computational_analysis', 30),
+  ('versologia-metadrama', 'portfolio_data_visualization', 40),
+  ('versologia-metadrama', 'portfolio_web_development', 50),
+  ('etso-plataforma-web', 'portfolio_web_development', 10),
+  ('etso-plataforma-web', 'portfolio_digital_corpora', 20),
+  ('redes-personajes-teatrales', 'portfolio_research', 10),
+  ('redes-personajes-teatrales', 'portfolio_computational_analysis', 20),
+  ('redes-personajes-teatrales', 'portfolio_data_visualization', 30),
+  ('redes-personajes-teatrales', 'portfolio_knowledge_transfer', 40),
+  ('redes-personajes-teatrales', 'portfolio_teaching', 50),
+  ('edicion-digital-corpus', 'portfolio_digital_editing', 10),
+  ('edicion-digital-corpus', 'portfolio_web_development', 20),
+  ('edicion-digital-corpus', 'portfolio_digital_corpora', 30);
 
 CREATE TABLE portfolio_items (
   portfolio_slug TEXT NOT NULL REFERENCES portfolio_projects(slug) ON DELETE CASCADE,

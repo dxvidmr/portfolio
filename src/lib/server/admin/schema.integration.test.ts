@@ -8,6 +8,13 @@ describe('esquema posterior a la limpieza 013', () => {
 		const db = createClient({ url: 'file::memory:' });
 		try {
 			await db.executeMultiple(`
+				CREATE TABLE type_vocab (
+					code TEXT PRIMARY KEY,
+					domain TEXT NOT NULL,
+					label_es TEXT NOT NULL,
+					label_en TEXT NOT NULL,
+					sort_order INTEGER NOT NULL DEFAULT 0
+				);
 				CREATE TABLE portfolio_items (
 					portfolio_slug TEXT NOT NULL,
 					entity_type TEXT NOT NULL,
@@ -25,12 +32,16 @@ describe('esquema posterior a la limpieza 013', () => {
 			await db.executeMultiple(readFileSync('db/migrations/014_portfolio_projects.sql', 'utf8'));
 			await db.executeMultiple(readFileSync('db/migrations/015_portfolio_publication_status.sql', 'utf8'));
 			await db.executeMultiple(readFileSync('db/migrations/016_simplify_portfolio_publication.sql', 'utf8'));
+			await db.executeMultiple(readFileSync('db/migrations/027_normalize_portfolio_taxonomies.sql', 'utf8'));
 
 			expect((await db.execute('SELECT COUNT(*) AS total FROM portfolio_projects')).rows[0]?.total).toBe(6);
 			expect((await db.execute(
 				`SELECT publication_status FROM portfolio_projects WHERE slug = 'versologia-metadrama'`
 			)).rows[0]).toMatchObject({ publication_status: 'draft' });
 			expect((await db.execute('PRAGMA table_info(portfolio_projects)')).rows.map((row) => row.name)).not.toContain('show_home');
+			expect((await db.execute('PRAGMA table_info(portfolio_projects)')).rows.map((row) => row.name))
+				.not.toEqual(expect.arrayContaining(['kind_es', 'kind_en', 'kicker_es', 'kicker_en', 'tags_json']));
+			expect((await db.execute('SELECT COUNT(*) AS total FROM portfolio_project_tags')).rows[0]?.total).toBe(21);
 			expect((await db.execute('SELECT portfolio_slug FROM portfolio_items')).rows).toMatchObject([
 				{ portfolio_slug: 'todos-a-una' }
 			]);
@@ -128,18 +139,22 @@ describe('esquema posterior a la limpieza 013', () => {
 			});
 			await db.execute({
 				sql: `INSERT INTO portfolio_projects
-					(slug, title_es, title_en, kind_es, kind_en, kicker_es, kicker_en,
-					 summary_es, summary_en, status_es, status_en, period)
-					VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+					(slug, title_es, title_en, kind_code, summary_es, summary_en,
+					 status_es, status_en, period)
+					VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
 				args: [
-					'proyecto-sin-narrativa', 'Proyecto básico', 'Basic project', 'Proyecto', 'Project',
-					'Proyecto', 'Project', 'Descripción', 'Description', 'En desarrollo', 'In development', '2026—'
+					'proyecto-sin-narrativa', 'Proyecto básico', 'Basic project', 'portfolio_project',
+					'Descripción', 'Description', 'En desarrollo', 'In development', '2026—'
 				]
 			});
 			expect((await db.execute(
-				`SELECT publication_status, tags_json, links_json FROM portfolio_projects
+				`SELECT publication_status, kind_code, links_json FROM portfolio_projects
 				 WHERE slug = 'proyecto-sin-narrativa'`
-			)).rows[0]).toMatchObject({ publication_status: 'published', tags_json: '[]', links_json: '[]' });
+			)).rows[0]).toMatchObject({
+				publication_status: 'published',
+				kind_code: 'portfolio_project',
+				links_json: '[]'
+			});
 			expect((await db.execute('PRAGMA foreign_key_check')).rows).toHaveLength(0);
 		} finally {
 			db.close();

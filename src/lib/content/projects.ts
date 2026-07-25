@@ -21,12 +21,11 @@ export type ProjectVisual =
 export type PortfolioProject = {
 	slug: string;
 	title: Bi<string>;
-	kind: Bi<string>;
-	kicker: Bi<string>;
+	kind: Bi<string> & { code: string };
 	summary: Bi<string>;
 	year: string;
 	status: Bi<string>;
-	tags: string[];
+	tags: Array<Bi<string> & { code: string }>;
 	visual: ProjectVisual;
 	facts?: Array<Bi<string>>;
 	links?: Array<{ label: Bi<string>; url: string }>;
@@ -118,7 +117,6 @@ export function projectFromMetadata(metadata: PortfolioProjectMetadata): Portfol
 		slug: metadata.slug,
 		title: metadata.title,
 		kind: metadata.kind,
-		kicker: metadata.kicker,
 		summary: metadata.summary,
 		status: metadata.status,
 		year: metadata.period,

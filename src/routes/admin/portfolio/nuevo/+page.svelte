@@ -3,9 +3,9 @@
 	import AdminPageHeader from '$lib/components/admin/AdminPageHeader.svelte';
 	import PortfolioProjectForm from '$lib/components/admin/PortfolioProjectForm.svelte';
 	import ButtonLink from '$lib/components/ui/ButtonLink.svelte';
-	import type { ActionData } from './$types';
+	import type { ActionData, PageData } from './$types';
 
-	let { form }: { form: ActionData } = $props();
+	let { data, form }: { data: PageData; form: ActionData } = $props();
 </script>
 
 <svelte:head><title>Nuevo elemento · cv/admin</title></svelte:head>
@@ -23,5 +23,10 @@
 </AdminPageHeader>
 
 <section class="border-t border-rule pt-5">
-	<PortfolioProjectForm action="?/create" submitLabel="Crear elemento" />
+	<PortfolioProjectForm
+		kindOptions={data.taxonomy.kinds}
+		tagOptions={data.taxonomy.tags}
+		action="?/create"
+		submitLabel="Crear elemento"
+	/>
 </section>

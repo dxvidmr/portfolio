@@ -78,6 +78,14 @@ await expectZero(
 );
 
 await expectZero(
+	'portfolio_project_tags sin fichas de portfolio huérfanas',
+	`SELECT COUNT(*) FROM portfolio_project_tags tag
+	 WHERE NOT EXISTS (
+	   SELECT 1 FROM portfolio_projects project
+	   WHERE project.slug = tag.portfolio_slug)`
+);
+
+await expectZero(
 	'Versología existe como borrador',
 	`SELECT ABS(COUNT(*) - 1) FROM portfolio_projects
 	 WHERE slug = 'versologia-metadrama' AND publication_status = 'draft'`
@@ -161,7 +169,9 @@ const vocabConsumers: Array<{ table: string; column: string; domain: string; nul
 	{ table: 'projects', column: 'role', domain: 'project_role', nullable: true },
 	{ table: 'service_activities', column: 'role', domain: 'service_role', nullable: true },
 	{ table: 'links', column: 'link_type', domain: 'link_type', nullable: false },
-	{ table: 'documents', column: 'document_type', domain: 'document_type', nullable: false }
+	{ table: 'documents', column: 'document_type', domain: 'document_type', nullable: false },
+	{ table: 'portfolio_projects', column: 'kind_code', domain: 'portfolio_kind', nullable: false },
+	{ table: 'portfolio_project_tags', column: 'tag_code', domain: 'portfolio_tag', nullable: false }
 ];
 
 for (const consumer of vocabConsumers) {

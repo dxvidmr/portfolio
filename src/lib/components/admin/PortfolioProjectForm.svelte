@@ -1,25 +1,32 @@
 <script lang="ts">
 	import AdminField from '$lib/components/admin/AdminField.svelte';
+	import TaxonomyCheckboxGroup from '$lib/components/admin/TaxonomyCheckboxGroup.svelte';
 	import Button from '$lib/components/ui/Button.svelte';
 	import Input from '$lib/components/ui/Input.svelte';
 	import Select from '$lib/components/ui/Select.svelte';
 	import Textarea from '$lib/components/ui/Textarea.svelte';
-	import type { PortfolioProjectMetadata } from '$lib/types/portfolio';
+	import type {
+		PortfolioProjectMetadata,
+		PortfolioTaxonomyOption
+	} from '$lib/types/portfolio';
 	import { untrack } from 'svelte';
 
 	let {
 		project = null,
+		kindOptions,
+		tagOptions,
 		action,
 		submitLabel
 	}: {
 		project?: PortfolioProjectMetadata | null;
+		kindOptions: PortfolioTaxonomyOption[];
+		tagOptions: PortfolioTaxonomyOption[];
 		action: string;
 		submitLabel: string;
 	} = $props();
 
 	const initialProject = untrack(() => project);
 	let publicationStatus = $state(initialProject?.publicationStatus ?? 'draft');
-	const tags = initialProject?.tags.join(', ') ?? '';
 	const primaryLink = initialProject?.links[0];
 </script>
 
@@ -42,17 +49,27 @@
 	</AdminField>
 	<AdminField label="Título (ES)"><Input name="titleEs" required value={project?.title.es ?? ''} /></AdminField>
 	<AdminField label="Título (EN)"><Input name="titleEn" value={project?.title.en ?? ''} /></AdminField>
-	<AdminField label="Tipo (ES)"><Input name="kindEs" required value={project?.kind.es ?? ''} placeholder="Proyecto digital" /></AdminField>
-	<AdminField label="Tipo (EN)"><Input name="kindEn" value={project?.kind.en ?? ''} /></AdminField>
-	<AdminField label="Línea superior (ES)"><Input name="kickerEs" value={project?.kicker.es ?? ''} /></AdminField>
-	<AdminField label="Línea superior (EN)"><Input name="kickerEn" value={project?.kicker.en ?? ''} /></AdminField>
+	<AdminField label="Tipo estructural" required help="Indica si la ficha representa un proyecto concreto, una línea de trabajo o una infraestructura.">
+		<Select name="kindCode" required value={project?.kind.code ?? ''}>
+			<option value="" disabled>Selecciona un tipo</option>
+			{#each kindOptions as option (option.code)}
+				<option value={option.code}>{option.labelEs}</option>
+			{/each}
+		</Select>
+	</AdminField>
 	<AdminField label="Estado mostrado (ES)"><Input name="statusEs" value={project?.status.es ?? ''} placeholder="En desarrollo" /></AdminField>
 	<AdminField label="Estado mostrado (EN)"><Input name="statusEn" value={project?.status.en ?? ''} /></AdminField>
 	<AdminField label="Periodo"><Input name="period" required value={project?.period ?? ''} placeholder="2026—" /></AdminField>
 	<AdminField label="Orden"><Input name="sortOrder" type="number" min="0" value={project?.sortOrder ?? ''} /></AdminField>
 	<div class="col-span-full"><AdminField label="Descripción (ES)" help="Formato permitido: <i>/<em> para cursiva y <b>/<strong> para negrita."><Textarea name="summaryEs" required rows={3} value={project?.summary.es ?? ''} /></AdminField></div>
 	<div class="col-span-full"><AdminField label="Descripción (EN)" help="Formato permitido: <i>/<em> para cursiva y <b>/<strong> para negrita."><Textarea name="summaryEn" rows={3} value={project?.summary.en ?? ''} /></AdminField></div>
-	<div class="col-span-full"><AdminField label="Etiquetas · separadas por comas"><Input name="tags" value={tags} /></AdminField></div>
+	<TaxonomyCheckboxGroup
+		label="Etiquetas"
+		name="tagCodes"
+		options={tagOptions}
+		selected={project?.tags.map((tag) => tag.code) ?? []}
+		help="Selecciona ámbitos estables y reutilizables. Las traducciones se gestionan desde Taxonomías."
+	/>
 	<AdminField label="Enlace principal"><Input name="linkUrl" type="url" value={primaryLink?.url ?? ''} /></AdminField>
 	<AdminField label="Etiqueta del enlace (ES)"><Input name="linkLabelEs" value={primaryLink?.label.es ?? ''} /></AdminField>
 	<AdminField label="Etiqueta del enlace (EN)"><Input name="linkLabelEn" value={primaryLink?.label.en ?? ''} /></AdminField>

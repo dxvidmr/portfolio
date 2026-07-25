@@ -1,5 +1,9 @@
 import { db } from '$lib/server/db';
-import type { PortfolioProjectMetadata, PortfolioPublicationStatus } from '$lib/types/portfolio';
+import type {
+	PortfolioProjectMetadata,
+	PortfolioPublicationStatus,
+	PortfolioTaxonomyTerm
+} from '$lib/types/portfolio';
 
 const text = (value: unknown) => String(value ?? '').trim();
 const publicationStatus = (value: unknown): PortfolioPublicationStatus => {
@@ -7,24 +11,21 @@ const publicationStatus = (value: unknown): PortfolioPublicationStatus => {
 	return status === 'draft' || status === 'archived' ? status : 'published';
 };
 
-function tagsFromJson(value: unknown): string[] {
-	try {
-		const tags = JSON.parse(String(value));
-		return Array.isArray(tags) ? tags.filter((tag): tag is string => typeof tag === 'string') : [];
-	} catch {
-		return [];
-	}
-}
-
-const metadataFromRow = (row: Record<string, unknown>): PortfolioProjectMetadata => ({
+const metadataFromRow = (
+	row: Record<string, unknown>,
+	tags: PortfolioTaxonomyTerm[]
+): PortfolioProjectMetadata => ({
 	slug: text(row.slug),
 	title: { es: text(row.title_es), en: text(row.title_en) },
-	kind: { es: text(row.kind_es), en: text(row.kind_en) },
-	kicker: { es: text(row.kicker_es), en: text(row.kicker_en) },
+	kind: {
+		code: text(row.kind_code),
+		es: text(row.kind_es),
+		en: text(row.kind_en) || text(row.kind_es)
+	},
 	summary: { es: text(row.summary_es), en: text(row.summary_en) },
 	status: { es: text(row.status_es), en: text(row.status_en) },
 	period: text(row.period),
-	tags: tagsFromJson(row.tags_json),
+	tags,
 	links: (() => {
 		try {
 			const links = JSON.parse(String(row.links_json));
@@ -50,14 +51,40 @@ const metadataFromRow = (row: Record<string, unknown>): PortfolioProjectMetadata
 });
 
 export async function getPortfolioProjects(options: { publicOnly?: boolean } = {}): Promise<PortfolioProjectMetadata[]> {
-	const result = await db.execute(`
-		SELECT slug, title_es, title_en, kind_es, kind_en, kicker_es, kicker_en,
-		       summary_es, summary_en, status_es, status_en, period, tags_json,
-		       links_json, publication_status, sort_order
-		FROM portfolio_projects
-		${options.publicOnly ? "WHERE publication_status = 'published'" : ''}
-		ORDER BY sort_order ASC, title_es COLLATE NOCASE ASC`);
-	return result.rows.map((row) => metadataFromRow(row));
+	const [projects, tags] = await Promise.all([
+		db.execute(`
+			SELECT project.slug, project.title_es, project.title_en, project.kind_code,
+			       kind.label_es AS kind_es, kind.label_en AS kind_en,
+			       project.summary_es, project.summary_en, project.status_es,
+			       project.status_en, project.period, project.links_json,
+			       project.publication_status, project.sort_order
+			FROM portfolio_projects AS project
+			JOIN type_vocab AS kind
+			  ON kind.code = project.kind_code
+			 AND kind.domain = 'portfolio_kind'
+			${options.publicOnly ? "WHERE project.publication_status = 'published'" : ''}
+			ORDER BY project.sort_order ASC, project.title_es COLLATE NOCASE ASC`),
+		db.execute(`
+			SELECT relation.portfolio_slug, vocab.code,
+			       vocab.label_es, vocab.label_en
+			FROM portfolio_project_tags AS relation
+			JOIN type_vocab AS vocab
+			  ON vocab.code = relation.tag_code
+			 AND vocab.domain = 'portfolio_tag'
+			ORDER BY relation.portfolio_slug, relation.sort_order, vocab.sort_order`)
+	]);
+	const tagsBySlug = new Map<string, PortfolioTaxonomyTerm[]>();
+	for (const row of tags.rows) {
+		const slug = text(row.portfolio_slug);
+		const values = tagsBySlug.get(slug) ?? [];
+		values.push({
+			code: text(row.code),
+			es: text(row.label_es),
+			en: text(row.label_en) || text(row.label_es)
+		});
+		tagsBySlug.set(slug, values);
+	}
+	return projects.rows.map((row) => metadataFromRow(row, tagsBySlug.get(text(row.slug)) ?? []));
 }
 
 export async function portfolioProjectExists(slug: string): Promise<boolean> {

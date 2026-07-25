@@ -52,13 +52,11 @@
 		locale === 'es'
 			? {
 					open: 'Explorar ficha completa',
-					contents: 'Índice de trabajos seleccionados',
-					preview: 'Elemento seleccionado'
+					contents: 'Índice de trabajos seleccionados'
 				}
 			: {
 					open: 'Explore full entry',
-					contents: 'Selected work index',
-					preview: 'Selected entry'
+					contents: 'Selected work index'
 				}
 	);
 
@@ -173,8 +171,7 @@
 					<div
 						class="[animation:editorial-preview-in_600ms_cubic-bezier(.16,1,.3,1)_both] motion-reduce:animate-none"
 					>
-						<div class="meta mb-[11px] flex justify-between gap-[18px] text-ink-faint">
-							<span>{copy.preview}</span>
+						<div class="meta mb-[11px] flex justify-end text-ink-faint">
 							<span>{String(activeIndex + 1).padStart(2, '0')} / {String(visibleProjects.length).padStart(2, '0')}</span>
 						</div>
 						<ProjectVisual
@@ -189,11 +186,11 @@
 							class="mt-4 mb-0 flex list-none flex-wrap gap-x-[14px] gap-y-1.5 p-0 text-ink-faint"
 							aria-label={locale === 'es' ? 'Temas' : 'Topics'}
 						>
-							{#each activeProject.tags.slice(0, 4) as tag (tag)}
+							{#each activeProject.tags as tag (tag.code)}
 								<li
 									class="meta after:pl-[14px] after:text-accent-strong after:content-['/'] last:after:content-none"
 								>
-									{tag}
+									{projectText(tag, locale)}
 								</li>
 							{/each}
 						</ul>

@@ -24,15 +24,26 @@ export type PortfolioRelatedItem = {
 
 export type PortfolioPublicationStatus = 'draft' | 'published' | 'archived';
 
+export type PortfolioTaxonomyTerm = {
+	code: string;
+	es: string;
+	en: string;
+};
+
+export type PortfolioTaxonomyOption = {
+	code: string;
+	labelEs: string;
+	labelEn: string;
+};
+
 export type PortfolioProjectMetadata = {
 	slug: string;
 	title: { es: string; en: string };
-	kind: { es: string; en: string };
-	kicker: { es: string; en: string };
+	kind: PortfolioTaxonomyTerm;
 	summary: { es: string; en: string };
 	status: { es: string; en: string };
 	period: string;
-	tags: string[];
+	tags: PortfolioTaxonomyTerm[];
 	links: Array<{ label: { es: string; en: string }; url: string }>;
 	publicationStatus: PortfolioPublicationStatus;
 	sortOrder: number;

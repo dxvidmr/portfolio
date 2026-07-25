@@ -172,7 +172,7 @@
 					class="grid min-h-[calc(100vh-190px)] grid-cols-[minmax(0,1.05fr)_minmax(360px,.95fr)] items-center gap-[clamp(40px,7vw,100px)] pb-[clamp(54px,8vw,110px)] max-[980px]:grid-cols-[minmax(0,1fr)_minmax(300px,.8fr)] max-[700px]:min-h-0 max-[700px]:grid-cols-1 max-[700px]:gap-[34px] max-[700px]:pb-[70px]"
 				>
 					<div class="intro-copy">
-						<p class="meta text-accent-strong">{projectText(project.kicker, locale)}</p>
+						<p class="meta text-accent-strong">{projectText(project.kind, locale)}</p>
 						<h2
 							class="mt-[18px] mb-0 max-w-[10ch] text-[clamp(3.2rem,8vw,7.8rem)] leading-[.86] tracking-[-.045em] max-[700px]:text-[clamp(3rem,15vw,5.5rem)]"
 							id="project-modal-title"
@@ -189,8 +189,8 @@
 								<div class="col-span-full grid gap-1">
 									<dt class="meta text-ink-faint">{copy.topics}</dt>
 									<dd class="m-0 flex flex-wrap gap-x-[14px] gap-y-1.5 text-[.78rem] leading-[1.45] text-ink-dim">
-										{#each project.tags as tag (tag)}
-											<span class="after:pl-[14px] after:text-accent-strong after:content-['/'] last:after:content-none">{tag}</span>
+										{#each project.tags as tag (tag.code)}
+											<span class="after:pl-[14px] after:text-accent-strong after:content-['/'] last:after:content-none">{projectText(tag, locale)}</span>
 										{/each}
 									</dd>
 								</div>
