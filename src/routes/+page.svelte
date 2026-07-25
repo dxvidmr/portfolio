@@ -17,11 +17,40 @@
 	let headerHidden = $state(false);
 	let headerScrolled = $state(false);
 	let introReady = $state(false);
+	let heroProgress = $state(0);
+	let heroSection = $state<HTMLElement | null>(null);
+	let heroName = $state<HTMLElement | null>(null);
+	let heroStatement = $state<HTMLElement | null>(null);
+	let headerBrand = $state<HTMLAnchorElement | null>(null);
+	let wordMotions = $state<Array<{ dx: number; dy: number; scale: number }>>([]);
+	let subtextOffset = $state(0);
 	const locale = $derived(localeFromPathname(page.url.pathname));
 	const projectModalOpen = $derived(
 		typeof (page.state as Record<string, unknown>)?.portfolioModal === 'string' ||
 			/\/portfolio\/[^/]+\/?$/.test(page.url.pathname)
 	);
+	const clamp = (value: number) => Math.min(1, Math.max(0, value));
+	const ease = (value: number) => value * value * (3 - 2 * value);
+	const nameProgress = $derived(ease(clamp(heroProgress / 0.52)));
+	const statementProgress = $derived(ease(clamp((heroProgress - 0.3) / 0.28)));
+	const heroNameOpacity = $derived(1 - ease(clamp((heroProgress - 0.3) / 0.22)));
+	const headerBrandOpacity = $derived(ease(clamp((heroProgress - 0.4) / 0.12)));
+	const scrollCueOpacity = $derived(1 - ease(clamp(heroProgress / 0.16)));
+
+	const wordTransform = (index: number) => {
+		const motion = wordMotions[index];
+		if (!motion) return 'translate3d(0, 0, 0) scale(1)';
+		return `translate3d(${motion.dx * nameProgress}px, ${motion.dy * nameProgress}px, 0) scale(${1 + (motion.scale - 1) * nameProgress})`;
+	};
+
+	const scrollToStatement = () => {
+		if (!heroSection) return;
+		const distance = Math.max(heroSection.offsetHeight - window.innerHeight, 1);
+		window.scrollTo({
+			top: heroSection.offsetTop + distance * 0.76,
+			behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth'
+		});
+	};
 
 	const completeIntro = () => {
 		introReady = true;
@@ -113,15 +142,59 @@
 		else document.body.classList.add('home-intro');
 		let lastScrollY = window.scrollY;
 		let frame = 0;
+		let resizeTimer = 0;
 		const introFallback = window.setTimeout(completeIntro, reducedMotion ? 0 : 4200);
+
+		const measureNameMotion = () => {
+			if (!heroName || !headerBrand) return;
+			const previousSubtextOffset = subtextOffset;
+			const nextSubtextOffset = Math.max(0, (heroStatement?.offsetHeight ?? 0) - heroName.offsetHeight);
+			subtextOffset = nextSubtextOffset;
+			const sourceWords = Array.from(heroName.querySelectorAll<HTMLElement>('.hero-name-word'));
+			const targetWords = Array.from(headerBrand.querySelectorAll<HTMLElement>('.header-name-word'));
+			const transforms = sourceWords.map((word) => word.style.transform);
+
+			sourceWords.forEach((word) => {
+				word.style.transform = 'none';
+			});
+
+			wordMotions = sourceWords.map((source, index) => {
+				const target = targetWords[index];
+				if (!target) return { dx: 0, dy: 0, scale: 1 };
+				const sourceRect = source.getBoundingClientRect();
+				const targetRect = target.getBoundingClientRect();
+				return {
+					dx: targetRect.left - sourceRect.left,
+					dy:
+						targetRect.top -
+						(sourceRect.top + nextSubtextOffset - previousSubtextOffset),
+					scale: targetRect.height / sourceRect.height
+				};
+			});
+
+			sourceWords.forEach((word, index) => {
+				word.style.transform = transforms[index];
+			});
+		};
 
 		const updateHeader = () => {
 			frame = 0;
 			const currentScrollY = window.scrollY;
 			const delta = currentScrollY - lastScrollY;
-			headerScrolled = currentScrollY > 20;
+			const heroDistance = heroSection
+				? Math.max(heroSection.offsetHeight - window.innerHeight, 1)
+				: window.innerHeight;
+			const rawHeroProgress = heroSection
+				? clamp((currentScrollY - heroSection.offsetTop) / heroDistance)
+				: 0;
+			heroProgress = reducedMotion ? (rawHeroProgress > 0.08 ? 1 : 0) : rawHeroProgress;
+			const nextHeaderScrolled = currentScrollY > 20 && heroProgress > 0.34;
+			if (nextHeaderScrolled !== headerScrolled) {
+				headerScrolled = nextHeaderScrolled;
+				window.requestAnimationFrame(measureNameMotion);
+			}
 
-			if (currentScrollY < 72) {
+			if (heroProgress < 0.98 || currentScrollY < 72) {
 				headerHidden = false;
 			} else if (delta > 2) {
 				headerHidden = true;
@@ -136,13 +209,26 @@
 			if (!frame) frame = window.requestAnimationFrame(updateHeader);
 		};
 
+		const handleResize = () => {
+			window.clearTimeout(resizeTimer);
+			resizeTimer = window.setTimeout(() => {
+				measureNameMotion();
+				updateHeader();
+			}, 120);
+		};
+
+		window.requestAnimationFrame(measureNameMotion);
+		void document.fonts.ready.then(measureNameMotion);
 		updateHeader();
 		window.addEventListener('scroll', handleScroll, { passive: true });
+		window.addEventListener('resize', handleResize, { passive: true });
 
 		return () => {
 			window.cancelAnimationFrame(frame);
 			window.clearTimeout(introFallback);
+			window.clearTimeout(resizeTimer);
 			window.removeEventListener('scroll', handleScroll);
+			window.removeEventListener('resize', handleResize);
 			document.body.classList.remove('home-page', 'home-intro');
 		};
 	});
@@ -156,10 +242,16 @@
 		class={`site-header fixed inset-x-0 top-0 z-20 border-b border-transparent py-3.5 [transition:transform_260ms_cubic-bezier(.22,1,.36,1),padding_220ms_ease,background-color_220ms_ease,border-color_220ms_ease] motion-reduce:duration-[1ms] max-[780px]:bg-[var(--surface-glass)] max-[780px]:py-2 max-[780px]:[backdrop-filter:blur(14px)] ${headerHidden ? '[transform:translateY(-110%)]' : ''} ${headerScrolled ? 'border-rule bg-[var(--surface-glass)] py-2 [backdrop-filter:blur(14px)]' : ''} ${introReady ? '[animation:home-intro-from-top_880ms_cubic-bezier(.16,1,.3,1)_backwards] motion-reduce:animate-none' : 'invisible'}`}
 	>
 		<div class="wrap flex items-center justify-between gap-6 max-[780px]:gap-2.5">
-			<a class="flex min-w-0 items-center hover:text-inherit" href={localizedPath('/', locale)} aria-label={profile.name}>
+			<a
+				class="flex min-w-0 items-center hover:text-inherit"
+				href={localizedPath('/', locale)}
+				aria-label={profile.name}
+				bind:this={headerBrand}
+				style:opacity={headerBrandOpacity}
+			>
 				<strong class="inline-flex gap-[.28em] whitespace-nowrap font-title text-[1.02rem] font-normal leading-[1.1] max-[520px]:text-[.9rem]">
 					{#each profile.name.split(' ') as word (word)}
-						<span><b class="font-bold text-accent-strong">{word.slice(0, 1)}</b>{word.slice(1)}</span>
+						<span class="header-name-word">{word}</span>
 					{/each}
 				</strong>
 			</a>
@@ -173,29 +265,59 @@
 	</header>
 	{/if}
 
-	<section class="wrap relative z-[1] grid min-h-svh grid-rows-[1fr_auto] gap-[clamp(32px,6vh,64px)] pt-[clamp(112px,16vh,168px)] pb-[clamp(22px,4vh,42px)] max-[780px]:pt-[104px]">
-		<div class="grid max-w-[1080px] grid-cols-[minmax(0,1fr)] content-center max-[780px]:grid-cols-1 max-[780px]:items-start">
-			<div class="relative isolate min-w-0 before:pointer-events-none before:absolute before:inset-[clamp(-5rem,-7vw,-3rem)_-9vw] before:z-[-1] before:bg-[radial-gradient(ellipse_at_38%_48%,color-mix(in_srgb,var(--bg)_98%,transparent)_0_42%,color-mix(in_srgb,var(--bg)_84%,transparent)_58%,transparent_80%)] before:content-['']" data-text-bg-avoid>
-				<div class={`mb-[clamp(25px,4vh,42px)] grid gap-[7px] max-[780px]:mb-6 ${introReady ? '[animation:home-intro-from-left_980ms_cubic-bezier(.16,1,.3,1)_90ms_backwards] motion-reduce:animate-none' : 'invisible'}`}>
-					<h1 class="text-[clamp(1.55rem,2.6vw,2.45rem)] font-normal leading-none tracking-[-.02em]">{profile.name}</h1>
+	<section class="relative z-[1] h-[220svh]" bind:this={heroSection}>
+		<div class="wrap sticky top-0 grid h-svh grid-rows-[1fr_auto] gap-[clamp(32px,6vh,64px)] overflow-hidden pt-[clamp(112px,16vh,168px)] pb-[clamp(22px,4vh,42px)] max-[780px]:pt-[104px]">
+			<div class="grid max-w-[1080px] grid-cols-[minmax(0,1fr)] content-center max-[780px]:grid-cols-1 max-[780px]:items-start">
+				<div class="relative isolate min-w-0 before:pointer-events-none before:absolute before:inset-[clamp(-5rem,-7vw,-3rem)_-9vw] before:z-[-1] before:bg-[radial-gradient(ellipse_at_38%_48%,color-mix(in_srgb,var(--bg)_98%,transparent)_0_42%,color-mix(in_srgb,var(--bg)_84%,transparent)_58%,transparent_80%)] before:content-['']" data-text-bg-avoid>
+					<h1
+						class={`absolute inset-x-0 z-10 m-0 flex flex-wrap gap-x-[.28em] gap-y-0 font-title text-[clamp(3.2rem,7.15vw,7.2rem)] font-normal leading-[.87] tracking-[-.06em] max-[780px]:text-[clamp(3rem,13.5vw,5.6rem)] max-[780px]:leading-[.9] max-[520px]:text-[clamp(2.8rem,13.6vw,4.4rem)] ${introReady ? 'opacity-100 [transition:opacity_700ms_ease]' : 'invisible opacity-0'}`}
+						bind:this={heroName}
+						style:top={`${subtextOffset}px`}
+						style:opacity={heroNameOpacity}
+					>
+						{#each profile.name.split(' ') as word, index (word)}
+							<span
+								class="hero-name-word inline-block origin-top-left will-change-transform"
+								style:transform={wordTransform(index)}
+							>{word}</span>
+						{/each}
+					</h1>
+
+					<div
+						id="hero-statement"
+						class="pointer-events-none"
+						bind:this={heroStatement}
+						style:opacity={statementProgress}
+						style:transform={`translate3d(0, ${(1 - statementProgress) * 32}px, 0)`}
+					>
+						<p class="m-0 font-title text-[clamp(3.2rem,7.15vw,7.2rem)] font-normal leading-[.87] tracking-[-.06em] max-[780px]:text-[clamp(3rem,13.5vw,5.6rem)] max-[780px]:leading-[.9] max-[520px]:text-[clamp(2.8rem,13.6vw,4.4rem)]">
+							<span class="block">{ui.thesisLine1Before}<em class="inline-block bg-accent [background-image:var(--accent-grain)] [background-size:180px_180px] [background-blend-mode:soft-light] px-[.13em] pt-[.01em] pb-[.03em] font-normal italic tracking-[-.04em] text-[var(--on-accent)]">{ui.thesisAccent}</em></span>
+							<span class="block">{ui.thesisLine2}</span>
+							<span class="block">{ui.thesisLine3}</span>
+						</p>
+					</div>
+
+					<div>
+						<p class="mt-[clamp(25px,4vh,40px)] mb-0 max-w-[54ch] font-title text-[clamp(1.05rem,1.5vw,1.3rem)] leading-[1.35] text-ink-dim max-[520px]:text-base">{ui.heroSummary}</p>
+						<p class="meta mt-3 mb-0 block text-ink-dim">{ui.affiliation}</p>
+					</div>
 				</div>
-
-				<p class="m-0 font-title text-[clamp(3.2rem,7.15vw,7.2rem)] font-normal leading-[.87] tracking-[-.06em] max-[780px]:text-[clamp(3rem,13.5vw,5.6rem)] max-[780px]:leading-[.9] max-[520px]:text-[clamp(2.8rem,13.6vw,4.4rem)]">
-					<span class={`block ${introReady ? '[animation:home-intro-from-right_1080ms_cubic-bezier(.16,1,.3,1)_170ms_backwards] motion-reduce:animate-none' : 'invisible'}`}>{ui.thesisLine1Before}<em class="inline-block bg-accent [background-image:var(--accent-grain)] [background-size:180px_180px] [background-blend-mode:soft-light] px-[.13em] pt-[.01em] pb-[.03em] font-normal italic tracking-[-.04em] text-[var(--on-accent)]">{ui.thesisAccent}</em></span>
-					<span class={`block ${introReady ? '[animation:home-intro-from-left_1120ms_cubic-bezier(.16,1,.3,1)_250ms_backwards] motion-reduce:animate-none' : 'invisible'}`}>{ui.thesisLine2}</span>
-					<span class={`block ${introReady ? '[animation:home-intro-from-right_1160ms_cubic-bezier(.16,1,.3,1)_330ms_backwards] motion-reduce:animate-none' : 'invisible'}`}>{ui.thesisLine3}</span>
-				</p>
-
-				<p class={`mt-[clamp(25px,4vh,40px)] mb-0 max-w-[54ch] font-title text-[clamp(1.05rem,1.5vw,1.3rem)] leading-[1.35] text-ink-dim max-[520px]:text-base ${introReady ? '[animation:home-intro-from-bottom_960ms_cubic-bezier(.16,1,.3,1)_460ms_backwards] motion-reduce:animate-none' : 'invisible'}`}>{ui.heroSummary}</p>
-				<p class={`meta mt-3 mb-0 block text-ink-dim ${introReady ? '[animation:home-intro-from-bottom_920ms_cubic-bezier(.16,1,.3,1)_540ms_backwards] motion-reduce:animate-none' : 'invisible'}`}>{ui.affiliation}</p>
 			</div>
 
-		</div>
-
-		<div class={`grid place-items-center ${introReady ? '[animation:home-intro-from-bottom_1050ms_cubic-bezier(.16,1,.3,1)_620ms_backwards] motion-reduce:animate-none' : 'invisible'}`}>
-			<a class="grid h-[42px] w-[42px] place-items-center text-ink-faint [animation:home-scroll-cue_1700ms_ease-in-out_infinite] hover:text-accent-strong motion-reduce:animate-none" href="#portfolio" aria-label={ui.scrollHint} title={ui.scrollHint}>
-				<ChevronDown size={30} strokeWidth={1.4} aria-hidden="true" />
-			</a>
+			<div
+				class={`grid place-items-center ${introReady ? '[animation:home-intro-from-bottom_1050ms_cubic-bezier(.16,1,.3,1)_300ms_backwards] motion-reduce:animate-none' : 'invisible'}`}
+				style:opacity={scrollCueOpacity}
+			>
+				<button
+					class="grid h-[42px] w-[42px] cursor-pointer place-items-center border-0 bg-transparent p-0 text-ink-faint [animation:home-scroll-cue_1700ms_ease-in-out_infinite] hover:text-accent-strong motion-reduce:animate-none"
+					type="button"
+					onclick={scrollToStatement}
+					aria-label={ui.scrollHint}
+					title={ui.scrollHint}
+				>
+					<ChevronDown size={30} strokeWidth={1.4} aria-hidden="true" />
+				</button>
+			</div>
 		</div>
 	</section>
 
