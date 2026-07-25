@@ -132,7 +132,8 @@
 			aboutText:
 				'Trabajo entre la filología, los estudios teatrales y las humanidades digitales, desde una mirada ligada también a la práctica escénica. Investigo la historia de la representación y recepción del teatro del Siglo de Oro, sus archivos y su edición, combinando trabajo documental, modelado de datos y métodos digitales a gran escala. Me interesa desarrollar formas sostenibles de publicar y preservar este patrimonio en la web.',
 			portraitAlt: 'Retrato de David Merino Recalde',
-			portraitCaption: 'Investigador · creador escénico',
+			portraitResearcher: 'Investigador',
+			portraitPerformer: 'Creador escénico',
 			contactTitle: 'Contacto',
 			profilesLabel: 'Perfiles y redes',
 			cvTitle: 'CV',
@@ -158,7 +159,8 @@
 			aboutText:
 				'I work across philology, theatre studies, and digital humanities, from a perspective also rooted in theatre practice. I study the performance and reception history of Spanish Golden Age theatre, its archives, and its editing, combining documentary research, data modelling, and large-scale digital methods. I am interested in developing sustainable ways to publish and preserve this heritage on the web.',
 			portraitAlt: 'Portrait of David Merino Recalde',
-			portraitCaption: 'Researcher · theatre practitioner',
+			portraitResearcher: 'Researcher',
+			portraitPerformer: 'Theatre practitioner',
 			contactTitle: 'Contact',
 			profilesLabel: 'Profiles and networks',
 			cvTitle: 'CV',
@@ -353,35 +355,33 @@
 			</div>
 
 			<div class="relative grid grid-cols-[minmax(240px,4fr)_minmax(0,7fr)] items-start gap-[clamp(34px,7vw,112px)] before:pointer-events-none before:absolute before:inset-[-5vw] before:z-[-1] before:bg-[color-mix(in_srgb,var(--bg)_44%,transparent)] before:[backdrop-filter:blur(7px)] before:[mask-image:radial-gradient(ellipse_at_center,#000_38%,transparent_78%)] before:content-[''] max-[780px]:grid-cols-1 max-[780px]:gap-[42px]">
-				<figure class="sticky top-[104px] m-0 max-[780px]:relative max-[780px]:top-auto max-[780px]:w-[min(74vw,420px)]">
-					<div class="group relative overflow-hidden rounded-ui border border-rule-strong bg-[#777]">
+				<figure class="group sticky top-[104px] m-0 max-[780px]:relative max-[780px]:top-auto max-[780px]:w-[min(74vw,420px)]">
+					<div class="relative overflow-hidden rounded-ui border border-rule-strong bg-[#777]">
 						<img
 							class="block h-auto w-full"
-							src="/images/about/david-merino-recalde.jpg"
+							src="/images/about/david-merino-recalde-researcher.jpg"
 							alt={ui.portraitAlt}
 							width="820"
 							height="1024"
 							loading="lazy"
 						/>
 						<img
-							class="pointer-events-none absolute inset-0 h-full w-full origin-center object-cover opacity-0 [transform:scale(1)] [transition:opacity_520ms_cubic-bezier(.22,1,.36,1),transform_900ms_cubic-bezier(.22,1,.36,1)] group-hover:opacity-100 group-hover:[transform:scale(1.035)] motion-reduce:transition-none"
-							src="/images/about/david-merino-recalde-hover.webp"
+							class="pointer-events-none absolute inset-0 h-full w-full object-cover object-[72%_50%] opacity-0 [transition:opacity_700ms_ease] group-hover:opacity-100 motion-reduce:transition-none"
+							src="/images/about/david-merino-recalde-stage.jpg"
 							alt=""
-							width="820"
-							height="1024"
+							width="1368"
+							height="912"
 							loading="lazy"
 							aria-hidden="true"
 						/>
-						<div class="pointer-events-none absolute right-[5%] bottom-[12%] left-[7%] z-[2] grid gap-1 font-mono text-[clamp(.42rem,.72vw,.58rem)] leading-[1.25] tracking-[.08em] text-[rgba(255,255,255,.82)] opacity-0 [text-shadow:0_1px_8px_rgba(0,0,0,.72)] [transition:opacity_360ms_ease_90ms] group-hover:opacity-100 motion-reduce:transition-none" aria-hidden="true">
-							<span class="mb-2 overflow-hidden text-[.92em] whitespace-nowrap">// DMR [ DECODED ]</span>
-							<span class="overflow-hidden whitespace-nowrap">01100100 01100001 01110110 01101001 01100100</span>
-							<span class="ml-[8%] overflow-hidden whitespace-nowrap opacity-[.68]">01110100 01100101 01111000 01110100 01101111</span>
-							<span class="ml-[3%] overflow-hidden whitespace-nowrap opacity-[.44]">01100101 01110011 01100011 01100101 01101110 01100001</span>
-						</div>
 					</div>
-					<figcaption class="meta mt-2.5 flex justify-between gap-[18px] text-[.6rem] text-ink-faint">
-						<span>{ui.portraitCaption}</span>
-						<span>Barcelona</span>
+					<figcaption class="mt-2.5 flex items-baseline justify-between gap-[18px]">
+						<span class="flex items-center gap-2 font-mono text-[.62rem] tracking-meta uppercase">
+							<span class="border-b border-accent-strong pb-0.5 font-semibold text-accent-strong [transition:color_700ms_ease,border-color_700ms_ease] group-hover:border-transparent group-hover:text-ink-faint">{ui.portraitResearcher}</span>
+							<span class="text-ink-faint opacity-50" aria-hidden="true">/</span>
+							<span class="border-b border-transparent pb-0.5 font-semibold text-ink-faint [transition:color_700ms_ease,border-color_700ms_ease] group-hover:border-accent-strong group-hover:text-accent-strong">{ui.portraitPerformer}</span>
+						</span>
+						<span class="font-mono text-[.56rem] tracking-[.14em] text-ink-faint uppercase opacity-80">Barcelona</span>
 					</figcaption>
 				</figure>
 
