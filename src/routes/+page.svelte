@@ -258,7 +258,7 @@
 	<header
 		class={`site-header fixed inset-x-0 top-0 z-20 border-b border-transparent py-3.5 [transition:transform_260ms_cubic-bezier(.22,1,.36,1),padding_220ms_ease,background-color_220ms_ease,border-color_220ms_ease] motion-reduce:duration-[1ms] max-[780px]:bg-[var(--surface-glass)] max-[780px]:py-2 max-[780px]:[backdrop-filter:blur(14px)] ${headerHidden ? '[transform:translateY(-110%)]' : ''} ${headerScrolled ? 'border-rule bg-[var(--surface-glass)] py-2 [backdrop-filter:blur(14px)]' : ''} ${introReady ? '[animation:home-intro-from-top_880ms_cubic-bezier(.16,1,.3,1)_backwards] motion-reduce:animate-none' : 'invisible'}`}
 	>
-		<div class="wrap flex items-center justify-between gap-6 max-[780px]:gap-2.5">
+		<div class="wrap flex items-center justify-between gap-6 max-[780px]:gap-2.5 max-[420px]:gap-1.5">
 			<a
 				class="flex min-w-0 items-center hover:text-inherit"
 				href={localizedPath('/', locale)}
@@ -266,16 +266,16 @@
 				bind:this={headerBrand}
 				style:opacity={headerBrandOpacity}
 			>
-				<strong class="inline-flex gap-[.28em] whitespace-nowrap font-title text-[1.02rem] font-normal leading-[1.1] max-[520px]:text-[.9rem]">
+				<strong class="inline-flex gap-[.28em] whitespace-nowrap font-title text-[1.02rem] font-normal leading-[1.1] max-[520px]:text-[.9rem] max-[420px]:gap-[.18em] max-[420px]:text-[.72rem]">
 					{#each profile.name.split(' ') as word (word)}
 						<span class="header-name-word">{word}</span>
 					{/each}
 				</strong>
 			</a>
-			<nav class="meta flex items-center gap-[clamp(14px,2.3vw,30px)] max-[780px]:gap-2.5 max-[520px]:gap-2" aria-label="Principal">
-				<a class="inline-flex items-baseline gap-[7px] text-ink-dim max-[780px]:gap-0 max-[780px]:text-[.62rem] max-[520px]:text-[.57rem] max-[520px]:tracking-[.08em]" href="#portfolio"><span class="text-[.58rem] tracking-normal text-accent max-[780px]:hidden">01</span>{ui.navPortfolio}</a>
-				<a class="inline-flex items-baseline gap-[7px] text-ink-dim max-[780px]:gap-0 max-[780px]:text-[.62rem] max-[520px]:text-[.57rem] max-[520px]:tracking-[.08em]" href="#about"><span class="text-[.58rem] tracking-normal text-accent max-[780px]:hidden">02</span>{ui.navAbout}</a>
-				<a class="inline-flex items-baseline gap-[7px] text-ink-dim max-[780px]:gap-0 max-[780px]:text-[.62rem] max-[520px]:text-[.57rem] max-[520px]:tracking-[.08em]" href="#cv"><span class="text-[.58rem] tracking-normal text-accent max-[780px]:hidden">03</span>CV</a>
+			<nav class="meta flex items-center gap-[clamp(14px,2.3vw,30px)] max-[780px]:gap-2.5 max-[520px]:gap-2 max-[420px]:gap-1" aria-label="Principal">
+				<a class="inline-flex items-baseline gap-[7px] text-ink-dim max-[780px]:gap-0 max-[780px]:text-[.62rem] max-[520px]:text-[.57rem] max-[520px]:tracking-[.08em] max-[420px]:text-[.52rem] max-[420px]:tracking-[.05em]" href="#portfolio"><span class="text-[.58rem] tracking-normal text-accent max-[780px]:hidden">01</span>{ui.navPortfolio}</a>
+				<a class="inline-flex items-baseline gap-[7px] text-ink-dim max-[780px]:gap-0 max-[780px]:text-[.62rem] max-[520px]:text-[.57rem] max-[520px]:tracking-[.08em] max-[420px]:text-[.52rem] max-[420px]:tracking-[.05em]" href="#about"><span class="text-[.58rem] tracking-normal text-accent max-[780px]:hidden">02</span>{ui.navAbout}</a>
+				<a class="inline-flex items-baseline gap-[7px] text-ink-dim max-[780px]:gap-0 max-[780px]:text-[.62rem] max-[520px]:text-[.57rem] max-[520px]:tracking-[.08em] max-[420px]:text-[.52rem] max-[420px]:tracking-[.05em]" href="#cv"><span class="text-[.58rem] tracking-normal text-accent max-[780px]:hidden">03</span>CV</a>
 				<SiteControls />
 			</nav>
 		</div>
@@ -355,7 +355,7 @@
 			</div>
 
 			<div class="relative grid grid-cols-[minmax(240px,4fr)_minmax(0,7fr)] items-start gap-[clamp(34px,7vw,112px)] before:pointer-events-none before:absolute before:inset-[-5vw] before:z-[-1] before:bg-[color-mix(in_srgb,var(--bg)_44%,transparent)] before:[backdrop-filter:blur(7px)] before:[mask-image:radial-gradient(ellipse_at_center,#000_38%,transparent_78%)] before:content-[''] max-[780px]:grid-cols-1 max-[780px]:gap-[42px]">
-				<figure class="group sticky top-[104px] m-0 max-[780px]:relative max-[780px]:top-auto max-[780px]:w-[min(74vw,420px)]">
+				<figure class="group sticky top-[104px] m-0 max-[780px]:relative max-[780px]:top-auto max-[780px]:w-full">
 					<div class="relative overflow-hidden rounded-ui border border-rule-strong bg-[#777]">
 						<img
 							class="block h-auto w-full"
@@ -366,7 +366,7 @@
 							loading="lazy"
 						/>
 						<img
-							class="pointer-events-none absolute inset-0 h-full w-full object-cover object-[72%_50%] opacity-0 [transition:opacity_700ms_ease] group-hover:opacity-100 motion-reduce:transition-none"
+							class="pointer-events-none absolute inset-0 h-full w-full object-cover object-[72%_50%] opacity-0 [transition:opacity_700ms_ease] group-hover:opacity-100 group-active:opacity-100 motion-reduce:transition-none"
 							src="/images/about/david-merino-recalde-stage.jpg"
 							alt=""
 							width="1368"
@@ -375,11 +375,11 @@
 							aria-hidden="true"
 						/>
 					</div>
-					<figcaption class="mt-2.5 flex items-baseline justify-between gap-[18px]">
+					<figcaption class="mt-2.5 flex items-baseline justify-between gap-x-[18px] gap-y-2 max-[520px]:flex-wrap">
 						<span class="flex items-center gap-2 font-mono text-[.62rem] tracking-meta uppercase">
-							<span class="border-b border-accent-strong pb-0.5 font-semibold text-accent-strong [transition:color_700ms_ease,border-color_700ms_ease] group-hover:border-transparent group-hover:text-ink-faint">{ui.portraitResearcher}</span>
+							<span class="border-b border-accent-strong pb-0.5 font-semibold text-accent-strong [transition:color_700ms_ease,border-color_700ms_ease] group-hover:border-transparent group-hover:text-ink-faint group-active:border-transparent group-active:text-ink-faint">{ui.portraitResearcher}</span>
 							<span class="text-ink-faint opacity-50" aria-hidden="true">/</span>
-							<span class="border-b border-transparent pb-0.5 font-semibold text-ink-faint [transition:color_700ms_ease,border-color_700ms_ease] group-hover:border-accent-strong group-hover:text-accent-strong">{ui.portraitPerformer}</span>
+							<span class="border-b border-transparent pb-0.5 font-semibold text-ink-faint [transition:color_700ms_ease,border-color_700ms_ease] group-hover:border-accent-strong group-hover:text-accent-strong group-active:border-accent-strong group-active:text-accent-strong">{ui.portraitPerformer}</span>
 						</span>
 						<span class="font-mono text-[.56rem] tracking-[.14em] text-ink-faint uppercase opacity-80">Barcelona</span>
 					</figcaption>

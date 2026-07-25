@@ -139,7 +139,7 @@
 	<EditorialBackground />
 
 <main class="wrap relative z-[1] pt-[clamp(24px,5vh,56px)] pb-[88px]" id="cv">
-	<header class="grid min-h-[54vh] content-center gap-[18px] border-b border-rule">
+	<header class="grid min-h-[54vh] content-center gap-[18px] border-b border-rule max-[520px]:min-h-[42svh]">
 		<div class="flex flex-wrap items-baseline justify-between gap-4">
 			<a class="meta text-ink-dim" href={localizedPath('/', locale)}>{ui.back}</a>
 			<SiteControls />
@@ -214,9 +214,9 @@
 					{/if}
 					<ol class="m-0 list-none p-0">
 					{#each section.items as item (section.key + item.title + item.year)}
-						<li class="grid grid-cols-[minmax(0,1fr)_180px] gap-[18px] border-b border-rule py-[18px] max-[840px]:grid-cols-1">
-							<div class="grid grid-cols-[64px_minmax(0,1fr)] gap-[18px] max-[840px]:grid-cols-1">
-								<span class="tabular-nums text-ink-faint">{item.hide_year ? '' : item.year ?? ui.noDate}</span>
+						<li class="grid grid-cols-[minmax(0,1fr)_180px] gap-[18px] border-b border-rule py-[18px] max-[840px]:grid-cols-1 max-[840px]:gap-2">
+							<div class="grid grid-cols-[64px_minmax(0,1fr)] gap-[18px] max-[840px]:grid-cols-1 max-[840px]:gap-2">
+								<span class="tabular-nums text-[.72rem] text-ink-faint">{item.hide_year ? '' : item.year ?? ui.noDate}</span>
 								<div>
 									<h3 class="text-base leading-[1.35]">
 										{#if item.target_url}
@@ -263,7 +263,7 @@
 								</div>
 							</div>
 							{#if typeLabel(item)}
-								<span class="meta justify-self-end text-right text-ink-dim max-[840px]:justify-self-start max-[840px]:text-left">{typeLabel(item)}</span>
+								<span class="meta justify-self-end text-right text-ink-dim max-[840px]:order-[-1] max-[840px]:justify-self-start max-[840px]:text-left">{typeLabel(item)}</span>
 							{/if}
 						</li>
 					{/each}

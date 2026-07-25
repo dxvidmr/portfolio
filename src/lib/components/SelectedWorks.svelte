@@ -142,7 +142,7 @@
 							{projectText(project.kind, locale)}
 						</span>
 						<span
-							class={`font-title text-[clamp(1.9rem,3.9vw,4.4rem)] font-[450] leading-[0.9] tracking-[-0.04em] [transition:color_180ms_ease,transform_320ms_cubic-bezier(.16,1,.3,1)] motion-reduce:transition-none max-[700px]:text-[clamp(2rem,10vw,3.6rem)] ${activeIndex === index ? 'translate-x-[9px] text-accent-strong' : ''}`}
+							class={`font-title text-[clamp(1.9rem,3.9vw,4.4rem)] font-[450] leading-[0.9] tracking-[-0.04em] [transition:color_180ms_ease,transform_320ms_cubic-bezier(.16,1,.3,1)] motion-reduce:transition-none max-[700px]:text-[clamp(2rem,10vw,3.6rem)] max-[420px]:text-[clamp(1.7rem,9vw,2.65rem)] ${activeIndex === index ? 'translate-x-[9px] text-accent-strong max-[420px]:translate-x-1' : ''}`}
 						>
 							{projectText(project.title, locale)}
 						</span>

@@ -25,7 +25,7 @@
 				: 'Switch to light'
 	);
 	const controlClass =
-		'inline-flex h-6.5 min-w-7 cursor-pointer items-center justify-center gap-[5px] rounded-ui-sm border-0 bg-transparent px-[7px] font-[inherit] text-meta leading-none tracking-[0.08em] text-ink-dim hover:bg-accent-wash hover:text-accent-strong';
+		'inline-flex h-6.5 min-w-7 cursor-pointer items-center justify-center gap-[5px] rounded-ui-sm border-0 bg-transparent px-[7px] font-[inherit] text-meta leading-none tracking-[0.08em] text-ink-dim hover:bg-accent-wash hover:text-accent-strong max-[420px]:min-w-6 max-[420px]:gap-0 max-[420px]:px-1';
 
 	onMount(() => {
 		const current = document.documentElement.dataset.theme;
@@ -40,7 +40,7 @@
 </script>
 
 <div
-	class="inline-flex items-center gap-px border-l border-rule-strong pl-2.5"
+	class="inline-flex items-center gap-px border-l border-rule-strong pl-2.5 max-[420px]:pl-1.5"
 	aria-label={currentLocale === 'es' ? 'Controles del sitio' : 'Site controls'}
 >
 	<a
@@ -49,11 +49,11 @@
 		aria-label={languageLabel}
 		title={languageLabel}
 	>
-		<Languages size={14} strokeWidth={1.8} aria-hidden="true" />
+		<Languages class="max-[420px]:hidden" size={14} strokeWidth={1.8} aria-hidden="true" />
 		<span>{targetLocale.toUpperCase()}</span>
 	</a>
 	<button
-		class="{controlClass} w-7 px-0"
+		class="{controlClass} w-7 px-0 max-[420px]:w-6"
 		type="button"
 		aria-label={themeLabel}
 		title={themeLabel}

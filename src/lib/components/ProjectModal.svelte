@@ -174,7 +174,7 @@
 					<div class="intro-copy">
 						<p class="meta text-accent-strong">{projectText(project.kind, locale)}</p>
 						<h2
-							class="mt-[18px] mb-0 max-w-[10ch] text-[clamp(3.2rem,8vw,7.8rem)] leading-[.86] tracking-[-.045em] max-[700px]:text-[clamp(3rem,15vw,5.5rem)]"
+							class="mt-[18px] mb-0 max-w-[10ch] text-[clamp(3.2rem,8vw,7.8rem)] leading-[.86] tracking-[-.045em] max-[700px]:text-[clamp(3rem,15vw,5.5rem)] max-[420px]:text-[clamp(2.65rem,13vw,4rem)]"
 							id="project-modal-title"
 						>
 							{projectText(project.title, locale)}
@@ -212,15 +212,15 @@
 						{#if project.sectionNav?.length}
 							<nav class="mt-[22px] grid max-w-[620px] gap-2.5 border-t border-rule-strong pt-3.5" aria-label={locale === 'es' ? 'Secciones de la ficha' : 'Entry sections'}>
 								<span class="meta text-accent-strong">{copy.sectionMenu}</span>
-								<div class="flex flex-wrap items-start gap-2">
+								<div class="flex flex-wrap items-start gap-2 max-[520px]:grid max-[520px]:grid-cols-2">
 									{#each project.sectionNav as item (item.label.es)}
 										{#if item.children?.length}
-											<details class="group relative">
+											<details class="group relative max-[520px]:col-span-full max-[520px]:w-full">
 												<summary class={`${sectionNavItemClass} cursor-pointer gap-[7px] list-none [&::-webkit-details-marker]:hidden [&>svg]:[transition:transform_180ms_ease] group-open:[&>svg]:rotate-180`}>
 													{projectText(item.label, locale)}
 													<ChevronDown size={14} strokeWidth={1.7} aria-hidden="true" />
 												</summary>
-												<div class="absolute top-[calc(100%+7px)] left-0 z-[5] grid min-w-max rounded-ui bg-[color-mix(in_srgb,var(--bg)_76%,transparent)] p-1.5 shadow-[0_16px_42px_color-mix(in_srgb,var(--fg)_10%,transparent)] [backdrop-filter:blur(16px)]">
+												<div class="absolute top-[calc(100%+7px)] left-0 z-[5] grid min-w-max rounded-ui bg-[color-mix(in_srgb,var(--bg)_76%,transparent)] p-1.5 shadow-[0_16px_42px_color-mix(in_srgb,var(--fg)_10%,transparent)] [backdrop-filter:blur(16px)] max-[520px]:relative max-[520px]:top-auto max-[520px]:mt-1.5 max-[520px]:w-full max-[520px]:min-w-0 max-[520px]:shadow-none">
 													{#each item.children as child (child.href)}
 														<a class={`${sectionNavItemClass} min-h-8 border-transparent`} href={child.href}>{projectText(child.label, locale)}</a>
 													{/each}
