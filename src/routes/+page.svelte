@@ -16,6 +16,7 @@
 	let { data } = $props();
 	let headerHidden = $state(false);
 	let headerScrolled = $state(false);
+	let introStarted = $state(false);
 	let introReady = $state(false);
 	let heroProgress = $state(0);
 	let heroSection = $state<HTMLElement | null>(null);
@@ -36,11 +37,49 @@
 	const heroNameOpacity = $derived(1 - ease(clamp((heroProgress - 0.3) / 0.22)));
 	const headerBrandOpacity = $derived(ease(clamp((heroProgress - 0.4) / 0.12)));
 	const scrollCueOpacity = $derived(1 - ease(clamp(heroProgress / 0.16)));
+	const introNameAnimation = (index: number) =>
+		index % 2 === 0
+			? '[animation:home-intro-from-left_1180ms_cubic-bezier(.16,1,.3,1)_backwards] motion-reduce:animate-none'
+			: '[animation:home-intro-from-right_1180ms_cubic-bezier(.16,1,.3,1)_backwards] motion-reduce:animate-none';
 
 	const wordTransform = (index: number) => {
 		const motion = wordMotions[index];
 		if (!motion) return 'translate3d(0, 0, 0) scale(1)';
 		return `translate3d(${motion.dx * nameProgress}px, ${motion.dy * nameProgress}px, 0) scale(${1 + (motion.scale - 1) * nameProgress})`;
+	};
+
+	const measureNameMotion = (includeMotion = introReady) => {
+		if (!heroName || !headerBrand) return;
+		const previousSubtextOffset = subtextOffset;
+		const nextSubtextOffset = Math.max(0, (heroStatement?.offsetHeight ?? 0) - heroName.offsetHeight);
+		subtextOffset = nextSubtextOffset;
+		if (!includeMotion) return;
+
+		const sourceWords = Array.from(heroName.querySelectorAll<HTMLElement>('.hero-name-word'));
+		const targetWords = Array.from(headerBrand.querySelectorAll<HTMLElement>('.header-name-word'));
+		const transforms = sourceWords.map((word) => word.style.transform);
+
+		sourceWords.forEach((word) => {
+			word.style.transform = 'none';
+		});
+
+		wordMotions = sourceWords.map((source, index) => {
+			const target = targetWords[index];
+			if (!target) return { dx: 0, dy: 0, scale: 1 };
+			const sourceRect = source.getBoundingClientRect();
+			const targetRect = target.getBoundingClientRect();
+			return {
+				dx: targetRect.left - sourceRect.left,
+				dy:
+					targetRect.top -
+					(sourceRect.top + nextSubtextOffset - previousSubtextOffset),
+				scale: targetRect.height / sourceRect.height
+			};
+		});
+
+		sourceWords.forEach((word, index) => {
+			word.style.transform = transforms[index];
+		});
 	};
 
 	const scrollToStatement = () => {
@@ -55,6 +94,9 @@
 	const completeIntro = () => {
 		introReady = true;
 		if (typeof document !== 'undefined') document.body.classList.remove('home-intro');
+		if (typeof window !== 'undefined') {
+			window.requestAnimationFrame(() => measureNameMotion(true));
+		}
 	};
 
 	const yr = (s: string | null) => (s ? s.slice(0, 4) : '—');
@@ -138,44 +180,17 @@
 	onMount(() => {
 		document.body.classList.add('home-page');
 		const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-		if (reducedMotion) completeIntro();
-		else document.body.classList.add('home-intro');
+		if (reducedMotion) {
+			introStarted = true;
+			completeIntro();
+		} else {
+			document.body.classList.add('home-intro');
+			window.requestAnimationFrame(() => (introStarted = true));
+		}
 		let lastScrollY = window.scrollY;
 		let frame = 0;
 		let resizeTimer = 0;
 		const introFallback = window.setTimeout(completeIntro, reducedMotion ? 0 : 4200);
-
-		const measureNameMotion = () => {
-			if (!heroName || !headerBrand) return;
-			const previousSubtextOffset = subtextOffset;
-			const nextSubtextOffset = Math.max(0, (heroStatement?.offsetHeight ?? 0) - heroName.offsetHeight);
-			subtextOffset = nextSubtextOffset;
-			const sourceWords = Array.from(heroName.querySelectorAll<HTMLElement>('.hero-name-word'));
-			const targetWords = Array.from(headerBrand.querySelectorAll<HTMLElement>('.header-name-word'));
-			const transforms = sourceWords.map((word) => word.style.transform);
-
-			sourceWords.forEach((word) => {
-				word.style.transform = 'none';
-			});
-
-			wordMotions = sourceWords.map((source, index) => {
-				const target = targetWords[index];
-				if (!target) return { dx: 0, dy: 0, scale: 1 };
-				const sourceRect = source.getBoundingClientRect();
-				const targetRect = target.getBoundingClientRect();
-				return {
-					dx: targetRect.left - sourceRect.left,
-					dy:
-						targetRect.top -
-						(sourceRect.top + nextSubtextOffset - previousSubtextOffset),
-					scale: targetRect.height / sourceRect.height
-				};
-			});
-
-			sourceWords.forEach((word, index) => {
-				word.style.transform = transforms[index];
-			});
-		};
 
 		const updateHeader = () => {
 			frame = 0;
@@ -191,7 +206,7 @@
 			const nextHeaderScrolled = currentScrollY > 20 && heroProgress > 0.34;
 			if (nextHeaderScrolled !== headerScrolled) {
 				headerScrolled = nextHeaderScrolled;
-				window.requestAnimationFrame(measureNameMotion);
+				window.requestAnimationFrame(() => measureNameMotion(true));
 			}
 
 			if (heroProgress < 0.98 || currentScrollY < 72) {
@@ -217,8 +232,8 @@
 			}, 120);
 		};
 
-		window.requestAnimationFrame(measureNameMotion);
-		void document.fonts.ready.then(measureNameMotion);
+		window.requestAnimationFrame(() => measureNameMotion(false));
+		void document.fonts.ready.then(() => measureNameMotion(introReady));
 		updateHeader();
 		window.addEventListener('scroll', handleScroll, { passive: true });
 		window.addEventListener('resize', handleResize, { passive: true });
@@ -270,14 +285,15 @@
 			<div class="grid max-w-[1080px] grid-cols-[minmax(0,1fr)] content-center max-[780px]:grid-cols-1 max-[780px]:items-start">
 				<div class="relative isolate min-w-0 before:pointer-events-none before:absolute before:inset-[clamp(-5rem,-7vw,-3rem)_-9vw] before:z-[-1] before:bg-[radial-gradient(ellipse_at_38%_48%,color-mix(in_srgb,var(--bg)_98%,transparent)_0_42%,color-mix(in_srgb,var(--bg)_84%,transparent)_58%,transparent_80%)] before:content-['']" data-text-bg-avoid>
 					<h1
-						class={`absolute inset-x-0 z-10 m-0 flex flex-wrap gap-x-[.28em] gap-y-0 font-title text-[clamp(3.2rem,7.15vw,7.2rem)] font-normal leading-[.87] tracking-[-.06em] max-[780px]:text-[clamp(3rem,13.5vw,5.6rem)] max-[780px]:leading-[.9] max-[520px]:text-[clamp(2.8rem,13.6vw,4.4rem)] ${introReady ? 'opacity-100 [transition:opacity_700ms_ease]' : 'invisible opacity-0'}`}
+						class={`absolute inset-x-0 z-10 m-0 flex flex-wrap gap-x-[.28em] gap-y-0 font-title text-[clamp(3.2rem,7.15vw,7.2rem)] font-normal leading-[.87] tracking-[-.06em] max-[780px]:text-[clamp(3rem,13.5vw,5.6rem)] max-[780px]:leading-[.9] max-[520px]:text-[clamp(2.8rem,13.6vw,4.4rem)] ${introStarted ? 'visible' : 'invisible'}`}
 						bind:this={heroName}
 						style:top={`${subtextOffset}px`}
 						style:opacity={heroNameOpacity}
 					>
 						{#each profile.name.split(' ') as word, index (word)}
 							<span
-								class="hero-name-word inline-block origin-top-left will-change-transform"
+								class={`hero-name-word inline-block origin-top-left will-change-transform ${introStarted ? introNameAnimation(index) : 'invisible'}`}
+								style:animation-delay={`${90 + index * 90}ms`}
 								style:transform={wordTransform(index)}
 							>{word}</span>
 						{/each}
@@ -297,9 +313,9 @@
 						</p>
 					</div>
 
-					<div>
-						<p class="mt-[clamp(25px,4vh,40px)] mb-0 max-w-[54ch] font-title text-[clamp(1.05rem,1.5vw,1.3rem)] leading-[1.35] text-ink-dim max-[520px]:text-base">{ui.heroSummary}</p>
-						<p class="meta mt-3 mb-0 block text-ink-dim">{ui.affiliation}</p>
+					<div class={introStarted ? 'visible' : 'invisible'}>
+						<p class={`mt-[clamp(25px,4vh,40px)] mb-0 max-w-[54ch] font-title text-[clamp(1.05rem,1.5vw,1.3rem)] leading-[1.35] text-ink-dim max-[520px]:text-base ${introStarted ? '[animation:home-intro-from-bottom_980ms_cubic-bezier(.16,1,.3,1)_500ms_backwards] motion-reduce:animate-none' : ''}`}>{ui.heroSummary}</p>
+						<p class={`meta mt-3 mb-0 block text-ink-dim ${introStarted ? '[animation:home-intro-from-bottom_920ms_cubic-bezier(.16,1,.3,1)_610ms_backwards] motion-reduce:animate-none' : ''}`}>{ui.affiliation}</p>
 					</div>
 				</div>
 			</div>
