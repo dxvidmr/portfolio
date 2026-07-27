@@ -48,8 +48,11 @@
 </section>
 
 <section class="mt-8 border-t border-rule pt-6">
-	<div class="flex items-start justify-between gap-4 max-[750px]:flex-col">
-		<div><h2 class="mt-0 mb-4 text-base">Roles y actividades</h2><p class="-mt-2.5 mb-4 max-w-[70ch] text-xs leading-[1.5] text-ink-faint">Un mismo evento puede reunir varios roles independientes.</p></div>
+	<div class="mb-4 flex items-start justify-between gap-4 max-[750px]:flex-col">
+		<div class="grid gap-2">
+			<h2 class="m-0 text-base">Roles y actividades</h2>
+			<p class="m-0 max-w-[70ch] text-xs leading-[1.5] text-ink-faint">Un mismo evento puede reunir varios roles independientes.</p>
+		</div>
 		<div class="flex flex-wrap gap-2">
 			<ButtonLink href={`/admin/entradas/nueva/talks?eventId=${data.event.id}`}>+ Comunicación</ButtonLink>
 			<ButtonLink href={`/admin/entradas/nueva/service_activities?eventId=${data.event.id}`}>+ Servicio</ButtonLink>
@@ -81,8 +84,11 @@
 </section>
 
 <section class="mt-8 rounded-ui border border-warning p-5">
-	<div class="flex items-start justify-between gap-4 max-[750px]:flex-col">
-		<div><h2 class="mt-0 mb-4 text-base">Asistencia como oyente</h2><p class="-mt-2.5 mb-4 max-w-[70ch] text-xs leading-[1.5] text-ink-faint">Este rol y sus futuros certificados son siempre privados y nunca se envían a la web pública.</p></div>
+	<div class="mb-4 flex items-start justify-between gap-4 max-[750px]:flex-col">
+		<div class="grid gap-2">
+			<h2 class="m-0 text-base">Asistencia como oyente</h2>
+			<p class="m-0 max-w-[70ch] text-xs leading-[1.5] text-ink-faint">Este rol y sus futuros certificados son siempre privados y nunca se envían a la web pública.</p>
+		</div>
 		<span class="border border-warning px-2 py-1 text-[0.62rem] text-warning uppercase">Privado</span>
 	</div>
 	<form class="grid gap-[0.8rem]" method="POST" action="?/asistencia" use:enhance={enhanceAttendance}>

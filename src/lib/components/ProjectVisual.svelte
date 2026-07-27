@@ -1,11 +1,8 @@
 <script lang="ts">
 	import type { ProjectVisual } from '$lib/content/projects';
-	import EditionsVisual from './project-visuals/EditionsVisual.svelte';
-	import EtsoVisual from './project-visuals/EtsoVisual.svelte';
-	import MetricsVisual from './project-visuals/MetricsVisual.svelte';
-	import NetworksVisual from './project-visuals/NetworksVisual.svelte';
-	import ReceptionVisual from './project-visuals/ReceptionVisual.svelte';
-	import StageVisual from './project-visuals/StageVisual.svelte';
+	import MinimalIllustration, {
+		type MinimalMotif
+	} from './project-visuals/MinimalIllustration.svelte';
 
 	let {
 		visual,
@@ -23,13 +20,27 @@
 
 	const visualTone: Record<ProjectVisual, string> = {
 		generic: 'bg-[color-mix(in_srgb,var(--accent)_7%,var(--visual-bg))] text-ink',
-		fuenteovejuna: 'bg-[#ddd7d6] text-[#383634]',
-		versologia: 'bg-[color-mix(in_srgb,#d4aa42_8%,var(--visual-bg))] text-ink',
-		etso: 'bg-[color-mix(in_srgb,#003a92_8%,var(--visual-bg))] text-ink',
-		networks: 'bg-[color-mix(in_srgb,#aaa0bd_14%,var(--visual-bg))] text-ink',
-		editions: 'bg-[color-mix(in_srgb,#2f7f7a_13%,var(--visual-bg))] text-ink',
-		stage: 'bg-[color-mix(in_srgb,#68495f_20%,var(--visual-bg))] text-ink'
+		fuenteovejuna: 'bg-[color-mix(in_srgb,#8f4142_5%,var(--visual-bg))] text-ink',
+		versologia: 'bg-[color-mix(in_srgb,#a96c13_5%,var(--visual-bg))] text-ink',
+		etso: 'bg-[color-mix(in_srgb,#164f96_5%,var(--visual-bg))] text-ink',
+		networks: 'bg-[color-mix(in_srgb,#815b86_5%,var(--visual-bg))] text-ink',
+		editions: 'bg-[color-mix(in_srgb,#287b73_5%,var(--visual-bg))] text-ink',
+		stage: 'bg-[color-mix(in_srgb,#74445f_5%,var(--visual-bg))] text-ink'
 	};
+
+	const minimalVisuals: Record<
+		Exclude<ProjectVisual, 'generic'>,
+		{ motif: MinimalMotif; accent: string }
+	> = {
+		fuenteovejuna: { motif: 'reception', accent: '#8f4142' },
+		versologia: { motif: 'metrics', accent: '#a96c13' },
+		etso: { motif: 'etso', accent: '#164f96' },
+		networks: { motif: 'networks', accent: '#815b86' },
+		editions: { motif: 'edition', accent: '#287b73' },
+		stage: { motif: 'stage', accent: '#74445f' }
+	};
+
+	const minimalVisual = $derived(visual === 'generic' ? null : minimalVisuals[visual]);
 </script>
 
 <div
@@ -41,18 +52,13 @@
 		<span>{period}</span>
 	</div>
 
-	{#if visual === 'fuenteovejuna'}
-		<ReceptionVisual {compact} />
-	{:else if visual === 'versologia'}
-		<MetricsVisual {compact} />
-	{:else if visual === 'etso'}
-		<EtsoVisual {compact} />
-	{:else if visual === 'networks'}
-		<NetworksVisual {compact} />
-	{:else if visual === 'editions'}
-		<EditionsVisual />
-	{:else if visual === 'stage'}
-		<StageVisual />
+	{#if minimalVisual}
+		<div
+			class={`absolute text-[var(--cover-accent)] ${compact ? 'inset-[14%_4%_8%]' : 'inset-[13%_5%_7%]'}`}
+			style={`--cover-accent:${minimalVisual.accent};--cover-paper:var(--visual-bg);`}
+		>
+			<MinimalIllustration motif={minimalVisual.motif} style="line" />
+		</div>
 	{:else}
 		<div class="absolute inset-[22%_12%_14%] grid place-items-center border-y border-current/20">
 			<span class="font-title text-[clamp(2rem,5vw,5rem)] leading-none text-current/70">{label}</span>

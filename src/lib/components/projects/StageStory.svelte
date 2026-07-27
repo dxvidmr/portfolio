@@ -17,19 +17,22 @@
 		'max-w-[620px] max-[960px]:col-start-2 max-[620px]:col-start-1';
 
 	const copy = $derived(locale === 'es' ? {
-		researchLabel: 'Investigación escénica',
-		researchTitle: 'Un laboratorio para contrastar hipótesis',
-		researchBody: 'El artículo «Documentos en acción» propone estudiar la técnica actoral del Siglo de Oro mediante un laboratorio escénico. No busca reconstruir literalmente una interpretación perdida: combina archivo y práctica para producir conocimiento situado sobre las posibilidades del texto.',
+		researchTerm: 'Practice-based research',
+		researchTranslation: 'Investigación basada en la práctica',
+		researchTitle: 'Investigar desde la escena',
+		researchBody: 'Entiendo el ensayo como un espacio para la investigación. Los textos, tratados, documentos e indicios históricos permiten formular preguntas sobre la voz, el gesto, el ritmo o la relación con el público; la práctica escénica permite poner a prueba hipótesis y ampliar así nuestro conocimiento del teatro.',
 		method: [
-			{ title: 'Fuentes', note: 'Textos, tratados e indicios históricos' },
-			{ title: 'Hipótesis', note: 'Preguntas concretas sobre voz, gesto y ritmo' },
-			{ title: 'Ensayo', note: 'Experimentación y registro del proceso' },
-			{ title: 'Análisis', note: 'Contraste entre resultados y documentos' },
-			{ title: 'Creación', note: 'La puesta en escena comunica los hallazgos' }
+			{ title: 'Fuentes', note: 'Textos y documentos que sitúan el problema escénico' },
+			{ title: 'Preguntas', note: 'Hipótesis concretas sobre voz, gesto, ritmo y público' },
+			{ title: 'Ensayo', note: 'Pruebas con la voz, el cuerpo y el espacio' },
+			{ title: 'Observación', note: 'Registro y contraste de lo que sucede en escena' },
+			{ title: 'Composición', note: 'Decisiones interpretativas a partir de los resultados' }
 		],
-		publication: 'Publicado en METADRAMA. Filología y puesta en escena del teatro del Siglo de Oro, Reichenberger, 2025.',
+		publicationLead: 'Este enfoque se desarrolla en «Documentos en acción», donde propongo el laboratorio escénico como vía para estudiar la técnica actoral del Siglo de Oro sin pretender reconstruir literalmente una interpretación perdida.',
+		publication: 'Publicado en <i>METADRAMA. Filología y puesta en escena del teatro del Siglo de Oro</i>, Reichenberger, 2025.',
 		productionsLabel: 'Trayectoria escénica',
 		productionsTitle: 'Montajes teatrales',
+		productionsIntro: 'Esta forma de trabajo se ha construido a través de mi formación como actor en la Escuela Superior de Arte Dramático y de los procesos de creación desarrollados en el Laboratorio de Investigación Teatral METADRAMA.',
 		fuenteTitle: 'Fuenteovejuna',
 		fuenteMeta: 'ESAD de Asturias · 2018',
 		fuenteBody: 'Taller Escénico Final del Grado en Arte Dramático, dirigido por Cristina Suárez. El montaje se estrenó en el Teatro de La Laboral de Gijón y tuvo varias funciones en Asturias, además de un pasacalles en Oviedo. Fue el cierre de mi formación reglada como actor y mi primer contacto prolongado con un clásico desde el proceso completo de montaje.',
@@ -66,22 +69,24 @@
 		didoCaption: 'Primera etapa de representaciones de Dido y Eneas en 2026.',
 		didoPosterAlt: 'Cartel de Dido y Eneas: no hay mal que por bien no venga',
 		didoPosterCaption: 'Cartel del montaje adaptado y dirigido por Gaston Gilabert.',
-		projectLink: 'Ficha del montaje',
-		closing: 'La investigación escénica no sustituye la práctica teatral ni la convierte en una simple demostración académica. Ambas líneas conviven: actuar es también una forma de observar, probar y comprender el teatro desde dentro.'
+		projectLink: 'Ficha del montaje'
 	} : {
-		researchLabel: 'Performance research',
-		researchTitle: 'A laboratory for testing hypotheses',
-		researchBody: 'The article “Documents in Action” proposes studying Golden Age acting technique through a performance laboratory. It does not attempt to literally reconstruct a lost performance: it combines archive and practice to produce situated knowledge about the possibilities of the text.',
+		researchTerm: 'Practice-based research',
+		researchTranslation: '',
+		researchTitle: 'Researching through performance',
+		researchBody: 'I understand rehearsal as a space for research. Texts, treatises, documents, and historical traces make it possible to formulate questions about voice, gesture, rhythm, and the relationship with the audience; performance practice makes it possible to test hypotheses and thereby expand our knowledge of theatre.',
 		method: [
-			{ title: 'Sources', note: 'Texts, treatises, and historical traces' },
-			{ title: 'Hypotheses', note: 'Specific questions about voice, gesture, and rhythm' },
-			{ title: 'Rehearsal', note: 'Experimentation and process documentation' },
-			{ title: 'Analysis', note: 'Comparing results and documents' },
-			{ title: 'Creation', note: 'Performance communicates the findings' }
+			{ title: 'Sources', note: 'Texts and documents that frame the performance problem' },
+			{ title: 'Questions', note: 'Specific hypotheses about voice, gesture, rhythm, and the audience' },
+			{ title: 'Rehearsal', note: 'Testing through voice, body, and space' },
+			{ title: 'Observation', note: 'Documenting and comparing what happens in performance' },
+			{ title: 'Composition', note: 'Acting choices informed by the results' }
 		],
-		publication: 'Published in METADRAMA. Filología y puesta en escena del teatro del Siglo de Oro, Reichenberger, 2025.',
+		publicationLead: 'This approach is developed in “Documents in Action”, where I propose the performance laboratory as a way of studying Golden Age acting technique without attempting a literal reconstruction of a lost performance.',
+		publication: 'Published in <i>METADRAMA. Filología y puesta en escena del teatro del Siglo de Oro</i>, Reichenberger, 2025.',
 		productionsLabel: 'Stage experience',
 		productionsTitle: 'Theatre productions',
+		productionsIntro: 'This way of working has developed through my actor training at the Asturias School of Dramatic Art and the creative processes undertaken at the METADRAMA Theatre Research Laboratory.',
 		fuenteTitle: 'Fuenteovejuna',
 		fuenteMeta: 'ESAD Asturias · 2018',
 		fuenteBody: 'Final Stage Workshop for the Drama degree, directed by Cristina Suárez. The production premiered at Teatro de La Laboral in Gijón and was performed several times across Asturias, as well as in a street parade in Oviedo. It closed my formal actor training and was my first sustained encounter with a classic through a complete production process.',
@@ -118,8 +123,7 @@
 		didoCaption: 'The first series of Dido and Aeneas performances in 2026.',
 		didoPosterAlt: 'Poster for Dido y Eneas: no hay mal que por bien no venga',
 		didoPosterCaption: 'Poster for the production adapted and directed by Gaston Gilabert.',
-		projectLink: 'Production page',
-		closing: 'Performance research does not replace theatre practice or reduce it to an academic demonstration. The two strands coexist: acting is also a way of observing, testing, and understanding theatre from within.'
+		projectLink: 'Production page'
 	});
 
 </script>
@@ -127,10 +131,16 @@
 <section class="grid gap-[clamp(100px,15vw,220px)] border-t border-rule-strong py-[clamp(76px,11vw,150px)]">
 	<article class="grid grid-cols-[minmax(300px,.85fr)_minmax(0,1.15fr)] items-start gap-[clamp(60px,10vw,150px)] max-[960px]:grid-cols-1" id="investigacion" use:reveal>
 		<div class="sticky top-[120px] max-w-[620px] max-[960px]:static">
-			<p class={labelClass}>{copy.researchLabel}</p>
+			<p class={labelClass}>
+				<em class="font-title text-[1.08em] tracking-normal normal-case">{copy.researchTerm}</em>
+				{#if copy.researchTranslation}<span class="ml-2 text-ink-faint">· {copy.researchTranslation}</span>{/if}
+			</p>
 			<h3 class="{headingClass} text-[clamp(2.4rem,5.3vw,5.4rem)] leading-[0.93]">{copy.researchTitle}</h3>
 			<p class="{bodyClass} mt-[26px] mb-0">{copy.researchBody}</p>
-			<p class="meta mt-[34px] mb-0 border-t border-rule pt-[18px] leading-[1.6] text-ink-faint">{copy.publication}</p>
+			<div class="mt-[34px] border-t border-rule pt-[18px]">
+				<p class="{bodyClass} mt-0 mb-3 text-[0.78rem]">{copy.publicationLead}</p>
+				<p class="meta m-0 leading-[1.6] text-ink-faint">{@html copy.publication}</p>
+			</div>
 		</div>
 		<ol class="m-0 list-none border-t border-rule-strong p-0">
 			{#each copy.method as step, index (step.title)}
@@ -148,7 +158,10 @@
 	<section class="grid gap-0">
 		<header class="mb-[clamp(54px,8vw,110px)] grid grid-cols-[minmax(140px,.35fr)_minmax(0,1fr)] items-end gap-[clamp(30px,6vw,90px)] border-b border-rule-strong pb-[clamp(28px,4vw,52px)] max-[620px]:grid-cols-1 max-[620px]:gap-[10px]" id="practica-escenica" use:reveal>
 			<p class="meta mt-0 mb-2 text-accent-strong">{copy.productionsLabel}</p>
-			<h3 class="{headingClass} max-w-[10ch] text-[clamp(3rem,6vw,6.2rem)] leading-[0.9]">{copy.productionsTitle}</h3>
+			<div>
+				<h3 class="{headingClass} max-w-[10ch] text-[clamp(3rem,6vw,6.2rem)] leading-[0.9]">{copy.productionsTitle}</h3>
+				<p class="{bodyClass} mt-[clamp(24px,3vw,38px)] mb-0 max-w-[68ch]">{copy.productionsIntro}</p>
+			</div>
 		</header>
 		<article class="{productionClass} border-t-0 pt-0" id="fuenteovejuna" use:reveal>
 			<div class="meta text-ink-faint">01 / 03</div>
@@ -207,5 +220,4 @@
 		</article>
 	</section>
 
-	<p class="mt-0 mr-[6%] mb-0 ml-auto w-[min(70%,850px)] border-t border-rule-strong pt-[clamp(48px,7vw,90px)] font-title text-[clamp(1.5rem,3vw,2.7rem)] leading-[1.25] text-ink-dim max-[620px]:mr-0 max-[620px]:w-full" use:reveal>{copy.closing}</p>
 </section>

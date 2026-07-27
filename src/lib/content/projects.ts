@@ -89,9 +89,9 @@ export const projectNarratives: ProjectNarrative[] = [
 		slug: 'documento-escena',
 		visual: 'stage',
 		sectionNav: [
-			{ label: { es: 'Investigación', en: 'Research' }, href: '#investigacion' },
+			{ label: { es: 'Enfoque', en: 'Approach' }, href: '#investigacion' },
 			{
-				label: { es: 'Práctica escénica', en: 'Performance practice' },
+				label: { es: 'Montajes', en: 'Productions' },
 				children: [
 					{ label: { es: 'Fuenteovejuna', en: 'Fuenteovejuna' }, href: '#fuenteovejuna' },
 					{ label: { es: 'La cueva de Salamanca', en: 'La cueva de Salamanca' }, href: '#cueva-salamanca' },

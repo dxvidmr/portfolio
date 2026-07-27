@@ -22,7 +22,10 @@
 	let introReady = $state(false);
 	let mobileMenuOpen = $state(false);
 	let mobileMenuButton = $state<HTMLButtonElement | null>(null);
-	let portraitMode = $state<'researcher' | 'performer'>('researcher');
+	type PortraitMode = 'researcher' | 'performer';
+
+	let portraitMode = $state<PortraitMode>('researcher');
+	let portraitPreview = $state<PortraitMode | null>(null);
 	let heroProgress = $state(0);
 	let heroSection = $state<HTMLElement | null>(null);
 	let heroName = $state<HTMLElement | null>(null);
@@ -95,6 +98,32 @@
 			behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth'
 		});
 	};
+
+	const isMouseClick = (event: MouseEvent) =>
+		event.detail > 0 &&
+		(event instanceof PointerEvent
+			? event.pointerType === 'mouse'
+			: window.matchMedia('(hover: hover) and (pointer: fine)').matches);
+
+	const selectPortrait = (mode: PortraitMode, event: MouseEvent) => {
+		if (isMouseClick(event)) return;
+		portraitMode = mode;
+	};
+
+	const previewPortrait = (mode: PortraitMode, event: PointerEvent) => {
+		if (event.pointerType === 'mouse') portraitPreview = mode;
+	};
+
+	const previewAlternatePortrait = (event: PointerEvent) => {
+		if (event.pointerType !== 'mouse') return;
+		portraitPreview = portraitMode === 'researcher' ? 'performer' : 'researcher';
+	};
+
+	const clearPortraitPreview = (event: PointerEvent) => {
+		if (event.pointerType === 'mouse') portraitPreview = null;
+	};
+
+	const activePortrait = $derived(portraitPreview ?? portraitMode);
 
 	const completeIntro = () => {
 		introReady = true;
@@ -384,22 +413,23 @@
 
 			<div class="relative grid grid-cols-[minmax(240px,4fr)_minmax(0,7fr)] items-start gap-[clamp(34px,7vw,112px)] before:pointer-events-none before:absolute before:inset-[-5vw] before:z-[-1] before:bg-[color-mix(in_srgb,var(--bg)_44%,transparent)] before:[backdrop-filter:blur(7px)] before:[mask-image:radial-gradient(ellipse_at_center,#000_38%,transparent_78%)] before:content-[''] max-[780px]:grid-cols-1 max-[780px]:gap-[42px]">
 				<figure class="sticky top-[104px] m-0 max-[780px]:relative max-[780px]:top-auto max-[780px]:w-full">
-					<button
-						class="relative block w-full cursor-pointer overflow-hidden rounded-ui border border-rule-strong bg-[#777] p-0 text-left"
-						type="button"
-						onclick={() => (portraitMode = portraitMode === 'researcher' ? 'performer' : 'researcher')}
-						aria-label={portraitMode === 'researcher' ? ui.portraitPerformer : ui.portraitResearcher}
+					<div
+						class="relative block w-full overflow-hidden rounded-ui border border-rule-strong bg-[#777]"
+						onpointerenter={previewAlternatePortrait}
+						onpointerleave={clearPortraitPreview}
+						role="img"
+						aria-label={ui.portraitAlt}
 					>
 						<img
-							class={`block h-auto w-full [transition:opacity_700ms_ease] motion-reduce:transition-none ${portraitMode === 'researcher' ? 'opacity-100' : 'opacity-0'}`}
+							class={`block h-auto w-full [transition:opacity_700ms_ease] motion-reduce:transition-none ${activePortrait === 'researcher' ? 'opacity-100' : 'opacity-0'}`}
 							src="/images/about/david-merino-recalde-researcher.jpg"
-							alt={ui.portraitAlt}
+							alt=""
 							width="820"
 							height="1024"
 							loading="lazy"
 						/>
 						<img
-							class={`pointer-events-none absolute inset-0 h-full w-full object-cover object-[72%_50%] [transition:opacity_700ms_ease] motion-reduce:transition-none ${portraitMode === 'performer' ? 'opacity-100' : 'opacity-0'}`}
+							class={`pointer-events-none absolute inset-0 h-full w-full object-cover object-[72%_50%] [transition:opacity_700ms_ease] motion-reduce:transition-none ${activePortrait === 'performer' ? 'opacity-100' : 'opacity-0'}`}
 							src="/images/about/david-merino-recalde-stage.jpg"
 							alt=""
 							width="1368"
@@ -407,20 +437,24 @@
 							loading="lazy"
 							aria-hidden="true"
 						/>
-					</button>
+					</div>
 					<figcaption class="mt-2.5 grid grid-cols-[minmax(0,1fr)_auto] items-start gap-4">
 						<span class="flex min-w-0 items-center gap-2 font-mono text-[.62rem] tracking-meta uppercase">
 							<button
-								class={`border-0 border-b bg-transparent p-0 pb-0.5 font-mono font-semibold tracking-meta uppercase [transition:color_700ms_ease,border-color_700ms_ease] ${portraitMode === 'researcher' ? 'border-accent-strong text-accent-strong' : 'border-transparent text-ink-faint'}`}
+								class={`cursor-pointer border-0 border-b bg-transparent p-0 pb-0.5 font-mono font-semibold tracking-meta uppercase [transition:color_700ms_ease,border-color_700ms_ease] ${activePortrait === 'researcher' ? 'border-accent-strong text-accent-strong' : 'border-transparent text-ink-faint'}`}
 								type="button"
-								onclick={() => (portraitMode = 'researcher')}
+								onclick={(event) => selectPortrait('researcher', event)}
+								onpointerenter={(event) => previewPortrait('researcher', event)}
+								onpointerleave={clearPortraitPreview}
 								aria-pressed={portraitMode === 'researcher'}
 							>{ui.portraitResearcher}</button>
 							<span class="text-ink-faint opacity-50" aria-hidden="true">/</span>
 							<button
-								class={`border-0 border-b bg-transparent p-0 pb-0.5 font-mono font-semibold tracking-meta uppercase [transition:color_700ms_ease,border-color_700ms_ease] ${portraitMode === 'performer' ? 'border-accent-strong text-accent-strong' : 'border-transparent text-ink-faint'}`}
+								class={`cursor-pointer border-0 border-b bg-transparent p-0 pb-0.5 font-mono font-semibold tracking-meta uppercase [transition:color_700ms_ease,border-color_700ms_ease] ${activePortrait === 'performer' ? 'border-accent-strong text-accent-strong' : 'border-transparent text-ink-faint'}`}
 								type="button"
-								onclick={() => (portraitMode = 'performer')}
+								onclick={(event) => selectPortrait('performer', event)}
+								onpointerenter={(event) => previewPortrait('performer', event)}
+								onpointerleave={clearPortraitPreview}
 								aria-pressed={portraitMode === 'performer'}
 							>{ui.portraitPerformer}</button>
 						</span>
