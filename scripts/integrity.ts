@@ -100,13 +100,6 @@ await expectZero(
 );
 
 await expectZero(
-	'documents (propietario asistencia) sin huérfanos',
-	`SELECT COUNT(*) FROM documents d
-	 WHERE d.event_attendance_id IS NOT NULL AND NOT EXISTS (
-	   SELECT 1 FROM event_attendance a WHERE a.id = d.event_attendance_id)`
-);
-
-await expectZero(
 	'funding_relations sin huérfanos en ninguno de los dos extremos',
 	`SELECT
 	   (SELECT COUNT(*) FROM funding_relations r
@@ -168,6 +161,11 @@ const vocabConsumers: Array<{ table: string; column: string; domain: string; nul
 	{ table: 'academic_works', column: 'work_type', domain: 'work_type', nullable: false },
 	{ table: 'projects', column: 'role', domain: 'project_role', nullable: true },
 	{ table: 'service_activities', column: 'role', domain: 'service_role', nullable: true },
+	{ table: 'event_attendance', column: 'role', domain: 'attendance_role', nullable: false },
+	{ table: 'events', column: 'modality', domain: 'event_modality', nullable: true },
+	{ table: 'languages', column: 'language', domain: 'language', nullable: false },
+	{ table: 'languages', column: 'level', domain: 'language_level', nullable: true },
+	{ table: 'memberships', column: 'role', domain: 'membership_role', nullable: false },
 	{ table: 'links', column: 'link_type', domain: 'link_type', nullable: false },
 	{ table: 'documents', column: 'document_type', domain: 'document_type', nullable: false },
 	{ table: 'portfolio_projects', column: 'kind_code', domain: 'portfolio_kind', nullable: false },
@@ -192,7 +190,6 @@ const fkChecks: Array<{ name: string; table: string; column: string; target: str
 	{ name: 'talks.project_id → projects', table: 'talks', column: 'project_id', target: 'projects' },
 	{ name: 'talks.canonical_event_id → events', table: 'talks', column: 'canonical_event_id', target: 'events' },
 	{ name: 'teaching.project_id → projects', table: 'teaching', column: 'project_id', target: 'projects' },
-	{ name: 'funding_awards.project_id → projects', table: 'funding_awards', column: 'project_id', target: 'projects' },
 	{ name: 'academic_works.education_id → education', table: 'academic_works', column: 'education_id', target: 'education' },
 	{ name: 'service_activities.canonical_event_id → events', table: 'service_activities', column: 'canonical_event_id', target: 'events' },
 	{ name: 'event_attendance.event_id → events', table: 'event_attendance', column: 'event_id', target: 'events' }
@@ -238,8 +235,11 @@ await expectZero(
 );
 
 await expectZero(
-	'la asistencia nunca entra en el índice transversal',
-	`SELECT COUNT(*) FROM entry_source WHERE entity_type = 'event_attendance'`
+	'toda asistencia entra en el índice transversal',
+	`SELECT ABS(
+	   (SELECT COUNT(*) FROM event_attendance)
+	   - (SELECT COUNT(*) FROM entry_source WHERE entity_type = 'event_attendance')
+	 )`
 );
 
 // ── Enlaces y documentos (decisiones 22 y Fase 5D) ───────────────────────────
@@ -260,21 +260,20 @@ await expectZero(
 
 await expectZero(
 	'ningún certificado es público',
-	`SELECT COUNT(*) FROM documents WHERE is_certificate = 1 AND is_public = 1`
+	`SELECT COUNT(*) FROM documents
+	 WHERE document_type = 'doc_certificate' AND is_public = 1`
 );
 
 await expectZero(
-	'los documentos de asistencia son certificados privados',
+	'los documentos de asistencia son privados',
 	`SELECT COUNT(*) FROM documents
-	 WHERE event_attendance_id IS NOT NULL AND (is_certificate = 0 OR is_public = 1)`
+	 WHERE entity_type = 'event_attendance' AND is_public = 1`
 );
 
 await expectZero(
-	'documents con exactamente un propietario',
+	'documents con propietario completo',
 	`SELECT COUNT(*) FROM documents
-	 WHERE NOT (
-	   (entity_type IS NOT NULL AND entity_id IS NOT NULL AND event_attendance_id IS NULL)
-	   OR (entity_type IS NULL AND entity_id IS NULL AND event_attendance_id IS NOT NULL))`
+	 WHERE entity_type IS NULL OR entity_id IS NULL`
 );
 
 console.log(`\n${pass}/${pass + fail} comprobaciones correctas${fail ? ` — ${fail} FALLOS` : ''}`);

@@ -1,5 +1,6 @@
 <script lang="ts">
 	import SearchableSelect from './SearchableSelect.svelte';
+	import GeoNamesLocationField from './GeoNamesLocationField.svelte';
 	interface FieldSpec {
 		name: string;
 		label: string;
@@ -19,24 +20,22 @@
 		field,
 		value = '',
 		error = null,
-		options = []
+		options = [],
+		allValues = {}
 	}: {
 		field: FieldSpec;
 		value?: string;
 		error?: string | null;
 		options?: Option[];
+		allValues?: Record<string, string>;
 	} = $props();
 
 	const inputId = $derived(`campo-${field.name}`);
 	const errorId = $derived(`error-${field.name}`);
-	const describedBy = $derived(error ? errorId : undefined);
-	// El campo url es el enlace canónico público del ítem; los archivos (PDF,
-	// certificados, Drive) se gestionarán aparte en «Documentos» (plan §14).
-	const help = $derived(
-		field.help ??
-			(field.kind === 'url'
-				? 'Enlace público del ítem (DOI, web del evento, editorial…). Los archivos de Drive irán en Documentos.'
-				: undefined)
+	const helpId = $derived(`ayuda-${field.name}`);
+	const help = $derived(field.help);
+	const describedBy = $derived(
+		[help ? helpId : null, error ? errorId : null].filter(Boolean).join(' ') || undefined
 	);
 	const controlClass =
 		'w-full rounded-ui-sm border border-rule bg-[var(--admin-surface)] px-[0.65rem] py-2 font-[inherit] text-ink focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent-strong';
@@ -57,6 +56,16 @@
 			/>
 			<span>{field.label}</span>
 		</label>
+	{:else if field.kind === 'location'}
+		<div class="grid gap-[0.35rem]">
+			<span class="text-[0.8rem] text-ink-dim">{field.label}</span>
+			<GeoNamesLocationField
+				id={inputId}
+				values={allValues}
+				invalid={Boolean(error)}
+				{describedBy}
+			/>
+		</div>
 	{:else}
 		<label class="grid gap-[0.35rem]" for={inputId}>
 			<span class="text-[0.8rem] text-ink-dim">
@@ -108,7 +117,7 @@
 					id={inputId}
 					type={field.kind === 'url' ? 'url' : 'text'}
 					inputmode={field.kind === 'integer' ? 'numeric' : field.kind === 'real' ? 'decimal' : undefined}
-					placeholder={field.kind === 'date' ? 'AAAA-MM-DD' : undefined}
+					placeholder={field.kind === 'date' ? 'AAAA, AAAA-MM o AAAA-MM-DD' : undefined}
 					name={field.name}
 					{value}
 					aria-invalid={error ? 'true' : undefined}
@@ -119,7 +128,7 @@
 		</label>
 	{/if}
 	{#if help}
-		<p class="m-0 text-[0.72rem] text-ink-faint">{help}</p>
+		<p class="m-0 text-[0.72rem] text-ink-faint" id={helpId}>{help}</p>
 	{/if}
 	{#if error}
 		<p class="m-0 text-[0.78rem] text-danger" id={errorId}>{error}</p>

@@ -4,6 +4,7 @@ import { requireAdmin } from '$lib/server/admin/auth';
 import {
 	entityDefinitions,
 	entityForms,
+	getEntityCapabilities,
 	isFormEntityType,
 	type EntityFormDef,
 	type FormEntityType
@@ -54,7 +55,15 @@ import {
 	updateDocument
 } from '$lib/server/admin/documents';
 
-const HEADING_KEYS = ['title', 'degree_title', 'institution', 'organization'];
+const HEADING_KEYS = [
+	'title',
+	'degree_title',
+	'institution',
+	'organization',
+	'role',
+	'language',
+	'category'
+];
 
 function parseParams(params: { type: string; id: string }): {
 	entityType: FormEntityType;
@@ -77,26 +86,37 @@ export const load: PageServerLoad = async ({ locals, params, setHeaders }) => {
 	const headingKey = HEADING_KEYS.find((key) => values[key]);
 	const entry = { entityType, entityId };
 	const formDefinition: EntityFormDef = entityForms[entityType];
+	const capabilities = getEntityCapabilities(entityType);
 	const [options, control, portfolioRelations, structuralRelations, fundingRelations, links, documents] = await Promise.all([
 		getFieldOptions(entityType),
 		getControlState(entityType, entityId),
-		getEntryPortfolioRelations({ entityType, entityId }),
+		capabilities.canUsePortfolio
+			? getEntryPortfolioRelations({ entityType, entityId })
+			: Promise.resolve([]),
 		getStructuralRelations({ entityType, entityId }),
 		getFundingRelationEditor({ entityType, entityId }),
-		getLinkEditor(entry),
+		capabilities.canUseLinks ? getLinkEditor(entry) : Promise.resolve(null),
 		getDocumentEditor({ kind: 'entry', entry })
 	]);
+	const heading =
+		headingKey && options[headingKey]
+			? options[headingKey].find((option) => option.value === values[headingKey])?.label ??
+				values[headingKey]
+			: headingKey
+				? values[headingKey]
+				: `#${entityId}`;
 
 	return {
 		entityType,
 		entityId,
 		typeLabel: entityDefinitions[entityType],
-		heading: headingKey ? values[headingKey] : `#${entityId}`,
+		heading,
 		fields: formDefinition.fields,
 		groups: formDefinition.groups ?? [],
 		options,
 		values,
 		control,
+		capabilities,
 		portfolioRelations,
 		structuralRelations,
 		hasStructuralRelations: supportsStructuralRelations(entityType),
@@ -120,7 +140,7 @@ export const actions: Actions = {
 		if (!(await getEntityFormValues(entityType, entityId))) error(404, 'Entrada no encontrada');
 
 		const parsed = parseEntityForm(entityForms[entityType], await request.formData());
-		await validateReferences(entityType, parsed);
+		await validateReferences(entityType, parsed, entityId);
 		validateEntitySemantics(entityType, parsed);
 		if (Object.keys(parsed.errors).length > 0) {
 			return fail(400, { errors: parsed.errors, raw: parsed.raw });
@@ -280,7 +300,7 @@ export const actions: Actions = {
 		await requireAdmin(locals);
 		const entry = parseParams(params);
 		const owner = { kind: 'entry' as const, entry };
-		const values = parseDocumentValues(await request.formData(), owner.kind);
+		const values = parseDocumentValues(await request.formData());
 		if (!values) return fail(400, { documentMessage: 'Revisa el tipo, la URL y la fecha del documento.', documentSuccess: false });
 		try {
 			await addDocument(owner, values);
@@ -297,7 +317,7 @@ export const actions: Actions = {
 		const owner = { kind: 'entry' as const, entry };
 		const formData = await request.formData();
 		const id = parseDocumentId(formData);
-		const values = parseDocumentValues(formData, owner.kind);
+		const values = parseDocumentValues(formData);
 		if (!id || !values) return fail(400, { documentMessage: 'Datos de documento no válidos.', documentSuccess: false });
 		try {
 			await updateDocument(owner, id, values);

@@ -243,6 +243,7 @@
 					<td class={tableCellClass}>{entry.sortDate ?? '—'}</td>
 					<td class={tableCellClass}>{entry.relationCount}</td>
 					<td class={tableCellClass}>
+						{#if entry.canPublish}
 						<form method="POST" action="?/control" use:enhance={controlSubmit(entry, 'public')}>
 							<input type="hidden" name="entityType" value={entry.entityType} />
 							<input type="hidden" name="entityId" value={entry.entityId} />
@@ -260,8 +261,12 @@
 								{entry.isPublic ? 'Sí' : 'No'}
 							</Button>
 						</form>
+						{:else}
+							<span class="text-[0.65rem] text-ink-faint">Siempre privada</span>
+						{/if}
 					</td>
 					<td class={tableCellClass}>
+						{#if entry.canShowHome}
 						<form method="POST" action="?/control" use:enhance={controlSubmit(entry, 'home')}>
 							<input type="hidden" name="entityType" value={entry.entityType} />
 							<input type="hidden" name="entityId" value={entry.entityId} />
@@ -279,6 +284,9 @@
 								{entry.showHome ? 'Sí' : 'No'}
 							</Button>
 						</form>
+						{:else}
+							<span class="text-[0.65rem] text-ink-faint">No aplica</span>
+						{/if}
 					</td>
 					<td class="{tableCellClass} text-[0.7rem] text-ink-faint">{entry.updatedAt ?? '—'}</td>
 				</tr>

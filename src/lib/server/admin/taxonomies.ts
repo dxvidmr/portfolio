@@ -92,6 +92,31 @@ export const TAXONOMY_DOMAINS: TaxonomyDomainDef[] = [
 		consumers: [{ table: 'service_activities', column: 'role' }]
 	},
 	{
+		domain: 'attendance_role',
+		label: 'Roles de asistencia',
+		consumers: [{ table: 'event_attendance', column: 'role' }]
+	},
+	{
+		domain: 'event_modality',
+		label: 'Modalidades de evento',
+		consumers: [{ table: 'events', column: 'modality' }]
+	},
+	{
+		domain: 'language',
+		label: 'Idiomas',
+		consumers: [{ table: 'languages', column: 'language' }]
+	},
+	{
+		domain: 'language_level',
+		label: 'Niveles de idioma',
+		consumers: [{ table: 'languages', column: 'level' }]
+	},
+	{
+		domain: 'membership_role',
+		label: 'Roles en asociaciones',
+		consumers: [{ table: 'memberships', column: 'role' }]
+	},
+	{
 		domain: 'link_type',
 		label: 'Tipos de enlace',
 		consumers: [{ table: 'links', column: 'link_type' }]

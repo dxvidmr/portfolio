@@ -67,8 +67,8 @@ describe('esquema posterior a la limpieza 013', () => {
 					args: []
 				},
 				{
-					sql: `INSERT INTO events (id, title, date_start, date_end, year)
-					      VALUES (18, 'Noviembre HD', '2020-11-01', '2020-11-30', 2020)`,
+					sql: `INSERT INTO events (id, title, date_start, date_end)
+					      VALUES (18, 'Noviembre HD', '2020-11-01', '2020-11-30')`,
 					args: []
 				},
 				{

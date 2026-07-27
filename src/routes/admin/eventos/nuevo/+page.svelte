@@ -8,7 +8,7 @@
 	import Button from '$lib/components/ui/Button.svelte';
 	import ButtonLink from '$lib/components/ui/ButtonLink.svelte';
 	import Checkbox from '$lib/components/ui/Checkbox.svelte';
-	import Input from '$lib/components/ui/Input.svelte';
+	import Select from '$lib/components/ui/Select.svelte';
 	import Textarea from '$lib/components/ui/Textarea.svelte';
 
 	let { data, form }: { data: PageData; form: ActionData } = $props();
@@ -40,7 +40,11 @@
 <form class="mt-6 grid gap-8" method="POST" action="?/crear">
 	<section>
 		<h2 class="mt-0 mb-3 text-base">Datos del evento</h2>
-		<CanonicalEventForm values={form?.raw ?? {}} errors={form?.errors ?? {}} />
+		<CanonicalEventForm
+			values={form?.raw ?? {}}
+			errors={form?.errors ?? {}}
+			modalityOptions={data.eventOptions.modalities}
+		/>
 	</section>
 
 	<section>
@@ -88,8 +92,17 @@
 			<fieldset class="mt-1.5 mb-4 rounded-ui border border-dashed border-rule p-4">
 				<legend class="px-2 text-[0.8rem] text-ink-dim">Asistencia</legend>
 				<div class="grid gap-4">
-					<AdminField label="Rol registrado">
-						<Input name="at_role_label" value={form?.raw?.at_role_label || 'Oyente/asistente'} />
+					<AdminField label="Rol registrado" error={form?.errors?.at_role}>
+						<Select
+							name="at_role"
+							value={form?.raw?.at_role || 'attendance_attendee'}
+							aria-invalid={form?.errors?.at_role ? 'true' : undefined}
+							required
+						>
+							{#each data.eventOptions.attendanceRoles as option (option.value)}
+								<option value={option.value}>{option.label}</option>
+							{/each}
+						</Select>
 					</AdminField>
 					<AdminField label="Notas privadas">
 						<Textarea name="at_notes" rows={3} value={form?.raw?.at_notes ?? ''} />

@@ -2,9 +2,7 @@ import { db } from '$lib/server/db';
 import type { EntryKey } from './controls';
 import { isValidPartialDate } from './date-validation';
 
-export type DocumentOwner =
-	| { kind: 'entry'; entry: EntryKey }
-	| { kind: 'attendance'; attendanceId: number };
+export type DocumentOwner = { kind: 'entry'; entry: EntryKey };
 
 export interface AdminDocument {
 	id: number;
@@ -13,7 +11,6 @@ export interface AdminDocument {
 	driveFileId: string;
 	url: string;
 	isPublic: boolean;
-	isCertificate: boolean;
 	issuedBy: string;
 	issuedDate: string;
 	notesPrivate: string;
@@ -21,7 +18,6 @@ export interface AdminDocument {
 }
 
 export interface DocumentEditor {
-	ownerKind: DocumentOwner['kind'];
 	documents: AdminDocument[];
 	types: Array<{ value: string; label: string }>;
 }
@@ -32,7 +28,6 @@ export interface DocumentValues {
 	driveFileId: string;
 	url: string;
 	isPublic: boolean;
-	isCertificate: boolean;
 	issuedBy: string;
 	issuedDate: string;
 	notesPrivate: string;
@@ -43,21 +38,17 @@ export type DocumentDirection = 'up' | 'down';
 const nullable = (value: unknown) => (value == null ? '' : String(value));
 
 function ownerWhere(owner: DocumentOwner): { sql: string; args: Array<string | number> } {
-	return owner.kind === 'entry'
-		? {
-				sql: 'entity_type = ? AND entity_id = ? AND event_attendance_id IS NULL',
-				args: [owner.entry.entityType, owner.entry.entityId]
-			}
-		: { sql: 'event_attendance_id = ? AND entity_type IS NULL AND entity_id IS NULL', args: [owner.attendanceId] };
+	return {
+		sql: 'entity_type = ? AND entity_id = ?',
+		args: [owner.entry.entityType, owner.entry.entityId]
+	};
 }
 
 async function ownerExists(owner: DocumentOwner): Promise<boolean> {
-	const result = owner.kind === 'entry'
-		? await db.execute({
-				sql: 'SELECT 1 FROM entry_controls WHERE entity_type = ? AND entity_id = ?',
-				args: [owner.entry.entityType, owner.entry.entityId]
-			})
-		: await db.execute({ sql: 'SELECT 1 FROM event_attendance WHERE id = ?', args: [owner.attendanceId] });
+	const result = await db.execute({
+		sql: 'SELECT 1 FROM entry_controls WHERE entity_type = ? AND entity_id = ?',
+		args: [owner.entry.entityType, owner.entry.entityId]
+	});
 	return result.rows.length === 1;
 }
 
@@ -88,7 +79,7 @@ function driveIdFromUrl(url: string): string {
 	}
 }
 
-export function parseDocumentValues(formData: FormData, ownerKind: DocumentOwner['kind']): DocumentValues | null {
+export function parseDocumentValues(formData: FormData): DocumentValues | null {
 	const documentType = String(formData.get('documentType') ?? '').trim().slice(0, 80);
 	const title = String(formData.get('title') ?? '').trim().slice(0, 300);
 	const url = String(formData.get('url') ?? '').trim().slice(0, 2000);
@@ -98,15 +89,12 @@ export function parseDocumentValues(formData: FormData, ownerKind: DocumentOwner
 	const notesPrivate = String(formData.get('notesPrivate') ?? '').trim().slice(0, 5000);
 	if (!documentType || !validUrl(url) || (issuedDate && !isValidPartialDate(issuedDate))) return null;
 	if (!driveFileId) driveFileId = driveIdFromUrl(url).slice(0, 300);
-	const requestedCertificate = formData.get('isCertificate') === '1';
-	const isCertificate = ownerKind === 'attendance' || requestedCertificate;
 	return {
-		documentType: ownerKind === 'attendance' ? 'doc_certificate' : documentType,
+		documentType,
 		title,
 		driveFileId,
 		url,
 		isPublic: false,
-		isCertificate,
 		issuedBy,
 		issuedDate,
 		notesPrivate
@@ -127,7 +115,7 @@ export async function getDocumentEditor(owner: DocumentOwner): Promise<DocumentE
 	const [documents, types] = await Promise.all([
 		db.execute({
 			sql: `SELECT id, document_type, title, drive_file_id, url, is_public,
-			             is_certificate, issued_by, issued_date, notes_private, sort_order
+			             issued_by, issued_date, notes_private, sort_order
 			      FROM documents WHERE ${where.sql} ORDER BY sort_order, id`,
 			args: where.args
 		}),
@@ -135,7 +123,6 @@ export async function getDocumentEditor(owner: DocumentOwner): Promise<DocumentE
 		            WHERE domain = 'document_type' ORDER BY sort_order, label_es`)
 	]);
 	return {
-		ownerKind: owner.kind,
 		documents: documents.rows.map((row) => ({
 			id: Number(row.id),
 			documentType: String(row.document_type),
@@ -143,7 +130,6 @@ export async function getDocumentEditor(owner: DocumentOwner): Promise<DocumentE
 			driveFileId: nullable(row.drive_file_id),
 			url: String(row.url),
 			isPublic: Number(row.is_public) === 1,
-			isCertificate: Number(row.is_certificate) === 1,
 			issuedBy: nullable(row.issued_by),
 			issuedDate: nullable(row.issued_date),
 			notesPrivate: nullable(row.notes_private),
@@ -157,9 +143,6 @@ async function validateMutation(owner: DocumentOwner, values: DocumentValues): P
 	const [exists, type] = await Promise.all([ownerExists(owner), validDocumentType(values.documentType)]);
 	if (!exists) throw new Error('El propietario del documento no existe');
 	if (!type) throw new Error('El tipo de documento no es válido');
-	if (owner.kind === 'attendance' && (!values.isCertificate || values.isPublic)) {
-		throw new Error('Los documentos de asistencia deben ser certificados privados');
-	}
 }
 
 export async function addDocument(owner: DocumentOwner, values: DocumentValues): Promise<void> {
@@ -169,23 +152,20 @@ export async function addDocument(owner: DocumentOwner, values: DocumentValues):
 		sql: `SELECT COALESCE(MAX(sort_order), 0) + 10 AS next_order FROM documents WHERE ${where.sql}`,
 		args: where.args
 	});
-	const ownerColumns = owner.kind === 'entry'
-		? [owner.entry.entityType, owner.entry.entityId, null]
-		: [null, null, owner.attendanceId];
 	await db.execute({
 		sql: `INSERT INTO documents
-			(entity_type, entity_id, event_attendance_id, document_type, title,
-			 drive_file_id, url, is_public, is_certificate, issued_by, issued_date,
+			(entity_type, entity_id, document_type, title,
+			 drive_file_id, url, is_public, issued_by, issued_date,
 			 notes_private, sort_order)
-			VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+			VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
 		args: [
-			...ownerColumns,
+			owner.entry.entityType,
+			owner.entry.entityId,
 			values.documentType,
 			values.title || null,
 			values.driveFileId || null,
 			values.url,
 			values.isPublic ? 1 : 0,
-			values.isCertificate ? 1 : 0,
 			values.issuedBy || null,
 			values.issuedDate || null,
 			values.notesPrivate || null,
@@ -199,7 +179,7 @@ export async function updateDocument(owner: DocumentOwner, id: number, values: D
 	const where = ownerWhere(owner);
 	const result = await db.execute({
 		sql: `UPDATE documents SET document_type = ?, title = ?, drive_file_id = ?,
-		       url = ?, is_public = ?, is_certificate = ?, issued_by = ?,
+		       url = ?, is_public = ?, issued_by = ?,
 		       issued_date = ?, notes_private = ?, updated_at = datetime('now')
 		      WHERE id = ? AND ${where.sql}`,
 		args: [
@@ -208,7 +188,6 @@ export async function updateDocument(owner: DocumentOwner, id: number, values: D
 			values.driveFileId || null,
 			values.url,
 			values.isPublic ? 1 : 0,
-			values.isCertificate ? 1 : 0,
 			values.issuedBy || null,
 			values.issuedDate || null,
 			values.notesPrivate || null,

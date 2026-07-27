@@ -15,6 +15,7 @@
 		};
 		wide?: boolean;
 		advanced?: boolean;
+		hidden?: boolean;
 	}
 
 	interface FieldGroup {
@@ -103,11 +104,15 @@
 		});
 	};
 	const regularFieldsFor = (group: FieldGroup) =>
-		fieldsFor(group).filter((field) => field.advanced !== true);
+		fieldsFor(group).filter((field) => field.advanced !== true && field.hidden !== true);
 	const advancedFieldsFor = (group: FieldGroup) =>
-		fieldsFor(group).filter((field) => field.advanced === true && isVisible(field));
+		fieldsFor(group).filter(
+			(field) => field.advanced === true && field.hidden !== true && isVisible(field)
+		);
 	const visibleGroups = () =>
-		groups.filter((group) => fieldsFor(group).some((field) => isVisible(field)));
+		groups.filter((group) =>
+			fieldsFor(group).some((field) => field.hidden !== true && isVisible(field))
+		);
 </script>
 
 <div use:trackDirty>
@@ -141,6 +146,7 @@
 										value={valueFor(field.name)}
 										error={errors[field.name] ?? null}
 										options={options[field.name] ?? []}
+										allValues={{ ...values, ...currentValues }}
 									/>
 								</div>
 							{/if}
@@ -162,6 +168,7 @@
 										value={valueFor(field.name)}
 										error={errors[field.name] ?? null}
 										options={options[field.name] ?? []}
+										allValues={{ ...values, ...currentValues }}
 									/>
 								{/each}
 							</div>
@@ -173,13 +180,14 @@
 	{:else}
 		<div class="grid grid-cols-2 gap-x-6 gap-y-[1.1rem] max-[720px]:grid-cols-1">
 			{#each fields as field (field.name)}
-				{#if isVisible(field)}
+				{#if field.hidden !== true && isVisible(field)}
 					<div class={wide(field) ? 'col-span-full' : ''}>
 						<FormField
 							{field}
 							value={valueFor(field.name)}
 							error={errors[field.name] ?? null}
 							options={options[field.name] ?? []}
+							allValues={{ ...values, ...currentValues }}
 						/>
 					</div>
 				{/if}

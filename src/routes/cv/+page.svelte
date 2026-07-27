@@ -84,12 +84,17 @@
 		null;
 	const linkLabel = (link: CvItem['links'][number]) =>
 		locale === 'en' ? link.label_en : link.label_es;
+	const itemTitle = (item: CvItem) =>
+		(locale === 'en' ? item.title_label_en : item.title_label_es) ?? item.title;
 	const itemDetail = (item: CvItem) =>
 		item.is_native
-			? [item.detail, locale === 'en' ? 'Native language' : 'Lengua materna']
+			? [
+					(locale === 'en' ? item.detail_label_en : item.detail_label_es) ?? item.detail,
+					locale === 'en' ? 'Native language' : 'Lengua materna'
+				]
 				.filter(Boolean)
 				.join(' · ')
-			: item.detail;
+			: (locale === 'en' ? item.detail_label_en : item.detail_label_es) ?? item.detail;
 	const typeOptionsFor = (items: CvItem[]) =>
 		Array.from(
 			items
@@ -221,13 +226,13 @@
 									<h3 class="text-base leading-[1.35]">
 										{#if item.target_url}
 											<a class="group flex items-start justify-between gap-4" href={item.target_url} target="_blank" rel="noreferrer">
-												<span>{item.title}</span>
+												<span>{itemTitle(item)}</span>
 												<span class="mt-px grid h-5 w-5 flex-[0_0_20px] place-items-center text-accent-strong [transition:transform_180ms_ease] group-hover:translate-x-0.5 group-hover:translate-y-[-2px] group-focus-visible:translate-x-0.5 group-focus-visible:translate-y-[-2px] motion-reduce:transition-none" aria-hidden="true">
 													<MoveUpRight size={19} strokeWidth={1.7} />
 												</span>
 											</a>
 										{:else}
-											{item.title}
+											{itemTitle(item)}
 										{/if}
 									</h3>
 									{#if item.metadata || itemDetail(item) || item.doi}

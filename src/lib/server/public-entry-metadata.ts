@@ -107,7 +107,8 @@ export const publicEntryMetadataSql = (entityRef: 'e' | 'pi') => ({
 		         teaching.teaching_type,
 		         research_project.project_type,
 		         service.activity_type,
-		         award.award_type
+		         award.award_type,
+		         membership.role
 		       ) AS subtype,
 		       tv.label_es AS subtype_label_es,
 		       tv.label_en AS subtype_label_en,
@@ -184,9 +185,9 @@ export const publicEntryMetadataSql = (entityRef: 'e' | 'pi') => ({
 		           education.institution,
 		           course.institution,
 		           award.awarding_body,
-		           membership.role,
+		           membership.role_details,
 		           skill.items_text,
-		           language.level
+		           COALESCE(language_level.label_es, language.level)
 		         )
 		       END AS detail,
 		       COALESCE(
@@ -243,6 +244,9 @@ export const publicEntryMetadataSql = (entityRef: 'e' | 'pi') => ({
 		         ON ${entityRef}.entity_type = 'skills' AND skill.id = ${entityRef}.entity_id
 		       LEFT JOIN languages language
 		         ON ${entityRef}.entity_type = 'languages' AND language.id = ${entityRef}.entity_id
+		       LEFT JOIN type_vocab language_level
+		         ON language_level.code = language.level
+		        AND language_level.domain = 'language_level'
 		       LEFT JOIN type_vocab tv
 		         ON tv.code = COALESCE(
 		           pub.publication_type,
@@ -251,6 +255,7 @@ export const publicEntryMetadataSql = (entityRef: 'e' | 'pi') => ({
 		           teaching.teaching_type,
 		           research_project.project_type,
 		           service.activity_type,
-		           award.award_type
+		           award.award_type,
+		           membership.role
 		         )`
 });

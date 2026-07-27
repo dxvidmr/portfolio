@@ -47,6 +47,9 @@ export async function updateEntryControl(
 ): Promise<EntryControlState> {
 	await assertEntryExists(key);
 	const { entityType, entityId } = key;
+	if (entityType === 'event_attendance') {
+		throw new Error('Las asistencias son siempre privadas y no aparecen en la actividad');
+	}
 
 	if (control === 'public') {
 		await db.execute({

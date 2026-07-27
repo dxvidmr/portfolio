@@ -32,7 +32,7 @@ const sections = [
 		title: 'Comunicaciones',
 		sql: `SELECT a.id AS entity_id, a.title, a.contribution_type AS type, tv.label_es AS type_label_es, tv.label_en AS type_label_en,
 		             canonical.title AS detail,
-		             substr(COALESCE(a.date_override, canonical.date_start, CAST(canonical.year AS TEXT)), 1, 4) AS year,
+		             substr(COALESCE(a.date_override, canonical.date_start), 1, 4) AS year,
 		             a.doi, COALESCE(a.url, canonical.url) AS url,
 		             a.authors_text AS metadata_authors, canonical.title AS metadata_event_title,
 		             canonical.institution AS metadata_institution, canonical.city AS metadata_city,
@@ -46,7 +46,7 @@ const sections = [
 		      LEFT JOIN type_vocab selection ON selection.code = a.selection_mode
 		      LEFT JOIN type_vocab session ON session.code = a.session_format
 		      LEFT JOIN events canonical ON canonical.id = a.canonical_event_id
-		      ORDER BY COALESCE(a.date_override, canonical.date_start, CAST(canonical.year AS TEXT)) DESC,
+		      ORDER BY COALESCE(a.date_override, canonical.date_start) DESC,
 		               a.title ASC`
 	},
 	{
@@ -106,13 +106,13 @@ const sections = [
 		title: 'Servicio académico',
 		sql: `SELECT s.id AS entity_id, s.title, s.activity_type AS type, tv.label_es AS type_label_es, tv.label_en AS type_label_en,
 		             COALESCE(canonical.title, s.venue_or_journal) AS detail,
-		             substr(COALESCE(s.date_start, canonical.date_start, CAST(canonical.year AS TEXT)), 1, 4) AS year,
+		             substr(COALESCE(s.date_start, canonical.date_start), 1, 4) AS year,
 		             COALESCE(s.url, canonical.url) AS url
 		      FROM service_activities s
 		      JOIN entries e ON e.entity_type = 'service_activities' AND e.entity_id = s.id AND e.public = 1
 		      LEFT JOIN type_vocab tv ON tv.code = s.activity_type
 		      LEFT JOIN events canonical ON canonical.id = s.canonical_event_id
-			      ORDER BY COALESCE(s.date_start, canonical.date_start, CAST(canonical.year AS TEXT)) DESC,
+			      ORDER BY COALESCE(s.date_start, canonical.date_start) DESC,
 			               s.title ASC`
 	},
 	{
@@ -139,9 +139,16 @@ const sections = [
 	{
 		key: 'memberships',
 		title: 'Asociaciones científicas',
-		sql: `SELECT m.id AS entity_id, m.organization AS title, NULL AS type, NULL AS type_label_es, NULL AS type_label_en,
-		             m.role AS detail, substr(m.date_start, 1, 4) AS year, NULL AS url
+		sql: `SELECT m.id AS entity_id, m.organization AS title,
+		             m.role AS type,
+		             membership_role.label_es AS type_label_es,
+		             membership_role.label_en AS type_label_en,
+		             m.role_details AS detail,
+		             substr(m.date_start, 1, 4) AS year, NULL AS url
 		      FROM memberships m
+		      LEFT JOIN type_vocab membership_role
+		        ON membership_role.code = m.role
+		       AND membership_role.domain = 'membership_role'
 		      JOIN entries e ON e.entity_type = 'memberships' AND e.entity_id = m.id AND e.public = 1
 		      ORDER BY year DESC, m.organization ASC`
 	},
@@ -157,11 +164,22 @@ const sections = [
 	{
 		key: 'languages',
 		title: 'Idiomas',
-		sql: `SELECT l.id AS entity_id, l.language AS title, NULL AS type, NULL AS type_label_es, NULL AS type_label_en,
-		             l.level AS detail, NULL AS year, NULL AS url, l.is_native
+		sql: `SELECT l.id AS entity_id,
+		             COALESCE(language_vocab.label_es, l.language) AS title,
+		             language_vocab.label_es AS title_label_es,
+		             language_vocab.label_en AS title_label_en,
+		             NULL AS type, NULL AS type_label_es, NULL AS type_label_en,
+		             COALESCE(level_vocab.label_es, l.level) AS detail,
+		             level_vocab.label_es AS detail_label_es,
+		             level_vocab.label_en AS detail_label_en,
+		             NULL AS year, NULL AS url, l.is_native
 		      FROM languages l
+		      LEFT JOIN type_vocab language_vocab
+		        ON language_vocab.code = l.language AND language_vocab.domain = 'language'
+		      LEFT JOIN type_vocab level_vocab
+		        ON level_vocab.code = l.level AND level_vocab.domain = 'language_level'
 		      JOIN entries e ON e.entity_type = 'languages' AND e.entity_id = l.id AND e.public = 1
-		      ORDER BY l.is_native DESC, l.language ASC`
+		      ORDER BY l.is_native DESC, title ASC`
 	}
 ] as const;
 
@@ -189,10 +207,14 @@ export const load: PageServerLoad = async () => {
 					return {
 						entity_id: Number(row.entity_id),
 						title: String(row.title),
+						title_label_es: normalize(row.title_label_es),
+						title_label_en: normalize(row.title_label_en),
 						type: normalize(row.type),
 						type_label_es: normalize(row.type_label_es),
 						type_label_en: normalize(row.type_label_en),
 						detail: normalize(row.detail),
+						detail_label_es: normalize(row.detail_label_es),
+						detail_label_en: normalize(row.detail_label_en),
 						is_native: Number(row.is_native) === 1,
 						hide_year: section.key === 'skills' || section.key === 'languages',
 						metadata: entryMetadataFromRow({ ...row, entity_type: section.key }),

@@ -4,8 +4,9 @@
  * - Sin Preflight: `app.css` conserva el reset y la base visual ya afinada.
  * - Sin prefijo: completada la migración, se usa la sintaxis estándar.
  * - Fuente explícita: solo se analizan los componentes de `src`.
+ * - Cascada compartida: vendor → theme → base → components → utilities.
  */
-@layer theme, base, components, utilities;
+@layer vendor, theme, base, components, utilities;
 
 @import 'tailwindcss/theme.css' layer(theme);
 @import 'tailwindcss/utilities.css' layer(utilities) source('../../');
@@ -26,8 +27,8 @@
 	--color-danger-soft: var(--admin-danger-soft, color-mix(in srgb, #a54848 12%, transparent));
 	--color-warning: var(--tone-amber);
 
-	--font-title: var(--font-title);
-	--font-mono: var(--font-mono);
+	--font-title: var(--font-editorial);
+	--font-mono: var(--font-code);
 
 	--radius-ui: var(--radius);
 	--radius-ui-sm: var(--radius-sm);
@@ -35,7 +36,7 @@
 	--spacing-gutter: var(--gutter);
 	--text-meta: var(--fs-meta);
 	--text-body: var(--fs-body);
-	--tracking-meta: var(--tracking-meta);
+	--tracking-meta: var(--tracking-instrument);
 }
 
 @keyframes editorial-preview-in {

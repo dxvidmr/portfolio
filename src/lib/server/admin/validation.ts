@@ -71,6 +71,8 @@ function parseField(field: FieldDef, raw: string): { value?: FieldValue; error?:
 			if (!Number.isSafeInteger(id) || id <= 0) return { error: 'Referencia no válida' };
 			return { value: id };
 		}
+		case 'location':
+			return { value: null };
 	}
 }
 

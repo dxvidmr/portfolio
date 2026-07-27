@@ -3,13 +3,17 @@
 	import AdminField from './AdminField.svelte';
 	import Input from '$lib/components/ui/Input.svelte';
 	import Textarea from '$lib/components/ui/Textarea.svelte';
+	import Select from '$lib/components/ui/Select.svelte';
+	import GeoNamesLocationField from './GeoNamesLocationField.svelte';
 
 	let {
 		values = {},
-		errors = {}
+		errors = {},
+		modalityOptions = []
 	}: {
 		values?: Partial<CanonicalEventValues>;
 		errors?: Record<string, string>;
+		modalityOptions?: Array<{ value: string; label: string }>;
 	} = $props();
 
 	interface EventField {
@@ -27,14 +31,11 @@
 		{
 			name: 'date_start',
 			label: 'Inicio del evento',
-			placeholder: 'AAAA-MM-DD',
-			help: 'Duración general; cada comunicación o servicio conserva sus propias fechas'
+			required: true,
+			placeholder: 'AAAA, AAAA-MM o AAAA-MM-DD'
 		},
-		{ name: 'date_end', label: 'Fin del evento', placeholder: 'AAAA-MM-DD' },
-		{ name: 'year', label: 'Año', placeholder: 'AAAA' },
+		{ name: 'date_end', label: 'Fin del evento', placeholder: 'AAAA, AAAA-MM o AAAA-MM-DD' },
 		{ name: 'institution', label: 'Institución o entidad organizadora' },
-		{ name: 'city', label: 'Ciudad' },
-		{ name: 'country', label: 'País' },
 		{ name: 'modality', label: 'Modalidad', placeholder: 'Presencial, en línea, híbrida…' },
 		{ name: 'url', label: 'URL del evento', type: 'url', wide: true }
 	];
@@ -49,16 +50,39 @@
 			error={errors[field.name]}
 			help={field.help}
 		>
-			<Input
-				type={field.type ?? 'text'}
-				name={field.name}
-				value={values[field.name] ?? ''}
-				placeholder={field.placeholder}
-				required={field.required}
-				aria-invalid={errors[field.name] ? 'true' : undefined}
-			/>
+			{#if field.name === 'modality'}
+				<Select name="modality" value={values.modality ?? ''} aria-invalid={errors.modality ? 'true' : undefined}>
+					<option value="">—</option>
+					{#each modalityOptions as option (option.value)}
+						<option value={option.value}>{option.label}</option>
+					{/each}
+				</Select>
+			{:else}
+				<Input
+					type={field.type ?? 'text'}
+					name={field.name}
+					value={values[field.name] ?? ''}
+					placeholder={field.placeholder}
+					required={field.required}
+					aria-invalid={errors[field.name] ? 'true' : undefined}
+				/>
+			{/if}
 		</AdminField>
 	{/each}
+	<AdminField label="Localización" wide error={errors.location}>
+		<GeoNamesLocationField
+			id="evento-localizacion"
+			values={{
+				city: values.city,
+				country: values.country,
+				country_code: values.country_code,
+				geoname_id: values.geoname_id,
+				latitude: values.latitude,
+				longitude: values.longitude
+			}}
+			invalid={Boolean(errors.location)}
+		/>
+	</AdminField>
 	<AdminField
 		label="Notas privadas"
 		wide

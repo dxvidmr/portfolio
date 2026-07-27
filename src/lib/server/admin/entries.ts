@@ -2,6 +2,7 @@ import { db } from '$lib/server/db';
 import {
 	entityDefinitions,
 	entityTypeOptions,
+	getEntityCapabilities,
 	isEntityType,
 	type EntityType
 } from './entity-definitions';
@@ -30,6 +31,8 @@ export interface AdminEntry {
 	homeOrder: number;
 	updatedAt: string | null;
 	relationCount: number;
+	canPublish: boolean;
+	canShowHome: boolean;
 }
 
 export interface AdminSummary {
@@ -79,9 +82,6 @@ const relationCountSql = `
 	    WHEN 'teaching' THEN
 	      (SELECT CASE WHEN teaching.project_id IS NULL THEN 0 ELSE 1 END
 	       FROM teaching WHERE teaching.id = source.entity_id)
-	    WHEN 'funding_awards' THEN
-	      (SELECT CASE WHEN funding.project_id IS NULL THEN 0 ELSE 1 END
-	       FROM funding_awards AS funding WHERE funding.id = source.entity_id)
 	    WHEN 'academic_works' THEN
 	      (SELECT CASE WHEN work.education_id IS NULL THEN 0 ELSE 1 END
 	       FROM academic_works AS work WHERE work.id = source.entity_id)
@@ -89,7 +89,6 @@ const relationCountSql = `
 	      (SELECT COUNT(*) FROM publications WHERE project_id = source.entity_id)
 	      + (SELECT COUNT(*) FROM talks WHERE project_id = source.entity_id)
 	      + (SELECT COUNT(*) FROM teaching WHERE project_id = source.entity_id)
-	      + (SELECT COUNT(*) FROM funding_awards WHERE project_id = source.entity_id)
 	    WHEN 'education' THEN
 	      (SELECT COUNT(*) FROM academic_works WHERE education_id = source.entity_id)
 	    ELSE 0
@@ -123,6 +122,7 @@ const rowToEntry = (row: Record<string, unknown>): AdminEntry => {
 		throw new Error(`Tipo de entidad inesperado en entry_source: ${entityType}`);
 	}
 
+	const capabilities = getEntityCapabilities(entityType);
 	return {
 		entityType,
 		entityId: Number(row.entity_id),
@@ -133,7 +133,9 @@ const rowToEntry = (row: Record<string, unknown>): AdminEntry => {
 		showHome: asBoolean(row.show_home),
 		homeOrder: Number(row.home_order),
 		updatedAt: row.updated_at == null ? null : String(row.updated_at),
-		relationCount: Number(row.relation_count)
+		relationCount: Number(row.relation_count),
+		canPublish: capabilities.canPublish,
+		canShowHome: capabilities.canShowHome
 	};
 };
 

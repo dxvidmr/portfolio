@@ -34,6 +34,16 @@
 		const target = event.currentTarget as HTMLInputElement;
 		query = target.value;
 		selectedValue = options.find((option) => option.label === query)?.value ?? '';
+		target.setCustomValidity(
+			query && !selectedValue ? 'Selecciona una opción de la lista' : required && !selectedValue ? 'Selecciona una opción' : ''
+		);
+	};
+
+	const validateSelection = (event: Event) => {
+		const target = event.currentTarget as HTMLInputElement;
+		target.setCustomValidity(
+			selectedValue ? '' : required ? 'Selecciona una opción de la lista' : query ? 'Selecciona una opción de la lista o borra el texto' : ''
+		);
 	};
 </script>
 
@@ -58,6 +68,7 @@
 			aria-required={required || undefined}
 			{required}
 			oninput={syncSelection}
+			onblur={validateSelection}
 		/>
 	</div>
 	{#if selectedOption?.meta}

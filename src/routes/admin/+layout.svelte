@@ -21,7 +21,8 @@
 			label: 'CV',
 			links: [
 				{ href: '/admin/entradas', label: 'Entradas' },
-				{ href: '/admin/eventos', label: 'Eventos' }
+				{ href: '/admin/eventos', label: 'Eventos' },
+				{ href: '/admin/documentos', label: 'Documentos' }
 			]
 		},
 		{

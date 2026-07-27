@@ -1,16 +1,24 @@
-@import url('https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,700;1,9..144,400&display=swap');
-@import '@fontsource/jetbrains-mono/latin-400.css';
-@import '@fontsource/jetbrains-mono/latin-500.css';
-@import '@fontsource/jetbrains-mono/latin-700.css';
-@import 'academicons/css/academicons.min.css';
-@import '@fortawesome/fontawesome-free/css/fontawesome.min.css';
-@import '@fortawesome/fontawesome-free/css/brands.min.css';
+@import url('https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,700;1,9..144,400&display=swap') layer(vendor);
+@import '@fontsource/jetbrains-mono/latin-400.css' layer(vendor);
+@import '@fontsource/jetbrains-mono/latin-500.css' layer(vendor);
+@import '@fontsource/jetbrains-mono/latin-700.css' layer(vendor);
+@import 'academicons/css/academicons.min.css' layer(vendor);
+@import '@fortawesome/fontawesome-free/css/fontawesome.min.css' layer(vendor);
+@import '@fortawesome/fontawesome-free/css/brands.min.css' layer(vendor);
+
+/*
+ * Toda regla propia participa en la cascada explícita. No añadir selectores
+ * globales fuera de estas capas: las utilidades deben poder sobrescribir la
+ * base y los componentes sin recurrir a mayor especificidad o `!important`.
+ */
+@layer vendor, theme, base, components, utilities;
 
 /* ============================================================
    Sistema de diseño — edición crítica contemporánea.
    Serif para la voz editorial, mono para datos y anotaciones.
    El verde cardenillo funciona como tinta de destaque.
    ============================================================ */
+@layer theme {
 :root {
 	--bg: #e6e7e5;
 	--bg-panel: #daddd9;
@@ -41,8 +49,8 @@
 	--tone-blue: #356b8c;
 	--tone-amber: #9a6829;
 
-	--font-title: 'Fraunces', 'Newsreader', 'Iowan Old Style', 'Palatino Linotype', 'Book Antiqua', Georgia, serif;
-	--font-mono: 'JetBrains Mono', ui-monospace, 'SFMono-Regular', 'Cascadia Mono', 'Menlo', monospace;
+	--font-editorial: 'Fraunces', 'Newsreader', 'Iowan Old Style', 'Palatino Linotype', 'Book Antiqua', Georgia, serif;
+	--font-code: 'JetBrains Mono', ui-monospace, 'SFMono-Regular', 'Cascadia Mono', 'Menlo', monospace;
 
 	--radius: 8px; /* redondeo ligero, no líneas rectas perfectas */
 	--radius-sm: 4px;
@@ -51,7 +59,7 @@
 
 	--fs-meta: 0.72rem;   /* etiquetas de instrumento */
 	--fs-body: 0.86rem;   /* cuerpo, denso */
-	--tracking-meta: 0.16em;
+	--tracking-instrument: 0.16em;
 }
 
 html[data-theme='dark'] {
@@ -82,7 +90,9 @@ html[data-theme='dark'] {
 	--tone-blue: #7aa7ff;
 	--tone-amber: #ffce6a;
 }
+}
 
+@layer base {
 *,
 *::before,
 *::after {
@@ -102,7 +112,7 @@ body {
 	margin: 0;
 	background: var(--bg);
 	color: var(--fg);
-	font-family: var(--font-mono);
+	font-family: var(--font-code);
 	font-size: var(--fs-body);
 	line-height: 1.5;
 	font-weight: 400;
@@ -114,7 +124,9 @@ body {
 	-webkit-font-smoothing: antialiased;
 	text-rendering: optimizeLegibility;
 }
+}
 
+@layer components {
 body.project-modal-open .site-header {
 	opacity: 0 !important;
 	visibility: hidden !important;
@@ -130,7 +142,9 @@ body:has(.home),
 body:has(.cv-page) {
 	background-image: none;
 }
+}
 
+@layer base {
 a {
 	color: inherit;
 	text-decoration: none;
@@ -162,11 +176,13 @@ img {
 	background: var(--accent);
 	color: var(--selection-fg);
 }
+}
 
+@layer components {
 /* ---- Etiquetas de metadato: "líneas de instrumento" ---- */
 .meta {
 	font-size: var(--fs-meta);
-	letter-spacing: var(--tracking-meta);
+	letter-spacing: var(--tracking-instrument);
 	text-transform: uppercase;
 	color: var(--fg-dim);
 	font-weight: 500;
@@ -185,17 +201,21 @@ hr,
 	border-top: 1px solid var(--line);
 	margin: 0;
 }
+}
 
+@layer base {
 h1, h2, h3, h4 {
-	font-family: var(--font-title);
+	font-family: var(--font-editorial);
 	font-weight: 500;
 	margin: 0;
 	letter-spacing: -0.025em;
 }
+}
 
+@layer components {
 .mono-caps {
 	text-transform: uppercase;
-	letter-spacing: var(--tracking-meta);
+	letter-spacing: var(--tracking-instrument);
 }
 
 /* Contenedor general */
@@ -256,4 +276,5 @@ html.editorial-cursor-enabled
 	.editorial-cursor {
 		display: none;
 	}
+}
 }

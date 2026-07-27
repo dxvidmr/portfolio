@@ -3,7 +3,9 @@ import type { Actions, PageServerLoad } from './$types';
 import { requireAdmin } from '$lib/server/admin/auth';
 import {
 	createEventWithRoles,
+	getEventFormOptions,
 	parseCanonicalEventForm,
+	validateEventTaxonomies,
 	unifiedTalkFields,
 	unifiedServiceFields,
 	type UnifiedRoles
@@ -59,9 +61,10 @@ async function parseRoleSection(
 
 export const load: PageServerLoad = async ({ locals }) => {
 	await requireAdmin(locals);
-	const [talkOptions, serviceOptions] = await Promise.all([
+	const [talkOptions, serviceOptions, eventOptions] = await Promise.all([
 		getFieldOptions('talks'),
-		getFieldOptions('service_activities')
+		getFieldOptions('service_activities'),
+		getEventFormOptions()
 	]);
 	const options: Record<string, SelectOption[]> = {
 		...prefixKeys(talkOptions, TALK_PREFIX),
@@ -70,7 +73,8 @@ export const load: PageServerLoad = async ({ locals }) => {
 	return {
 		talkFields: prefixFields(unifiedTalkFields, TALK_PREFIX),
 		serviceFields: prefixFields(unifiedServiceFields, SERVICE_PREFIX),
-		options
+		options,
+		eventOptions
 	};
 };
 
@@ -90,7 +94,7 @@ export const actions: Actions = {
 			rol_contribucion: wantsTalk ? '1' : '',
 			rol_servicio: wantsService ? '1' : '',
 			rol_asistencia: wantsAttendance ? '1' : '',
-			at_role_label: String(formData.get('at_role_label') ?? '').trim(),
+			at_role: String(formData.get('at_role') ?? '').trim(),
 			at_notes: String(formData.get('at_notes') ?? '').trim()
 		};
 
@@ -121,11 +125,14 @@ export const actions: Actions = {
 			);
 		}
 		if (wantsAttendance) {
+			if (!raw.at_role) errors.at_role = 'Selecciona un rol de asistencia';
 			roles.attendance = {
-				roleLabel: raw.at_role_label,
+				role: raw.at_role,
 				notesPrivate: raw.at_notes
 			};
 		}
+		await validateEventTaxonomies(event, wantsAttendance ? raw.at_role : undefined);
+		Object.assign(errors, event.errors);
 
 		if (Object.keys(errors).length > 0) {
 			return fail(400, { errors, raw });

@@ -18,10 +18,13 @@ export interface CanonicalEventValues {
 	title: string;
 	date_start: string;
 	date_end: string;
-	year: string;
 	institution: string;
 	city: string;
 	country: string;
+	country_code: string;
+	geoname_id: string;
+	latitude: string;
+	longitude: string;
 	modality: string;
 	url: string;
 	notes_private: string;
@@ -34,13 +37,17 @@ export interface EventActivity {
 	typeCode: string;
 	typeLabel: string;
 	isPublic: boolean;
+	documentCount: number;
+	certificateCount: number;
 }
 
 export interface EventAttendance {
 	id: number;
-	roleType: 'attendee';
+	roleCode: string;
 	roleLabel: string;
 	notesPrivate: string | null;
+	documentCount: number;
+	certificateCount: number;
 }
 
 export interface CanonicalEventDetail {
@@ -54,6 +61,16 @@ export interface CanonicalEventDetail {
 export interface ParsedEventForm {
 	values: CanonicalEventValues;
 	errors: Record<string, string>;
+}
+
+export interface EventTaxonomyOption {
+	value: string;
+	label: string;
+}
+
+export interface EventFormOptions {
+	modalities: EventTaxonomyOption[];
+	attendanceRoles: EventTaxonomyOption[];
 }
 
 const text = (value: FormDataEntryValue | null, max: number) =>
@@ -79,28 +96,73 @@ export function parseCanonicalEventForm(formData: FormData): ParsedEventForm {
 		title: text(formData.get('title'), 500),
 		date_start: text(formData.get('date_start'), 10),
 		date_end: text(formData.get('date_end'), 10),
-		year: text(formData.get('year'), 4),
 		institution: text(formData.get('institution'), 300),
 		city: text(formData.get('city'), 160),
 		country: text(formData.get('country'), 160),
+		country_code: text(formData.get('country_code'), 2).toUpperCase(),
+		geoname_id: text(formData.get('geoname_id'), 20),
+		latitude: text(formData.get('latitude'), 32),
+		longitude: text(formData.get('longitude'), 32),
 		modality: text(formData.get('modality'), 100),
 		url: text(formData.get('url'), 2000),
 		notes_private: text(formData.get('notes_private'), 5000)
 	};
 	const errors: Record<string, string> = {};
 	if (!values.title) errors.title = 'El nombre del evento es obligatorio';
+	if (!values.date_start) errors.date_start = 'Indica como mínimo el año';
 	if (!validDate(values.date_start)) errors.date_start = 'Usa AAAA, AAAA-MM o AAAA-MM-DD';
 	if (!validDate(values.date_end)) errors.date_end = 'Usa AAAA, AAAA-MM o AAAA-MM-DD';
-	if (values.year && (!/^\d{4}$/.test(values.year) || Number(values.year) < 1000)) {
-		errors.year = 'Introduce un año de cuatro cifras';
+	if (values.date_end && values.date_start && values.date_end < values.date_start) {
+		errors.date_end = 'La fecha de fin debe ser posterior al inicio';
+	}
+	if (values.geoname_id && !/^\d+$/.test(values.geoname_id)) {
+		errors.location = 'La localización de GeoNames no es válida';
 	}
 	if (!validUrl(values.url)) errors.url = 'La URL debe empezar por http:// o https://';
 	return { values, errors };
 }
 
+export async function getEventFormOptions(): Promise<EventFormOptions> {
+	const result = await db.execute({
+		sql: `SELECT code, domain, label_es
+		      FROM type_vocab
+		      WHERE domain IN ('event_modality', 'attendance_role')
+		      ORDER BY domain, sort_order, label_es`,
+		args: []
+	});
+	const optionsFor = (domain: string) =>
+		result.rows
+			.filter((row) => row.domain === domain)
+			.map((row) => ({ value: String(row.code), label: String(row.label_es) }));
+	return {
+		modalities: optionsFor('event_modality'),
+		attendanceRoles: optionsFor('attendance_role')
+	};
+}
+
+export async function validateEventTaxonomies(
+	parsed: ParsedEventForm,
+	attendanceRole?: string
+): Promise<void> {
+	const checks: Array<{ field: string; value: string; domain: string }> = [];
+	if (parsed.values.modality) {
+		checks.push({ field: 'modality', value: parsed.values.modality, domain: 'event_modality' });
+	}
+	if (attendanceRole) {
+		checks.push({ field: 'at_role', value: attendanceRole, domain: 'attendance_role' });
+	}
+	for (const check of checks) {
+		const result = await db.execute({
+			sql: 'SELECT 1 FROM type_vocab WHERE code = ? AND domain = ?',
+			args: [check.value, check.domain]
+		});
+		if (result.rows.length === 0) parsed.errors[check.field] = 'Valor no reconocido';
+	}
+}
+
 export async function getCanonicalEvents(): Promise<CanonicalEventSummary[]> {
 	const result = await db.execute(`
-		SELECT event.id, event.title, event.date_start, event.year,
+		SELECT event.id, event.title, event.date_start,
 		       COALESCE(event.city, event.institution, event.country) AS place,
 		       (SELECT COUNT(*) FROM talks contribution
 		        WHERE contribution.canonical_event_id = event.id) AS contribution_count,
@@ -109,14 +171,13 @@ export async function getCanonicalEvents(): Promise<CanonicalEventSummary[]> {
 		       EXISTS(SELECT 1 FROM event_attendance attendance
 		              WHERE attendance.event_id = event.id) AS has_attendance
 		FROM events event
-		ORDER BY (COALESCE(event.date_start, CAST(event.year AS TEXT)) IS NULL) ASC,
-		         COALESCE(event.date_start, CAST(event.year AS TEXT)) DESC,
+		ORDER BY event.date_start DESC,
 		         event.title COLLATE NOCASE ASC`);
 	return result.rows.map((row) => ({
 		id: Number(row.id),
 		title: String(row.title),
-		sortDate: nullable(row.date_start) ?? nullable(row.year),
-		year: row.year == null ? null : Number(row.year),
+		sortDate: nullable(row.date_start),
+		year: row.date_start ? Number(String(row.date_start).slice(0, 4)) : null,
 		place: nullable(row.place),
 		contributionCount: Number(row.contribution_count),
 		serviceCount: Number(row.service_count),
@@ -129,10 +190,13 @@ function eventValues(row: Record<string, unknown>): CanonicalEventValues {
 		title: String(row.title),
 		date_start: nullable(row.date_start) ?? '',
 		date_end: nullable(row.date_end) ?? '',
-		year: nullable(row.year) ?? '',
 		institution: nullable(row.institution) ?? '',
 		city: nullable(row.city) ?? '',
 		country: nullable(row.country) ?? '',
+		country_code: nullable(row.country_code) ?? '',
+		geoname_id: nullable(row.geoname_id) ?? '',
+		latitude: nullable(row.latitude) ?? '',
+		longitude: nullable(row.longitude) ?? '',
 		modality: nullable(row.modality) ?? '',
 		url: nullable(row.url) ?? '',
 		notes_private: nullable(row.notes_private) ?? ''
@@ -149,7 +213,9 @@ function activityRows(
 		title: String(row.title),
 		typeCode: String(row.type_code),
 		typeLabel: nullable(row.type_label) ?? String(row.type_code).replaceAll('_', ' '),
-		isPublic: Number(row.is_public) === 1
+		isPublic: Number(row.is_public) === 1,
+		documentCount: Number(row.document_count),
+		certificateCount: Number(row.certificate_count)
 	}));
 }
 
@@ -160,7 +226,14 @@ export async function getCanonicalEvent(id: number): Promise<CanonicalEventDetai
 			sql: `SELECT contribution.id, contribution.title,
 			             contribution.contribution_type AS type_code,
 			             vocab.label_es AS type_label,
-			             COALESCE(control.is_public, 0) AS is_public
+			             COALESCE(control.is_public, 0) AS is_public,
+			             (SELECT COUNT(*) FROM documents document
+			              WHERE document.entity_type = 'talks'
+			                AND document.entity_id = contribution.id) AS document_count,
+			             (SELECT COUNT(*) FROM documents document
+			              WHERE document.entity_type = 'talks'
+			                AND document.entity_id = contribution.id
+			                AND document.document_type = 'doc_certificate') AS certificate_count
 			      FROM talks contribution
 			      LEFT JOIN type_vocab vocab ON vocab.code = contribution.contribution_type
 			      LEFT JOIN entry_controls control
@@ -172,7 +245,14 @@ export async function getCanonicalEvent(id: number): Promise<CanonicalEventDetai
 		db.execute({
 			sql: `SELECT service.id, service.title, service.activity_type AS type_code,
 			             vocab.label_es AS type_label,
-			             COALESCE(control.is_public, 0) AS is_public
+			             COALESCE(control.is_public, 0) AS is_public,
+			             (SELECT COUNT(*) FROM documents document
+			              WHERE document.entity_type = 'service_activities'
+			                AND document.entity_id = service.id) AS document_count,
+			             (SELECT COUNT(*) FROM documents document
+			              WHERE document.entity_type = 'service_activities'
+			                AND document.entity_id = service.id
+			                AND document.document_type = 'doc_certificate') AS certificate_count
 			      FROM service_activities service
 			      LEFT JOIN type_vocab vocab ON vocab.code = service.activity_type
 			      LEFT JOIN entry_controls control
@@ -182,8 +262,20 @@ export async function getCanonicalEvent(id: number): Promise<CanonicalEventDetai
 			args: [id]
 		}),
 		db.execute({
-			sql: `SELECT id, role_type, role_label, notes_private
-			      FROM event_attendance WHERE event_id = ?`,
+			sql: `SELECT attendance.id, attendance.role,
+			             COALESCE(vocab.label_es, attendance.role) AS role_label,
+			             attendance.notes_private,
+			             (SELECT COUNT(*) FROM documents document
+			              WHERE document.entity_type = 'event_attendance'
+			                AND document.entity_id = attendance.id) AS document_count,
+			             (SELECT COUNT(*) FROM documents document
+			              WHERE document.entity_type = 'event_attendance'
+			                AND document.entity_id = attendance.id
+			                AND document.document_type = 'doc_certificate') AS certificate_count
+			      FROM event_attendance attendance
+			      LEFT JOIN type_vocab vocab
+			        ON vocab.code = attendance.role AND vocab.domain = 'attendance_role'
+			      WHERE attendance.event_id = ?`,
 			args: [id]
 		})
 	]);
@@ -203,9 +295,11 @@ export async function getCanonicalEvent(id: number): Promise<CanonicalEventDetai
 		attendance: attendanceRow
 			? {
 					id: Number(attendanceRow.id),
-					roleType: 'attendee',
+					roleCode: String(attendanceRow.role),
 					roleLabel: String(attendanceRow.role_label),
-					notesPrivate: nullable(attendanceRow.notes_private)
+					notesPrivate: nullable(attendanceRow.notes_private),
+					documentCount: Number(attendanceRow.document_count),
+					certificateCount: Number(attendanceRow.certificate_count)
 				}
 			: null
 	};
@@ -215,10 +309,13 @@ const dbValues = (values: CanonicalEventValues) => [
 	values.title,
 	values.date_start || null,
 	values.date_end || null,
-	values.year ? Number(values.year) : null,
 	values.institution || null,
 	values.city || null,
 	values.country || null,
+	values.country_code || null,
+	values.geoname_id ? Number(values.geoname_id) : null,
+	values.latitude ? Number(values.latitude) : null,
+	values.longitude ? Number(values.longitude) : null,
 	values.modality || null,
 	values.url || null,
 	values.notes_private || null
@@ -227,9 +324,9 @@ const dbValues = (values: CanonicalEventValues) => [
 export async function createCanonicalEvent(values: CanonicalEventValues): Promise<number> {
 	const result = await db.execute({
 		sql: `INSERT INTO events
-				(title, date_start, date_end, year, institution, city, country,
-				 modality, url, notes_private)
-			VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+				(title, date_start, date_end, institution, city, country, country_code,
+				 geoname_id, latitude, longitude, modality, url, notes_private)
+			VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
 		args: dbValues(values)
 	});
 	return Number(result.lastInsertRowid);
@@ -240,7 +337,7 @@ export async function createCanonicalEvent(values: CanonicalEventValues): Promis
 export interface UnifiedRoles {
 	talk?: Record<string, FieldValue>;
 	service?: Record<string, FieldValue>;
-	attendance?: { roleLabel: string; notesPrivate: string };
+	attendance?: { role: string; notesPrivate: string };
 }
 
 // Campos propios de cada rol en el alta unificada: los del formulario del tipo
@@ -250,6 +347,10 @@ export interface UnifiedRoles {
 const SERVICE_EVENT_OMITTED = new Set([
 	'city',
 	'country',
+	'country_code',
+	'geoname_id',
+	'latitude',
+	'longitude',
 	'venue_or_journal',
 	'related_entity'
 ]);
@@ -259,7 +360,10 @@ export const unifiedTalkFields: FieldDef[] = entityForms.talks.fields.filter(
 );
 
 export const unifiedServiceFields: FieldDef[] = entityForms.service_activities.fields.filter(
-	(field) => field.name !== 'canonical_event_id' && !SERVICE_EVENT_OMITTED.has(field.name)
+	(field) =>
+		field.name !== 'canonical_event_id' &&
+		field.persist !== false &&
+		!SERVICE_EVENT_OMITTED.has(field.name)
 );
 
 export async function createEventWithRoles(
@@ -270,9 +374,9 @@ export async function createEventWithRoles(
 	try {
 		const insertedEvent = await tx.execute({
 			sql: `INSERT INTO events
-					(title, date_start, date_end, year, institution, city, country,
-					 modality, url, notes_private)
-				VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+					(title, date_start, date_end, institution, city, country, country_code,
+					 geoname_id, latitude, longitude, modality, url, notes_private)
+				VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
 			args: dbValues(eventValues)
 		});
 		const eventId = Number(insertedEvent.lastInsertRowid);
@@ -310,14 +414,18 @@ export async function createEventWithRoles(
 		}
 
 		if (roles.attendance) {
-			await tx.execute({
-				sql: `INSERT INTO event_attendance (event_id, role_type, role_label, notes_private)
-					VALUES (?, 'attendee', ?, ?)`,
+			const insertedAttendance = await tx.execute({
+				sql: `INSERT INTO event_attendance (event_id, role, notes_private)
+					VALUES (?, ?, ?)`,
 				args: [
 					eventId,
-					roles.attendance.roleLabel.trim() || 'Oyente/asistente',
+					roles.attendance.role || 'attendance_attendee',
 					roles.attendance.notesPrivate.trim() || null
 				]
+			});
+			await tx.execute({
+				sql: 'INSERT INTO entry_controls (entity_type, entity_id, is_public) VALUES (?, ?, 0)',
+				args: ['event_attendance', Number(insertedAttendance.lastInsertRowid)]
 			});
 		}
 
@@ -331,34 +439,14 @@ export async function createEventWithRoles(
 export async function updateCanonicalEvent(id: number, values: CanonicalEventValues): Promise<void> {
 	const result = await db.execute({
 		sql: `UPDATE events SET
-			title = ?, date_start = ?, date_end = ?, year = ?, institution = ?,
-			city = ?, country = ?, modality = ?, url = ?, notes_private = ?,
+			title = ?, date_start = ?, date_end = ?, institution = ?,
+			city = ?, country = ?, country_code = ?, geoname_id = ?, latitude = ?, longitude = ?,
+			modality = ?, url = ?, notes_private = ?,
 			updated_at = datetime('now')
 		WHERE id = ?`,
 		args: [...dbValues(values), id]
 	});
 	if (result.rowsAffected === 0) throw new Error('El evento no existe');
-}
-
-export async function saveEventAttendance(
-	eventId: number,
-	roleLabel: string,
-	notesPrivate: string
-): Promise<void> {
-	await db.execute({
-		sql: `INSERT INTO event_attendance
-				(event_id, role_type, role_label, notes_private, updated_at)
-			VALUES (?, 'attendee', ?, ?, datetime('now'))
-			ON CONFLICT (event_id) DO UPDATE SET
-				role_label = excluded.role_label,
-				notes_private = excluded.notes_private,
-				updated_at = datetime('now')`,
-		args: [eventId, roleLabel.trim() || 'Oyente/asistente', notesPrivate.trim() || null]
-	});
-}
-
-export async function removeEventAttendance(eventId: number): Promise<void> {
-	await db.execute({ sql: 'DELETE FROM event_attendance WHERE event_id = ?', args: [eventId] });
 }
 
 export async function deleteCanonicalEvent(id: number): Promise<void> {
@@ -386,13 +474,6 @@ export async function getCanonicalEventDefaults(
 	if (entityType === 'talks') return { canonical_event_id: String(eventId) };
 	return {
 		canonical_event_id: String(eventId),
-		date_start: nullable(row.date_start) ?? '',
-		date_end: nullable(row.date_end) ?? '',
-		year: nullable(row.year) ?? '',
-		city: nullable(row.city) ?? '',
-		country: nullable(row.country) ?? '',
-		url: nullable(row.url) ?? '',
-		title: String(row.title),
-		venue_or_journal: nullable(row.institution) ?? ''
+		title: String(row.title)
 	};
 }

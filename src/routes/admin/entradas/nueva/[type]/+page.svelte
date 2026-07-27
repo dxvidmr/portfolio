@@ -11,6 +11,18 @@
 	let { data, form }: { data: PageData; form: ActionData } = $props();
 	const hasGroupedForm = $derived(data.groups.length > 0);
 	const navItems = $derived(data.groups.map((group) => ({ href: `#${group.id}`, label: group.title })));
+	const pageTitle = $derived(
+		data.entityType === 'service_activities' && data.creationContext === 'event'
+			? 'Nuevo servicio en un evento'
+			: data.entityType === 'service_activities' && data.creationContext === 'standalone'
+				? 'Nuevo servicio independiente'
+				: `Nueva entrada: ${data.typeLabel}`
+	);
+	const formAction = $derived(
+		data.creationContext === 'general'
+			? '?/crear'
+			: `?context=${data.creationContext}&/crear`
+	);
 </script>
 
 <svelte:head>
@@ -27,16 +39,11 @@
 	<span>{data.typeLabel}</span>
 </nav>
 
-<AdminPageHeader
-	title={`Nueva entrada: ${data.typeLabel}`}
-	eyebrow="Índice transversal"
-	description="Se creará como privada; podrás publicarla desde su ficha."
-/>
+<AdminPageHeader title={pageTitle} />
 
-{#if data.entityType === 'talks' || data.entityType === 'service_activities'}
-	<p class="-mt-2 mb-6 border border-dashed border-rule px-3 py-2.5 text-[0.8rem] text-ink-dim">
-		¿El evento aún no existe? <a class="text-accent-strong" href="/admin/eventos/nuevo">Créalo primero con su rol desde Eventos</a>:
-		allí registras evento y comunicación/servicio en un solo paso.
+{#if data.entityType === 'talks' || data.entityType === 'event_attendance'}
+	<p class="mt-4 mb-6 text-[0.8rem] text-ink-dim">
+		Evento obligatorio · <a class="text-accent-strong" href="/admin/eventos/nuevo">Crear evento</a>
 	</p>
 {/if}
 
@@ -50,7 +57,8 @@
 	{#if hasGroupedForm}
 		<AdminFormNav items={navItems} formId="new-entry-form" submitLabel="Crear entrada" submitKind="create" />
 	{/if}
-	<form id="new-entry-form" class="min-w-0" method="POST" action="?/crear">
+	<form id="new-entry-form" class="min-w-0" method="POST" action={formAction}>
+		<input type="hidden" name="creation_context" value={data.creationContext} />
 		<EntityForm
 			fields={data.fields}
 			groups={data.groups}

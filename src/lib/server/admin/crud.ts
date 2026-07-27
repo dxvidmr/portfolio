@@ -71,10 +71,9 @@ async function getFkOptions(entity: FkEntity): Promise<SelectOption[]> {
 	if (entity === 'events') {
 		const res = await db.execute(
 			`SELECT id, title, date_start, date_end,
-			        COALESCE(CAST(year AS TEXT), substr(date_start, 1, 4), '') AS y
+			        COALESCE(substr(date_start, 1, 4), '') AS y
 			 FROM events
-			 ORDER BY (year IS NULL AND date_start IS NULL) ASC,
-			          COALESCE(CAST(year AS TEXT), date_start) DESC, title COLLATE NOCASE`
+			 ORDER BY date_start DESC, title COLLATE NOCASE`
 		);
 		return res.rows.map((row) => {
 			const start = row.date_start ? String(row.date_start) : '';
@@ -92,13 +91,11 @@ async function getFkOptions(entity: FkEntity): Promise<SelectOption[]> {
 		        COALESCE(
 		          substr(talk.date_override, 1, 4),
 		          substr(event.date_start, 1, 4),
-		          CAST(event.year AS TEXT),
 		          ''
 		        ) AS y
 		 FROM talks AS talk
 		 LEFT JOIN events AS event ON event.id = talk.canonical_event_id
-		 ORDER BY (COALESCE(talk.date_override, event.date_start, CAST(event.year AS TEXT)) IS NULL) ASC,
-		          COALESCE(talk.date_override, event.date_start, CAST(event.year AS TEXT)) DESC,
+		 ORDER BY COALESCE(talk.date_override, event.date_start) DESC,
 		          talk.title COLLATE NOCASE`
 	);
 	return res.rows.map((row) => ({
@@ -110,7 +107,8 @@ async function getFkOptions(entity: FkEntity): Promise<SelectOption[]> {
 // Revalidación contra BD de vocabulario (código + dominio) y referencias FK.
 export async function validateReferences(
 	type: FormEntityType,
-	parsed: ParsedForm
+	parsed: ParsedForm,
+	entityId?: number
 ): Promise<void> {
 	for (const field of entityForms[type].fields as FieldDef[]) {
 		const value = parsed.values[field.name];
@@ -138,6 +136,20 @@ export async function validateReferences(
 			});
 			if (res.rows.length === 0) {
 				parsed.errors[field.name] = 'La referencia seleccionada no existe';
+			}
+		}
+	}
+
+	if (type === 'event_attendance' && !parsed.errors.event_id) {
+		const eventId = parsed.values.event_id;
+		if (eventId != null) {
+			const existing = await db.execute({
+				sql: `SELECT id FROM event_attendance
+				      WHERE event_id = ? AND (? IS NULL OR id <> ?)`,
+				args: [eventId, entityId ?? null, entityId ?? null]
+			});
+			if (existing.rows.length > 0) {
+				parsed.errors.event_id = 'Este evento ya tiene una entrada de asistencia';
 			}
 		}
 	}
@@ -216,9 +228,16 @@ export async function createEntity(
 	const cols = fieldNames(type);
 	const tx = await db.transaction('write');
 	try {
+		const insertValues = { ...values };
+		if (type === 'skills' && insertValues.sort_order == null) {
+			const order = await tx.execute(
+				'SELECT COALESCE(MAX(sort_order), 0) + 10 AS next_order FROM skills'
+			);
+			insertValues.sort_order = Number(order.rows[0]?.next_order ?? 10);
+		}
 		const inserted = await tx.execute({
 			sql: `INSERT INTO ${type} (${cols.join(', ')}) VALUES (${cols.map(() => '?').join(', ')})`,
-			args: cols.map((col) => values[col] ?? null)
+			args: cols.map((col) => insertValues[col] ?? null)
 		});
 		const id = Number(inserted.lastInsertRowid);
 		await tx.execute({
@@ -261,7 +280,7 @@ export async function deleteEntity(type: FormEntityType, id: number): Promise<vo
 	const stmts: Array<{ sql: string; args: Array<string | number> }> = [];
 
 	if (type === 'projects') {
-		for (const table of ['publications', 'talks', 'teaching', 'funding_awards']) {
+		for (const table of ['publications', 'talks', 'teaching']) {
 			stmts.push({ sql: `UPDATE ${table} SET project_id = NULL WHERE project_id = ?`, args: [id] });
 		}
 	}

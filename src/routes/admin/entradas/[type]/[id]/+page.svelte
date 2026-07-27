@@ -35,11 +35,15 @@
 			label: string;
 			meta?: string | number;
 			group?: 'content' | 'management';
-		}> = isPublication
+		}> = data.groups.length > 0
 			? data.groups.map((group) => ({ href: `#${group.id}`, label: group.title }))
 			: [{ href: '#content-section', label: 'Contenido' }];
 
-		items.push({ href: '#presence-section', label: 'Presencia pública', group: 'management' });
+		items.push({
+			href: '#presence-section',
+			label: data.capabilities.canPublish ? 'Presencia pública' : 'Privacidad',
+			group: 'management'
+		});
 		if (hasStructuralRelationItems)
 			items.push({ href: '#structural-section', label: 'Relaciones estructurales', group: 'management' });
 		if (data.fundingRelations)
@@ -49,14 +53,21 @@
 				meta: data.fundingRelations.relations.length,
 				group: 'management'
 			});
-		items.push(
-			{
+		if (data.links) {
+			items.push({
 				href: '#links-section',
 				label: 'Recursos y archivos',
 				meta: data.links.links.length + data.documents.documents.length,
 				group: 'management'
-			}
-		);
+			});
+		} else {
+			items.push({
+				href: '#documents-section',
+				label: 'Documentos',
+				meta: data.documents.documents.length,
+				group: 'management'
+			});
+		}
 		return items;
 	});
 
@@ -116,7 +127,7 @@
 				data.control.isPublic ? 'border-accent text-accent' : 'border-rule-strong text-ink-dim'
 			}`}
 		>
-			{data.control.isPublic ? 'Pública' : 'Privada'}
+			{data.capabilities.canPublish && data.control.isPublic ? 'Pública' : 'Privada'}
 		</span>
 		{#if data.control.showHome}
 			<span class="rounded-ui-sm border border-accent px-2 py-1 text-[0.7rem] uppercase tracking-[0.08em] text-accent">
@@ -127,7 +138,12 @@
 </AdminPageHeader>
 
 {#if created}
-	<AdminToast message="Entrada creada como privada. Publícala cuando esté lista." success={true} />
+	<AdminToast
+		message={data.capabilities.canPublish
+			? 'Entrada creada como privada. Publícala cuando esté lista.'
+			: 'Asistencia creada como entrada privada.'}
+		success={true}
+	/>
 {/if}
 {#if toast}
 	{#key form}
@@ -157,7 +173,10 @@
 </section>
 
 <section class="scroll-mt-36 {sectionClass}" id="presence-section" aria-labelledby="presence-title">
-	<h2 class={sectionTitleClass} id="presence-title">Presencia pública</h2>
+	<h2 class={sectionTitleClass} id="presence-title">
+		{data.capabilities.canPublish ? 'Presencia pública' : 'Privacidad'}
+	</h2>
+	{#if data.capabilities.canPublish}
 	<div class="grid gap-4 lg:grid-cols-3">
 		<div class="grid content-start gap-3 rounded-ui border border-rule p-5">
 			<div>
@@ -225,6 +244,18 @@
 			</a>
 		</div>
 	</div>
+	{:else}
+		<div class="grid max-w-[48rem] gap-3 rounded-ui border border-warning p-5">
+			<div>
+				<p class="m-0 text-[0.6rem] tracking-[0.1em] text-warning uppercase">Entrada privada</p>
+				<h3 class="mt-1 mb-0 text-sm font-medium text-ink">Asistencia a evento</h3>
+			</div>
+			<p class="m-0 max-w-[65ch] text-sm leading-relaxed text-ink-dim">
+				Esta entrada y sus documentos nunca aparecen en el CV, el portfolio ni la actividad pública.
+				Sí forma parte del índice transversal del dashboard y puede tener certificados.
+			</p>
+		</div>
+	{/if}
 </section>
 
 {#if hasStructuralRelationItems}
@@ -278,7 +309,9 @@
 	<FundingRelations editor={data.fundingRelations} />
 {/if}
 
-<AdditionalLinks editor={data.links} />
+{#if data.links}
+	<AdditionalLinks editor={data.links} />
+{/if}
 
 <DocumentsEditor editor={data.documents} />
 

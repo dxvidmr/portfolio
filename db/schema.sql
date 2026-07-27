@@ -58,6 +58,10 @@ CREATE TABLE research_stays (
   supervisor TEXT,
   city TEXT,
   country TEXT,
+  country_code TEXT,
+  geoname_id INTEGER,
+  latitude REAL,
+  longitude REAL,
   date_start TEXT,
   date_end TEXT,
   url TEXT,
@@ -93,20 +97,22 @@ CREATE TABLE projects (
   currency TEXT,
   description_short_es TEXT,
   description_short_en TEXT,
-  slug TEXT UNIQUE,
   url TEXT
 );
 
 CREATE TABLE events (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
   title TEXT NOT NULL,
-  date_start TEXT,
+  date_start TEXT NOT NULL,
   date_end TEXT,
-  year INTEGER,
   institution TEXT,
   city TEXT,
   country TEXT,
-  modality TEXT,
+  country_code TEXT,
+  geoname_id INTEGER,
+  latitude REAL,
+  longitude REAL,
+  modality TEXT REFERENCES type_vocab(code),
   url TEXT,
   notes_private TEXT,
   created_at TEXT NOT NULL DEFAULT (datetime('now')),
@@ -114,7 +120,7 @@ CREATE TABLE events (
 );
 
 CREATE INDEX idx_events_date
-  ON events(year DESC, date_start DESC, title);
+  ON events(date_start DESC, title);
 
 CREATE TABLE talks (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -210,6 +216,10 @@ CREATE TABLE service_activities (
   related_entity TEXT,
   city TEXT,
   country TEXT,
+  country_code TEXT,
+  geoname_id INTEGER,
+  latitude REAL,
+  longitude REAL,
   date_start TEXT,
   date_end TEXT,
   description TEXT,
@@ -232,7 +242,6 @@ CREATE TABLE funding_awards (
   currency TEXT,
   year INTEGER,
   related_context TEXT,
-  project_id INTEGER REFERENCES projects(id),
   url TEXT,
   notes_private TEXT
 );
@@ -240,7 +249,8 @@ CREATE TABLE funding_awards (
 CREATE TABLE memberships (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
   organization TEXT NOT NULL,
-  role TEXT,
+  role TEXT NOT NULL REFERENCES type_vocab(code),
+  role_details TEXT,
   date_start TEXT,
   date_end TEXT,
   notes_private TEXT
@@ -255,16 +265,15 @@ CREATE TABLE skills (
 
 CREATE TABLE languages (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
-  language TEXT NOT NULL,
-  level TEXT,
+  language TEXT NOT NULL REFERENCES type_vocab(code),
+  level TEXT REFERENCES type_vocab(code),
   is_native INTEGER DEFAULT 0
 );
 
 CREATE TABLE event_attendance (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
   event_id INTEGER NOT NULL REFERENCES events(id) ON DELETE CASCADE,
-  role_type TEXT NOT NULL DEFAULT 'attendee' CHECK (role_type = 'attendee'),
-  role_label TEXT NOT NULL DEFAULT 'Oyente/asistente',
+  role TEXT NOT NULL DEFAULT 'attendance_attendee' REFERENCES type_vocab(code),
   notes_private TEXT,
   created_at TEXT NOT NULL DEFAULT (datetime('now')),
   updated_at TEXT NOT NULL DEFAULT (datetime('now')),
@@ -273,6 +282,35 @@ CREATE TABLE event_attendance (
 
 CREATE INDEX idx_event_attendance_event
   ON event_attendance(event_id);
+
+CREATE TRIGGER event_attendance_control_private_insert
+BEFORE INSERT ON entry_controls
+WHEN NEW.entity_type = 'event_attendance'
+ AND (
+   NEW.is_public <> 0 OR NEW.show_home <> 0 OR NEW.home_order <> 0
+   OR NEW.featured_cv <> 0 OR NEW.cv_order <> 0
+ )
+BEGIN
+  SELECT RAISE(ABORT, 'event attendance must remain private');
+END;
+
+CREATE TRIGGER event_attendance_control_private_update
+BEFORE UPDATE ON entry_controls
+WHEN NEW.entity_type = 'event_attendance'
+ AND (
+   NEW.is_public <> 0 OR NEW.show_home <> 0 OR NEW.home_order <> 0
+   OR NEW.featured_cv <> 0 OR NEW.cv_order <> 0
+ )
+BEGIN
+  SELECT RAISE(ABORT, 'event attendance must remain private');
+END;
+
+CREATE TRIGGER event_attendance_control_cleanup
+AFTER DELETE ON event_attendance
+BEGIN
+  DELETE FROM entry_controls
+  WHERE entity_type = 'event_attendance' AND entity_id = OLD.id;
+END;
 
 CREATE TABLE tags (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -292,6 +330,22 @@ CREATE INDEX idx_entity_tags_entity
   ON entity_tags(entity_type, entity_id);
 
 INSERT INTO type_vocab (code, domain, label_es, label_en, sort_order) VALUES
+  ('attendance_attendee', 'attendance_role', 'Oyente/asistente', 'Attendee', 10),
+  ('attendance_listener', 'attendance_role', 'Oyente', 'Auditor', 20),
+  ('attendance_participant', 'attendance_role', 'Participante', 'Participant', 30),
+  ('event_in_person', 'event_modality', 'Presencial', 'In person', 10),
+  ('event_online', 'event_modality', 'En línea', 'Online', 20),
+  ('event_hybrid', 'event_modality', 'Híbrida', 'Hybrid', 30),
+  ('language_spanish', 'language', 'Castellano', 'Spanish', 10),
+  ('language_english', 'language', 'Inglés', 'English', 20),
+  ('language_a1', 'language_level', 'A1', 'A1', 10),
+  ('language_a2', 'language_level', 'A2', 'A2', 20),
+  ('language_b1', 'language_level', 'B1', 'B1', 30),
+  ('language_b2', 'language_level', 'B2', 'B2', 40),
+  ('language_c1', 'language_level', 'C1', 'C1', 50),
+  ('language_c2', 'language_level', 'C2', 'C2', 60),
+  ('membership_member', 'membership_role', 'Miembro', 'Member', 10),
+  ('membership_board_member', 'membership_role', 'Vocal de la Junta Directiva', 'Board member', 20),
   ('portfolio_project', 'portfolio_kind', 'Proyecto', 'Project', 10),
   ('portfolio_line', 'portfolio_kind', 'Línea de trabajo', 'Line of work', 20),
   ('portfolio_infrastructure', 'portfolio_kind', 'Infraestructura', 'Infrastructure', 30),
@@ -438,15 +492,13 @@ CREATE UNIQUE INDEX idx_links_one_primary
 
 CREATE TABLE documents (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
-  entity_type TEXT,
-  entity_id INTEGER,
-  event_attendance_id INTEGER,
+  entity_type TEXT NOT NULL,
+  entity_id INTEGER NOT NULL,
   document_type TEXT NOT NULL REFERENCES type_vocab(code),
   title TEXT,
   drive_file_id TEXT,
   url TEXT NOT NULL,
   is_public INTEGER NOT NULL DEFAULT 0 CHECK (is_public IN (0, 1)),
-  is_certificate INTEGER NOT NULL DEFAULT 0 CHECK (is_certificate IN (0, 1)),
   issued_by TEXT,
   issued_date TEXT,
   notes_private TEXT,
@@ -455,37 +507,19 @@ CREATE TABLE documents (
   updated_at TEXT NOT NULL DEFAULT (datetime('now')),
   FOREIGN KEY (entity_type, entity_id)
     REFERENCES entry_controls(entity_type, entity_id) ON DELETE CASCADE,
-  FOREIGN KEY (event_attendance_id)
-    REFERENCES event_attendance(id) ON DELETE CASCADE,
-  CHECK (
-    (entity_type IS NOT NULL AND entity_id IS NOT NULL AND event_attendance_id IS NULL)
-    OR
-    (entity_type IS NULL AND entity_id IS NULL AND event_attendance_id IS NOT NULL)
-  ),
-  CHECK (entity_type IS NULL OR entity_type IN (
+  CHECK (entity_type IN (
     'publications', 'talks', 'teaching', 'projects', 'education',
     'research_stays', 'funding_awards', 'service_activities', 'academic_works',
-    'courses', 'memberships', 'skills', 'languages'
+    'courses', 'memberships', 'skills', 'languages', 'event_attendance'
   )),
-  CHECK (NOT (is_certificate = 1 AND is_public = 1)),
-  CHECK (event_attendance_id IS NULL OR (is_certificate = 1 AND is_public = 0))
+  CHECK (document_type <> 'doc_certificate' OR is_public = 0)
 );
 
 CREATE INDEX idx_documents_entry
-  ON documents(entity_type, entity_id, sort_order, id)
-  WHERE entity_type IS NOT NULL;
-
-CREATE INDEX idx_documents_attendance
-  ON documents(event_attendance_id, sort_order, id)
-  WHERE event_attendance_id IS NOT NULL;
+  ON documents(entity_type, entity_id, sort_order, id);
 
 CREATE UNIQUE INDEX idx_documents_entry_url
-  ON documents(entity_type, entity_id, url)
-  WHERE entity_type IS NOT NULL;
-
-CREATE UNIQUE INDEX idx_documents_attendance_url
-  ON documents(event_attendance_id, url)
-  WHERE event_attendance_id IS NOT NULL;
+  ON documents(entity_type, entity_id, url);
 
 CREATE VIEW entry_source AS
 SELECT 'projects' AS entity_type, id AS entity_id, title, date_start AS sort_date FROM projects
@@ -505,8 +539,7 @@ UNION ALL
 SELECT 'talks', talk.id, talk.title,
        COALESCE(
          talk.date_override,
-         (SELECT event.date_start FROM events AS event WHERE event.id = talk.canonical_event_id),
-         CAST((SELECT event.year FROM events AS event WHERE event.id = talk.canonical_event_id) AS TEXT)
+         (SELECT event.date_start FROM events AS event WHERE event.id = talk.canonical_event_id)
        )
 FROM talks AS talk
 UNION ALL
@@ -515,16 +548,25 @@ UNION ALL
 SELECT 'service_activities', service.id, service.title,
        COALESCE(
          service.date_start,
-         (SELECT event.date_start FROM events AS event WHERE event.id = service.canonical_event_id),
-         CAST((SELECT event.year FROM events AS event WHERE event.id = service.canonical_event_id) AS TEXT)
+         (SELECT event.date_start FROM events AS event WHERE event.id = service.canonical_event_id)
        )
 FROM service_activities AS service
+UNION ALL
+SELECT 'event_attendance', attendance.id, event.title,
+       event.date_start
+FROM event_attendance AS attendance
+JOIN events AS event ON event.id = attendance.event_id
 UNION ALL
 SELECT 'memberships', id, organization, date_start FROM memberships
 UNION ALL
 SELECT 'skills', id, category, NULL FROM skills
 UNION ALL
-SELECT 'languages', id, language, NULL FROM languages;
+SELECT 'languages', language_entry.id,
+       COALESCE(language_vocab.label_es, language_entry.language), NULL
+FROM languages AS language_entry
+LEFT JOIN type_vocab AS language_vocab
+  ON language_vocab.code = language_entry.language
+ AND language_vocab.domain = 'language';
 
 CREATE VIEW entries AS
 SELECT
