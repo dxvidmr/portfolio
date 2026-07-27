@@ -10,6 +10,7 @@
 		getKey,
 		getLabel,
 		onreorder,
+		reorderable = true,
 		children,
 		actions
 	}: {
@@ -17,6 +18,7 @@
 		getKey: (item: T) => string;
 		getLabel: (item: T) => string;
 		onreorder?: (items: T[]) => void;
+		reorderable?: boolean;
 		children: Snippet<[T, number]>;
 		actions?: Snippet<[T, number]>;
 	} = $props();
@@ -31,6 +33,7 @@
 	};
 
 	const moveBy = (index: number, offset: -1 | 1) => {
+		if (!reorderable) return;
 		const destination = index + offset;
 		if (destination < 0 || destination >= items.length) return;
 		const next = [...items];
@@ -39,6 +42,7 @@
 	};
 
 	const startDrag = (event: DragEvent, item: T) => {
+		if (!reorderable) return;
 		draggedKey = getKey(item);
 		if (event.dataTransfer) {
 			event.dataTransfer.effectAllowed = 'move';
@@ -47,7 +51,7 @@
 	};
 
 	const updateDropTarget = (event: DragEvent, index: number) => {
-		if (!draggedKey) return;
+		if (!reorderable || !draggedKey) return;
 		event.preventDefault();
 		if (event.dataTransfer) event.dataTransfer.dropEffect = 'move';
 		const rect = (event.currentTarget as HTMLElement).getBoundingClientRect();
@@ -55,6 +59,7 @@
 	};
 
 	const drop = (event: DragEvent) => {
+		if (!reorderable) return;
 		event.preventDefault();
 		if (!draggedKey || !dropTarget) return;
 		const fromIndex = items.findIndex((item) => getKey(item) === draggedKey);
@@ -79,33 +84,39 @@
 	{#each items as item, index (getKey(item))}
 		<li
 			class={`relative grid grid-cols-[3rem_minmax(0,1fr)_auto] items-center gap-4 border-b border-rule py-4 max-[700px]:grid-cols-[2rem_minmax(0,1fr)] ${draggedKey === getKey(item) ? 'opacity-45' : ''}`}
-			ondragover={(event) => updateDropTarget(event, index)}
-			ondrop={drop}
+			ondragover={reorderable ? (event) => updateDropTarget(event, index) : undefined}
+			ondrop={reorderable ? drop : undefined}
 		>
-			{#if dropTarget?.index === index}
+			{#if reorderable && dropTarget?.index === index}
 				<span
 					class={`pointer-events-none absolute right-0 left-0 z-10 h-0.5 bg-accent-strong shadow-[0_0_0_1px_var(--bg),0_0_10px_color-mix(in_srgb,var(--accent)_45%,transparent)] ${dropTarget.position === 'before' ? 'top-[-1px]' : 'bottom-[-1px]'}`}
 					aria-hidden="true"
 				></span>
 			{/if}
-			<button
-				type="button"
-				class="flex cursor-grab items-center gap-1 border-0 bg-transparent p-0 text-ink-faint active:cursor-grabbing"
-				draggable="true"
-				ondragstart={(event) => startDrag(event, item)}
-				ondragend={endDrag}
-				aria-label={`Arrastrar ${getLabel(item)} para reordenar`}
-				title="Arrastrar para reordenar"
-			>
-				<GripVertical size={16} strokeWidth={1.6} aria-hidden="true" />
+			{#if reorderable}
+				<button
+					type="button"
+					class="flex cursor-grab items-center gap-1 border-0 bg-transparent p-0 text-ink-faint active:cursor-grabbing"
+					draggable="true"
+					ondragstart={(event) => startDrag(event, item)}
+					ondragend={endDrag}
+					aria-label={`Arrastrar ${getLabel(item)} para reordenar`}
+					title="Arrastrar para reordenar"
+				>
+					<GripVertical size={16} strokeWidth={1.6} aria-hidden="true" />
+					<span class="font-mono text-[0.65rem]">{String(index + 1).padStart(2, '0')}</span>
+				</button>
+			{:else}
 				<span class="font-mono text-[0.65rem]">{String(index + 1).padStart(2, '0')}</span>
-			</button>
+			{/if}
 			<div class="min-w-0">{@render children(item, index)}</div>
 			<div class="flex items-center gap-2 max-[700px]:col-start-2 max-[700px]:justify-end">
-				<div class="flex gap-px">
-					<Button type="button" variant="ghost" size="icon" disabled={index === 0} onclick={() => moveBy(index, -1)} aria-label={`Subir ${getLabel(item)}`} title="Subir"><ChevronUp size={16} /></Button>
-					<Button type="button" variant="ghost" size="icon" disabled={index === items.length - 1} onclick={() => moveBy(index, 1)} aria-label={`Bajar ${getLabel(item)}`} title="Bajar"><ChevronDown size={16} /></Button>
-				</div>
+				{#if reorderable}
+					<div class="flex gap-px">
+						<Button type="button" variant="ghost" size="icon" disabled={index === 0} onclick={() => moveBy(index, -1)} aria-label={`Subir ${getLabel(item)}`} title="Subir"><ChevronUp size={16} /></Button>
+						<Button type="button" variant="ghost" size="icon" disabled={index === items.length - 1} onclick={() => moveBy(index, 1)} aria-label={`Bajar ${getLabel(item)}`} title="Bajar"><ChevronDown size={16} /></Button>
+					</div>
+				{/if}
 				{#if actions}{@render actions(item, index)}{/if}
 			</div>
 		</li>

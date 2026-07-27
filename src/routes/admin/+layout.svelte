@@ -3,32 +3,18 @@
 	import type { LayoutData } from './$types';
 	import type { Snippet } from 'svelte';
 	import '$lib/styles/admin.css';
-	import ThemeToggle from '$lib/components/admin/ThemeToggle.svelte';
-	import Button from '$lib/components/ui/Button.svelte';
+	import SiteControls from '$lib/components/SiteControls.svelte';
 
 	let { children, data }: { children: Snippet; data: LayoutData } = $props();
 
-	const groups = [
-		{
-			label: 'Gestión',
-			links: [
-				{ href: '/admin', label: 'Resumen' },
-				{ href: '/admin/actividad', label: 'Actividad' },
-				{ href: '/admin/portfolio', label: 'Portfolio' }
-			]
-		},
-		{
-			label: 'CV',
-			links: [
-				{ href: '/admin/entradas', label: 'Entradas' },
-				{ href: '/admin/eventos', label: 'Eventos' },
-				{ href: '/admin/documentos', label: 'Documentos' }
-			]
-		},
-		{
-			label: 'Control',
-			links: [{ href: '/admin/taxonomias', label: 'Taxonomías' }]
-		}
+	const links = [
+		{ href: '/admin', label: 'Resumen' },
+		{ href: '/admin/actividad', label: 'Actividad' },
+		{ href: '/admin/portfolio', label: 'Portfolio' },
+		{ href: '/admin/entradas', label: 'Entradas' },
+		{ href: '/admin/eventos', label: 'Eventos' },
+		{ href: '/admin/documentos', label: 'Documentos' },
+		{ href: '/admin/taxonomias', label: 'Taxonomías' }
 	];
 
 	const isCurrent = (href: string) =>
@@ -41,56 +27,56 @@
 
 <div class="admin-shell min-h-screen bg-canvas font-mono text-ink">
 	<header
-		class="sticky top-0 z-[100] flex flex-wrap items-stretch gap-[clamp(1.25rem,3vw,2.5rem)] border-b border-rule bg-[var(--surface-glass)] px-gutter py-[0.7rem] backdrop-blur-[14px] max-[980px]:gap-4 max-[620px]:px-4"
+		class="sticky top-0 z-[100] border-b border-rule bg-[var(--surface-glass)] py-2 backdrop-blur-[14px]"
 	>
-		<a
-			class="grid min-w-18 content-center leading-none text-ink"
-			href="/admin"
-			aria-label="Ir al resumen del dashboard"
+		<div
+			class="mx-auto flex w-[calc(100%-2*var(--gutter))] max-w-[88rem] flex-wrap items-center gap-x-[clamp(1.25rem,3vw,2.5rem)] gap-y-2 max-[720px]:w-[calc(100%-2rem)]"
 		>
-			<span class="font-title text-[1.15rem] font-medium">DMR</span>
-			<small class="mt-1 text-[0.58rem] tracking-[0.12em] text-ink-faint uppercase"
-				>cv/admin</small
-			>
-		</a>
-		<nav
-			class="flex items-stretch gap-[clamp(1rem,2.5vw,2rem)] max-[980px]:order-3 max-[980px]:w-full max-[980px]:overflow-x-auto max-[980px]:pt-1"
-			aria-label="Secciones del dashboard"
-		>
-			{#each groups as group (group.label)}
-				<div class="grid content-center gap-[0.22rem]">
-					<span class="text-[0.55rem] tracking-[0.14em] text-ink-faint uppercase"
-						>{group.label}</span
-					>
-					<div class="flex gap-3">
-						{#each group.links as link (link.href)}
-							<a
-								class="border-b border-transparent pb-[0.2rem] text-[0.72rem] text-ink-dim hover:border-accent-strong hover:text-accent-strong aria-[current=page]:border-accent-strong aria-[current=page]:text-accent-strong"
-								href={link.href}
-								data-sveltekit-preload-data="off"
-								aria-current={isCurrent(link.href) ? 'page' : undefined}
-							>
-								{link.label}
-							</a>
-						{/each}
-					</div>
-				</div>
-			{/each}
-		</nav>
-		<div class="ml-auto flex items-center gap-2.5">
-			<ThemeToggle />
 			<a
-				href="/es"
-				class="text-[0.68rem] text-ink-dim hover:text-accent-strong max-[620px]:hidden"
-				>Web pública ↗</a
+				class="inline-flex min-w-0 items-center whitespace-nowrap font-title text-[1.02rem] font-normal leading-[1.1] text-ink hover:text-accent-strong"
+				href="/admin"
+				aria-label="Ir al resumen del dashboard"
 			>
-			<span
-				class="max-w-32 overflow-hidden text-[0.65rem] text-ellipsis whitespace-nowrap text-ink-faint max-[620px]:hidden"
-				title={data.session?.user?.name ?? 'admin'}>{data.session?.user?.name ?? 'admin'}</span
+				CV/admin
+			</a>
+			<nav
+				class="meta flex min-w-0 items-center gap-[clamp(0.85rem,1.7vw,1.65rem)] max-[1080px]:order-3 max-[1080px]:w-full max-[1080px]:overflow-x-auto max-[1080px]:border-t max-[1080px]:border-rule max-[1080px]:pt-2 max-[1080px]:pb-0.5"
+				aria-label="Secciones del dashboard"
 			>
-			<form method="POST" action="/admin?/salir">
-				<Button type="submit" size="sm">Salir</Button>
-			</form>
+				{#each links as link, index (link.href)}
+					<a
+						class="inline-flex shrink-0 items-baseline gap-[0.42rem] text-ink-dim hover:text-accent-strong aria-[current=page]:text-accent-strong"
+						href={link.href}
+						data-sveltekit-preload-data="off"
+						aria-current={isCurrent(link.href) ? 'page' : undefined}
+					>
+						<span class="text-[0.58rem] tracking-normal text-accent" aria-hidden="true">
+							{String(index + 1).padStart(2, '0')}
+						</span>
+						{link.label}
+					</a>
+				{/each}
+			</nav>
+			<div class="ml-auto flex items-center gap-[clamp(0.7rem,1.5vw,1.2rem)]">
+				<SiteControls showLanguage={false} />
+				<a
+					href="/es"
+					class="meta text-ink-dim hover:text-accent-strong max-[620px]:hidden"
+					>Web ↗</a
+				>
+				<span
+					class="max-w-28 overflow-hidden text-[0.6rem] text-ellipsis whitespace-nowrap text-ink-faint max-[760px]:hidden"
+					title={data.session?.user?.name ?? 'admin'}>{data.session?.user?.name ?? 'admin'}</span
+				>
+				<form method="POST" action="/admin?/salir">
+					<button
+						class="meta cursor-pointer border-0 bg-transparent p-0 text-ink-dim hover:text-accent-strong"
+						type="submit"
+					>
+						Salir
+					</button>
+				</form>
+			</div>
 		</div>
 	</header>
 	<main

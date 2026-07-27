@@ -8,9 +8,97 @@ export const profile = {
 	name: 'David Merino Recalde',
 	initials: 'DMR',
 	role: {
-		es: 'Investigador Predoctoral en Formación · PROLOPE · Universitat Autònoma de Barcelona',
-		en: 'Predoctoral Researcher · PROLOPE · Universitat Autònoma de Barcelona'
-	} as Bi<string>,
+		es: {
+			title: 'Personal investigador en formación',
+			department: 'Departamento de Filología Española',
+			institution: 'Universitat Autònoma de Barcelona',
+			funding: 'Contrato predoctoral FI–Joan Oró · AGAUR'
+		},
+		en: {
+			title: 'Doctoral Researcher',
+			department: 'Department of Spanish Philology',
+			institution: 'Universitat Autònoma de Barcelona',
+			funding: 'FI Joan Oró Fellow · AGAUR'
+		}
+	} as Bi<{ title: string; department: string; institution: string; funding: string }>,
+	currentAffiliations: {
+		es: [
+			{
+				name: 'PROLOPE',
+				url: 'https://prolope.uab.cat/',
+				role: 'Miembro del equipo',
+				context: 'Grupo de investigación · Universitat Autònoma de Barcelona',
+				project: {
+					title: 'La integral dramática de Lope de Vega: textos, métodos, problemas, proyección (II)',
+					code: 'PID2024-155584NB-I00'
+				}
+			},
+			{
+				name: 'METADRAMA',
+				url: 'https://www.ub.edu/metadrama/',
+				role: 'Miembro del equipo',
+				context: 'Aula de teatro y grupo de investigación · Universitat de Barcelona',
+				project: {
+					title: 'Teatro áureo en diacronía: estudio, edición y puesta en escena del verso clásico',
+					code: 'PID2024-161481NB-I00'
+				}
+			},
+			{
+				name: 'Humanidades Digitales Hispánicas',
+				url: 'https://humanidadesdigitaleshispanicas.es/',
+				role: 'Vocal de la Junta Directiva · Comunicación y difusión',
+				context: 'Desde 2021'
+			},
+			{
+				name: 'Anuario Lope de Vega',
+				url: 'https://revistes.uab.cat/anuariolopedevega/',
+				role: 'Editor de la sección de reseñas',
+				context: 'Desde 2024 · Universitat Autònoma de Barcelona'
+			}
+		],
+		en: [
+			{
+				name: 'PROLOPE',
+				url: 'https://prolope.uab.cat/',
+				role: 'Team member',
+				context: 'Research group · Universitat Autònoma de Barcelona',
+				project: {
+					title: 'La integral dramática de Lope de Vega: textos, métodos, problemas, proyección (II)',
+					code: 'PID2024-155584NB-I00'
+				}
+			},
+			{
+				name: 'METADRAMA',
+				url: 'https://www.ub.edu/metadrama/',
+				role: 'Team member',
+				context: 'Theatre laboratory and research group · Universitat de Barcelona',
+				project: {
+					title: 'Teatro áureo en diacronía: estudio, edición y puesta en escena del verso clásico',
+					code: 'PID2024-161481NB-I00'
+				}
+			},
+			{
+				name: 'Humanidades Digitales Hispánicas',
+				url: 'https://humanidadesdigitaleshispanicas.es/',
+				role: 'Board member · Communications and outreach',
+				context: 'Since 2021'
+			},
+			{
+				name: 'Anuario Lope de Vega',
+				url: 'https://revistes.uab.cat/anuariolopedevega/',
+				role: 'Reviews Editor',
+				context: 'Since 2024 · Universitat Autònoma de Barcelona'
+			}
+		]
+	} as Bi<
+		Array<{
+			name: string;
+			url: string;
+			role: string;
+			context: string;
+			project?: { title: string; code: string };
+		}>
+	>,
 	location: { es: 'Barcelona, España', en: 'Barcelona, Spain' } as Bi<string>,
 	timezone: { label: 'BARCELONA GMT+1', tz: 'Europe/Madrid' },
 	areas: {

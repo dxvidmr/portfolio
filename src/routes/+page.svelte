@@ -9,6 +9,7 @@
 	import { profile, t } from '$lib/content/profile';
 	import { entityLabel } from '$lib/content/labels';
 	import AcademicPath from '$lib/components/AcademicPath.svelte';
+	import CurrentAffiliations from '$lib/components/CurrentAffiliations.svelte';
 	import EntryMetadata from '$lib/components/EntryMetadata.svelte';
 	import MobileMenu from '$lib/components/MobileMenu.svelte';
 	import SelectedWorks from '$lib/components/SelectedWorks.svelte';
@@ -34,6 +35,7 @@
 	let wordMotions = $state<Array<{ dx: number; dy: number; scale: number }>>([]);
 	let subtextOffset = $state(0);
 	const locale = $derived(localeFromPathname(page.url.pathname));
+	const currentRole = $derived(t(profile.role, locale));
 	const projectModalOpen = $derived(
 		typeof (page.state as Record<string, unknown>)?.portfolioModal === 'string' ||
 			/\/portfolio\/[^/]+\/?$/.test(page.url.pathname)
@@ -438,7 +440,7 @@
 							aria-hidden="true"
 						/>
 					</div>
-					<figcaption class="mt-2.5 grid grid-cols-[minmax(0,1fr)_auto] items-start gap-4">
+					<figcaption class="mt-2.5 grid gap-4">
 						<span class="flex min-w-0 items-center gap-2 font-mono text-[.62rem] tracking-meta uppercase">
 							<button
 								class={`cursor-pointer border-0 border-b bg-transparent p-0 pb-0.5 font-mono font-semibold tracking-meta uppercase [transition:color_700ms_ease,border-color_700ms_ease] ${activePortrait === 'researcher' ? 'border-accent-strong text-accent-strong' : 'border-transparent text-ink-faint'}`}
@@ -458,17 +460,23 @@
 								aria-pressed={portraitMode === 'performer'}
 							>{ui.portraitPerformer}</button>
 						</span>
-						<span class="pt-px text-right font-mono text-[.56rem] tracking-[.14em] whitespace-nowrap text-ink-faint uppercase opacity-80 max-[520px]:hidden">Barcelona</span>
+						<div class="mt-4 border-l-2 border-accent-strong pl-4">
+							<p class="m-0 max-w-[24ch] font-title text-[clamp(1.05rem,1.6vw,1.3rem)] leading-[1.2] text-ink">{currentRole.title}</p>
+							<p class="mt-2 mb-0 text-[.72rem] leading-[1.4] text-ink-dim">{currentRole.department}</p>
+							<p class="meta mt-1.5 mb-0 leading-[1.4] text-ink-faint">{currentRole.institution}</p>
+							<p class="mt-3 mb-0 border-t border-rule pt-3 text-[.66rem] leading-[1.4] text-accent-strong">{currentRole.funding}</p>
+						</div>
 					</figcaption>
 				</figure>
 
 				<div class="min-w-0 pt-[clamp(8px,2vw,28px)] max-[780px]:pt-0">
 					<p class="mt-0 mb-[clamp(26px,4vw,48px)] max-w-[36ch] font-title text-[clamp(1.35rem,2.2vw,2rem)] leading-[1.32] text-ink">{ui.aboutText}</p>
-					<ul class="mt-0 mb-[clamp(48px,7vw,84px)] flex list-none flex-wrap gap-x-3 gap-y-[7px] p-0 max-[520px]:gap-1.5">
+					<ul class="mt-0 mb-[clamp(34px,5vw,56px)] flex list-none flex-wrap gap-x-3 gap-y-[7px] p-0 max-[520px]:gap-1.5">
 						{#each t(profile.areas, locale) as area (area)}
 							<li class="inline-flex items-center gap-3 text-[.7rem] tracking-[.06em] text-ink-dim uppercase after:text-accent-strong after:content-['/'] last:after:content-none max-[520px]:rounded-full max-[520px]:border max-[520px]:border-rule max-[520px]:px-2.5 max-[520px]:py-1.5 max-[520px]:text-[.58rem] max-[520px]:after:hidden">{area}</li>
 						{/each}
 					</ul>
+					<CurrentAffiliations {locale} />
 					<AcademicPath {locale} />
 				</div>
 			</div>

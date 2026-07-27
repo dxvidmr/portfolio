@@ -6,6 +6,7 @@ import {
 	isEntityType,
 	type EntityType
 } from './entity-definitions';
+import type { ActivityOrderMode } from '$lib/server/activity-order';
 
 export type VisibilityFilter = 'all' | 'public' | 'draft';
 export type HomeFilter = 'all' | 'yes' | 'no';
@@ -191,11 +192,16 @@ export async function getAdminEntries(filters: EntryFilters): Promise<AdminEntry
 	return result.rows.map((row) => rowToEntry(row));
 }
 
-export async function getHomeEntries(): Promise<AdminEntry[]> {
+export async function getHomeEntries(orderMode: ActivityOrderMode): Promise<AdminEntry[]> {
+	const orderBy =
+		orderMode === 'manual'
+			? `control.home_order ASC, (source.sort_date IS NULL) ASC,
+			   source.sort_date DESC, source.title COLLATE NOCASE ASC`
+			: `(source.sort_date IS NULL) ASC, source.sort_date DESC,
+			   source.title COLLATE NOCASE ASC`;
 	const result = await db.execute(`${entrySelectSql}
 		WHERE COALESCE(control.show_home, 0) = 1
-		ORDER BY control.home_order ASC, (source.sort_date IS NULL) ASC,
-		         source.sort_date DESC, source.title COLLATE NOCASE ASC`);
+		ORDER BY ${orderBy}`);
 
 	return result.rows.map((row) => rowToEntry(row));
 }

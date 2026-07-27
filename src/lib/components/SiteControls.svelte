@@ -9,7 +9,13 @@
 
 	type Theme = 'light' | 'dark';
 
-	let { expanded = false }: { expanded?: boolean } = $props();
+	let {
+		expanded = false,
+		showLanguage = true
+	}: {
+		expanded?: boolean;
+		showLanguage?: boolean;
+	} = $props();
 	let theme = $state<Theme>('light');
 	const currentLocale = $derived(localeFromPathname(page.url.pathname));
 	const targetLocale = $derived(currentLocale === 'es' ? 'en' : 'es');
@@ -54,21 +60,23 @@
 
 <div
 	class={expanded
-		? 'grid grid-cols-2'
+		? `grid ${showLanguage ? 'grid-cols-2' : 'grid-cols-1'}`
 		: 'inline-flex items-center gap-px border-l border-rule-strong pl-2.5 max-[420px]:pl-1.5'}
 	aria-label={currentLocale === 'es' ? 'Controles del sitio' : 'Site controls'}
 >
-	<a
-		class={controlClass}
-		href={localizedPath(baseHref, targetLocale)}
-		aria-label={languageLabel}
-		title={languageLabel}
-	>
-		<span class="inline-flex items-center gap-2">
-			<Languages class={expanded ? '' : 'max-[420px]:hidden'} size={expanded ? 18 : 14} strokeWidth={1.8} aria-hidden="true" />
-		</span>
-		<span>{expanded ? (targetLocale === 'en' ? 'English' : 'Español') : targetLocale.toUpperCase()}</span>
-	</a>
+	{#if showLanguage}
+		<a
+			class={controlClass}
+			href={localizedPath(baseHref, targetLocale)}
+			aria-label={languageLabel}
+			title={languageLabel}
+		>
+			<span class="inline-flex items-center gap-2">
+				<Languages class={expanded ? '' : 'max-[420px]:hidden'} size={expanded ? 18 : 14} strokeWidth={1.8} aria-hidden="true" />
+			</span>
+			<span>{expanded ? (targetLocale === 'en' ? 'English' : 'Español') : targetLocale.toUpperCase()}</span>
+		</a>
+	{/if}
 	<button
 		class="{controlClass} {expanded ? '' : 'w-7 px-0 max-[420px]:w-6'}"
 		type="button"

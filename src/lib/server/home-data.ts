@@ -3,33 +3,45 @@ import { getPortfolioItems } from '$lib/server/portfolio-items';
 import { getPortfolioProjects } from '$lib/server/portfolio-projects';
 import { getPublicAdditionalLinks, groupPublicAdditionalLinks } from '$lib/server/public-links';
 import { entryMetadataFromRow, publicEntryMetadataSql } from '$lib/server/public-entry-metadata';
+import { getActivityOrderMode } from '$lib/server/activity-order';
 
 const nullable = (value: unknown) => (value == null ? null : String(value));
 const metadata = publicEntryMetadataSql('e');
 
 export async function getHomeData() {
+	const orderModePromise = getActivityOrderMode();
+	const recentPromise = db.execute(
+		`SELECT e.entity_type, e.entity_id, e.title_cache AS title, e.sort_date,
+		        ${metadata.select}
+		 FROM entries e
+		 ${metadata.joins}
+		 WHERE e.public = 1
+		 ORDER BY (e.sort_date IS NULL) ASC, e.sort_date DESC
+		 LIMIT 8`
+	);
+	const portfolioItemsPromise = getPortfolioItems();
+	const portfolioProjectsPromise = getPortfolioProjects({ publicOnly: true });
+	const publicLinksPromise = getPublicAdditionalLinks();
+	const activityOrderMode = await orderModePromise;
+	const activityOrder =
+		activityOrderMode === 'manual'
+			? `e.sort_order ASC, (e.sort_date IS NULL) ASC, e.sort_date DESC`
+			: `(e.sort_date IS NULL) ASC, e.sort_date DESC, e.title_cache COLLATE NOCASE ASC`;
+	const homePromise = db.execute(
+		`SELECT e.entity_type, e.entity_id, e.title_cache AS title, e.sort_date,
+		        ${metadata.select}
+		 FROM entries e
+		 ${metadata.joins}
+		 WHERE e.public = 1
+		   AND e.show_home = 1
+		 ORDER BY ${activityOrder}`
+	);
 	const [recentRes, homeRes, portfolioItems, portfolioProjects, publicLinks] = await Promise.all([
-		db.execute(
-			`SELECT e.entity_type, e.entity_id, e.title_cache AS title, e.sort_date,
-			        ${metadata.select}
-			 FROM entries e
-			 ${metadata.joins}
-			 WHERE e.public = 1
-			 ORDER BY (e.sort_date IS NULL) ASC, e.sort_date DESC
-			 LIMIT 8`
-		),
-		db.execute(
-			`SELECT e.entity_type, e.entity_id, e.title_cache AS title, e.sort_date,
-			        ${metadata.select}
-			 FROM entries e
-			 ${metadata.joins}
-			 WHERE e.public = 1
-			   AND e.show_home = 1
-			 ORDER BY e.sort_order ASC, (e.sort_date IS NULL) ASC, e.sort_date DESC`
-		),
-		getPortfolioItems(),
-		getPortfolioProjects({ publicOnly: true }),
-		getPublicAdditionalLinks()
+		recentPromise,
+		homePromise,
+		portfolioItemsPromise,
+		portfolioProjectsPromise,
+		publicLinksPromise
 	]);
 
 	const linksByEntry = groupPublicAdditionalLinks(publicLinks);

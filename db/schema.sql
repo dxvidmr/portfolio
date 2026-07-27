@@ -38,6 +38,15 @@ CREATE INDEX idx_entry_controls_home
 CREATE INDEX idx_entry_controls_cv
   ON entry_controls(is_public, featured_cv, cv_order);
 
+CREATE TABLE site_settings (
+  key TEXT PRIMARY KEY,
+  value TEXT NOT NULL,
+  updated_at TEXT NOT NULL DEFAULT (datetime('now'))
+);
+
+INSERT INTO site_settings (key, value)
+VALUES ('activity_order_mode', 'date');
+
 CREATE TABLE education (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
   degree_title TEXT NOT NULL,
