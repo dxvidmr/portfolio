@@ -1,0 +1,10 @@
+/* Page geometry and counters are shared by preview and historical deliveries. */
+@media print {
+  .editorial-cursor { display: none !important; }
+  @page {
+    size: 210mm 297mm;
+    margin: 0;
+  }
+  html, body { width: 210mm; margin: 0 !important; padding: 0 !important; }
+  .admin-shell { min-height: 0 !important; }
+}

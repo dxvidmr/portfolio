@@ -1,0 +1,93 @@
+/* Parsed by Paged.js. Both the screen sheets and the PDF use this page geometry. */
+@page {
+  size: 210mm 297mm;
+  margin: 16mm 17mm 18mm;
+  @bottom-right {
+    content: counter(page);
+    font-family: "CV JetBrains Mono", monospace;
+    font-size: 8pt;
+    color: #50534d;
+  }
+}
+.cv-document {
+  width: 176mm;
+  max-width: none;
+  padding: 0;
+  margin: 0;
+  box-shadow: none;
+  color: #171916;
+  font-family: "Public Sans", Arial, sans-serif;
+}
+.cv-document header { margin-bottom: 7mm; padding-bottom: 5mm; }
+.cv-document h1 { font-size: 29pt; }
+.cv-document .cv-heading { display: block; font-size: 16pt; break-after: avoid; margin-bottom: 4mm; }
+.cv-document .cv-index { margin-right: 3mm; }
+.cv-document .cv-selection-label { font-size: 7pt; margin: 0 0 1mm; break-after: avoid; }
+.cv-document .cv-section-header { break-inside: avoid; break-after: avoid; }
+.cv-document .cv-section { margin-top: 6mm; }
+.cv-document .cv-section-brief { break-inside: avoid; }
+.cv-document .cv-entry { break-inside: avoid; margin: 4mm 0; }
+.cv-document .cv-entry h3 { font-size: 12pt; }
+.cv-document .cv-entry-brief { margin: 2.5mm 0; }
+.cv-document .cv-entry-brief + .cv-entry-brief { border-top: 0.5pt solid #e1e3df; padding-top: 2.5mm; }
+.cv-document .cv-entry .cv-brief-title { font-size: 10pt; }
+.cv-document .cv-brief-period { font-size: 7.5pt; }
+.cv-document .cv-brief-detail { font-size: 8pt; }
+.cv-document .cv-prose { font-size: 10.5pt; line-height: 1.5; }
+.cv-document .cv-prose p, .cv-document .cv-prose li { widows: 3; orphans: 3; }
+.cv-document .cv-position { font-size: 11pt; }
+.cv-document .cv-contact, .cv-document .cv-email { font-size: 9pt; }
+.cv-document .cv-date { font-size: 8pt; }
+.cv-document .cv-detail, .cv-document .cv-description, .cv-document .cv-talk-authors,
+.cv-document .cv-talk-context, .cv-document .cv-project-context, .cv-document .cv-project-reference { font-size: 9pt; }
+.cv-document .cv-reference { font-size: 9.5pt; line-height: 1.55; padding-left: 4mm; text-indent: -4mm; }
+.cv-document .cv-reference-title { font-size: 11pt; }
+.cv-document .cv-reference-link { font-size: 7pt; }
+.cv-document .cv-entry[data-entry-type="publications"] { margin: 3.5mm 0; }
+.cv-document .cv-session { font-size: 8.5pt; }
+.cv-document .cv-talk-type { font-size: 8pt; }
+.cv-document .cv-project-code { font-size: 8pt; }
+.cv-document .cv-project-role-label { font-size: 7.5pt; }
+.cv-document .cv-project-period { font-size: 8.5pt; }
+.cv-document .cv-entry[data-entry-type="projects"] + .cv-entry[data-entry-type="projects"] { border-top: 0.5pt solid #e1e3df; padding-top: 3mm; }
+.cv-document .cv-link { font-size: 8pt; }
+.cv-document .cv-entry .cv-technical-title { font-size: 11.5pt; }
+.cv-document .cv-technical-context { font-size: 8.5pt; }
+.cv-document .cv-technical-background { font-size: 8pt; }
+.cv-document .cv-entry[data-entry-type="technical_works"] { margin: 3mm 0; }
+.cv-document .cv-technical-card { padding: 3mm; background: #f3f3ef; }
+.cv-document .cv-technical-contribution .cv-prose { font-size: 9pt; line-height: 1.45; }
+.cv-document .cv-technical-contribution .cv-prose p { margin: 0; }
+.cv-document .cv-technical-link { font-size: 7.5pt; }
+.cv-document .cv-education-entry { break-inside: avoid; padding: 2.5mm 0 2.5mm 6mm; }
+.cv-document .cv-education-entry::after { top: 4.5mm; }
+.cv-document .cv-education-row { grid-template-columns: 24mm minmax(0, 1fr); gap: 3mm; }
+.cv-document .cv-education-period { font-size: 8pt; }
+.cv-document .cv-education-date-label { font-size: 7pt; }
+.cv-document .cv-education-title { font-size: 12pt; }
+.cv-document .cv-education-qualifier { font-size: 9pt; }
+.cv-document .cv-education-institution { font-size: 9pt; }
+.cv-document .cv-funding-row { grid-template-columns: 20mm minmax(0, 1fr); gap: 4mm; }
+.cv-document .cv-entry .cv-funding-title { font-size: 11pt; }
+.cv-document .cv-funding-year { font-size: 9pt; }
+.cv-document .cv-funding-type { font-size: 7pt; }
+.cv-document .cv-funding-body { font-size: 8.5pt; }
+.cv-document .cv-funding-amount { font-size: 8pt; }
+.cv-document .cv-funding-context { font-size: 8pt; }
+.cv-document .cv-entry[data-entry-type="funding_awards"] { margin: 3mm 0; }
+.cv-document .cv-entry[data-entry-type="funding_awards"] + .cv-entry[data-entry-type="funding_awards"] { border-top: 0.5pt solid #e1e3df; padding-top: 3mm; }
+.cv-document .cv-contribution .cv-prose { font-size: 9pt; }
+.cv-document .cv-contribution .cv-prose p, .cv-document .cv-contribution .cv-prose ul { margin: 1.5mm 0; }
+.cv-document .cv-kicker, .cv-document .cv-index { font-size: 7.5pt; }
+.cv-document .cv-skill-area { margin-top: 3mm; padding: 3mm; background: #f3f3ef; }
+.cv-document .cv-skill-area-title { font-size: 12pt; margin-bottom: 2mm; break-after: avoid; }
+.cv-document .cv-skill-area-compact { break-inside: avoid; }
+.cv-document .cv-skill-area-compact .cv-skill-area-title { font-size: 10.5pt; }
+.cv-document .cv-skill-names { padding: 0; }
+.cv-document .cv-skill-name { font-size: 9pt; padding-top: 1.3mm; padding-bottom: 1.3mm; }
+.cv-document .cv-skill-name:last-child { padding-bottom: 0; }
+.cv-document .cv-skill-title { font-size: 10pt; }
+.cv-document .cv-skill-item { break-inside: avoid; margin: 0; padding: 2mm 0; border-top: 0.5pt solid #d2d9ce; }
+.cv-document .cv-skill-description .cv-prose { font-size: 8.5pt; line-height: 1.4; }
+.cv-document .cv-skill-description .cv-prose p { margin: 0; }
+.cv-document .cv-skill-resources { font-size: 7pt; }

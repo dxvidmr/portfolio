@@ -34,11 +34,16 @@
 	},
 	"dependencies": {
 		"@auth/sveltekit": "^1.11.2",
+		"@fontsource/fraunces": "^5.3.0",
 		"@fontsource/jetbrains-mono": "^5.2.8",
 		"@fontsource/newsreader": "^5.2.10",
+		"@fontsource/public-sans": "^5.3.0",
 		"@fortawesome/fontawesome-free": "^7.3.0",
 		"@libsql/client": "^0.17.4",
 		"@lucide/svelte": "^1.23.0",
-		"academicons": "github:jpswalsh/academicons#v1.9.4"
+		"@sparticuz/chromium": "^153.0.0",
+		"academicons": "github:jpswalsh/academicons#v1.9.4",
+		"pagedjs": "^0.4.3",
+		"puppeteer-core": "^25.12.0"
 	}
 }

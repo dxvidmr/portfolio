@@ -1,0 +1,17 @@
+/* Static, self-hosted faces shared by the preview and the PDF. Separate names
+   prevent the site's remote variable font from replacing these faces. */
+@font-face { font-family: 'CV Fraunces'; font-style: normal; font-weight: 400; font-display: block; src: url('@fontsource/fraunces/files/fraunces-latin-400-normal.woff2') format('woff2'); }
+@font-face { font-family: 'CV Fraunces'; font-style: normal; font-weight: 500; font-display: block; src: url('@fontsource/fraunces/files/fraunces-latin-500-normal.woff2') format('woff2'); }
+@font-face { font-family: 'CV Fraunces'; font-style: normal; font-weight: 600; font-display: block; src: url('@fontsource/fraunces/files/fraunces-latin-600-normal.woff2') format('woff2'); }
+@font-face { font-family: 'CV Fraunces'; font-style: normal; font-weight: 700; font-display: block; src: url('@fontsource/fraunces/files/fraunces-latin-700-normal.woff2') format('woff2'); }
+@font-face { font-family: 'CV Fraunces'; font-style: italic; font-weight: 400; font-display: block; src: url('@fontsource/fraunces/files/fraunces-latin-400-italic.woff2') format('woff2'); }
+@font-face { font-family: 'CV JetBrains Mono'; font-style: normal; font-weight: 400; font-display: block; src: url('@fontsource/jetbrains-mono/files/jetbrains-mono-latin-400-normal.woff') format('woff'); }
+@font-face { font-family: 'CV JetBrains Mono'; font-style: normal; font-weight: 500; font-display: block; src: url('@fontsource/jetbrains-mono/files/jetbrains-mono-latin-500-normal.woff') format('woff'); }
+@font-face { font-family: 'CV JetBrains Mono'; font-style: normal; font-weight: 600; font-display: block; src: url('@fontsource/jetbrains-mono/files/jetbrains-mono-latin-600-normal.woff') format('woff'); }
+@font-face { font-family: 'CV JetBrains Mono'; font-style: normal; font-weight: 700; font-display: block; src: url('@fontsource/jetbrains-mono/files/jetbrains-mono-latin-700-normal.woff') format('woff'); }
+.cv-document {
+  --font-editorial: 'CV Fraunces', serif;
+  --font-code: 'CV JetBrains Mono', monospace;
+  font-synthesis: none;
+}
+.cv-pages { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
