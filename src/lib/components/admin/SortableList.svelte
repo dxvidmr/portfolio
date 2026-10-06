@@ -43,6 +43,7 @@
 
 	const startDrag = (event: DragEvent, item: T) => {
 		if (!reorderable) return;
+		event.stopPropagation();
 		draggedKey = getKey(item);
 		if (event.dataTransfer) {
 			event.dataTransfer.effectAllowed = 'move';
@@ -52,6 +53,7 @@
 
 	const updateDropTarget = (event: DragEvent, index: number) => {
 		if (!reorderable || !draggedKey) return;
+		event.stopPropagation();
 		event.preventDefault();
 		if (event.dataTransfer) event.dataTransfer.dropEffect = 'move';
 		const rect = (event.currentTarget as HTMLElement).getBoundingClientRect();
@@ -60,6 +62,7 @@
 
 	const drop = (event: DragEvent) => {
 		if (!reorderable) return;
+		event.stopPropagation();
 		event.preventDefault();
 		if (!draggedKey || !dropTarget) return;
 		const fromIndex = items.findIndex((item) => getKey(item) === draggedKey);

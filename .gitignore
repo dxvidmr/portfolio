@@ -30,3 +30,7 @@ tmp
 
 # Respaldo de Turso (datos personales, nunca al repo)
 backups/
+
+# CV export profiles, narrative drafts and generated personal documents
+/cv-profiles/
+/output/pdf/

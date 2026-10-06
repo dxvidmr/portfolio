@@ -12,6 +12,8 @@
 		{ href: '/admin/actividad', label: 'Actividad' },
 		{ href: '/admin/portfolio', label: 'Portfolio' },
 		{ href: '/admin/entradas', label: 'Entradas' },
+		{ href: '/admin/competencias', label: 'Competencias' },
+		{ href: '/admin/cv', label: 'Mis CV' },
 		{ href: '/admin/eventos', label: 'Eventos' },
 		{ href: '/admin/documentos', label: 'Documentos' },
 		{ href: '/admin/taxonomias', label: 'Taxonomías' }
