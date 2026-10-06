@@ -157,7 +157,10 @@ const vocabConsumers: Array<{ table: string; column: string; domain: string; nul
 	{ table: 'teaching', column: 'teaching_type', domain: 'teaching_type', nullable: false },
 	{ table: 'service_activities', column: 'activity_type', domain: 'activity_type', nullable: false },
 	{ table: 'funding_awards', column: 'award_type', domain: 'award_type', nullable: true },
-	{ table: 'projects', column: 'project_type', domain: 'project_type', nullable: true },
+	{ table: 'projects', column: 'programme_code', domain: 'project_programme', nullable: true },
+	{ table: 'projects', column: 'nature', domain: 'project_nature', nullable: true },
+	{ table: 'technical_works', column: 'work_type', domain: 'technical_work_type', nullable: true },
+	{ table: 'technical_works', column: 'modality', domain: 'technical_modality', nullable: true },
 	{ table: 'academic_works', column: 'work_type', domain: 'work_type', nullable: false },
 	{ table: 'projects', column: 'role', domain: 'project_role', nullable: true },
 	{ table: 'service_activities', column: 'role', domain: 'service_role', nullable: true },
@@ -243,6 +246,24 @@ await expectZero(
 );
 
 // ── Enlaces y documentos (decisiones 22 y Fase 5D) ───────────────────────────
+
+await expectZero('trabajos técnicos con proyecto existente',
+  `SELECT COUNT(*) FROM technical_works t WHERE t.project_id IS NOT NULL
+   AND NOT EXISTS(SELECT 1 FROM projects p WHERE p.id=t.project_id)`);
+await expectZero('contexto técnico vinculado sin duplicación manual',
+  `SELECT COUNT(*) FROM technical_works WHERE project_id IS NOT NULL AND
+   (context_name IS NOT NULL OR context_code IS NOT NULL OR context_programme IS NOT NULL
+    OR context_funding_body IS NOT NULL OR context_institution IS NOT NULL OR context_responsibles IS NOT NULL)`);
+await expectZero('categorías de equipo específicas de Generación de Conocimiento',
+  `SELECT COUNT(*) FROM projects WHERE role IN ('research_team_member','working_team_member')
+   AND COALESCE(programme_code,'')<>'generation_knowledge'`);
+await expectZero('alias de convocatoria compatible con la web anterior',
+  `SELECT COUNT(*) FROM projects WHERE project_type IS NOT programme_code`);
+await expectZero('selecciones de CV sin referencias huérfanas',
+  `SELECT COUNT(*) FROM cv_block_entries c WHERE NOT EXISTS(SELECT 1 FROM entry_source e
+   WHERE e.entity_type=c.entity_type AND e.entity_id=c.entity_id)`);
+await expectZero('periodos técnicos coherentes',
+  `SELECT COUNT(*) FROM technical_works WHERE date_start IS NOT NULL AND date_end IS NOT NULL AND date_end<date_start`);
 
 await expectZero(
 	'como máximo un enlace destacado por entrada',

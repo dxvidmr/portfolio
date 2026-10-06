@@ -16,6 +16,8 @@
 		wide?: boolean;
 		advanced?: boolean;
 		hidden?: boolean;
+		choices?: Array<{ value: string; label: string }>;
+		optionConditions?: Record<string, { field: string; values: string[] }>;
 	}
 
 	interface FieldGroup {
@@ -70,6 +72,10 @@
 			dirty = true;
 			const target = event.target;
 			if (!(target instanceof HTMLInputElement || target instanceof HTMLSelectElement || target instanceof HTMLTextAreaElement)) return;
+			if (fields.find(field=>field.name===target.name)?.kind === 'fk_multi') {
+				currentValues[target.name] = new FormData(target.form!).getAll(target.name).map(String).join(',');
+				return;
+			}
 			currentValues[target.name] = target instanceof HTMLInputElement && target.type === 'checkbox'
 				? target.checked
 					? '1'

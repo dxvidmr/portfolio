@@ -6,7 +6,8 @@ type StructuralEntityType =
 	| 'publications'
 	| 'academic_works'
 	| 'talks'
-	| 'teaching';
+	| 'teaching'
+	| 'technical_works';
 
 export interface StructuralRelationItem {
 	entityType: StructuralEntityType;
@@ -25,6 +26,7 @@ export interface StructuralRelationGroup {
 }
 
 const projectGroups: Array<Omit<StructuralRelationGroup, 'items'>> = [
+	{ entityType: 'technical_works', label: 'Trabajos técnicos y profesionales', description: 'Trabajos realizados dentro de tu participación en este proyecto.' },
 	{
 		entityType: 'publications',
 		label: 'Publicaciones',
@@ -77,7 +79,8 @@ export async function getStructuralRelations(entry: EntryKey): Promise<Structura
 			FROM talks WHERE project_id = ?
 			UNION ALL
 			SELECT 'teaching', id, 3
-			FROM teaching WHERE project_id = ?`
+			FROM teaching WHERE project_id = ?
+			UNION ALL SELECT 'technical_works', technical_work_id, 4 FROM technical_work_projects WHERE project_id = ?`
 		: isEvent
 			? `SELECT 'publications' AS entity_type, id AS entity_id, 1 AS group_order
 				FROM publications WHERE event_id = ?`
@@ -85,7 +88,7 @@ export async function getStructuralRelations(entry: EntryKey): Promise<Structura
 				FROM academic_works WHERE education_id = ?`;
 
 	const args = isProject
-		? [entry.entityId, entry.entityId, entry.entityId]
+		? [entry.entityId, entry.entityId, entry.entityId, entry.entityId]
 		: [entry.entityId];
 	const result = await db.execute({
 		sql: `WITH related AS (${relationSql})

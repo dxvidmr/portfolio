@@ -4,6 +4,7 @@ import type { Locale } from '$lib/paraglide/runtime';
 // separado del de UI (paraglide). Aquí: entity_type de `entries`.
 const entityTypeLabels: Record<string, { es: string; en: string }> = {
 	projects: { es: 'Proyecto', en: 'Project' },
+	technical_works: { es: 'Trabajo técnico y profesional', en: 'Technical and professional work' },
 	publications: { es: 'Publicación', en: 'Publication' },
 	academic_works: { es: 'Trabajo académico', en: 'Academic work' },
 	talks: { es: 'Comunicación', en: 'Talk' },

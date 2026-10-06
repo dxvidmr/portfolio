@@ -55,6 +55,12 @@ export const emptyEntryFilters: EntryFilters = {
 };
 
 const relationCountSql = `
+  (SELECT COUNT(*) FROM skill_evidence_links sl WHERE sl.entity_type=source.entity_type AND sl.entity_id=source.entity_id)
+  + CASE WHEN source.entity_type='skills' THEN
+    (SELECT COUNT(*) FROM skill_evidence_links sl WHERE sl.skill_id=source.entity_id)
+    +(SELECT COUNT(*) FROM skill_resource_links sl WHERE sl.skill_id=source.entity_id)
+    +(SELECT COUNT(*) FROM skill_portfolio_links sl WHERE sl.skill_id=source.entity_id)
+    ELSE 0 END +
 	(SELECT COUNT(*) FROM portfolio_items AS pi
 	 WHERE pi.entity_type = source.entity_type AND pi.entity_id = source.entity_id)
 	+ (SELECT COUNT(*) FROM entity_tags AS et
@@ -90,6 +96,9 @@ const relationCountSql = `
 	      (SELECT COUNT(*) FROM publications WHERE project_id = source.entity_id)
 	      + (SELECT COUNT(*) FROM talks WHERE project_id = source.entity_id)
 	      + (SELECT COUNT(*) FROM teaching WHERE project_id = source.entity_id)
+	      + (SELECT COUNT(*) FROM technical_work_projects WHERE project_id = source.entity_id)
+	    WHEN 'technical_works' THEN
+	      (SELECT CASE WHEN project_id IS NULL THEN 0 ELSE 1 END FROM technical_works WHERE id=source.entity_id)
 	    WHEN 'education' THEN
 	      (SELECT COUNT(*) FROM academic_works WHERE education_id = source.entity_id)
 	    ELSE 0

@@ -31,6 +31,7 @@
 				talks: 'Comunicaciones',
 				teaching: 'Docencia',
 				projects: 'Proyectos de investigación',
+				technical_works: 'Experiencia técnica y profesional',
 				education: 'Formación',
 				research_stays: 'Estancias',
 				funding_awards: 'Financiación y premios',
@@ -38,7 +39,7 @@
 				academic_works: 'Trabajos académicos',
 				courses: 'Cursos y formación complementaria',
 				memberships: 'Asociaciones científicas',
-				skills: 'Competencias',
+				skills: 'Competencias técnicas y metodológicas',
 				languages: 'Idiomas'
 			}
 		},
@@ -59,6 +60,7 @@
 				talks: 'Talks',
 				teaching: 'Teaching',
 				projects: 'Research projects',
+				technical_works: 'Technical and professional experience',
 				education: 'Education',
 				research_stays: 'Research stays',
 				funding_awards: 'Funding and awards',
@@ -66,7 +68,7 @@
 				academic_works: 'Academic works',
 				courses: 'Courses and further training',
 				memberships: 'Scientific associations',
-				skills: 'Skills',
+				skills: 'Technical and methodological capabilities',
 				languages: 'Languages'
 			}
 		}
@@ -247,7 +249,11 @@
 											{/if}
 										</p>
 									{/if}
-									{#if item.links.length}
+									{#if item.skillDetails}
+                  {#if item.skillDetails.resources.length}<p class="mt-2 text-sm text-ink-dim">{item.skillDetails.resources.map(r=>locale==='en' ? r.labelEn : r.label).join(', ')}</p>{/if}
+                  <ul class="mt-2 list-none space-y-1 p-0 text-sm">{#each item.skillDetails.evidence as example}<li>{#if example.url}<a href={example.url} class="text-accent-strong underline underline-offset-2">{locale==='en' ? example.labelEn : example.label} ↗</a>{:else}{locale==='en' ? example.labelEn : example.label}{/if}</li>{/each}</ul>
+                {/if}
+                {#if item.links.length}
 										<div class="mt-2 flex flex-wrap gap-1.5">
 											{#each item.links as link (link.url)}
 												<a

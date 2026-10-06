@@ -16,6 +16,7 @@ export interface TaxonomyDomainDef {
 }
 
 export const TAXONOMY_DOMAINS: TaxonomyDomainDef[] = [
+ {domain:'skill_area',label:'Áreas de competencias',consumers:[{table:'skills',column:'area'}]},
 	{
 		domain: 'publication_type',
 		label: 'Tipos de publicación',
@@ -72,10 +73,13 @@ export const TAXONOMY_DOMAINS: TaxonomyDomainDef[] = [
 		consumers: [{ table: 'funding_awards', column: 'award_type' }]
 	},
 	{
-		domain: 'project_type',
-		label: 'Tipos de proyecto',
-		consumers: [{ table: 'projects', column: 'project_type' }]
+		domain: 'project_programme',
+		label: 'Programas y convocatorias de proyectos',
+		consumers: [{ table: 'projects', column: 'programme_code' }]
 	},
+	{ domain: 'project_nature', label: 'Naturaleza de los proyectos', consumers: [{ table: 'projects', column: 'nature' }] },
+	{ domain: 'technical_work_type', label: 'Tipos de trabajo técnico y profesional', consumers: [{ table: 'technical_works', column: 'work_type' }] },
+	{ domain: 'technical_modality', label: 'Modalidades de participación técnica', consumers: [{ table: 'technical_works', column: 'modality' }] },
 	{
 		domain: 'work_type',
 		label: 'Tipos de trabajo académico',

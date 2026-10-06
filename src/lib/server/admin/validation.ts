@@ -65,11 +65,19 @@ function parseField(field: FieldDef, raw: string): { value?: FieldValue; error?:
 			// comprueba contra la BD en crud.ts (la FK lo respalda a nivel de motor).
 			if (!/^[a-z0-9_]{1,64}$/.test(raw)) return { error: 'Código de tipo no válido' };
 			return { value: raw };
+		case 'choice':
+			return field.choices?.some(option => option.value === raw)
+				? { value: raw } : { error: 'Opción no válida' };
 		case 'fk': {
 			if (!/^\d+$/.test(raw)) return { error: 'Referencia no válida' };
 			const id = Number(raw);
 			if (!Number.isSafeInteger(id) || id <= 0) return { error: 'Referencia no válida' };
 			return { value: id };
+		}
+		case 'fk_multi': {
+			const ids = raw.split(',');
+			if (ids.length > 50 || ids.some(id => !/^\d+$/.test(id) || !Number.isSafeInteger(Number(id)) || Number(id) <= 0)) return { error: 'Referencias no válidas' };
+			return { value: [...new Set(ids)].join(',') };
 		}
 		case 'location':
 			return { value: null };
@@ -82,7 +90,7 @@ export function parseEntityForm(def: EntityFormDef, formData: FormData): ParsedF
 	const errors: Record<string, string> = {};
 
 	for (const field of def.fields) {
-		const entry = formData.get(field.name);
+		const entry = field.kind === 'fk_multi' ? formData.getAll(field.name).filter(v=>typeof v==='string' && v.trim()).join(',') : formData.get(field.name);
 		const rawValue =
 			field.kind === 'boolean'
 				? entry == null

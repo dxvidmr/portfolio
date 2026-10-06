@@ -1,3 +1,4 @@
+import { db } from '$lib/server/db';
 import { error, fail, redirect } from '@sveltejs/kit';
 import type { Actions, PageServerLoad } from './$types';
 import { requireAdmin } from '$lib/server/admin/auth';
@@ -62,7 +63,7 @@ const HEADING_KEYS = [
 	'organization',
 	'role',
 	'language',
-	'category'
+	'name_es'
 ];
 
 function parseParams(params: { type: string; id: string }): {
@@ -122,8 +123,9 @@ export const load: PageServerLoad = async ({ locals, params, setHeaders }) => {
 		hasStructuralRelations: supportsStructuralRelations(entityType),
 		fundingRelations,
 		links,
-		documents
-	};
+		documents,
+    skillUses: (await db.execute({sql:'SELECT s.id,s.name_es FROM skill_evidence_links l JOIN skills s ON s.id=l.skill_id WHERE l.entity_type=? AND l.entity_id=? ORDER BY s.sort_order',args:[entityType,entityId]})).rows.map(r=>({id:Number(r.id),name:String(r.name_es)}))
+  };
 };
 
 function parseFundingPayload(formData: FormData) {
@@ -365,7 +367,8 @@ export const actions: Actions = {
 			return fail(400, { eliminarError: 'Marca la casilla de confirmación para eliminar' });
 		}
 
-		await deleteEntity(entityType, entityId);
+		try { await deleteEntity(entityType, entityId); }
+		catch (e) { return fail(409, { eliminarError: e instanceof Error ? e.message : 'No se puede eliminar esta entrada mientras conserve relaciones.' }); }
 		redirect(303, '/admin/entradas?eliminada=1');
 	}
 };

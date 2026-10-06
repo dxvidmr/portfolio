@@ -1,6 +1,6 @@
 import { db } from '$lib/server/db';
 import {
-	entityForms,
+	entityForms, entityDefinitions, type EntityType,
 	type FieldDef,
 	type FkEntity,
 	type FormEntityType
@@ -36,7 +36,7 @@ export async function getFieldOptions(
 				value: String(row.code),
 				label: String(row.label_es)
 			}));
-		} else if (field.kind === 'fk' && field.fkEntity) {
+		} else if ((field.kind === 'fk' || field.kind === 'fk_multi') && field.fkEntity) {
 			options[field.name] = await getFkOptions(field.fkEntity);
 		}
 	}
@@ -45,14 +45,28 @@ export async function getFieldOptions(
 }
 
 async function getFkOptions(entity: FkEntity): Promise<SelectOption[]> {
-	if (entity === 'projects') {
+	if (entity === 'skill_resources') {
+    return (await db.execute('SELECT id,name_es,nature FROM skill_resources ORDER BY name_es')).rows.map(r=>({value:String(r.id),label:String(r.name_es),meta:({method:'Método',standard:'Estándar',language:'Lenguaje',tool:'Herramienta',platform:'Plataforma'} as Record<string,string>)[String(r.nature)]}));
+  }
+  if (entity === 'skill_evidence') {
+    return (await db.execute("SELECT c.rowid AS id,e.title_cache,e.entity_type FROM entries e JOIN entry_controls c ON c.entity_type=e.entity_type AND c.entity_id=e.entity_id WHERE e.entity_type IN ('technical_works','publications','talks','teaching','courses','projects','academic_works') ORDER BY e.title_cache")).rows.map(r=>({value:String(r.id),label:String(r.title_cache),meta:entityDefinitions[r.entity_type as EntityType]}));
+  }
+  if (entity === 'skill_portfolio') {
+    return (await db.execute('SELECT rowid AS id,title_es FROM portfolio_projects ORDER BY sort_order')).rows.map(r=>({value:String(r.id),label:String(r.title_es)}));
+  }
+  if (entity === 'projects') {
 		const res = await db.execute(
-			`SELECT id, title, COALESCE(acronym, '') AS acronym FROM projects
+			`SELECT p.id, p.title, COALESCE(p.acronym, '') AS acronym,
+			        p.project_code, p.institution, p.funding_body, p.principal_investigators_text,
+			        programme.label_es AS programme
+			 FROM projects p LEFT JOIN type_vocab programme ON programme.code=p.programme_code
 			 ORDER BY title COLLATE NOCASE`
 		);
 		return res.rows.map((row) => ({
 			value: String(row.id),
-			label: row.acronym ? `${row.acronym} — ${row.title}` : String(row.title)
+			label: row.acronym ? `${row.acronym} — ${row.title}` : String(row.title),
+			meta: [row.project_code,row.institution,row.programme,row.funding_body,
+				row.principal_investigators_text ? `IP: ${row.principal_investigators_text}` : ''].filter(Boolean).join(' · ')
 		}));
 	}
 	if (entity === 'education') {
@@ -122,19 +136,20 @@ export async function validateReferences(
 			if (res.rows.length === 0) {
 				parsed.errors[field.name] = 'Tipo no reconocido en el vocabulario';
 			}
-		} else if (field.kind === 'fk' && field.fkEntity) {
+		} else if ((field.kind === 'fk' || field.kind === 'fk_multi') && field.fkEntity) {
 			const tableByFk: Record<FkEntity, string> = {
 				projects: 'projects',
 				talks: 'talks',
 				education: 'education',
-				events: 'events'
+				events: 'events', skill_resources: 'skill_resources', skill_evidence: 'entry_controls', skill_portfolio: 'portfolio_projects'
 			};
 			const table = tableByFk[field.fkEntity];
+			const ids = field.kind === 'fk_multi' ? String(value).split(',').map(Number) : [value];
 			const res = await db.execute({
-				sql: `SELECT 1 FROM ${table} WHERE id = ?`,
-				args: [value]
+				sql: `SELECT rowid FROM ${table} WHERE ${field.fkEntity === 'skill_evidence' ? "entity_type IN ('technical_works','publications','talks','teaching','courses','projects','academic_works') AND" : ''} rowid IN (${ids.map(()=>'?').join(',')})`,
+				args: ids
 			});
-			if (res.rows.length === 0) {
+			if (res.rows.length !== ids.length) {
 				parsed.errors[field.name] = 'La referencia seleccionada no existe';
 			}
 		}
@@ -159,6 +174,22 @@ export async function validateReferences(
 // vocabulario y referencias, tanto en las altas independientes como en la
 // pantalla unificada de eventos.
 export function validateEntitySemantics(type: FormEntityType, parsed: ParsedForm): void {
+	if (type === 'projects' && ['research_team_member','working_team_member'].includes(String(parsed.values.role))
+		&& parsed.values.programme_code !== 'generation_knowledge') {
+		parsed.errors.role = 'Estas categorías de equipo son específicas de Generación de Conocimiento';
+	}
+	if (type === 'technical_works') {
+		if (parsed.values.date_start && parsed.values.date_end && String(parsed.values.date_end) < String(parsed.values.date_start))
+			parsed.errors.date_end = 'La fecha de fin no puede preceder a la de inicio';
+		if (parsed.values.context_mode === 'project') {
+			if (!parsed.values.project_ids) parsed.errors.project_ids = 'Selecciona los proyectos en los que participas';
+			parsed.values.project_id = parsed.values.project_ids ? Number(String(parsed.values.project_ids).split(',')[0]) : null;
+			for (const name of ['context_name','context_code','context_programme','context_funding_body','context_institution','context_responsibles']) {
+				parsed.values[name] = null;
+				delete parsed.errors[name];
+			}
+		} else { parsed.values.project_id = null; parsed.values.project_ids = null; delete parsed.errors.project_id; delete parsed.errors.project_ids; }
+	}
 	if (type === 'publications') {
 		const publicationType = parsed.values.publication_type;
 		const myRole = parsed.values.my_role;
@@ -240,6 +271,10 @@ export async function createEntity(
 			args: cols.map((col) => insertValues[col] ?? null)
 		});
 		const id = Number(inserted.lastInsertRowid);
+		if (type === 'skills') for (const statement of skillStatements(id,insertValues)) await tx.execute(statement);
+		if (type === 'technical_works') {
+			for (const statement of technicalProjectStatements(id,insertValues)) await tx.execute(statement);
+		}
 		await tx.execute({
 			sql: 'INSERT INTO entry_controls (entity_type, entity_id, is_public) VALUES (?, ?, 0)',
 			args: [type, id]
@@ -271,7 +306,28 @@ export async function updateEntity(
 				args: [type, id]
 			}
 		];
+	if (type === 'skills') statements.push(...skillStatements(id,values));
+	if (type === 'technical_works') statements.push(...technicalProjectStatements(id,values));
 	await db.batch(statements, 'write');
+}
+
+function skillStatements(id: number, values: Record<string,FieldValue>) {
+  const ids = (field:string)=>String(values[field] || '').split(',').filter(Boolean).map(Number);
+  return [
+    {sql:'DELETE FROM skill_resource_links WHERE skill_id=?',args:[id]},
+    {sql:'DELETE FROM skill_evidence_links WHERE skill_id=?',args:[id]},
+    {sql:'DELETE FROM skill_portfolio_links WHERE skill_id=?',args:[id]},
+    ...ids('resource_ids').map(r=>({sql:'INSERT INTO skill_resource_links VALUES(?,?)',args:[id,r]})),
+    ...ids('evidence_ids').map(r=>({sql:'INSERT INTO skill_evidence_links SELECT ?,entity_type,entity_id FROM entry_controls WHERE rowid=?',args:[id,r]})),
+    ...ids('portfolio_ids').map(r=>({sql:'INSERT INTO skill_portfolio_links SELECT ?,slug FROM portfolio_projects WHERE rowid=?',args:[id,r]}))
+  ];
+}
+function technicalProjectStatements(id: number, values: Record<string, FieldValue>) {
+	const ids = String(values.project_ids || '').split(',').filter(Boolean).map(Number);
+	return [
+		{sql:'DELETE FROM technical_work_projects WHERE technical_work_id=?',args:[id]},
+		...ids.map(projectId=>({sql:'INSERT INTO technical_work_projects(technical_work_id,project_id) VALUES(?,?)',args:[id,projectId]}))
+	];
 }
 
 // Eliminar (§12): relaciones → control → fila, en un batch transaccional.
@@ -280,6 +336,9 @@ export async function deleteEntity(type: FormEntityType, id: number): Promise<vo
 	const stmts: Array<{ sql: string; args: Array<string | number> }> = [];
 
 	if (type === 'projects') {
+		// La relación se mantiene: evita borrar el contexto vivo del trabajo.
+		const linked = await db.execute({ sql: 'SELECT 1 FROM technical_work_projects WHERE project_id=? LIMIT 1', args: [id] });
+		if (linked.rows.length) throw new Error('Este proyecto tiene trabajos técnicos vinculados. Desvincúlalos o traslada su contexto antes de eliminarlo.');
 		for (const table of ['publications', 'talks', 'teaching']) {
 			stmts.push({ sql: `UPDATE ${table} SET project_id = NULL WHERE project_id = ?`, args: [id] });
 		}
@@ -333,7 +392,20 @@ export async function getEntityFormValues(
 		else if (field.kind === 'boolean') values[field.name] = Number(value) === 1 ? '1' : '';
 		else values[field.name] = String(value);
 	}
-	if (type === 'talks') values.date_range_enabled = values.date_end_override ? '1' : '';
+	if (type === 'skills') {
+    const sets=await db.batch([
+      {sql:'SELECT resource_id AS id FROM skill_resource_links WHERE skill_id=?',args:[id]},
+      {sql:'SELECT c.rowid AS id FROM skill_evidence_links l JOIN entry_controls c ON c.entity_type=l.entity_type AND c.entity_id=l.entity_id WHERE l.skill_id=?',args:[id]},
+      {sql:'SELECT p.rowid AS id FROM skill_portfolio_links l JOIN portfolio_projects p ON p.slug=l.portfolio_slug WHERE l.skill_id=?',args:[id]}
+    ],'read');
+    ['resource_ids','evidence_ids','portfolio_ids'].forEach((name,i)=>values[name]=sets[i].rows.map(r=>String(r.id)).join(','));
+  }
+  if (type === 'talks') values.date_range_enabled = values.date_end_override ? '1' : '';
+	if (type === 'technical_works') {
+		const links = await db.execute({sql:'SELECT project_id FROM technical_work_projects WHERE technical_work_id=? ORDER BY project_id',args:[id]});
+		values.project_ids = links.rows.map(row=>String(row.project_id)).join(',');
+		values.context_mode = values.project_ids ? 'project' : 'external';
+	}
 	return values;
 }
 

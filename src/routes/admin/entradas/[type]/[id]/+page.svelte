@@ -120,6 +120,7 @@
 	<span>#{data.entityId}</span>
 </nav>
 
+{#if data.skillUses.length}<aside class="mb-5 border-b border-rule pb-4 text-xs"><p>Este trabajo ejemplifica:</p><div class="flex flex-wrap gap-3">{#each data.skillUses as skill}<a href={`/admin/entradas/skills/${skill.id}`} class="text-accent-strong underline">{skill.name}</a>{/each}</div></aside>{/if}
 <AdminPageHeader title={data.heading} eyebrow={data.typeLabel}>
 	{#snippet actions()}
 		<span

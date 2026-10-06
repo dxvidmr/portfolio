@@ -1,5 +1,6 @@
 export const entityDefinitions = {
 	projects: 'Proyectos',
+	technical_works: 'Trabajos técnicos y profesionales',
 	publications: 'Publicaciones',
 	academic_works: 'Trabajos académicos',
 	talks: 'Comunicaciones',
@@ -42,7 +43,10 @@ export type VocabDomain =
 	| 'teaching_type'
 	| 'activity_type'
 	| 'award_type'
-	| 'project_type'
+	| 'project_programme'
+	| 'project_nature'
+	| 'technical_work_type'
+	| 'technical_modality'
 	| 'work_type'
 	| 'project_role'
 	| 'service_role'
@@ -50,9 +54,10 @@ export type VocabDomain =
 	| 'event_modality'
 	| 'language'
 	| 'language_level'
-	| 'membership_role';
+	| 'membership_role'
+	| 'skill_area';
 
-export type FkEntity = 'projects' | 'talks' | 'education' | 'events';
+export type FkEntity = 'projects' | 'talks' | 'education' | 'events' | 'skill_resources' | 'skill_evidence' | 'skill_portfolio';
 
 export type FieldKind =
 	| 'text'
@@ -63,7 +68,9 @@ export type FieldKind =
 	| 'boolean'
 	| 'url'
 	| 'vocab'
+	| 'choice'
 	| 'fk'
+	| 'fk_multi'
 	| 'location';
 
 export interface FieldDef {
@@ -83,6 +90,8 @@ export interface FieldDef {
 	advanced?: boolean;
 	persist?: boolean;
 	hidden?: boolean;
+	choices?: Array<{ value: string; label: string }>;
+	optionConditions?: Record<string, { field: string; values: string[] }>;
 }
 
 export interface FieldGroupDef {
@@ -459,7 +468,7 @@ export const entityForms = {
 			{
 				id: 'project-main',
 				title: 'Proyecto',
-				fields: ['title', 'acronym', 'project_code', 'project_type', 'role']
+				fields: ['title', 'acronym', 'project_code', 'nature', 'programme_code', 'role']
 			},
 			{
 				id: 'project-team',
@@ -474,15 +483,21 @@ export const entityForms = {
 			{
 				id: 'project-public',
 				title: 'Presentación',
-				fields: ['description_short_es', 'description_short_en', 'url']
+				fields: ['description_short_es', 'description_short_en', 'contribution_es', 'contribution_en', 'url']
 			}
 		],
 		fields: [
 			f('title', 'Título', 'text', { required: true, wide: true }),
 			f('acronym', 'Acrónimo', 'text'),
 			f('project_code', 'Código del proyecto', 'text'),
-			f('project_type', 'Tipo de proyecto', 'vocab', { vocabDomain: 'project_type' }),
-			f('role', 'Mi rol en el proyecto', 'vocab', { vocabDomain: 'project_role' }),
+			f('nature', 'Naturaleza del proyecto', 'vocab', { vocabDomain: 'project_nature', help: 'Finalidad del proyecto, independiente de su convocatoria.' }),
+			f('programme_code', 'Programa o convocatoria', 'vocab', { vocabDomain: 'project_programme' }),
+			f('role', 'Mi participación académica', 'vocab', { vocabDomain: 'project_role',
+				help: 'Las categorías de equipo de investigación y equipo de trabajo son específicas de Generación de Conocimiento.',
+				optionConditions: {
+					research_team_member: { field: 'programme_code', values: ['generation_knowledge'] },
+					working_team_member: { field: 'programme_code', values: ['generation_knowledge'] }
+				} }),
 			f('institution', 'Institución', 'text'),
 			f('research_group', 'Grupo de investigación', 'text'),
 			f('funding_body', 'Entidad financiadora', 'text'),
@@ -493,7 +508,39 @@ export const entityForms = {
 			f('currency', 'Moneda', 'text', { help: 'EUR, USD…' }),
 			f('description_short_es', 'Descripción breve (ES)', 'textarea'),
 			f('description_short_en', 'Descripción breve (EN)', 'textarea', { advanced: true }),
+			f('contribution_es', 'Mi aportación (ES)', 'textarea', { help: 'Tu trabajo y resultados. Los CV heredan este texto salvo que elijas adaptarlo u ocultarlo.' }),
+			f('contribution_en', 'Mi aportación (EN)', 'textarea', { advanced: true }),
 			f('url', 'Enlace del proyecto', 'url', { wide: true })
+		]
+	},
+	technical_works: {
+		groups: [
+			{ id: 'technical-main', title: 'Trabajo técnico o profesional', fields: ['title', 'work_type', 'modality', 'date_start', 'date_end', 'recipient'] },
+			{ id: 'technical-context', title: 'Contexto del trabajo', description: 'Vincula los proyectos en los que participas académicamente. Un trabajo puede continuar en varias convocatorias. Para encargos externos, describe el contexto sin vincular proyectos.', fields: ['context_mode', 'project_ids', 'context_name', 'context_code', 'context_programme', 'context_funding_body', 'context_institution', 'context_responsibles'] },
+			{ id: 'technical-contribution', title: 'Mi aportación y resultados', fields: ['contribution_es', 'contribution_en', 'url', 'notes_private'] }
+		],
+		fields: [
+			f('title', 'Título del trabajo', 'text', { required: true, wide: true }),
+			f('work_type', 'Tipo de trabajo', 'vocab', { vocabDomain: 'technical_work_type' }),
+			f('modality', 'Modalidad de participación', 'vocab', { required: true, vocabDomain: 'technical_modality' }),
+			f('date_start', 'Fecha de inicio', 'date'),
+			f('date_end', 'Fecha de fin', 'date'),
+			f('recipient', 'Destinatario o entidad contratante', 'text', { help: 'Opcional, también para iniciativas propias.', wide: true }),
+			f('context_mode', 'Relación con un proyecto', 'choice', { persist: false, choices: [
+				{ value: 'external', label: 'Sin vinculación académica: contexto opcional' },
+				{ value: 'project', label: 'Trabajo dentro de un proyecto en el que participo' }
+			] }),
+			f('project_id', 'Proyecto de compatibilidad', 'fk', { fkEntity: 'projects', hidden: true }),
+			f('project_ids', 'Proyectos en los que participo', 'fk_multi', { fkEntity: 'projects', persist: false, wide: true, showWhen: { all: [{ field: 'context_mode', values: ['project'] }] }, help: 'Selecciona uno o varios. Sus datos se heredan de los registros originales, sin duplicarlos.' }),
+			...([
+				['context_name', 'Proyecto o iniciativa destinataria'], ['context_code', 'Código del proyecto de contexto'],
+				['context_programme', 'Programa, convocatoria o beca de contexto'], ['context_funding_body', 'Financiación del contexto'],
+				['context_institution', 'Institución del contexto'], ['context_responsibles', 'Responsables del contexto']
+			] as const).map(([name, label]) => f(name, label, 'text', { wide: true, showWhen: { all: [{ field: 'context_mode', notValues: ['project'] }] } })),
+			f('contribution_es', 'Mi aportación y resultados (ES)', 'textarea', { help: 'Texto base para la web y los CV. Cada CV puede abreviarlo, reemplazarlo u ocultarlo.' }),
+			f('contribution_en', 'Mi aportación y resultados (EN)', 'textarea', { advanced: true }),
+			f('url', 'Enlace principal', 'url', { wide: true }),
+			f('notes_private', 'Notas privadas', 'textarea', { isPrivate: true, advanced: true })
 		]
 	},
 	education: {
@@ -763,14 +810,23 @@ export const entityForms = {
 		]
 	},
 	skills: {
-		groups: [{ id: 'skill-main', title: 'Competencias', fields: ['category', 'items_text', 'sort_order'] }],
-		fields: [
-			f('category', 'Categoría', 'text', { required: true }),
-			f('items_text', 'Elementos', 'textarea', { required: true }),
-			f('sort_order', 'Orden en el CV', 'integer', { advanced: true })
-		]
-	},
-	languages: {
+    groups: [
+      {id:'skill-main',title:'Capacidad',fields:['name_es','name_en','area','description_es','description_en','sort_order']},
+      {id:'skill-support',title:'Recursos y ejemplos',description:'Selecciona solo recursos representativos. Los ejemplos explican dónde se aplica esta capacidad.',fields:['resource_ids','evidence_ids','portfolio_ids']}
+    ],
+    fields: [
+      f('name_es','Capacidad','text',{required:true}),
+      f('name_en','Capacidad en inglés','text'),
+      f('area','Área','vocab',{required:true,vocabDomain:'skill_area'}),
+      f('description_es','Qué hago','textarea',{required:true}),
+      f('description_en','Descripción en inglés','textarea'),
+      f('sort_order','Orden general','integer',{advanced:true}),
+      f('resource_ids','Métodos, estándares y herramientas','fk_multi',{fkEntity:'skill_resources',persist:false,help:'Gestiona el catálogo en /admin/competencias. No hace falta listar todas las herramientas que utilizas.'}),
+      f('evidence_ids','Trabajos y méritos relacionados','fk_multi',{fkEntity:'skill_evidence',persist:false}),
+      f('portfolio_ids','Ejemplos del portfolio','fk_multi',{fkEntity:'skill_portfolio',persist:false})
+    ]
+  },
+  languages: {
 		groups: [{ id: 'language-main', title: 'Idioma', fields: ['language', 'is_native', 'level'] }],
 		fields: [
 			f('language', 'Idioma', 'vocab', { required: true, vocabDomain: 'language' }),

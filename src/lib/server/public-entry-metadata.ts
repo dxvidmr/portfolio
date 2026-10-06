@@ -1,4 +1,5 @@
 import type { EntryMetadata } from '$lib/types/entry-metadata';
+import { publicTechnicalContextSql } from './technical-context';
 
 const nullable = (value: unknown) => (value == null || String(value).trim() === '' ? null : String(value));
 
@@ -20,6 +21,23 @@ const fundingFromRow = (value: unknown) => {
 
 export const entryMetadataFromRow = (row: Record<string, unknown>): EntryMetadata | null => {
 	const entityType = String(row.entity_type);
+	if (entityType === 'technical_works') {
+		const contextName = nullable(row.metadata_context_name);
+		return { kind: 'professional', recipient: nullable(row.metadata_recipient),
+			projects: JSON.parse(String(row.metadata_technical_projects || '[]')),
+			modality_es: nullable(row.metadata_modality_es), modality_en: nullable(row.metadata_modality_en),
+			contribution_es: nullable(row.metadata_contribution_es), contribution_en: nullable(row.metadata_contribution_en),
+			context_name: contextName === nullable(row.title ?? row.title_cache) ? null : contextName, context_code: nullable(row.metadata_context_code),
+			context_programme_es: nullable(row.metadata_context_programme_es), context_programme_en: nullable(row.metadata_context_programme_en),
+			context_funding: nullable(row.metadata_context_funding), context_institution: nullable(row.metadata_context_institution), context_responsibles: nullable(row.metadata_context_responsibles) };
+	}
+	if (entityType === 'projects') {
+		return { kind: 'project', institution: nullable(row.metadata_project_institution),code: nullable(row.metadata_project_code), investigators: nullable(row.metadata_project_investigators),
+			role_es: nullable(row.metadata_project_role_es), role_en: nullable(row.metadata_project_role_en),
+			programme_es: nullable(row.metadata_project_programme_es), programme_en: nullable(row.metadata_project_programme_en),
+			nature_es: nullable(row.metadata_project_nature_es), nature_en: nullable(row.metadata_project_nature_en),
+			contribution_es: nullable(row.metadata_project_contribution_es), contribution_en: nullable(row.metadata_project_contribution_en) };
+	}
 	if (entityType === 'publications') {
 		const bookTitle = nullable(row.metadata_book_title);
 		const journalTitle = nullable(row.metadata_journal_title);
@@ -99,19 +117,31 @@ export const publicFundingMetadataSql = (entityRef: 'e' | 'pi' | 'r') => {
 
 // Proyección compartida para presentar entradas públicas en listados editoriales.
 // `entityRef` debe ser un alias SQL conocido y controlado por el servidor.
+export const publicProjectMetadataSql = `research_project.institution AS metadata_project_institution,
+  research_project.project_code AS metadata_project_code, research_project.principal_investigators_text AS metadata_project_investigators,
+  project_role.label_es AS metadata_project_role_es, project_role.label_en AS metadata_project_role_en,
+  project_programme.label_es AS metadata_project_programme_es, project_programme.label_en AS metadata_project_programme_en,
+  project_nature.label_es AS metadata_project_nature_es, project_nature.label_en AS metadata_project_nature_en,
+  research_project.contribution_es AS metadata_project_contribution_es, research_project.contribution_en AS metadata_project_contribution_en`;
+export const publicProjectMetadataJoins = `LEFT JOIN type_vocab project_role ON project_role.code=research_project.role
+  LEFT JOIN type_vocab project_programme ON project_programme.code=research_project.programme_code
+  LEFT JOIN type_vocab project_nature ON project_nature.code=research_project.nature`;
 export const publicEntryMetadataSql = (entityRef: 'e' | 'pi') => ({
 	select: `COALESCE(
 		         pub.publication_type,
 		         event.contribution_type,
 		         work.work_type,
 		         teaching.teaching_type,
-		         research_project.project_type,
+		         research_project.programme_code,
+		         technical.work_type,
 		         service.activity_type,
 		         award.award_type,
 		         membership.role
 		       ) AS subtype,
 		       tv.label_es AS subtype_label_es,
 		       tv.label_en AS subtype_label_en,
+		       ${publicTechnicalContextSql.select},
+		       ${publicProjectMetadataSql},
 		       COALESCE(pub.authors_text, event.authors_text) AS metadata_authors,
 		       pub.my_role AS metadata_my_role,
 		       pub.publication_type AS metadata_publication_type,
@@ -186,7 +216,7 @@ export const publicEntryMetadataSql = (entityRef: 'e' | 'pi') => ({
 		           course.institution,
 		           award.awarding_body,
 		           membership.role_details,
-		           skill.items_text,
+		           skill.description_es,
 		           COALESCE(language_level.label_es, language.level)
 		         )
 		       END AS detail,
@@ -197,6 +227,7 @@ export const publicEntryMetadataSql = (entityRef: 'e' | 'pi') => ({
 		         work.url,
 		         teaching.url,
 		         research_project.url,
+		         technical.url,
 		         service.url,
 		         canonical_service_event.url,
 		         education.url,
@@ -226,6 +257,10 @@ export const publicEntryMetadataSql = (entityRef: 'e' | 'pi') => ({
 		         ON ${entityRef}.entity_type = 'teaching' AND teaching.id = ${entityRef}.entity_id
 		       LEFT JOIN projects research_project
 		         ON ${entityRef}.entity_type = 'projects' AND research_project.id = ${entityRef}.entity_id
+		       ${publicProjectMetadataJoins}
+		       LEFT JOIN technical_works technical
+		         ON ${entityRef}.entity_type='technical_works' AND technical.id=${entityRef}.entity_id
+		       ${publicTechnicalContextSql.joins}
 		       LEFT JOIN service_activities service
 		         ON ${entityRef}.entity_type = 'service_activities' AND service.id = ${entityRef}.entity_id
 		       LEFT JOIN events canonical_service_event
@@ -253,7 +288,8 @@ export const publicEntryMetadataSql = (entityRef: 'e' | 'pi') => ({
 		           event.contribution_type,
 		           work.work_type,
 		           teaching.teaching_type,
-		           research_project.project_type,
+		           research_project.programme_code,
+		           technical.work_type,
 		           service.activity_type,
 		           award.award_type,
 		           membership.role

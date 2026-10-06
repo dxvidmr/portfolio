@@ -11,6 +11,7 @@ export const fundingRelationKinds = [
 export type FundingRelationKind = (typeof fundingRelationKinds)[number]['value'];
 
 const targetTypes = [
+	'technical_works',
 	'projects',
 	'education',
 	'research_stays',

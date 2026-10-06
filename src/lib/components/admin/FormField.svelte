@@ -8,6 +8,8 @@
 		required?: boolean;
 		help?: string;
 		isPrivate?: boolean;
+		choices?: Array<{ value: string; label: string }>;
+		optionConditions?: Record<string, { field: string; values: string[] }>;
 	}
 
 	interface Option {
@@ -30,10 +32,17 @@
 		allValues?: Record<string, string>;
 	} = $props();
 
-	const inputId = $derived(`campo-${field.name}`);
+	let multiSearch=$state('');
+  const fold=(s:string)=>s.normalize('NFD').replace(/\p{Diacritic}/gu,'').toLowerCase();
+  const multiMatches=(o:Option)=>value.split(',').includes(o.value) || fold(o.label+' '+(o.meta || '')).includes(fold(multiSearch));
+  const inputId = $derived(`campo-${field.name}`);
 	const errorId = $derived(`error-${field.name}`);
 	const helpId = $derived(`ayuda-${field.name}`);
 	const help = $derived(field.help);
+	const visibleOptions = $derived((field.choices ?? options).filter(option => {
+		const condition = field.optionConditions?.[option.value];
+		return !condition || condition.values.includes(allValues[condition.field] ?? '');
+	}));
 	const describedBy = $derived(
 		[help ? helpId : null, error ? errorId : null].filter(Boolean).join(' ') || undefined
 	);
@@ -56,6 +65,20 @@
 			/>
 			<span>{field.label}</span>
 		</label>
+	{:else if field.kind === 'fk_multi'}
+		<fieldset class="grid gap-2 rounded-ui-sm border border-rule p-3" aria-describedby={describedBy}>
+			<legend class="px-1 text-[0.8rem] text-ink-dim">{field.label}</legend>
+			{#if options.length>10}<label class="grid gap-1 text-xs">Buscar en {field.label.toLowerCase()}<input bind:value={multiSearch} type="search" class="border border-rule bg-canvas p-2" placeholder="Buscar por título o tipo" /></label>{/if}
+      <div class="grid max-h-80 gap-2 overflow-y-auto">
+      {#each options as option (option.value)}
+        <label hidden={!multiMatches(option)} class={multiMatches(option) ? "flex items-start gap-2 text-[0.85rem]" : "hidden"}>
+
+					<input type="checkbox" name={field.name} value={option.value} checked={value.split(',').includes(option.value)} class="mt-1 accent-accent-strong" />
+					<span>{option.label}{#if option.meta}<small class="block text-ink-dim">{option.meta}</small>{/if}</span>
+				</label>
+			{/each}
+      </div>
+		</fieldset>
 	{:else if field.kind === 'location'}
 		<div class="grid gap-[0.35rem]">
 			<span class="text-[0.8rem] text-ink-dim">{field.label}</span>
@@ -97,7 +120,7 @@
 					describedBy={describedBy}
 					invalid={Boolean(error)}
 				/>
-			{:else if field.kind === 'vocab'}
+			{:else if field.kind === 'vocab' || field.kind === 'choice'}
 				<select
 					class="{controlClass} {invalidControlClass}"
 					id={inputId}
@@ -107,7 +130,7 @@
 					aria-required={field.required || undefined}
 				>
 					<option value="">—</option>
-					{#each options as option (option.value)}
+						{#each visibleOptions as option (option.value)}
 						<option value={option.value} selected={option.value === value}>{option.label}</option>
 					{/each}
 				</select>

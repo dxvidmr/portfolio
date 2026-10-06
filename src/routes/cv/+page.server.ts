@@ -1,7 +1,9 @@
+import { getSkillDetails } from '$lib/server/skills';
 import type { PageServerLoad } from './$types';
 import { db } from '$lib/server/db';
 import { getPublicAdditionalLinks, groupPublicAdditionalLinks } from '$lib/server/public-links';
-import { entryMetadataFromRow, publicFundingMetadataSql } from '$lib/server/public-entry-metadata';
+import { entryMetadataFromRow, publicFundingMetadataSql, publicProjectMetadataSql, publicProjectMetadataJoins } from '$lib/server/public-entry-metadata';
+import { publicTechnicalContextSql } from '$lib/server/technical-context';
 
 // La visibilidad la gobierna la vista `entries` (entry_controls): el CV solo
 // muestra filas con public = 1, igual que la portada.
@@ -63,12 +65,23 @@ const sections = [
 	{
 		key: 'projects',
 		title: 'Proyectos de investigación',
-		sql: `SELECT p.id AS entity_id, p.title, p.project_type AS type, tv.label_es AS type_label_es, tv.label_en AS type_label_en,
-		             p.institution AS detail, substr(p.date_start, 1, 4) AS year, p.url
-		      FROM projects p
-		      JOIN entries e ON e.entity_type = 'projects' AND e.entity_id = p.id AND e.public = 1
-		      LEFT JOIN type_vocab tv ON tv.code = p.project_type
-		      ORDER BY year DESC, p.title ASC`
+		sql: `SELECT research_project.id AS entity_id, research_project.title, research_project.programme_code AS type, tv.label_es AS type_label_es, tv.label_en AS type_label_en,
+		             research_project.institution AS detail, substr(research_project.date_start, 1, 4) AS year, research_project.url, ${publicProjectMetadataSql}
+		      FROM projects research_project
+		      JOIN entries e ON e.entity_type = 'projects' AND e.entity_id = research_project.id AND e.public = 1
+		      LEFT JOIN type_vocab tv ON tv.code = research_project.programme_code
+		      ${publicProjectMetadataJoins}
+		      ORDER BY year DESC, research_project.title ASC`
+	},
+	{
+		key: 'technical_works', title: 'Experiencia técnica y profesional',
+		sql: `SELECT technical.id AS entity_id,technical.title,technical.work_type AS type,
+		  tv.label_es AS type_label_es,tv.label_en AS type_label_en,technical.recipient AS detail,
+		  substr(technical.date_start,1,4) AS year,technical.url,${publicTechnicalContextSql.select}
+		  FROM technical_works technical
+		  JOIN entries e ON e.entity_type='technical_works' AND e.entity_id=technical.id AND e.public=1
+		  LEFT JOIN type_vocab tv ON tv.code=technical.work_type ${publicTechnicalContextSql.joins}
+		  ORDER BY technical.date_start DESC,technical.title ASC`
 	},
 	{
 		key: 'education',
@@ -155,11 +168,11 @@ const sections = [
 	{
 		key: 'skills',
 		title: 'Competencias',
-		sql: `SELECT s.id AS entity_id, s.category AS title, NULL AS type, NULL AS type_label_es, NULL AS type_label_en,
-		             s.items_text AS detail, NULL AS year, NULL AS url
-		      FROM skills s
+		sql: `SELECT s.id AS entity_id, s.name_es AS title, s.name_es AS title_label_es, COALESCE(s.name_en,s.name_es) AS title_label_en, s.area AS type, area.label_es AS type_label_es, area.label_en AS type_label_en,
+		             s.description_es AS detail, s.description_es AS detail_label_es, COALESCE(s.description_en,s.description_es) AS detail_label_en, NULL AS year, NULL AS url
+		      FROM skills s LEFT JOIN type_vocab area ON area.code=s.area
 		      JOIN entries e ON e.entity_type = 'skills' AND e.entity_id = s.id AND e.public = 1
-		      ORDER BY s.sort_order, s.category ASC`
+		      ORDER BY s.sort_order, s.name_es ASC`
 	},
 	{
 		key: 'languages',
@@ -229,6 +242,7 @@ export const load: PageServerLoad = async () => {
 		),
 		getPublicAdditionalLinks()
 	]);
+	const skillDetails=await getSkillDetails(db,'es',true);
 	const linksByEntry = groupPublicAdditionalLinks(publicLinks);
 	const enrichedResults = results.map((section) => ({
 		...section,
@@ -250,6 +264,7 @@ export const load: PageServerLoad = async () => {
 				null;
 			return {
 				...item,
+ skillDetails: section.key === 'skills' ? skillDetails.get(item.entity_id) : undefined,
 				links,
 				target_url: targetUrl
 			};

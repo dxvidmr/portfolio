@@ -30,7 +30,7 @@ export const profile = {
 				context: 'Grupo de investigación · Universitat Autònoma de Barcelona',
 				project: {
 					title: 'La integral dramática de Lope de Vega: textos, métodos, problemas, proyección (II)',
-					code: 'PID2024-155584NB-I00'
+					code: 'PID2024-155554NB-I00'
 				}
 			},
 			{
@@ -64,7 +64,7 @@ export const profile = {
 				context: 'Research group · Universitat Autònoma de Barcelona',
 				project: {
 					title: 'La integral dramática de Lope de Vega: textos, métodos, problemas, proyección (II)',
-					code: 'PID2024-155584NB-I00'
+					code: 'PID2024-155554NB-I00'
 				}
 			},
 			{

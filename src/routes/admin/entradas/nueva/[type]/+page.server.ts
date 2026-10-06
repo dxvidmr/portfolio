@@ -29,6 +29,7 @@ export const load: PageServerLoad = async ({ locals, params, url }) => {
 			: 'general';
 	const eventId = Number(url.searchParams.get('eventId'));
 	let initialValues: Record<string, string> = {};
+	if (params.type === 'technical_works') initialValues.context_mode = 'external';
 	if (params.type === 'event_attendance') {
 		initialValues = {
 			event_id: Number.isSafeInteger(eventId) && eventId > 0 ? String(eventId) : '',

@@ -1,6 +1,7 @@
 <script lang="ts">
 	import type { Locale } from '$lib/paraglide/runtime';
 	import type { EntryMetadata as EntryMetadataValue } from '$lib/types/entry-metadata';
+	import PracticeMetadata from './PracticeMetadata.svelte';
 
 	let { metadata, locale }: { metadata: EntryMetadataValue; locale: Locale } = $props();
 
@@ -51,7 +52,9 @@
 		].filter((value): value is string => Boolean(value));
 </script>
 
-{#if metadata.kind === 'publication'}
+{#if metadata.kind === 'project' || metadata.kind === 'professional'}
+	<PracticeMetadata {metadata} {locale} />
+{:else if metadata.kind === 'publication'}
 	{#if isEditorialPublication(metadata.my_role) && metadata.editors}
 		<span>{editorialLead(metadata.my_role)} {#each authorSegments(withoutTerminalPunctuation(metadata.editors)) as segment, index (index)}{#if segment.own && !isSoleAuthor(metadata.editors)}<span class="underline decoration-[.08em] underline-offset-[.14em]">{segment.text}</span>{:else}{segment.text}{/if}{/each}. </span>
 	{:else if metadata.authors && !isSoleAuthor(metadata.authors)}
