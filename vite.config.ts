@@ -12,7 +12,9 @@ export default defineConfig({
 				// Force runes mode for the project, except for libraries. Can be removed in svelte 6.
 				runes: ({ filename }) => filename.split(/[/\\]/).includes('node_modules') ? undefined : true
 			},
-			adapter: adapter()
+			// Paraglide removes locale prefixes inside the server middleware. Keep
+			// the complete route manifest in one function so /es and /en resolve.
+			adapter: adapter({ runtime: 'nodejs22.x', maxDuration: 60 })
 		}),
 		paraglideVitePlugin({
 			project: './project.inlang',

@@ -4,8 +4,6 @@ import { cvId } from '$lib/server/admin/cv-route';
 import { renderCvPdf } from '$lib/server/admin/cv-pdf';
 import type { RequestHandler } from './$types';
 
-export const config = { runtime: 'nodejs22.x', maxDuration: 60, split: true };
-
 export const GET: RequestHandler = async ({ params, url, cookies }) => {
   const id = cvId(params.id);
   const exportId = cvId(params.exportId);
