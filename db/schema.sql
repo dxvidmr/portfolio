@@ -1,4 +1,4 @@
--- Portfolio académico bilingüe — fotografía del esquema tras la migración 013.
+-- Portfolio académico bilingüe — fotografía del esquema hasta la migración 043.
 -- Codificación: UTF-8.
 --
 -- Turso es la fuente de verdad. Este archivo describe la estructura final para
@@ -94,7 +94,11 @@ CREATE TABLE projects (
   title TEXT NOT NULL,
   acronym TEXT,
   project_code TEXT,
-  project_type TEXT REFERENCES type_vocab(code),
+  programme_code TEXT REFERENCES type_vocab(code),
+  project_type TEXT, -- Compatibilidad de lectura; la convocatoria se escribe en programme_code.
+  nature TEXT REFERENCES type_vocab(code),
+  contribution_es TEXT,
+  contribution_en TEXT,
   role TEXT REFERENCES type_vocab(code),
   institution TEXT,
   research_group TEXT,
@@ -108,6 +112,39 @@ CREATE TABLE projects (
   description_short_en TEXT,
   url TEXT
 );
+
+CREATE TABLE technical_works (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  title TEXT NOT NULL,
+  work_type TEXT REFERENCES type_vocab(code),
+  modality TEXT REFERENCES type_vocab(code),
+  contribution_es TEXT,
+  contribution_en TEXT,
+  date_start TEXT,
+  date_end TEXT,
+  recipient TEXT,
+  project_id INTEGER REFERENCES projects(id) ON DELETE RESTRICT,
+  context_name TEXT,
+  context_code TEXT,
+  context_programme TEXT,
+  context_funding_body TEXT,
+  context_institution TEXT,
+  context_responsibles TEXT,
+  url TEXT,
+  notes_private TEXT,
+  CHECK (project_id IS NULL OR (
+    context_name IS NULL AND context_code IS NULL AND context_programme IS NULL
+    AND context_funding_body IS NULL AND context_institution IS NULL
+    AND context_responsibles IS NULL
+  ))
+);
+CREATE INDEX idx_technical_works_project ON technical_works(project_id);
+CREATE TABLE technical_work_projects (
+  technical_work_id INTEGER NOT NULL REFERENCES technical_works(id) ON DELETE CASCADE,
+  project_id INTEGER NOT NULL REFERENCES projects(id) ON DELETE RESTRICT,
+  PRIMARY KEY(technical_work_id,project_id)
+);
+CREATE INDEX idx_technical_work_projects_project ON technical_work_projects(project_id);
 
 CREATE TABLE events (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -267,9 +304,12 @@ CREATE TABLE memberships (
 
 CREATE TABLE skills (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
-  category TEXT NOT NULL,
-  items_text TEXT NOT NULL,
-  sort_order INTEGER DEFAULT 0
+  name_es TEXT NOT NULL,
+  name_en TEXT,
+  description_es TEXT NOT NULL,
+  description_en TEXT,
+  area TEXT NOT NULL REFERENCES type_vocab(code),
+  sort_order INTEGER NOT NULL DEFAULT 0
 );
 
 CREATE TABLE languages (
@@ -459,7 +499,7 @@ CREATE TABLE funding_relations (
   FOREIGN KEY (entity_type, entity_id)
     REFERENCES entry_controls(entity_type, entity_id) ON DELETE CASCADE,
   CHECK (entity_type IN (
-    'projects', 'education', 'research_stays', 'courses', 'publications',
+    'technical_works', 'projects', 'education', 'research_stays', 'courses', 'publications',
     'academic_works', 'talks', 'teaching', 'service_activities'
   ))
 );
@@ -483,7 +523,7 @@ CREATE TABLE links (
   FOREIGN KEY (entity_type, entity_id)
     REFERENCES entry_controls(entity_type, entity_id) ON DELETE CASCADE,
   CHECK (entity_type IN (
-    'publications', 'talks', 'teaching', 'projects', 'education',
+    'publications', 'talks', 'teaching', 'technical_works', 'projects', 'education',
     'research_stays', 'funding_awards', 'service_activities', 'academic_works',
     'courses', 'memberships', 'skills', 'languages'
   ))
@@ -517,7 +557,7 @@ CREATE TABLE documents (
   FOREIGN KEY (entity_type, entity_id)
     REFERENCES entry_controls(entity_type, entity_id) ON DELETE CASCADE,
   CHECK (entity_type IN (
-    'publications', 'talks', 'teaching', 'projects', 'education',
+    'publications', 'talks', 'teaching', 'technical_works', 'projects', 'education',
     'research_stays', 'funding_awards', 'service_activities', 'academic_works',
     'courses', 'memberships', 'skills', 'languages', 'event_attendance'
   )),
@@ -532,6 +572,8 @@ CREATE UNIQUE INDEX idx_documents_entry_url
 
 CREATE VIEW entry_source AS
 SELECT 'projects' AS entity_type, id AS entity_id, title, date_start AS sort_date FROM projects
+UNION ALL
+SELECT 'technical_works', id, title, date_start FROM technical_works
 UNION ALL
 SELECT 'education', id, degree_title, COALESCE(date_end, date_start) FROM education
 UNION ALL
@@ -561,14 +603,13 @@ SELECT 'service_activities', service.id, service.title,
        )
 FROM service_activities AS service
 UNION ALL
-SELECT 'event_attendance', attendance.id, event.title,
-       event.date_start
+SELECT 'event_attendance', attendance.id, event.title, event.date_start
 FROM event_attendance AS attendance
 JOIN events AS event ON event.id = attendance.event_id
 UNION ALL
 SELECT 'memberships', id, organization, date_start FROM memberships
 UNION ALL
-SELECT 'skills', id, category, NULL FROM skills
+SELECT 'skills', id, name_es, NULL FROM skills
 UNION ALL
 SELECT 'languages', language_entry.id,
        COALESCE(language_vocab.label_es, language_entry.language), NULL
@@ -592,3 +633,93 @@ FROM entry_source AS source
 LEFT JOIN entry_controls AS control
   ON control.entity_type = source.entity_type
  AND control.entity_id = source.entity_id;
+
+-- Modelo editorial 040–042: reglas de participación y CV privados.
+CREATE TRIGGER projects_programme_compat_insert AFTER INSERT ON projects
+WHEN NEW.project_type IS NOT NEW.programme_code
+BEGIN UPDATE projects SET project_type=NEW.programme_code WHERE id=NEW.id; END;
+CREATE TRIGGER projects_programme_compat_update AFTER UPDATE OF programme_code ON projects
+WHEN NEW.project_type IS NOT NEW.programme_code
+BEGIN UPDATE projects SET project_type=NEW.programme_code WHERE id=NEW.id; END;
+CREATE TRIGGER projects_programme_role_insert BEFORE INSERT ON projects
+WHEN NEW.role IN ('research_team_member','working_team_member')
+  AND COALESCE(NEW.programme_code,'') <> 'generation_knowledge'
+BEGIN SELECT RAISE(ABORT,'Las categorías de equipo requieren Generación de Conocimiento'); END;
+CREATE TRIGGER projects_programme_role_update BEFORE UPDATE OF role,programme_code ON projects
+WHEN NEW.role IN ('research_team_member','working_team_member')
+  AND COALESCE(NEW.programme_code,'') <> 'generation_knowledge'
+BEGIN SELECT RAISE(ABORT,'Las categorías de equipo requieren Generación de Conocimiento'); END;
+
+CREATE TABLE cv_profiles (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  name TEXT NOT NULL,
+  title TEXT NOT NULL DEFAULT 'Currículum investigador',
+  person_name TEXT NOT NULL DEFAULT 'David Merino Recalde',
+  affiliation TEXT NOT NULL DEFAULT '',
+  language TEXT NOT NULL DEFAULT 'es' CHECK(language IN ('es','en')),
+  version INTEGER NOT NULL DEFAULT 1,
+  created_at TEXT NOT NULL DEFAULT (datetime('now')),
+  updated_at TEXT NOT NULL DEFAULT (datetime('now')),
+  position TEXT NOT NULL DEFAULT '',
+  email TEXT NOT NULL DEFAULT '',
+  website TEXT NOT NULL DEFAULT ''
+);
+CREATE TABLE cv_blocks (
+  skills_display TEXT NOT NULL DEFAULT 'names' CHECK(skills_display IN ('names','descriptions')),
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  cv_id INTEGER NOT NULL REFERENCES cv_profiles(id) ON DELETE CASCADE,
+  kind TEXT NOT NULL CHECK(kind IN ('text','entries')),
+  title TEXT NOT NULL DEFAULT '', body TEXT NOT NULL DEFAULT '',
+  sort_order INTEGER NOT NULL, UNIQUE(cv_id,sort_order)
+);
+CREATE TABLE cv_block_entries (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  block_id INTEGER NOT NULL REFERENCES cv_blocks(id) ON DELETE CASCADE,
+  entity_type TEXT NOT NULL CHECK(entity_type IN (
+    'technical_works','projects','publications','talks','teaching','research_stays','education',
+    'funding_awards','academic_works','courses','memberships','skills','languages','service_activities'
+  )),
+  entity_id INTEGER NOT NULL CHECK(entity_id > 0),
+  contribution_mode TEXT NOT NULL DEFAULT 'inherit' CHECK(contribution_mode IN ('inherit','custom','hidden')),
+  contribution_text TEXT NOT NULL DEFAULT '', skill_options TEXT NOT NULL DEFAULT '{"resources":[],"evidence":[]}' CHECK(json_valid(skill_options)), commentary TEXT NOT NULL DEFAULT '',
+  sort_order INTEGER NOT NULL, UNIQUE(block_id,sort_order), UNIQUE(block_id,entity_type,entity_id)
+);
+CREATE TABLE cv_exports (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  cv_id INTEGER NOT NULL REFERENCES cv_profiles(id) ON DELETE CASCADE,
+  profile_version INTEGER NOT NULL,
+  snapshot_json TEXT NOT NULL CHECK(json_valid(snapshot_json)),
+  created_at TEXT NOT NULL DEFAULT (datetime('now'))
+);
+CREATE INDEX idx_cv_blocks_cv ON cv_blocks(cv_id,sort_order);
+CREATE INDEX idx_cv_entries_block ON cv_block_entries(block_id,sort_order);
+CREATE INDEX idx_cv_exports_cv ON cv_exports(cv_id,id DESC);
+
+CREATE TABLE skill_resources (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  name_es TEXT NOT NULL UNIQUE,
+  name_en TEXT,
+  nature TEXT NOT NULL CHECK(nature IN ('method','standard','language','tool','platform'))
+);
+CREATE TABLE skill_resource_links (
+  skill_id INTEGER NOT NULL REFERENCES skills(id) ON DELETE CASCADE,
+  resource_id INTEGER NOT NULL REFERENCES skill_resources(id) ON DELETE CASCADE,
+  PRIMARY KEY(skill_id,resource_id)
+);
+CREATE TABLE skill_evidence_links (
+  skill_id INTEGER NOT NULL REFERENCES skills(id) ON DELETE CASCADE,
+  entity_type TEXT NOT NULL,
+  entity_id INTEGER NOT NULL,
+  PRIMARY KEY(skill_id,entity_type,entity_id),
+  FOREIGN KEY(entity_type,entity_id) REFERENCES entry_controls(entity_type,entity_id) ON DELETE CASCADE,
+  CHECK(entity_type IN ('technical_works','publications','talks','teaching','courses','projects','academic_works'))
+);
+CREATE TABLE skill_portfolio_links (
+  skill_id INTEGER NOT NULL REFERENCES skills(id) ON DELETE CASCADE,
+  portfolio_slug TEXT NOT NULL REFERENCES portfolio_projects(slug) ON DELETE CASCADE,
+  PRIMARY KEY(skill_id,portfolio_slug)
+);
+INSERT INTO type_vocab(code,domain,label_es,label_en,sort_order) VALUES('skill_text','skill_area','Edición digital y tratamiento textual','Digital editing and text processing',10);
+INSERT INTO type_vocab(code,domain,label_es,label_en,sort_order) VALUES('skill_data','skill_area','Modelado y gestión de información','Data modelling and management',20);
+INSERT INTO type_vocab(code,domain,label_es,label_en,sort_order) VALUES('skill_development','skill_area','Desarrollo y mantenimiento de recursos digitales','Digital resource development and maintenance',30);
+INSERT INTO type_vocab(code,domain,label_es,label_en,sort_order) VALUES('skill_analysis','skill_area','Análisis y visualización','Analysis and visualization',40);
