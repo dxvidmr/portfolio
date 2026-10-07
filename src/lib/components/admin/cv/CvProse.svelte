@@ -1,16 +1,11 @@
 <script lang="ts">
   import type { Snippet } from 'svelte';
+  import { renderCvMarkdown } from '$lib/content/cv-markdown';
   let { body, lead }: { body: string; lead?: Snippet } = $props();
-  const paragraphs = (text: string) => text.trim().split(/\n\s*\n/).filter(Boolean);
-  const isList = (text: string) => text.split('\n').every(line => line.trim().startsWith('- '));
 </script>
 {#if body.trim() || lead}
-  <div class="cv-prose text-[0.95rem] leading-relaxed">
-    {#if lead && (!body.trim() || isList(paragraphs(body)[0]))}<p class="my-3">{@render lead()}</p>{/if}
-    {#each paragraphs(body) as paragraph,index}
-      {#if isList(paragraph)}
-        <ul class="my-3 list-disc pl-5">{#each paragraph.split('\n') as line}<li>{line.trim().slice(2)}</li>{/each}</ul>
-      {:else}<p class="my-3 whitespace-pre-line">{#if index===0 && lead}{@render lead()}{' '}{/if}{paragraph}</p>{/if}
-    {/each}
+  <div class="cv-prose text-[0.95rem] leading-relaxed [&_p]:my-3 [&_ul]:my-3 [&_ul]:list-disc [&_ul]:pl-5 [&_ol]:my-3 [&_ol]:list-decimal [&_ol]:pl-5 [&_a]:text-[#41583d] [&_a]:underline [&_a]:underline-offset-2 [&_h4]:mt-4 [&_h4]:mb-2 [&_h4]:font-title [&_h4]:font-medium [&_blockquote]:border-l [&_blockquote]:border-[#d4d7ce] [&_blockquote]:pl-4">
+    {#if lead}<p>{@render lead()}</p>{/if}
+    {@html renderCvMarkdown(body)}
   </div>
 {/if}

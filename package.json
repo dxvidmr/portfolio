@@ -43,6 +43,7 @@
 		"@lucide/svelte": "^1.23.0",
 		"@sparticuz/chromium": "^153.0.0",
 		"academicons": "github:jpswalsh/academicons#v1.9.4",
+		"marked": "^18.1.0",
 		"pagedjs": "^0.4.3",
 		"puppeteer-core": "^25.12.0"
 	}

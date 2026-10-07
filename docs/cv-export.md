@@ -6,7 +6,7 @@ La entrada `/admin/cv` gestiona variantes privadas guardadas en Turso. El CV pú
 
 1. Crear un CV o duplicar uno existente desde **Mis CV**.
 2. Editar el nombre interno, título del documento, nombre personal, posición, correo electrónico, afiliación, web e idioma de las etiquetas. Afiliación y web se guardan por separado y se reúnen en la cabecera. El idioma no traduce los títulos ni los textos escritos.
-3. Añadir bloques de texto narrativo y apartados de méritos. Reordenarlos arrastrando o con las flechas. Los textos admiten párrafos separados por líneas en blanco y listas con `- `; no HTML ni Markdown enriquecido.
+3. Añadir bloques de texto narrativo y apartados de méritos. Reordenarlos arrastrando o con las flechas. Los textos admiten Markdown: párrafos separados por líneas en blanco, `*cursiva*`, `**negrita**`, `[texto](URL)` y listas. `CvProse.svelte` comparte el mismo renderizado entre vista previa y PDF. Se conservan también las etiquetas HTML sencillas de énfasis (`i`, `em`, `b`, `strong`), sin atributos; el resto del HTML se muestra como texto y se restringen los protocolos de los enlaces.
 4. En un apartado, añadir registros mediante búsqueda y filtro de tipo. Se pueden combinar tipos, ordenar manualmente o por fecha y escribir un comentario propio para cada mérito. Ese comentario no modifica el registro original.
 5. Guardar o elegir **Guardar y vista previa**.
 6. En la vista previa, pulsar **Exportar PDF**. Se conserva una entrega con los datos actuales en el historial y se descarga directamente un PDF A4, con texto seleccionable y enlaces activos. En una entrega existente, **Descargar PDF** vuelve a generar el archivo sin crear otra versión. La DB conserva el contenido reproducible, no los bytes del PDF.
