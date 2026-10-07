@@ -220,7 +220,7 @@
 						</fieldset>
 					{/if}
 					<ol class="m-0 list-none p-0">
-					{#each section.items as item (section.key + item.title + item.year)}
+					{#each section.items as item (item.entity_id)}
 						<li class="grid grid-cols-[minmax(0,1fr)_180px] gap-[18px] border-b border-rule py-[18px] max-[840px]:grid-cols-1 max-[840px]:gap-2">
 							<div class="grid grid-cols-[64px_minmax(0,1fr)] gap-[18px] max-[840px]:grid-cols-1 max-[840px]:gap-2">
 								<span class="tabular-nums text-[.72rem] text-ink-faint">{item.hide_year ? '' : item.year ?? ui.noDate}</span>
