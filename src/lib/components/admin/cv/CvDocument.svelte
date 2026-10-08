@@ -13,9 +13,12 @@
   import '$lib/styles/cv-fonts.css';
   import '$lib/styles/cv-print.css';
   let { snapshot }: { snapshot: CvSnapshot } = $props();
-  const affiliationAndWeb = $derived(snapshot.affiliation !== undefined
-    ? [snapshot.affiliation, snapshot.website?.replace(/^https?:\/\//, '').replace(/\/$/, '')].filter(Boolean).join(' · ')
-    : snapshot.contact || '');
+  // Las versiones exportadas antes de separar afiliación y web solo guardan `contact`.
+  const affiliation = $derived(snapshot.affiliation !== undefined ? snapshot.affiliation : snapshot.contact || '');
+  const website = $derived(snapshot.website?.trim()
+    ? { href: /^https?:\/\//i.test(snapshot.website.trim()) ? snapshot.website.trim() : `https://${snapshot.website.trim()}`,
+        label: snapshot.website.trim().replace(/^https?:\/\//i, '').replace(/\/$/, '') }
+    : null);
   const entryGroups = (entries: CvSnapshot['blocks'][number]['entries']) => {
     const groups: { education: boolean; skills: boolean; memberships: boolean; entries: typeof entries }[] = [];
     for (const entry of entries) {
@@ -34,10 +37,19 @@
 <article class="cv-document mx-auto max-w-[210mm] bg-white px-[clamp(1.5rem,5vw,4rem)] py-12 text-[#171916] shadow-sm" lang={snapshot.language}>
   <header class="mb-9 border-b-2 border-[#536a4f] pb-6">
     <p class="cv-kicker mb-4 text-[0.62rem] tracking-[0.14em] text-[#536a4f] uppercase">{snapshot.title}</p>
-    <h1 class="m-0 font-title text-[clamp(2rem,4vw,3rem)] leading-[1.08] font-normal">{snapshot.personName}</h1>
-    {#if snapshot.position}<p class="cv-position mt-4 mb-0 text-[0.9rem] leading-relaxed font-medium text-[#41583d]">{snapshot.position}</p>{/if}
-    {#if affiliationAndWeb}<p class="cv-contact mt-2 mb-0 text-[0.8rem] leading-relaxed text-[#50534d]">{affiliationAndWeb}</p>{/if}
-    {#if snapshot.email}<p class="cv-email mt-1 mb-0 text-[0.8rem]"><a href={`mailto:${snapshot.email}`} class="text-[#536a4f] no-underline">{snapshot.email}</a></p>{/if}
+    <div class="cv-identity flex flex-wrap items-end justify-between gap-x-8 gap-y-4">
+      <div class="min-w-0">
+        <h1 class="m-0 font-title text-[clamp(2rem,4vw,3rem)] leading-[1.08] font-normal">{snapshot.personName}</h1>
+        {#if snapshot.position}<p class="cv-position mt-4 mb-0 text-[0.9rem] leading-relaxed font-medium text-[#41583d]">{snapshot.position}</p>{/if}
+        {#if affiliation}<p class="cv-contact mt-1 mb-0 text-[0.8rem] leading-relaxed text-[#50534d]">{affiliation}</p>{/if}
+      </div>
+      {#if snapshot.email || website}
+        <address class="cv-email grid justify-items-end gap-1 text-right text-[0.8rem] leading-relaxed not-italic">
+          {#if snapshot.email}<a href={`mailto:${snapshot.email}`} class="text-[#536a4f] no-underline">{snapshot.email}</a>{/if}
+          {#if website}<a href={website.href} class="text-[#536a4f] no-underline">{website.label}</a>{/if}
+        </address>
+      {/if}
+    </div>
   </header>
   {#each snapshot.blocks as block, index (block.key)}
     {@const selected = /\s+(seleccionad[oa]s?|selected)$/i.test(block.title)}
