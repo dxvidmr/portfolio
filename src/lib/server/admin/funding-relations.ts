@@ -239,7 +239,7 @@ async function assertParticipants(fundingAwardId: number, target: EntryKey): Pro
 			args: [target.entityType, target.entityId]
 		})
 	]);
-	if (funding.rows.length === 0 || entry.rows.length === 0) throw new Error('La entrada relacionada no existe');
+	if (funding.rows.length === 0 || entry.rows.length === 0) throw new Error('El mérito relacionado no existe');
 }
 
 export function relationBelongsToEntry(

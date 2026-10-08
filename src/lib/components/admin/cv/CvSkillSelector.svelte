@@ -39,7 +39,7 @@
 </script>
 <div class="grid gap-4">
   <label class="grid gap-2 text-xs">Presentación de las competencias en este CV<select bind:value={block.skillsDisplay} class="border border-rule bg-canvas p-2"><option value="names">Solo nombres</option><option value="descriptions">Nombres y descripciones</option></select></label>
-  <p class="m-0 text-xs leading-relaxed text-ink-dim">Las áreas agrupan las competencias seleccionadas. Puedes elegir una a una o seleccionar el área completa. «Solo nombres» oculta descripciones, recursos y comentarios sin borrar su configuración.</p>
+  <p class="m-0 text-xs leading-relaxed text-ink-dim">Elige competencias sueltas o áreas completas. «Solo nombres» oculta descripciones y recursos sin perder lo que hayas configurado.</p>
   <label class="grid gap-2 text-xs">Buscar competencias o áreas<input type="search" bind:value={search} class="border border-rule bg-canvas p-2" /></label>
   <p class="m-0 text-xs text-accent-strong">{selected.size} competencias en {areas.filter(g=>g.count).length} áreas</p>
   {#each block.entries.filter(e=>e.entityType==='skills'&&!catalog.some(c=>c.entityType==='skills'&&c.entityId===e.entityId)) as missing}
@@ -62,8 +62,8 @@
             <details class="mt-2 text-xs">
               <summary class="cursor-pointer text-accent-strong">Texto adaptado y opciones adicionales{block.skillsDisplay==='names' ? ' (ocultos en el PDF)' : ''}</summary>
               <div class="mt-3 grid gap-3">
-                <a href={`/admin/entradas/skills/${entry.entityId}`} target="_blank" rel="noopener" class="text-accent-strong underline">Editar capacidad original ↗</a>
-                <label class="grid gap-2">Descripción<select bind:value={selection.contributionMode} class="border border-rule bg-canvas p-2"><option value="inherit">Mantener texto de la DB</option><option value="custom">Adaptar para este CV</option><option value="hidden">Ocultar descripción</option></select></label>
+                <a href={`/admin/meritos/skills/${entry.entityId}`} target="_blank" rel="noopener" class="text-accent-strong underline">Editar capacidad original ↗</a>
+                <label class="grid gap-2">Descripción<select bind:value={selection.contributionMode} class="border border-rule bg-canvas p-2"><option value="inherit">Usar el texto original</option><option value="custom">Adaptar para este CV</option><option value="hidden">Ocultar descripción</option></select></label>
                 {#if selection.contributionMode==='custom'}<label class="grid gap-2">Descripción adaptada<textarea bind:value={selection.contributionText} rows="3" maxlength="10000" class="border border-rule bg-canvas p-2"></textarea></label>{/if}
                 {#if entry.presentation?.kind==='skill'}
                   <fieldset class="grid gap-2"><legend>Recursos opcionales</legend>{#each entry.presentation.resources as resource}<label><input type="checkbox" checked={selection.skillOptions?.resources.includes(resource.key)??false} onchange={e=>{selection.skillOptions??={resources:[],evidence:[]};selection.skillOptions.resources=e.currentTarget.checked?[...selection.skillOptions.resources,resource.key]:selection.skillOptions.resources.filter(k=>k!==resource.key);}} /> {resource.label}</label>{/each}</fieldset>

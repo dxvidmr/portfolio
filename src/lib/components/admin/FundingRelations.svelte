@@ -44,8 +44,8 @@
 		editor.mode === 'funding' ? relation.entitySortDate : relation.fundingSortDate;
 	const relationHref = (relation: FundingRelation) =>
 		editor.mode === 'funding'
-			? `/admin/entradas/${relation.entityType}/${relation.entityId}`
-			: `/admin/entradas/funding_awards/${relation.fundingAwardId}`;
+			? `/admin/meritos/${relation.entityType}/${relation.entityId}`
+			: `/admin/meritos/funding_awards/${relation.fundingAwardId}`;
 
 	let typeOptions = $derived.by(() => {
 		const labels = new Map<string, string>();
@@ -83,12 +83,12 @@
 
 <section id="funding-section" class="scroll-mt-36 mt-10 border-t border-rule pt-6" aria-labelledby="funding-relations-title">
 	<h2 class="mt-0 mb-5 text-sm font-medium tracking-[0.08em] text-ink-dim uppercase" id="funding-relations-title">
-		{editor.mode === 'funding' ? 'Actividad relacionada' : 'Financiación y premios'}
+		{editor.mode === 'funding' ? 'Méritos relacionados' : 'Financiación y premios'}
 	</h2>
 	<p class="mt-0 mb-4 max-w-[68ch] leading-[1.6] text-ink-dim">
 		{editor.mode === 'funding'
-			? 'Vincula esta ayuda, contrato o premio con las actividades académicas a las que da soporte o reconoce.'
-			: 'Vincula esta entrada con las ayudas, contratos o premios relacionados.'}
+			? 'Méritos que esta ayuda, contrato o premio financia o reconoce.'
+			: 'Ayudas, contratos o premios relacionados con este mérito.'}
 	</p>
 
 	{#if editor.relations.length === 0}
@@ -165,7 +165,7 @@
 			</div>
 			<p class="m-0 px-4 pt-[0.55rem] pb-[0.85rem] text-[0.65rem] text-ink-faint">{availableCandidates.length} disponibles</p>
 			{#if availableCandidates.length === 0}
-				<p class="m-0 p-4 text-xs text-ink-faint">No hay entradas disponibles con estos filtros.</p>
+				<p class="m-0 p-4 text-xs text-ink-faint">No hay méritos disponibles con estos filtros.</p>
 			{:else}
 				<ul class="m-0 max-h-[32rem] list-none overflow-y-auto border-t border-rule p-0">
 					{#each availableCandidates as candidate (relationKey(candidate))}

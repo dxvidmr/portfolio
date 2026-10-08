@@ -36,8 +36,7 @@
 	</h2>
 	{#if editor.documents.length > 0}
 		<p class="max-w-[72ch] leading-[1.6] text-ink-dim">
-			Todos los documentos son privados y nunca llegan a la web pública. Usa el tipo «Certificado»
-			para incorporarlos también al índice global de certificados.
+			Los documentos son siempre privados. Todos se pueden consultar también en Méritos › Documentos.
 		</p>
 	{/if}
 

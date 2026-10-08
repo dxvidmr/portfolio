@@ -1,6 +1,6 @@
 # Portfolio
 
-Web personal y CV de David Merino Recalde, en español e inglés, con un panel privado (`/admin`) para editar las entradas del CV, el portfolio y las variantes de CV exportables a PDF.
+Web personal y CV de David Merino Recalde, en español e inglés, con un panel privado (`/admin`) para editar los méritos del CV, el portfolio y las variantes de CV exportables a PDF.
 
 - **SvelteKit 2 + Svelte 5** (runes) sobre **Vite 8**, desplegado en **Vercel**.
 - **Turso (libSQL)** como fuente de verdad de los datos. Solo se usa en el servidor.

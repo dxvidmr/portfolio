@@ -36,8 +36,7 @@
 
 <AdminPageHeader
 	title="Taxonomías"
-	eyebrow="Control"
-	description="Edita las etiquetas y el orden de los tipos. Los que están en uso se pueden modificar, pero no eliminar."
+	description="Nombres y orden de los tipos y categorías. Los que están en uso no se pueden borrar."
 />
 
 {#if form?.message}

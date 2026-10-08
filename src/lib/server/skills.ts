@@ -39,7 +39,7 @@ export async function getSkillDetails(reader: Reader = db, language: 'es' | 'en'
     return result.get(key)!;
   };
   for (const r of sets[0].rows) get(r.skill_id).resources.push({key:String(r.id),label:String(language==='en' ? r.name_en || r.name_es : r.name_es),labelEn:String(r.name_en || r.name_es)});
-  for (const r of sets[1].rows) get(r.skill_id).evidence.push({key:`${r.entity_type}:${r.entity_id}`,label:String(r.title_cache),labelEn:String(r.title_cache),url:safeUrl(r.url),adminUrl:`/admin/entradas/${r.entity_type}/${r.entity_id}`});
+  for (const r of sets[1].rows) get(r.skill_id).evidence.push({key:`${r.entity_type}:${r.entity_id}`,label:String(r.title_cache),labelEn:String(r.title_cache),url:safeUrl(r.url),adminUrl:`/admin/meritos/${r.entity_type}/${r.entity_id}`});
   for (const r of sets[2].rows) get(r.skill_id).evidence.push({key:`portfolio:${r.slug}`,label:String(language==='en' ? r.title_en : r.title_es),labelEn:String(r.title_en),url:`https://davidmerinorecalde.com/${language}/portfolio/${r.slug}`,adminUrl:`/admin/portfolio/${r.slug}`});
   return result;
 }

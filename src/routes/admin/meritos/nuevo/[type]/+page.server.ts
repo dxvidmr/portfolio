@@ -4,8 +4,10 @@ import { requireAdmin } from '$lib/server/admin/auth';
 import {
 	entityDefinitions,
 	entityForms,
+	eventRoleByType,
 	getEntityCapabilities,
 	isFormEntityType,
+	meritTypes,
 	type EntityFormDef
 } from '$lib/server/admin/entity-definitions';
 import { parseEntityForm } from '$lib/server/admin/validation';
@@ -19,7 +21,7 @@ import { getCanonicalEventDefaults } from '$lib/server/admin/events';
 
 export const load: PageServerLoad = async ({ locals, params, url }) => {
 	await requireAdmin(locals);
-	if (!isFormEntityType(params.type)) error(404, 'Tipo de entrada no soportado');
+	if (!isFormEntityType(params.type)) error(404, 'Tipo de mérito no soportado');
 
 	const requestedContext = url.searchParams.get('context');
 	const creationContext =
@@ -63,6 +65,9 @@ export const load: PageServerLoad = async ({ locals, params, url }) => {
 	return {
 		entityType: params.type,
 		typeLabel: entityDefinitions[params.type],
+		meritLabel: meritTypes[params.type].label,
+		// Solo se ofrece crear un evento nuevo cuando el mérito no es explícitamente independiente.
+		eventRole: creationContext === 'standalone' ? undefined : eventRoleByType[params.type],
 		creationContext,
 		capabilities: getEntityCapabilities(params.type),
 		fields: formDefinition.fields,
@@ -75,7 +80,7 @@ export const load: PageServerLoad = async ({ locals, params, url }) => {
 export const actions: Actions = {
 	crear: async ({ locals, params, request }) => {
 		await requireAdmin(locals);
-		if (!isFormEntityType(params.type)) error(404, 'Tipo de entrada no soportado');
+		if (!isFormEntityType(params.type)) error(404, 'Tipo de mérito no soportado');
 
 		const formData = await request.formData();
 		const creationContext = String(formData.get('creation_context') ?? '');
@@ -94,6 +99,6 @@ export const actions: Actions = {
 		}
 
 		const id = await createEntity(params.type, parsed.values);
-		redirect(303, `/admin/entradas/${params.type}/${id}?creada=1`);
+		redirect(303, `/admin/meritos/${params.type}/${id}?creada=1`);
 	}
 };

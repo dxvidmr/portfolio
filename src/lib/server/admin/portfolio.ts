@@ -266,7 +266,7 @@ async function assertEntryExists({ entityType, entityId }: EntryKey): Promise<vo
 		sql: 'SELECT 1 FROM entry_source WHERE entity_type = ? AND entity_id = ? LIMIT 1',
 		args: [entityType, entityId]
 	});
-	if (result.rows.length === 0) throw new Error('La entrada no existe');
+	if (result.rows.length === 0) throw new Error('El mérito no existe');
 }
 
 export async function addPortfolioRelation(

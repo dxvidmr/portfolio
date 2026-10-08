@@ -56,10 +56,10 @@ export const actions: Actions = {
 		if (!portfolioSlug || !entry) return fail(400, { success: false, message: 'Relación no válida.' });
 		try {
 			const relation = await addPortfolioRelation(portfolioSlug, entry);
-			return { success: true, message: 'Entrada añadida a la ficha.', relation };
+			return { success: true, message: 'Mérito añadido a la ficha.', relation };
 		} catch (cause) {
 			console.error('[admin] Error al relacionar una entrada con el portfolio', { message: cause instanceof Error ? cause.message : 'Error desconocido' });
-			return fail(500, { success: false, message: 'No se pudo añadir la entrada.' });
+			return fail(500, { success: false, message: 'No se pudo añadir el mérito.' });
 		}
 	},
 	remove: async ({ request, locals, params }) => {
@@ -71,10 +71,10 @@ export const actions: Actions = {
 		if (!portfolioSlug || !entry) return fail(400, { success: false, message: 'Relación no válida.' });
 		try {
 			await removePortfolioRelation(portfolioSlug, entry);
-			return { success: true, message: 'Entrada retirada de la ficha.' };
+			return { success: true, message: 'Mérito retirado de la ficha.' };
 		} catch (cause) {
 			console.error('[admin] Error al retirar una relación del portfolio', { message: cause instanceof Error ? cause.message : 'Error desconocido' });
-			return fail(500, { success: false, message: 'No se pudo retirar la entrada.' });
+			return fail(500, { success: false, message: 'No se pudo retirar el mérito.' });
 		}
 	},
 	featured: async ({ request, locals, params }) => {
@@ -87,7 +87,7 @@ export const actions: Actions = {
 		if (!portfolioSlug || !entry || featured == null) return fail(400, { success: false, message: 'Destacado no válido.' });
 		try {
 			const relation = await setPortfolioFeatured(portfolioSlug, entry, featured);
-			return { success: true, message: featured ? 'Entrada destacada en la ficha.' : 'Destacado retirado.', relation };
+			return { success: true, message: featured ? 'Mérito destacado en la ficha.' : 'Destacado retirado.', relation };
 		} catch (cause) {
 			console.error('[admin] Error al actualizar el destacado del portfolio', { message: cause instanceof Error ? cause.message : 'Error desconocido' });
 			return fail(500, { success: false, message: 'No se pudo actualizar el destacado.' });

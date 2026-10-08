@@ -114,7 +114,7 @@ export async function getLinkEditor(entry: EntryKey): Promise<LinkEditor> {
 
 async function validateMutation(entry: EntryKey, values: LinkValues): Promise<void> {
 	const [owner, type] = await Promise.all([entryExists(entry), validLinkType(values.linkType)]);
-	if (!owner) throw new Error('La entrada no existe');
+	if (!owner) throw new Error('El mérito no existe');
 	if (!type) throw new Error('El tipo de enlace no es válido');
 }
 

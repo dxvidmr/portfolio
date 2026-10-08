@@ -30,7 +30,7 @@ const projectGroups: Array<Omit<StructuralRelationGroup, 'items'>> = [
 	{
 		entityType: 'publications',
 		label: 'Publicaciones',
-		description: 'Publicaciones cuyo campo «Proyecto de investigación» apunta a esta entrada.'
+		description: 'Publicaciones cuyo campo «Proyecto de investigación» apunta a este mérito.'
 	},
 	{
 		entityType: 'talks',
@@ -48,7 +48,7 @@ const eventGroups: Array<Omit<StructuralRelationGroup, 'items'>> = [
 	{
 		entityType: 'publications',
 		label: 'Publicaciones derivadas',
-		description: 'Publicaciones cuyo campo «Evento de origen» apunta a esta entrada.'
+		description: 'Publicaciones cuyo campo «Evento de origen» apunta a este mérito.'
 	}
 ];
 

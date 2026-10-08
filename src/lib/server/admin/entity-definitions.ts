@@ -694,7 +694,7 @@ export const entityForms = {
 			{
 				id: 'attendance-event',
 				title: 'Evento',
-				description: 'La asistencia siempre depende de un evento creado previamente.',
+				description: 'Toda asistencia pertenece a un evento.',
 				fields: ['event_id']
 			},
 			{
@@ -707,7 +707,7 @@ export const entityForms = {
 			f('event_id', 'Evento', 'fk', {
 				required: true,
 				fkEntity: 'events',
-				help: 'Si el evento aún no existe, créalo primero desde Eventos.',
+				help: 'Si el evento aún no existe, regístralo desde Méritos › Eventos › Nuevo evento.',
 				wide: true
 			}),
 			f('role', 'Rol de asistencia', 'vocab', {
@@ -847,6 +847,53 @@ export const isFormEntityType = (value: string): value is FormEntityType =>
 export const formEntityTypeOptions = (Object.keys(entityForms) as FormEntityType[]).map(
 	(value) => ({ value, label: entityDefinitions[value] })
 );
+
+// Selector de «Nuevo mérito»: cada tipo en singular, con una pista de lo que abarca,
+// y agrupado como los apartados de un CV. Cada tipo aparece en un solo grupo.
+export const meritTypes: Record<FormEntityType, { label: string; hint: string }> = {
+	publications: { label: 'Publicación', hint: 'Artículo, libro, capítulo, edición o reseña' },
+	projects: { label: 'Proyecto de investigación', hint: 'Participación en un proyecto' },
+	technical_works: {
+		label: 'Trabajo técnico o profesional',
+		hint: 'Desarrollo, edición digital, datos, asesoramiento…'
+	},
+	research_stays: { label: 'Estancia de investigación', hint: 'En otra universidad o centro' },
+	funding_awards: { label: 'Financiación o premio', hint: 'Contrato, beca, ayuda o premio' },
+	talks: { label: 'Comunicación', hint: 'Ponencia, póster o conferencia en un evento' },
+	event_attendance: {
+		label: 'Asistencia a un evento',
+		hint: 'Siempre privada; sirve para guardar el certificado'
+	},
+	service_activities: {
+		label: 'Servicio académico',
+		hint: 'Organización, comités, evaluación, edición de revistas…'
+	},
+	teaching: { label: 'Docencia', hint: 'Asignatura, curso o taller impartido' },
+	education: { label: 'Formación', hint: 'Grado, máster o doctorado' },
+	academic_works: { label: 'Trabajo académico', hint: 'TFG o TFM' },
+	courses: { label: 'Curso', hint: 'Formación complementaria recibida' },
+	memberships: { label: 'Asociación científica', hint: 'Pertenencia a una sociedad o red' },
+	languages: { label: 'Idioma', hint: 'Nivel y certificación' },
+	skills: { label: 'Competencia', hint: 'Capacidad técnica o metodológica' }
+};
+
+export const meritTypeGroups: Array<{ title: string; types: FormEntityType[] }> = [
+	{
+		title: 'Investigación y experiencia',
+		types: ['publications', 'projects', 'technical_works', 'research_stays', 'funding_awards']
+	},
+	{ title: 'Eventos y servicio académico', types: ['talks', 'event_attendance', 'service_activities'] },
+	{ title: 'Docencia y formación', types: ['teaching', 'education', 'academic_works', 'courses'] },
+	{ title: 'Perfil', types: ['memberships', 'languages', 'skills'] }
+];
+
+// Tipos que cuelgan de un evento: desde su formulario se puede registrar un evento
+// nuevo junto con el mérito (valor del parámetro `rol` de /admin/eventos/nuevo).
+export const eventRoleByType: Partial<Record<FormEntityType, 'comunicacion' | 'servicio' | 'asistencia'>> = {
+	talks: 'comunicacion',
+	service_activities: 'servicio',
+	event_attendance: 'asistencia'
+};
 
 export interface EntityCapabilities {
 	canPublish: boolean;

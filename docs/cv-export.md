@@ -1,6 +1,6 @@
 # Mis CV: edición y exportación
 
-La entrada `/admin/cv` gestiona variantes privadas guardadas en Turso. El CV público y sus controles de visibilidad son independientes de estas selecciones.
+La sección `/admin/cv` («Mis CV») gestiona variantes privadas guardadas en Turso. El CV público y sus controles de visibilidad son independientes de estas selecciones.
 
 ## Uso
 
@@ -40,7 +40,7 @@ La migración `039_cv_affiliation_and_website.sql` separa afiliación y web, con
 
 Las migraciones `040` y `041` separan la participación académica de los trabajos técnicos y profesionales. Los proyectos conservan naturaleza, programa/convocatoria, participación y «Mi aportación» como datos independientes. Las categorías de equipo de investigación y de trabajo solo están disponibles para Generación de Conocimiento. Las convocatorias de UNIR se identifican expresamente; se retira la falsa categoría de proyecto «Colaboración externa».
 
-**Trabajos técnicos y profesionales** es una categoría de Entradas, con su propio formulario, controles de publicación, enlaces, documentos, financiación personal relacionada y vínculos con el portfolio. Permite encargos profesionales, colaboraciones técnicas e iniciativas propias. No exige destinatario ni proyecto. El tipo de trabajo es ampliable desde Taxonomías: desarrollo, edición digital, datos, análisis, asesoramiento y preservación son los términos iniciales.
+**Trabajos técnicos y profesionales** es un tipo de mérito, con su propio formulario, controles de publicación, enlaces, documentos, financiación personal relacionada y vínculos con el portfolio. Permite encargos profesionales, colaboraciones técnicas e iniciativas propias. No exige destinatario ni proyecto. El tipo de trabajo es ampliable desde Taxonomías: desarrollo, edición digital, datos, análisis, asesoramiento y preservación son los términos iniciales.
 
 Si el trabajo pertenece a proyectos en los que participas, `technical_work_projects` hereda sus contextos vivos. Si es un encargo o colaboración sin pertenencia académica, los campos opcionales de contexto describen la iniciativa, convocatoria, financiación y responsables dentro del trabajo; no se crea un proyecto académico ficticio. La DB impide duplicar ambos contextos. Eliminar un proyecto vinculado requiere primero resolver sus trabajos; publicar un trabajo no revela el contexto de un proyecto privado.
 

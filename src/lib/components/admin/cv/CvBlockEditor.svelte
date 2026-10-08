@@ -42,20 +42,20 @@
           </summary>
         {#if entry}
           <p class="text-[0.65rem] leading-relaxed text-ink-dim">{entry.detail}</p>
-          <a href={`/admin/entradas/${selection.entityType}/${selection.entityId}`} target="_blank" rel="noopener" class="text-[0.65rem] text-accent-strong">Editar registro original ↗</a>
+          <a href={`/admin/meritos/${selection.entityType}/${selection.entityId}`} target="_blank" rel="noopener" class="text-[0.65rem] text-accent-strong">Editar registro original ↗</a>
         {:else}<p class="text-warning" role="alert">Este registro ya no existe: {selection.entityType}:{selection.entityId}. Retíralo para exportar.</p>{/if}
         {#if entry && (entry.entityType === 'projects' || entry.entityType === 'technical_works')}
           <label class="mt-3 grid gap-2 text-[0.65rem]">Mi aportación en este CV
             <select bind:value={selection.contributionMode} class="w-full rounded-sm border border-rule bg-canvas p-2">
-              <option value="inherit">Mantener texto de la DB</option><option value="custom">Adaptar para este CV</option><option value="hidden">Ocultar aportación</option>
+              <option value="inherit">Usar el texto original</option><option value="custom">Adaptar para este CV</option><option value="hidden">Ocultar aportación</option>
             </select>
           </label>
           {#if selection.contributionMode === 'custom'}
-            <Button type="button" size="sm" variant="ghost" onclick={() => selection.contributionText = entry.contribution ?? ''}>Copiar texto de la DB para adaptarlo</Button>
+            <Button type="button" size="sm" variant="ghost" onclick={() => selection.contributionText = entry.contribution ?? ''}>Copiar el texto original para adaptarlo</Button>
             <label class="mt-2 grid gap-2 text-[0.65rem]">Aportación adaptada<textarea bind:value={selection.contributionText} rows="3" maxlength="10000" class="w-full rounded-sm border border-rule bg-canvas p-2"></textarea></label>
-            <p class="text-[0.65rem] text-ink-faint">Solo cambia este CV; las actualizaciones del original no sobrescriben esta adaptación.</p>
+            <p class="text-[0.65rem] text-ink-faint">Solo afecta a este CV. Si después cambias el original, esta versión no se actualiza.</p>
           {:else if selection.contributionMode !== 'hidden'}
-            <p class="mt-2 whitespace-pre-line text-[0.7rem] text-ink-dim">{entry.contribution || 'Sin aportación escrita en el registro original.'}</p>
+            <p class="mt-2 whitespace-pre-line text-[0.7rem] text-ink-dim">{entry.contribution || 'El mérito original no tiene texto de aportación.'}</p>
           {/if}
         {/if}
         <label class="mt-3 grid gap-2 text-[0.65rem]">Comentario adicional para este CV<textarea bind:value={selection.commentary} rows="2" maxlength="10000" class="w-full rounded-sm border border-rule bg-canvas p-2"></textarea></label>
@@ -66,7 +66,7 @@
     {/if}
     {#if !skillsOnly}
     <details class="rounded-sm border border-rule p-4">
-      <summary class="cursor-pointer text-sm text-accent-strong">+ Añadir méritos de la base de datos</summary>
+      <summary class="cursor-pointer text-sm text-accent-strong">+ Añadir méritos</summary>
       <div class="mt-4 grid gap-3 sm:grid-cols-2">
         <label class="grid gap-2 text-xs">Buscar<input bind:value={search} placeholder="Título, autor, institución…" class="w-full rounded-sm border border-rule bg-canvas p-3" /></label>
         <label class="grid gap-2 text-xs">Tipo<select bind:value={type} class="w-full rounded-sm border border-rule bg-canvas p-3"><option value="">Todos los tipos</option>{#each Object.entries(cvEntityLabels).filter(([key])=>key!=='skills') as [key, label]}<option value={key}>{label}</option>{/each}</select></label>

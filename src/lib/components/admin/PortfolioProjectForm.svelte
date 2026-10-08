@@ -33,16 +33,16 @@
 <form class="grid grid-cols-2 gap-4 max-[760px]:grid-cols-1" method="POST" {action}>
 	{#if project}
 		<input type="hidden" name="slug" value={project.slug} />
-		<AdminField label="Slug"><Input value={project.slug} disabled /></AdminField>
+		<AdminField label="Dirección (URL)"><Input value={`/portfolio/${project.slug}`} disabled /></AdminField>
 	{:else}
-		<AdminField label="Slug">
+		<AdminField label="Dirección (URL)" help="Solo minúsculas, números y guiones. No se puede cambiar después.">
 			<Input name="slug" required pattern="[a-z0-9]+(?:-[a-z0-9]+)*" placeholder="mi-proyecto" />
 		</AdminField>
 	{/if}
 
 	<AdminField label="Estado editorial">
 		<Select name="publicationStatus" bind:value={publicationStatus}>
-			<option value="draft">Borrador · solo dashboard</option>
+			<option value="draft">Borrador · solo en el panel</option>
 			<option value="published">Publicado · visible en la web</option>
 			<option value="archived">Archivado · retirado</option>
 		</Select>
@@ -68,7 +68,7 @@
 		name="tagCodes"
 		options={tagOptions}
 		selected={project?.tags.map((tag) => tag.code) ?? []}
-		help="Selecciona ámbitos estables y reutilizables. Las traducciones se gestionan desde Taxonomías."
+		help="Las traducciones se editan en Taxonomías."
 	/>
 	<AdminField label="Enlace principal"><Input name="linkUrl" type="url" value={primaryLink?.url ?? ''} /></AdminField>
 	<AdminField label="Etiqueta del enlace (ES)"><Input name="linkLabelEs" value={primaryLink?.label.es ?? ''} /></AdminField>

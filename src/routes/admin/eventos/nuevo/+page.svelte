@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { page } from '$app/state';
 	import type { ActionData, PageData } from './$types';
 	import CanonicalEventForm from '$lib/components/admin/CanonicalEventForm.svelte';
 	import EntityForm from '$lib/components/admin/EntityForm.svelte';
@@ -15,13 +16,17 @@
 
 	// Roles marcados (decisión 23). Sin use:enhance, un fallo de validación
 	// llega como página completa nueva, así que el valor inicial de `form`
-	// es exactamente el estado a restaurar.
+	// es exactamente el estado a restaurar. Sin envío previo, `?rol=` marca el
+	// papel con el que se llega desde «Nuevo mérito».
+	const initialRole = page.url.searchParams.get('rol');
+	const initiallyChecked = (field: string, role: string) =>
+		form ? form.raw?.[field] === '1' : initialRole === role;
 	// svelte-ignore state_referenced_locally
-	let withTalk = $state(form?.raw?.rol_contribucion === '1');
+	let withTalk = $state(initiallyChecked('rol_contribucion', 'comunicacion'));
 	// svelte-ignore state_referenced_locally
-	let withService = $state(form?.raw?.rol_servicio === '1');
+	let withService = $state(initiallyChecked('rol_servicio', 'servicio'));
 	// svelte-ignore state_referenced_locally
-	let withAttendance = $state(form?.raw?.rol_asistencia === '1');
+	let withAttendance = $state(initiallyChecked('rol_asistencia', 'asistencia'));
 </script>
 
 <svelte:head><title>Nuevo evento · cv/admin</title></svelte:head>
@@ -31,8 +36,8 @@
 >
 <AdminPageHeader
 	title="Nuevo evento"
-	eyebrow="Identidad académica compartida"
-	description="Registra una sola vez los datos comunes del evento y marca los papeles que quieras crear ahora. Las contribuciones y servicios nacen privados; podrás completarlos y publicarlos después."
+	eyebrow="Eventos"
+	description="Registra el evento y, si quieres, tus papeles en él. Cada papel se crea como un mérito privado."
 />
 
 {#if form?.errors}<AdminToast message="Revisa los campos marcados." success={false} />{/if}
@@ -49,7 +54,7 @@
 
 	<section>
 		<h2 class="mt-0 mb-3 text-base">¿Cuál fue tu papel?</h2>
-		<p class="mt-0 mb-3 text-[0.78rem] text-ink-faint">Puedes marcar varios; también puedes registrar solo el evento y añadir roles más tarde.</p>
+		<p class="mt-0 mb-3 text-[0.78rem] text-ink-faint">Puedes marcar varios, o ninguno y añadirlos después.</p>
 
 		<label class="mt-3 mb-1.5 flex cursor-pointer items-baseline gap-2.5 text-ink">
 			<Checkbox name="rol_contribucion" value="1" bind:checked={withTalk} />

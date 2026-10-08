@@ -41,8 +41,7 @@
 
 <AdminPageHeader
 	title="Portfolio"
-	eyebrow="Elementos del portfolio"
-	description="Gestiona el estado editorial, el orden y las relaciones de cada ficha."
+	description="Fichas de proyecto de la web: estado, orden y méritos relacionados."
 >
 	{#snippet actions()}<ButtonLink href="/admin/portfolio/nuevo" variant="primary">+ Nuevo elemento</ButtonLink>{/snippet}
 </AdminPageHeader>

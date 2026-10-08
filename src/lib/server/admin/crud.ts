@@ -164,7 +164,7 @@ export async function validateReferences(
 				args: [eventId, entityId ?? null, entityId ?? null]
 			});
 			if (existing.rows.length > 0) {
-				parsed.errors.event_id = 'Este evento ya tiene una entrada de asistencia';
+				parsed.errors.event_id = 'Este evento ya tiene una asistencia registrada';
 			}
 		}
 	}

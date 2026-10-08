@@ -70,8 +70,8 @@ function parseParams(params: { type: string; id: string }): {
 	entityType: FormEntityType;
 	entityId: number;
 } {
-	if (!isFormEntityType(params.type)) error(404, 'Tipo de entrada no soportado');
-	if (!/^\d+$/.test(params.id)) error(404, 'Entrada no encontrada');
+	if (!isFormEntityType(params.type)) error(404, 'Tipo de mérito no soportado');
+	if (!/^\d+$/.test(params.id)) error(404, 'Mérito no encontrado');
 	return { entityType: params.type, entityId: Number(params.id) };
 }
 
@@ -80,7 +80,7 @@ export const load: PageServerLoad = async ({ locals, params, setHeaders }) => {
 	const { entityType, entityId } = parseParams(params);
 
 	const values = await getEntityFormValues(entityType, entityId);
-	if (!values) error(404, 'Entrada no encontrada');
+	if (!values) error(404, 'Mérito no encontrado');
 
 	setHeaders({ 'cache-control': 'private, no-store' });
 
@@ -139,7 +139,7 @@ export const actions: Actions = {
 	guardar: async ({ locals, params, request }) => {
 		await requireAdmin(locals);
 		const { entityType, entityId } = parseParams(params);
-		if (!(await getEntityFormValues(entityType, entityId))) error(404, 'Entrada no encontrada');
+		if (!(await getEntityFormValues(entityType, entityId))) error(404, 'Mérito no encontrado');
 
 		const parsed = parseEntityForm(entityForms[entityType], await request.formData());
 		await validateReferences(entityType, parsed, entityId);
@@ -368,7 +368,7 @@ export const actions: Actions = {
 		}
 
 		try { await deleteEntity(entityType, entityId); }
-		catch (e) { return fail(409, { eliminarError: e instanceof Error ? e.message : 'No se puede eliminar esta entrada mientras conserve relaciones.' }); }
-		redirect(303, '/admin/entradas?eliminada=1');
+		catch (e) { return fail(409, { eliminarError: e instanceof Error ? e.message : 'No se puede eliminar este mérito mientras conserve relaciones.' }); }
+		redirect(303, '/admin/meritos?eliminada=1');
 	}
 };

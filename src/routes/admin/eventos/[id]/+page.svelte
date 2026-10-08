@@ -14,7 +14,7 @@
 			id: item.entityId,
 			title: item.title,
 			meta: item.typeLabel,
-			href: `/admin/entradas/${item.entityType}/${item.entityId}`,
+			href: `/admin/meritos/${item.entityType}/${item.entityId}`,
 			isPublic: item.isPublic,
 			documentCount: item.documentCount,
 			certificateCount: item.certificateCount
@@ -25,7 +25,7 @@
 			id: item.entityId,
 			title: item.title,
 			meta: item.typeLabel,
-			href: `/admin/entradas/${item.entityType}/${item.entityId}`,
+			href: `/admin/meritos/${item.entityType}/${item.entityId}`,
 			isPublic: item.isPublic,
 			documentCount: item.documentCount,
 			certificateCount: item.certificateCount
@@ -37,7 +37,7 @@
 					id: data.event.attendance.id,
 					title: data.event.attendance.roleLabel,
 					meta: 'Asistencia a este evento',
-					href: `/admin/entradas/event_attendance/${data.event.attendance.id}`,
+					href: `/admin/meritos/event_attendance/${data.event.attendance.id}`,
 					isPublic: false,
 					documentCount: data.event.attendance.documentCount,
 					certificateCount: data.event.attendance.certificateCount
@@ -51,9 +51,9 @@
 <ButtonLink variant="ghost" size="sm" href="/admin/eventos" class="mb-4 px-0"
 	>← Volver a eventos</ButtonLink
 >
-<AdminPageHeader title={data.event.values.title} eyebrow={`Evento canónico #${data.event.id}`}>
+<AdminPageHeader title={data.event.values.title} eyebrow="Evento">
 	{#snippet actions()}
-		<span class="text-[0.68rem] text-ink-faint">La visibilidad pertenece a cada actividad</span>
+		<span class="text-[0.68rem] text-ink-faint">Cada mérito tiene su propia visibilidad</span>
 	{/snippet}
 </AdminPageHeader>
 
@@ -77,8 +77,7 @@
 	<div class="mb-4 grid gap-2">
 		<h2 class="m-0 text-base">Roles y actividades</h2>
 		<p class="m-0 max-w-[70ch] text-xs leading-[1.5] text-ink-faint">
-			Un mismo evento puede reunir varias entradas independientes. Cada una conserva su formulario,
-			sus documentos y sus certificados.
+			Cada papel es un mérito independiente, con su propia ficha, visibilidad y documentos.
 		</p>
 	</div>
 
@@ -88,7 +87,7 @@
 			description="Ponencias, comunicaciones, pósteres y otras contribuciones."
 			items={contributionItems}
 			emptyText="Sin comunicaciones vinculadas."
-			addHref={`/admin/entradas/nueva/talks?eventId=${data.event.id}`}
+			addHref={`/admin/meritos/nuevo/talks?eventId=${data.event.id}`}
 			addLabel="+ Comunicación"
 		/>
 		<EventRoleCard
@@ -96,7 +95,7 @@
 			description="Organización, comités, evaluación u otros servicios vinculados."
 			items={serviceItems}
 			emptyText="Sin actividades de servicio vinculadas."
-			addHref={`/admin/entradas/nueva/service_activities?eventId=${data.event.id}`}
+			addHref={`/admin/meritos/nuevo/service_activities?eventId=${data.event.id}`}
 			addLabel="+ Servicio"
 		/>
 		<EventRoleCard
@@ -106,7 +105,7 @@
 			emptyText="Sin asistencia registrada."
 			addHref={data.event.attendance
 				? undefined
-				: `/admin/entradas/nueva/event_attendance?eventId=${data.event.id}`}
+				: `/admin/meritos/nuevo/event_attendance?eventId=${data.event.id}`}
 			addLabel={data.event.attendance ? undefined : '+ Asistencia'}
 		/>
 	</div>
@@ -114,6 +113,6 @@
 
 <details class="mt-10 rounded-ui border border-danger p-4 text-ink-dim">
 	<summary class="cursor-pointer text-danger">Eliminar evento</summary>
-	<p>Solo puede eliminarse cuando no tenga contribuciones, servicios ni asistencia asociados.</p>
+	<p>Solo se puede eliminar si no tiene méritos asociados.</p>
 	<form class="grid justify-items-start gap-3" method="POST" action="?/eliminar"><label class="flex items-center gap-2"><Checkbox name="confirmar" value="1" /> Confirmo la eliminación</label><Button variant="danger" type="submit">Eliminar</Button></form>
 </details>

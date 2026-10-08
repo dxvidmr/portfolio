@@ -4,12 +4,12 @@
   const natures={method:'Método',standard:'Estándar',language:'Lenguaje',tool:'Herramienta',platform:'Plataforma'};
 </script>
 <h1 class="font-title text-3xl">Competencias técnicas y metodológicas</h1>
-<p class="max-w-3xl text-sm leading-relaxed text-ink-dim">Describe qué haces y vincúlalo a trabajos concretos. Los recursos son opcionales y representativos. No hay niveles ni listas exhaustivas de tecnologías.</p>
-<div class="my-5 flex gap-5 text-sm"><a href="/admin/entradas/nueva/skills" class="text-accent-strong underline">Crear capacidad</a><a href="/admin/taxonomias" class="text-accent-strong underline">Editar áreas</a></div>
+<p class="max-w-3xl text-sm leading-relaxed text-ink-dim">Qué sabes hacer, con ejemplos de trabajos concretos. Sin niveles ni listas de tecnologías.</p>
+<div class="my-5 flex gap-5 text-sm"><a href="/admin/meritos/nuevo/skills" class="text-accent-strong underline">Nueva competencia</a><a href="/admin/taxonomias" class="text-accent-strong underline">Editar áreas</a></div>
 {#each data.skills as skill,i (skill.id)}
   {#if i===0 || data.skills[i-1].area!==skill.area}<h2 class="mt-8 font-title text-xl">{skill.area}</h2>{/if}
   <article class="border-t border-rule py-4">
-    <h3 class="m-0 font-title text-lg"><a href={`/admin/entradas/skills/${skill.id}`} class="text-accent-strong">{skill.name} ↗</a></h3>
+    <h3 class="m-0 font-title text-lg"><a href={`/admin/meritos/skills/${skill.id}`} class="text-accent-strong">{skill.name} ↗</a></h3>
     <p class="max-w-4xl text-sm leading-relaxed">{skill.description}</p>
     <p class="text-xs text-ink-dim">{skill.isPublic ? 'Pública' : 'Privada'}{skill.details?.resources.length ? ` · ${skill.details.resources.map(r=>r.label).join(', ')}` : ''}</p>
     {#if skill.details?.evidence.length}<div class="flex flex-wrap gap-x-4 gap-y-2 text-xs">{#each skill.details.evidence as example}<a href={example.adminUrl} class="text-accent-strong underline">{example.label}</a>{/each}</div>{/if}
@@ -17,7 +17,7 @@
 {/each}
 <section class="mt-10 border-t border-rule pt-6">
   <h2 class="font-title text-2xl">Catálogo de recursos</h2>
-  <p class="text-sm text-ink-dim">Un mismo recurso puede apoyar varias capacidades. Añade uno nuevo solo si ayuda a explicar tu trabajo.</p>
+  <p class="text-sm text-ink-dim">Métodos, estándares, lenguajes y herramientas que puedes asociar a varias competencias.</p>
   {#if form?.message}<p role="status" class="text-sm text-accent-strong">{form.message}</p>{/if}
   {#snippet fields(id:number,name:string,nameEn:string,nature:string)}
     <input type="hidden" name="id" value={id} />

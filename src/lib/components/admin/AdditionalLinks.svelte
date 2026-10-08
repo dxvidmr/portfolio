@@ -33,7 +33,7 @@
 	<h2 class="mt-0 mb-5 text-sm font-medium tracking-[0.08em] text-ink-dim uppercase" id="additional-links-title">Recursos y enlaces</h2>
 	{#if editor.links.length > 0}
 		<p class="max-w-[68ch] leading-[1.6] text-ink-dim">
-			El campo URL del contenido es su destino canónico. Aquí se gestionan los recursos complementarios.
+			El enlace principal se edita en el formulario. Aquí puedes añadir otros.
 		</p>
 	{/if}
 

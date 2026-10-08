@@ -54,8 +54,8 @@
 
 <AdminPageHeader
 	title="Eventos"
-	eyebrow="Identidad académica compartida"
-	description="Un evento puede reunir varias contribuciones y roles. Las fechas de cada actividad se editan dentro de su ficha."
+	eyebrow="Eventos vinculados a tus méritos"
+	description="Nombre, fechas y lugar se guardan una vez y los comparten tus comunicaciones, servicios y asistencias en ese evento."
 >
 	{#snippet actions()}
 		<ButtonLink variant="primary" href="/admin/eventos/nuevo">+ Nuevo evento</ButtonLink>

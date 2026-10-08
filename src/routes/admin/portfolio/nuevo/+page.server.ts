@@ -25,7 +25,7 @@ export const actions: Actions = {
 			});
 			return fail(500, {
 				success: false,
-				message: 'No se pudo crear el elemento. Comprueba que el slug no esté en uso.'
+				message: 'No se pudo crear el elemento. Comprueba que la dirección no esté en uso.'
 			});
 		}
 		redirect(303, `/admin/portfolio/${encodeURIComponent(project.slug)}`);

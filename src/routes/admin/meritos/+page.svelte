@@ -125,14 +125,14 @@
 </script>
 
 <svelte:head>
-	<title>Entradas · cv/admin</title>
+	<title>Méritos · cv/admin</title>
 </svelte:head>
 
-<AdminPageHeader title="Entradas" eyebrow="Índice transversal">
+<AdminPageHeader title="Méritos">
 	{#snippet actions()}
-		<span class="text-xs text-ink-faint">{filteredEntries.length} de {entries.length} entradas</span>
-		<ButtonLink variant="primary" href="/admin/entradas/nueva" data-sveltekit-preload-data="off"
-			>Nueva entrada</ButtonLink
+		<span class="text-xs text-ink-faint">{filteredEntries.length} de {entries.length} méritos</span>
+		<ButtonLink variant="primary" href="/admin/meritos/nuevo" data-sveltekit-preload-data="off"
+			>Nuevo mérito</ButtonLink
 		>
 	{/snippet}
 </AdminPageHeader>
@@ -143,13 +143,13 @@
 	{/key}
 {/if}
 {#if page.url.searchParams.get('eliminada') === '1'}
-	<AdminToast message="Entrada eliminada." success={true} />
+	<AdminToast message="Mérito eliminado." success={true} />
 {/if}
 
-<section class="mb-6 grid gap-4 rounded-ui border border-rule bg-[var(--admin-surface)] p-[clamp(0.8rem,2vw,1.15rem)]" aria-label="Filtros de entradas">
+<section class="mb-6 grid gap-4 rounded-ui border border-rule bg-[var(--admin-surface)] p-[clamp(0.8rem,2vw,1.15rem)]" aria-label="Filtros de méritos">
 	<div class="grid grid-cols-[minmax(0,1fr)_auto] items-end gap-4 max-[640px]:grid-cols-1">
-		<AdminField class="max-w-3xl" label="Buscar entradas">
-			<Input type="search" bind:value={query} placeholder="Título de la entrada…" />
+		<AdminField class="max-w-3xl" label="Buscar méritos">
+			<Input type="search" bind:value={query} placeholder="Título del mérito…" />
 		</AdminField>
 		<div class="grid min-w-24 text-right text-ink-dim max-[640px]:hidden" aria-live="polite">
 			<strong class="font-title text-[1.35rem] font-medium leading-none text-ink">{filteredEntries.length}</strong>
@@ -168,9 +168,9 @@
 		</AdminField>
 		<AdminField label="Visibilidad">
 			<Select bind:value={visibility}>
-				<option value="all">Públicas y privadas</option>
-				<option value="public">Solo públicas</option>
-				<option value="draft">Solo privadas</option>
+				<option value="all">Públicos y privados</option>
+				<option value="public">Solo públicos</option>
+				<option value="draft">Solo privados</option>
 			</Select>
 		</AdminField>
 		<AdminField label="Orden">
@@ -188,11 +188,11 @@
 			<AdminField label="Año">
 				<Input bind:value={year} inputmode="numeric" pattern="[0-9]{4}" maxlength={4} placeholder="AAAA" />
 			</AdminField>
-			<AdminField label="Actividad">
+			<AdminField label="Portada">
 				<Select bind:value={home}>
 					<option value="all">En cualquier estado</option>
-					<option value="yes">En actividad</option>
-					<option value="no">Fuera de actividad</option>
+					<option value="yes">En portada</option>
+					<option value="no">Fuera de portada</option>
 				</Select>
 			</AdminField>
 			<AdminField label="Relaciones">
@@ -215,11 +215,11 @@
 	<table class="w-full border-collapse text-[0.78rem]">
 		<thead>
 			<tr>
-				<th class={tableHeadingClass}>Entrada</th>
+				<th class={tableHeadingClass}>Mérito</th>
 				<th class={tableHeadingClass}>Fecha</th>
 				<th class={tableHeadingClass}>Rel.</th>
-				<th class={tableHeadingClass}>Pública</th>
-				<th class={tableHeadingClass}>Actividad</th>
+				<th class={tableHeadingClass}>Público</th>
+				<th class={tableHeadingClass}>Portada</th>
 				<th class={tableHeadingClass}>Actualización</th>
 			</tr>
 		</thead>
@@ -230,7 +230,7 @@
 						{#if data.editableTypes.includes(entry.entityType)}
 							<a
 								class="group text-inherit focus-visible:outline-2 focus-visible:outline-offset-3 focus-visible:outline-accent-strong"
-								href={`/admin/entradas/${entry.entityType}/${entry.entityId}`}
+								href={`/admin/meritos/${entry.entityType}/${entry.entityId}`}
 								data-sveltekit-preload-data="off"
 							>
 								<strong class="mb-1 block font-medium text-ink group-hover:text-accent-strong">{entry.title}</strong>
@@ -279,7 +279,7 @@
 								name="enabled"
 								value={entry.showHome ? '0' : '1'}
 								disabled={isPending(entry, 'home')}
-								aria-label={`${entry.showHome ? 'Eliminar de' : 'Añadir a'} actividad: ${entry.title}`}
+								aria-label={`${entry.showHome ? 'Eliminar de' : 'Añadir a'} portada: ${entry.title}`}
 							>
 								{entry.showHome ? 'Sí' : 'No'}
 							</Button>
@@ -296,5 +296,5 @@
 </div>
 
 {#if filteredEntries.length === 0}
-	<p class="p-8 text-center text-ink-faint">No hay entradas que coincidan con estos filtros.</p>
+	<p class="p-8 text-center text-ink-faint">No hay méritos que coincidan con estos filtros.</p>
 {/if}

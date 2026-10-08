@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { tick } from 'svelte';
+	import { tick, type Snippet } from 'svelte';
 	import XIcon from '@lucide/svelte/icons/x';
 	import type { Locale } from '$lib/paraglide/runtime';
 	import SiteControls from '$lib/components/SiteControls.svelte';
@@ -10,14 +10,17 @@
 		returnFocus,
 		locale,
 		name,
-		links
+		links,
+		footer
 	}: {
 		open: boolean;
 		onclose: () => void;
 		returnFocus: HTMLButtonElement | null;
 		locale: Locale;
 		name: string;
-		links: Array<{ href: string; label: string; number: string }>;
+		links: Array<{ href: string; label: string; number: string; current?: boolean }>;
+		/** Sustituye a los controles de la web pública en el pie del menú. */
+		footer?: Snippet;
 	} = $props();
 
 	let shell = $state<HTMLElement | null>(null);
@@ -103,8 +106,9 @@
 		>
 			{#each links as link, index (link.href)}
 				<a
-					class="group grid grid-cols-[34px_minmax(0,1fr)_auto] items-baseline gap-3 border-b border-rule py-[clamp(14px,2.8vh,24px)] text-ink no-underline last:border-b-0 hover:text-accent-strong focus-visible:text-accent-strong"
+					class="group grid grid-cols-[34px_minmax(0,1fr)_auto] items-baseline gap-3 border-b border-rule py-[clamp(14px,2.8vh,24px)] text-ink no-underline last:border-b-0 hover:text-accent-strong focus-visible:text-accent-strong aria-[current=page]:text-accent-strong"
 					href={link.href}
+					aria-current={link.current ? 'page' : undefined}
 					onclick={() => closeMenu(false)}
 					style:animation={`project-modal-in 520ms ${index * 55}ms cubic-bezier(.16,1,.3,1) both`}
 				>
@@ -117,7 +121,11 @@
 		</nav>
 
 		<footer class="wrap py-4">
-			<SiteControls expanded />
+			{#if footer}
+				{@render footer()}
+			{:else}
+				<SiteControls expanded />
+			{/if}
 		</footer>
 	</div>
 {/if}

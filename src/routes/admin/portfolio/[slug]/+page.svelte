@@ -18,7 +18,7 @@
 <AdminPageHeader
 	title={data.project.title.es}
 	eyebrow="Portfolio"
-	description={`${data.project.kind.es} · ${data.hasNarrative ? 'Narrativa especial detectada' : 'Plantilla básica'}`}
+	description={`${data.project.kind.es} · ${data.hasNarrative ? 'Ficha con diseño propio' : 'Ficha estándar'}`}
 >
 	{#snippet actions()}
 		<ButtonLink href="/admin/portfolio">← Portfolio</ButtonLink>
@@ -27,7 +27,7 @@
 		{/if}
 	{/snippet}
 </AdminPageHeader>
-{#if data.skillUses.length}<aside class="my-5 text-xs"><p>Este trabajo ejemplifica:</p><div class="flex flex-wrap gap-3">{#each data.skillUses as skill}<a href={`/admin/entradas/skills/${skill.id}`} class="text-accent-strong underline">{skill.name}</a>{/each}</div></aside>{/if}
+{#if data.skillUses.length}<aside class="my-5 text-xs"><p>Este trabajo ejemplifica:</p><div class="flex flex-wrap gap-3">{#each data.skillUses as skill}<a href={`/admin/meritos/skills/${skill.id}`} class="text-accent-strong underline">{skill.name}</a>{/each}</div></aside>{/if}
 
 <details class="mb-8 rounded-ui border border-rule bg-surface px-4 py-3">
 	<summary class="cursor-pointer font-mono text-xs text-ink">Datos básicos y publicación</summary>

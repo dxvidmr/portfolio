@@ -17,7 +17,7 @@
 <AdminPageHeader
 	title="Nuevo elemento"
 	eyebrow="Portfolio"
-	description="La ficha básica se genera desde estos datos. El elemento nace como borrador salvo que elijas publicarlo."
+	description="La ficha se crea como borrador salvo que elijas publicarla."
 >
 	{#snippet actions()}<ButtonLink href="/admin/portfolio">← Portfolio</ButtonLink>{/snippet}
 </AdminPageHeader>

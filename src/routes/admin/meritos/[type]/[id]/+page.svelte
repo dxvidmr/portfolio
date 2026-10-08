@@ -78,13 +78,13 @@
 			return {
 				message:
 					form.visibilidad === 'publicada'
-						? 'La entrada ahora es pública.'
-						: 'La entrada ahora es privada.',
+						? 'El mérito ahora es público.'
+						: 'El mérito ahora es privado.',
 				success: true
 			};
 		if (form.actividad !== undefined)
 			return {
-				message: form.actividad ? 'Añadida a la actividad.' : 'Retirada de la actividad.',
+				message: form.actividad ? 'Añadido a la portada.' : 'Retirado de la portada.',
 				 success: true
 			};
 		if (form.relationMessage)
@@ -107,20 +107,20 @@
 <ButtonLink
 	variant="ghost"
 	size="sm"
-	href="/admin/entradas"
+	href="/admin/meritos"
 	class="mb-4 px-0"
 	data-sveltekit-preload-data="off">← Volver</ButtonLink
 >
 
 <nav class="mb-6 flex gap-2 text-[0.8rem] text-ink-faint" aria-label="Ruta">
-	<a class="text-ink-dim hover:text-accent" href="/admin/entradas">Entradas</a>
+	<a class="text-ink-dim hover:text-accent" href="/admin/meritos">Méritos</a>
 	<span aria-hidden="true">/</span>
 	<span>{data.typeLabel}</span>
 	<span aria-hidden="true">/</span>
 	<span>#{data.entityId}</span>
 </nav>
 
-{#if data.skillUses.length}<aside class="mb-5 border-b border-rule pb-4 text-xs"><p>Este trabajo ejemplifica:</p><div class="flex flex-wrap gap-3">{#each data.skillUses as skill}<a href={`/admin/entradas/skills/${skill.id}`} class="text-accent-strong underline">{skill.name}</a>{/each}</div></aside>{/if}
+{#if data.skillUses.length}<aside class="mb-5 border-b border-rule pb-4 text-xs"><p>Este trabajo ejemplifica:</p><div class="flex flex-wrap gap-3">{#each data.skillUses as skill}<a href={`/admin/meritos/skills/${skill.id}`} class="text-accent-strong underline">{skill.name}</a>{/each}</div></aside>{/if}
 <AdminPageHeader title={data.heading} eyebrow={data.typeLabel}>
 	{#snippet actions()}
 		<span
@@ -128,11 +128,11 @@
 				data.control.isPublic ? 'border-accent text-accent' : 'border-rule-strong text-ink-dim'
 			}`}
 		>
-			{data.capabilities.canPublish && data.control.isPublic ? 'Pública' : 'Privada'}
+			{data.capabilities.canPublish && data.control.isPublic ? 'Público' : 'Privado'}
 		</span>
 		{#if data.control.showHome}
 			<span class="rounded-ui-sm border border-accent px-2 py-1 text-[0.7rem] uppercase tracking-[0.08em] text-accent">
-				En actividad
+				En portada
 			</span>
 		{/if}
 	{/snippet}
@@ -141,8 +141,8 @@
 {#if created}
 	<AdminToast
 		message={data.capabilities.canPublish
-			? 'Entrada creada como privada. Publícala cuando esté lista.'
-			: 'Asistencia creada como entrada privada.'}
+			? 'Mérito creado como privado. Publícalo cuando esté listo.'
+			: 'Asistencia creada. Las asistencias son siempre privadas.'}
 		success={true}
 	/>
 {/if}
@@ -186,14 +186,14 @@
 			</div>
 			{#if data.control.isPublic}
 				<p class="m-0 max-w-[60ch] text-sm leading-relaxed text-ink-dim">
-					Visible en la web pública. Al pasarla a privada también se retira de la actividad.
+					Visible en la web. Si lo haces privado, también sale de la portada.
 				</p>
 				<form method="POST" action="?/despublicar">
-					<Button type="submit" variant="secondary"><EyeOff size={15} strokeWidth={1.7} aria-hidden="true" />Hacer privada</Button>
+					<Button type="submit" variant="secondary"><EyeOff size={15} strokeWidth={1.7} aria-hidden="true" />Hacer privado</Button>
 				</form>
 			{:else}
 				<p class="m-0 max-w-[60ch] text-sm leading-relaxed text-ink-dim">
-					Entrada privada: no aparece en el CV ni en la actividad.
+					Privado: no aparece en la web.
 				</p>
 				<form method="POST" action="?/publicar">
 					<Button type="submit"><Eye size={15} strokeWidth={1.7} aria-hidden="true" />Publicar</Button>
@@ -203,22 +203,22 @@
 		<div class="grid content-start gap-3 rounded-ui border border-rule p-5">
 			<div>
 				<p class="m-0 text-[0.6rem] tracking-[0.1em] text-ink-faint uppercase">Selección</p>
-				<h3 class="mt-1 mb-0 text-sm font-medium text-ink">Actividad reciente</h3>
+				<h3 class="mt-1 mb-0 text-sm font-medium text-ink">Portada</h3>
 			</div>
 			{#if data.control.showHome}
-				<p class="m-0 text-sm leading-relaxed text-ink-dim">Seleccionada en la actividad.</p>
+				<p class="m-0 text-sm leading-relaxed text-ink-dim">Seleccionado para «Actividad reciente» en la portada.</p>
 				<form method="POST" action="?/actividad">
 					<input type="hidden" name="enabled" value="0" />
-					<Button type="submit" variant="danger"><X size={15} strokeWidth={1.7} aria-hidden="true" />Eliminar de actividad</Button>
+					<Button type="submit" variant="danger"><X size={15} strokeWidth={1.7} aria-hidden="true" />Quitar de la portada</Button>
 				</form>
 			{:else}
 				<p class="m-0 max-w-[60ch] text-sm leading-relaxed text-ink-dim">
-					No aparece en la actividad.
-					{#if !data.control.isPublic}Mostrarla en actividad también la hará pública.{/if}
+					No aparece en la portada.
+					{#if !data.control.isPublic}Mostrarlo en la portada también lo hará público.{/if}
 				</p>
 				<form method="POST" action="?/actividad">
 					<input type="hidden" name="enabled" value="1" />
-					<Button type="submit"><Plus size={15} strokeWidth={1.7} aria-hidden="true" />Mostrar en actividad</Button>
+					<Button type="submit"><Plus size={15} strokeWidth={1.7} aria-hidden="true" />Mostrar en portada</Button>
 				</form>
 			{/if}
 		</div>
@@ -238,7 +238,7 @@
 					{/each}
 				</ul>
 			{:else}
-				<p class="m-0 text-sm leading-relaxed text-ink-dim">No aparece en ninguna ficha narrativa.</p>
+				<p class="m-0 text-sm leading-relaxed text-ink-dim">No aparece en ninguna ficha del portfolio.</p>
 			{/if}
 			<a class="mt-auto inline-flex items-center gap-1.5 pt-2 text-xs text-ink hover:text-accent" href="/admin/portfolio">
 				Gestionar en Portfolio <ExternalLink size={13} strokeWidth={1.7} aria-hidden="true" />
@@ -248,12 +248,11 @@
 	{:else}
 		<div class="grid max-w-[48rem] gap-3 rounded-ui border border-warning p-5">
 			<div>
-				<p class="m-0 text-[0.6rem] tracking-[0.1em] text-warning uppercase">Entrada privada</p>
+				<p class="m-0 text-[0.6rem] tracking-[0.1em] text-warning uppercase">Mérito privado</p>
 				<h3 class="mt-1 mb-0 text-sm font-medium text-ink">Asistencia a evento</h3>
 			</div>
 			<p class="m-0 max-w-[65ch] text-sm leading-relaxed text-ink-dim">
-				Esta entrada y sus documentos nunca aparecen en el CV, el portfolio ni la actividad pública.
-				Sí forma parte del índice transversal del dashboard y puede tener certificados.
+				Las asistencias no aparecen en la web ni en Mis CV. Sirven para guardar el certificado.
 			</p>
 		</div>
 	{/if}
@@ -261,10 +260,9 @@
 
 {#if hasStructuralRelationItems}
 	<section class="scroll-mt-36 {sectionClass}" id="structural-section" aria-labelledby="structural-title">
-		<h2 class={sectionTitleClass} id="structural-title">Relaciones estructurales</h2>
+		<h2 class={sectionTitleClass} id="structural-title">Méritos que apuntan a este</h2>
 		<p class="-mt-2 mb-6 max-w-[82ch] text-sm leading-[1.7] text-ink-dim">
-			Estas relaciones proceden de los campos del contenido relacionado. Para cambiarlas, edita
-			la entrada correspondiente y modifica su selector.
+			Para cambiar estas relaciones, edita esos méritos.
 		</p>
 		<div class="grid max-w-[76rem] gap-5 md:grid-cols-2">
 			{#each data.structuralRelations as group (group.entityType)}
@@ -284,7 +282,7 @@
 								<li class="flex items-center justify-between gap-4 border-b border-rule px-5 py-4 last:border-b-0">
 									<a
 										class="grid min-w-0 gap-1 text-xs leading-snug text-ink hover:text-accent"
-										href={`/admin/entradas/${item.entityType}/${item.entityId}`}
+										href={`/admin/meritos/${item.entityType}/${item.entityId}`}
 									>
 										<span>{item.title}</span>
 										<small class="text-[0.65rem] text-ink-faint">{item.sortDate ?? 'Sin fecha'}</small>
@@ -294,7 +292,7 @@
 											item.isPublic ? 'text-accent' : 'text-ink-dim'
 										}`}
 									>
-										{item.isPublic ? 'Pública' : 'Privada'}
+										{item.isPublic ? 'Público' : 'Privado'}
 									</span>
 								</li>
 							{/each}
@@ -321,15 +319,15 @@
 		Zona peligrosa
 	</summary>
 	<p class="max-w-[60ch] leading-relaxed text-ink-dim">
-		Eliminar borra la entrada y sus relaciones (portfolio, etiquetas, enlaces y documentos). No se
-		puede deshacer desde el dashboard.
+		Borra el mérito con sus enlaces, documentos, etiquetas y relaciones con el portfolio. No se
+		puede deshacer.
 	</p>
 	<form method="POST" action="?/eliminar">
 		<label class="mb-4 flex items-center gap-2 text-ink">
 			<Checkbox name="confirmar" value="1" class="accent-danger" />
 			<span>Entiendo que la eliminación es definitiva</span>
 		</label>
-		<Button type="submit" variant="danger"><Trash2 size={15} strokeWidth={1.7} aria-hidden="true" />Eliminar entrada</Button>
+		<Button type="submit" variant="danger"><Trash2 size={15} strokeWidth={1.7} aria-hidden="true" />Eliminar mérito</Button>
 	</form>
 </details>
 	</div>

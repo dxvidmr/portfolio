@@ -153,14 +153,14 @@
 	</section>
 
 	<section class="min-w-0 border-t border-rule" aria-labelledby="add-title">
-		<header class="py-4"><p class="m-0 text-[0.68rem] uppercase tracking-[0.1em] text-ink-faint">Añadir resultados</p><h2 class="mt-1 mb-0 text-base text-ink" id="add-title">Buscar entradas</h2></header>
+		<header class="py-4"><p class="m-0 text-[0.68rem] uppercase tracking-[0.1em] text-ink-faint">Añadir resultados</p><h2 class="mt-1 mb-0 text-base text-ink" id="add-title">Buscar méritos</h2></header>
 		<div class="grid grid-cols-[minmax(0,1fr)_10rem] gap-3 border-t border-rule pt-4 max-[620px]:grid-cols-1">
 			<AdminField label="Buscar por título"><Input type="search" bind:value={query} placeholder="Escribe para filtrar…" /></AdminField>
 			<AdminField label="Tipo"><Select bind:value={type}><option value="">Todos</option>{#each typeOptions as option (option.value)}<option value={option.value}>{option.label}</option>{/each}</Select></AdminField>
 		</div>
-		<p class="m-0 py-3 text-[0.68rem] text-ink-faint">{availableEntries.length} entradas disponibles</p>
+		<p class="m-0 py-3 text-[0.68rem] text-ink-faint">{availableEntries.length} méritos disponibles</p>
 		{#if availableEntries.length === 0}
-			<p class="m-0 border-t border-rule px-4 py-8 text-center text-xs text-ink-faint">No hay entradas disponibles con estos filtros.</p>
+			<p class="m-0 border-t border-rule px-4 py-8 text-center text-xs text-ink-faint">No hay méritos disponibles con estos filtros.</p>
 		{:else}
 			<ul class="m-0 max-h-[55rem] list-none overflow-y-auto border-t border-rule p-0">
 				{#each availableEntries as entry (entryKey(entry))}

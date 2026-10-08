@@ -290,7 +290,7 @@ export async function deleteTaxonomyType(domain: string, code: string): Promise<
 	if (!isTaxonomyDomain(domain)) throw new Error('Dominio no permitido');
 	const inUse = await countTaxonomyUsage(domain, code);
 	if (inUse > 0) {
-		throw new Error(`No se puede eliminar: lo usan ${inUse} entradas.`);
+		throw new Error(`No se puede eliminar: lo usan ${inUse} méritos.`);
 	}
 	// La FK de las tablas consumidoras respalda esta comprobación a nivel de BD.
 	const result = await db.execute({

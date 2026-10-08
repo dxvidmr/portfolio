@@ -62,8 +62,8 @@
 
 <AdminPageHeader
 	title="Documentos"
-	eyebrow="Archivo transversal"
-	description="Cada documento pertenece a una entrada. Los certificados son el tipo prioritario, pero también puedes registrar carteles, programas, textos, informes y materiales complementarios."
+	eyebrow="Justificantes de los méritos"
+	description="Certificados, carteles, programas y otros archivos. Cada uno pertenece a un mérito y es siempre privado."
 >
 	{#snippet actions()}
 		<div class="flex flex-wrap items-center gap-3 text-xs text-ink-faint">
@@ -82,11 +82,10 @@
 		<Plus size={15} strokeWidth={1.7} aria-hidden="true" />Añadir documento
 	</summary>
 	<p class="mt-3 mb-5 max-w-[72ch] text-xs leading-[1.6] text-ink-dim">
-		Selecciona primero la entrada propietaria. El formulario propone «Certificado» por defecto, pero
-		puedes escoger cualquier otro tipo documental.
+		Elige el mérito al que pertenece y el tipo de documento.
 	</p>
 	<form class="grid gap-4" method="POST" action="?/crear">
-		<AdminField label="Entrada relacionada" wide>
+		<AdminField label="Mérito relacionado" wide>
 			<SearchableSelect
 				id="document-owner"
 				name="owner"
@@ -128,7 +127,7 @@
 <section class="my-6 grid gap-4 rounded-ui border border-rule bg-admin-surface p-[clamp(0.8rem,2vw,1.15rem)]" aria-label="Filtros de documentos">
 	<div class="grid grid-cols-[minmax(0,1fr)_auto] items-end gap-4 max-[650px]:grid-cols-1">
 		<AdminField class="max-w-3xl" label="Buscar documentos">
-			<Input bind:value={query} type="search" placeholder="Título, entrada, evento, emisor o tipo…" />
+			<Input bind:value={query} type="search" placeholder="Título, mérito, evento, emisor o tipo…" />
 		</AdminField>
 		<div class="grid min-w-24 text-right text-ink-dim max-[650px]:hidden" aria-live="polite">
 			<strong class="font-title text-[1.35rem] font-medium leading-none text-ink">{filtered.length}</strong>
@@ -144,7 +143,7 @@
 				{/each}
 			</Select>
 		</AdminField>
-		<AdminField label="Tipo de entrada">
+		<AdminField label="Tipo de mérito">
 			<Select bind:value={entityType}>
 				<option value="">Todos los tipos</option>
 				{#each data.entityTypes as type (type.value)}
@@ -178,7 +177,7 @@
 				<tr class="text-[0.65rem] tracking-[0.08em] text-ink-faint uppercase">
 					<th class="border-b border-rule p-3">Documento</th>
 					<th class="border-b border-rule p-3">Tipo</th>
-					<th class="border-b border-rule p-3">Entrada</th>
+					<th class="border-b border-rule p-3">Mérito</th>
 					<th class="border-b border-rule p-3">Emitido por</th>
 					<th class="border-b border-rule p-3">Fecha</th>
 					<th class="border-b border-rule p-3">Archivo</th>
@@ -197,7 +196,7 @@
 						</td>
 						<td class="border-b border-rule p-3 align-top text-ink-dim">{document.documentTypeLabel}</td>
 						<td class="border-b border-rule p-3 align-top">
-							<a class="grid gap-1 text-ink hover:text-accent-strong" href={`/admin/entradas/${document.entityType}/${document.entityId}`}>
+							<a class="grid gap-1 text-ink hover:text-accent-strong" href={`/admin/meritos/${document.entityType}/${document.entityId}`}>
 								<span>{document.entryTitle}</span>
 								<small class="text-ink-faint">{document.typeLabel}</small>
 							</a>

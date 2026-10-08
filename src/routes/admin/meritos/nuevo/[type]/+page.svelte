@@ -16,7 +16,14 @@
 			? 'Nuevo servicio en un evento'
 			: data.entityType === 'service_activities' && data.creationContext === 'standalone'
 				? 'Nuevo servicio independiente'
-				: `Nueva entrada: ${data.typeLabel}`
+				: `Nuevo mérito: ${data.meritLabel.toLowerCase()}`
+	);
+	const eventMeritName = $derived(
+		data.entityType === 'talks'
+			? 'esta comunicación'
+			: data.entityType === 'event_attendance'
+				? 'esta asistencia'
+				: 'este servicio'
 	);
 	const formAction = $derived(
 		data.creationContext === 'general'
@@ -26,36 +33,42 @@
 </script>
 
 <svelte:head>
-	<title>Nueva: {data.typeLabel} · cv/admin</title>
+	<title>{pageTitle} · cv/admin</title>
 </svelte:head>
 
-<ButtonLink variant="ghost" size="sm" href="/admin/entradas/nueva" data-sveltekit-preload-data="off" class="mb-4 px-0">← Volver</ButtonLink>
+<ButtonLink variant="ghost" size="sm" href="/admin/meritos/nuevo" data-sveltekit-preload-data="off" class="mb-4 px-0">← Volver</ButtonLink>
 
 <nav class="mb-6 flex gap-2 text-[0.8rem] text-ink-faint" aria-label="Ruta">
-	<a class="text-ink-dim" href="/admin/entradas">Entradas</a>
+	<a class="text-ink-dim" href="/admin/meritos">Méritos</a>
 	<span aria-hidden="true">/</span>
-	<a class="text-ink-dim" href="/admin/entradas/nueva">Nueva</a>
+	<a class="text-ink-dim" href="/admin/meritos/nuevo">Nuevo</a>
 	<span aria-hidden="true">/</span>
-	<span>{data.typeLabel}</span>
+	<span>{data.meritLabel}</span>
 </nav>
 
 <AdminPageHeader title={pageTitle} />
 
-{#if data.entityType === 'talks' || data.entityType === 'event_attendance'}
-	<p class="mt-4 mb-6 text-[0.8rem] text-ink-dim">
-		Evento obligatorio · <a class="text-accent-strong" href="/admin/eventos/nuevo">Crear evento</a>
+{#if data.eventRole}
+	<p class="mt-4 mb-6 max-w-[70ch] rounded-ui border border-dashed border-rule px-4 py-3 text-[0.8rem] leading-relaxed text-ink-dim">
+		{data.entityType === 'service_activities'
+			? 'Si el servicio corresponde a un evento, elígelo en el formulario.'
+			: 'Elige el evento en el formulario.'}
+		Si el evento aún no está registrado,
+		<a class="text-accent-strong underline" href={`/admin/eventos/nuevo?rol=${data.eventRole}`}
+			>regístralo junto con {eventMeritName}</a
+		>: se crean los dos a la vez.
 	</p>
 {/if}
 
 {#if form?.errors}
 	{#key form}
-		<AdminToast message="Revisa los campos marcados; la entrada no se ha creado." success={false} />
+		<AdminToast message="Revisa los campos marcados; el mérito no se ha creado." success={false} />
 	{/key}
 {/if}
 
 <div class={hasGroupedForm ? 'grid items-start gap-10 min-[1100px]:grid-cols-[12rem_minmax(0,1fr)]' : ''}>
 	{#if hasGroupedForm}
-		<AdminFormNav items={navItems} formId="new-entry-form" submitLabel="Crear entrada" submitKind="create" />
+		<AdminFormNav items={navItems} formId="new-entry-form" submitLabel="Crear mérito" submitKind="create" />
 	{/if}
 	<form id="new-entry-form" class="min-w-0" method="POST" action={formAction}>
 		<input type="hidden" name="creation_context" value={data.creationContext} />
@@ -67,8 +80,8 @@
 			errors={form?.errors ?? {}}
 		/>
 		<div class="mt-8 flex items-center gap-4 border-t border-rule pt-6">
-			<Button variant="primary" type="submit"><Plus size={15} strokeWidth={1.7} aria-hidden="true" />Crear entrada</Button>
-			<ButtonLink href="/admin/entradas">Cancelar</ButtonLink>
+			<Button variant="primary" type="submit"><Plus size={15} strokeWidth={1.7} aria-hidden="true" />Crear mérito</Button>
+			<ButtonLink href="/admin/meritos">Cancelar</ButtonLink>
 		</div>
 	</form>
 </div>

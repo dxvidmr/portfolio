@@ -42,12 +42,12 @@ export const actions: Actions = {
 		if (!owner || !values) {
 			return fail(400, {
 				success: false,
-				message: 'Selecciona una entrada y revisa el tipo, la URL y la fecha.'
+				message: 'Selecciona un mérito y revisa el tipo, la URL y la fecha.'
 			});
 		}
 		try {
 			await addDocument(owner, values);
-			return { success: true, message: 'Documento añadido a la entrada.' };
+			return { success: true, message: 'Documento añadido al mérito.' };
 		} catch (cause) {
 			return fail(409, {
 				success: false,

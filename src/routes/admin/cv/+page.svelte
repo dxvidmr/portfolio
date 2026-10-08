@@ -7,7 +7,7 @@
   let { data, form }: { data: PageData; form: ActionData } = $props();
 </script>
 <svelte:head><title>Mis CV · cv/admin</title></svelte:head>
-<AdminPageHeader title="Mis CV" eyebrow="Selecciones de investigación" description="Crea variantes con textos propios y méritos de tu base de datos. Edita, ordena y exporta cada CV sin cambiar lo que muestras en la web." />
+<AdminPageHeader title="Mis CV" description="Un CV para cada solicitud, con tus textos y los méritos que elijas. Lo que cambies aquí no afecta a la web." />
 {#if form?.message}<p role="alert" class="text-warning">{form.message}</p>{/if}
 <form method="POST" action="?/create" use:enhance class="mb-8 flex flex-wrap items-end gap-3">
   <label class="grid gap-2 text-xs">Nombre del nuevo CV<input name="name" required maxlength="200" placeholder="Solicitud, convocatoria o destinatario" class="min-w-72 rounded-sm border border-rule bg-canvas p-3" /></label>

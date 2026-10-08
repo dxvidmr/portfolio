@@ -49,7 +49,7 @@
 </script>
 <svelte:window onbeforeunload={unload} />
 <svelte:head><title>{data.cv.name} · Mis CV</title></svelte:head>
-<AdminPageHeader title="Editar CV" eyebrow={data.cv.name} description="Organiza bloques de texto y apartados de méritos. Los datos originales se actualizan al cargar el CV y al generar una versión para PDF.">
+<AdminPageHeader title="Editar CV" eyebrow={data.cv.name} description="Los méritos se actualizan con sus datos originales al abrir el CV y al exportarlo.">
   {#snippet actions()}<ButtonLink href="/admin/cv">Mis CV</ButtonLink><Button type="button" variant="ghost" onclick={refresh}>Recargar datos</Button>{/snippet}
 </AdminPageHeader>
 {#if form?.message}<p role="status" class={form.success ? 'text-accent-strong' : 'text-warning'}>{form.message}</p>{/if}
@@ -72,9 +72,9 @@
       <label class="grid gap-2 text-xs">Correo electrónico<input type="email" bind:value={cv.email} maxlength="254" class="rounded-sm border border-rule bg-canvas p-3" /></label>
       <label class="grid gap-2 text-xs">Afiliación<input bind:value={cv.affiliation} maxlength="1000" class="rounded-sm border border-rule bg-canvas p-3" /></label>
       <label class="grid gap-2 text-xs">Web<input bind:value={cv.website} inputmode="url" maxlength="1000" placeholder="https://davidmerinorecalde.com" class="rounded-sm border border-rule bg-canvas p-3" /></label>
-      <label class="grid gap-2 text-xs">Idioma de las etiquetas<select bind:value={cv.language} class="rounded-sm border border-rule bg-canvas p-3"><option value="es">Español</option><option value="en">English</option></select><span class="text-ink-faint">Los títulos y textos propios conservan lo que escribas; no se traducen automáticamente.</span></label>
+      <label class="grid gap-2 text-xs">Idioma de las etiquetas<select bind:value={cv.language} class="rounded-sm border border-rule bg-canvas p-3"><option value="es">Español</option><option value="en">English</option></select><span class="text-ink-faint">Solo cambia las etiquetas automáticas; tus textos no se traducen.</span></label>
     </div></section>
-    <div class="grid gap-3"><h2 class="m-0 font-title text-xl">Contenido del CV</h2><div class="flex flex-wrap items-center gap-3"><Button type="button" onclick={() => addBlock('text')}>+ Texto narrativo</Button><Button type="button" onclick={() => addBlock('entries')}>+ Apartado de méritos</Button><Button type="button" onclick={() => addBlock('entries','skills')}>+ Apartado de competencias</Button></div><p class="m-0 text-xs text-ink-faint">Abre un apartado para editarlo. Arrastra su número o usa las flechas para ordenar.</p></div>
+    <div class="grid gap-3"><h2 class="m-0 font-title text-xl">Contenido del CV</h2><div class="flex flex-wrap items-center gap-3"><Button type="button" onclick={() => addBlock('text')}>+ Texto narrativo</Button><Button type="button" onclick={() => addBlock('entries')}>+ Apartado de méritos</Button><Button type="button" onclick={() => addBlock('entries','skills')}>+ Apartado de competencias</Button></div><p class="m-0 text-xs text-ink-faint">Arrastra el número o usa las flechas para reordenar.</p></div>
     <SortableList bind:items={cv.blocks} layout="blocks" getId={b => `cv-block-${b.key}`} {isExpanded} getKey={b => b.key} getLabel={b => b.title || 'Texto narrativo'}>
       {#snippet heading(block)}<button type="button" class="w-full cursor-pointer border-0 bg-transparent p-0 text-left text-ink" aria-expanded={isExpanded(block)} aria-controls={`cv-content-${block.key}`} onclick={() => toggle(block)}><span class="mb-1 block text-[0.65rem] text-accent-strong">{blockLabel(block)}{block.kind === 'entries' ? ` · ${block.entries.length} seleccionados` : ''}</span><span class="block font-title text-lg">{block.title || 'Texto narrativo'} <span class="font-mono text-xs text-ink-faint">{isExpanded(block) ? '▾' : '▸'}</span></span></button>{/snippet}
       {#snippet children(block, index)}<div id={`cv-content-${block.key}`}><CvBlockEditor bind:block={cv.blocks[index]} catalog={data.catalog} /></div>{/snippet}
@@ -86,7 +86,7 @@
     </div>
   </fieldset>
 </form>
-<section class="mt-10 border-t border-rule pt-6"><h2 class="font-title text-xl">Historial de versiones para PDF</h2><p class="text-xs text-ink-dim">Cada versión conserva los textos y méritos tal como estaban al exportar. Puedes volver a imprimirla aunque los registros originales cambien.</p>
+<section class="mt-10 border-t border-rule pt-6"><h2 class="font-title text-xl">Historial de versiones para PDF</h2><p class="text-xs text-ink-dim">Cada versión guarda el CV tal como estaba al exportarlo. Puedes volver a descargarla aunque después cambies los méritos.</p>
   {#each data.exports as item (item.id)}<p class="text-xs"><a href={`/admin/cv/${cv.id}/exports/${item.id}`} class="text-accent-strong">Entrega #{item.id} · CV v{item.profile_version} · {item.created_at} UTC ↗</a></p>{:else}<p class="text-xs text-ink-faint">Todavía no hay versiones.</p>{/each}
 </section>
 <details class="mt-10 border-t border-rule pt-6"><summary class="cursor-pointer text-xs text-warning">Eliminar este CV y su historial</summary><form method="POST" action="?/delete" class="mt-4 flex flex-wrap items-end gap-3"><input type="hidden" name="version" value={data.cv.version} /><label class="grid gap-2 text-xs">Escribe ELIMINAR<input name="confirm" required pattern="ELIMINAR" class="rounded-sm border border-rule bg-canvas p-3" /></label><Button type="submit">Eliminar CV</Button></form></details>
