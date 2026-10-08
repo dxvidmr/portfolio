@@ -1,0 +1,4 @@
+# Finales de línea LF en todas las máquinas, aunque Git use core.autocrlf=true
+# (valor por defecto en Windows). Algunos tests y scripts leen archivos del repo
+# y dependen de "\n".
+* text=auto eol=lf
