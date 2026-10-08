@@ -11,6 +11,10 @@
 		getLabel,
 		onreorder,
 		reorderable = true,
+		layout = 'rows',
+		getId,
+		isExpanded,
+		heading,
 		children,
 		actions
 	}: {
@@ -19,6 +23,10 @@
 		getLabel: (item: T) => string;
 		onreorder?: (items: T[]) => void;
 		reorderable?: boolean;
+		layout?: 'rows' | 'blocks';
+		getId?: (item: T) => string;
+		isExpanded?: (item: T) => boolean;
+		heading?: Snippet<[T, number]>;
 		children: Snippet<[T, number]>;
 		actions?: Snippet<[T, number]>;
 	} = $props();
@@ -86,7 +94,8 @@
 <ol class="m-0 list-none border-t border-rule p-0">
 	{#each items as item, index (getKey(item))}
 		<li
-			class={`relative grid grid-cols-[3rem_minmax(0,1fr)_auto] items-center gap-4 border-b border-rule py-4 max-[700px]:grid-cols-[2rem_minmax(0,1fr)] ${draggedKey === getKey(item) ? 'opacity-45' : ''}`}
+			id={getId?.(item)}
+			class={`relative grid scroll-mt-36 grid-cols-[3rem_minmax(0,1fr)_auto] items-start gap-4 border-b border-rule py-4 max-[700px]:grid-cols-[2rem_minmax(0,1fr)] ${layout === 'blocks' ? 'my-4 rounded-sm border border-rule bg-canvas p-4' : ''} ${draggedKey === getKey(item) ? 'opacity-45' : ''}`}
 			ondragover={reorderable ? (event) => updateDropTarget(event, index) : undefined}
 			ondrop={reorderable ? drop : undefined}
 		>
@@ -112,7 +121,7 @@
 			{:else}
 				<span class="font-mono text-[0.65rem]">{String(index + 1).padStart(2, '0')}</span>
 			{/if}
-			<div class="min-w-0">{@render children(item, index)}</div>
+			<div class="min-w-0">{#if layout === 'blocks'}{#if heading}{@render heading(item, index)}{:else}{getLabel(item)}{/if}{:else}{@render children(item, index)}{/if}</div>
 			<div class="flex items-center gap-2 max-[700px]:col-start-2 max-[700px]:justify-end">
 				{#if reorderable}
 					<div class="flex gap-px">
@@ -122,6 +131,7 @@
 				{/if}
 				{#if actions}{@render actions(item, index)}{/if}
 			</div>
+			{#if layout === 'blocks' && (isExpanded?.(item) ?? true)}<div class="col-span-full min-w-0 border-t border-rule pt-4">{@render children(item, index)}</div>{/if}
 		</li>
 	{/each}
 </ol>

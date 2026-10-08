@@ -26,6 +26,7 @@ export function parseCv(value: unknown): Omit<CvProfile, 'id'> {
     if (!raw || typeof raw !== 'object') throw new Error('Bloque no válido.');
     const b = raw as Record<string, unknown>;
     if (b.skillsDisplay != null && !['names','descriptions'].includes(String(b.skillsDisplay))) throw new Error('Presentación de competencias no válida.');
+    if (b.entryScope != null && !['merits','skills'].includes(String(b.entryScope))) throw new Error('Contenido del apartado no válido.');
     if (b.kind !== 'text' && b.kind !== 'entries') throw new Error('Tipo de bloque no válido.');
     if (!Array.isArray(b.entries) || b.entries.length > 300 || (b.kind === 'text' && b.entries.length)) throw new Error('Selección no válida.');
     const seen = new Set<string>();
@@ -40,7 +41,7 @@ export function parseCv(value: unknown): Omit<CvProfile, 'id'> {
       return { key: `${index}-${entryIndex}`, entityType: e.entityType as CvSelection['entityType'], entityId: Number(e.entityId), commentary: str(e.commentary, 10000, 'Comentario'),
         skillOptions: skillOptions(e.skillOptions), contributionMode: contributionMode as CvSelection['contributionMode'], contributionText: str(e.contributionText ?? '', 10000, 'Aportación adaptada') };
     });
-    return { key: String(index), kind: b.kind, skillsDisplay: (b.skillsDisplay ?? 'names') as 'names'|'descriptions', title: str(b.title, 300, 'Título del bloque'), body: str(b.body, 30000, 'Texto'), entries };
+    return { key: String(index), kind: b.kind, entryScope: (b.entryScope ?? (entries.length && entries.every(e => e.entityType === 'skills') ? 'skills' : 'merits')) as 'merits'|'skills', skillsDisplay: (b.skillsDisplay ?? 'names') as 'names'|'descriptions', title: str(b.title, 300, 'Título del bloque'), body: str(b.body, 30000, 'Texto'), entries };
   });
   if (count > 1000) throw new Error('Máximo 1000 méritos por CV.');
   const email = str(p.email ?? '', 254, 'Correo electrónico');

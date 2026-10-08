@@ -666,6 +666,7 @@ CREATE TABLE cv_profiles (
 );
 CREATE TABLE cv_blocks (
   skills_display TEXT NOT NULL DEFAULT 'names' CHECK(skills_display IN ('names','descriptions')),
+  entry_scope TEXT NOT NULL DEFAULT 'merits' CHECK(entry_scope IN ('merits','skills')),
   id INTEGER PRIMARY KEY AUTOINCREMENT,
   cv_id INTEGER NOT NULL REFERENCES cv_profiles(id) ON DELETE CASCADE,
   kind TEXT NOT NULL CHECK(kind IN ('text','entries')),

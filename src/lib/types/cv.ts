@@ -8,7 +8,7 @@ export const cvEntityLabels = {
 export type CvEntityType = keyof typeof cvEntityLabels;
 export type CvSelection = { key: string; entityType: CvEntityType; entityId: number; commentary: string;
   contributionMode?: 'inherit' | 'custom' | 'hidden'; contributionText?: string; skillOptions?: {resources:string[];evidence:string[]} };
-export type CvBlock = { key: string; kind: 'text' | 'entries'; title: string; body: string; skillsDisplay?: 'names'|'descriptions'; entries: CvSelection[] };
+export type CvBlock = { key: string; kind: 'text' | 'entries'; title: string; body: string; entryScope?: 'merits'|'skills'; skillsDisplay?: 'names'|'descriptions'; entries: CvSelection[] };
 export type CvProfile = {
   id: number; version: number; name: string; title: string; personName: string;
   affiliation: string; website: string; position: string; email: string; language: 'es' | 'en'; blocks: CvBlock[];

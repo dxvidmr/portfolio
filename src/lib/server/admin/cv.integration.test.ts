@@ -35,6 +35,7 @@ beforeEach(async () => {
   await connection.db.executeMultiple(migration.slice(migration.indexOf('CREATE TABLE cv_block_entries_new'),migration.indexOf('CREATE TABLE documents_new')));
   await connection.db.executeMultiple(`
     ALTER TABLE cv_blocks ADD COLUMN skills_display TEXT NOT NULL DEFAULT 'names';
+    ALTER TABLE cv_blocks ADD COLUMN entry_scope TEXT NOT NULL DEFAULT 'merits';
     ALTER TABLE cv_block_entries ADD COLUMN skill_options TEXT NOT NULL DEFAULT '{"resources":[],"evidence":[]}';
     ALTER TABLE skills ADD COLUMN name_es TEXT;
     ALTER TABLE skills ADD COLUMN name_en TEXT;
@@ -57,6 +58,15 @@ beforeEach(async () => {
 });
 afterEach(() => { connection.db?.close(); connection.db = null; });
 describe('CV guardados', () => {
+  it('conserva un apartado de competencias vacío al guardar y duplicar el CV', async () => {
+    const id = await createCv('Competencias');
+    const cv = base();
+    cv.blocks.push({ key: 'skills', kind: 'entries', entryScope: 'skills', title: 'Competencias', body: '', entries: [] });
+    await saveCv(id, cv);
+    expect((await getCv(id)).blocks[2].entryScope).toBe('skills');
+    expect((await getCv(await createCv('Copia', id))).blocks[2].entryScope).toBe('skills');
+    expect(() => parseCv({ ...base(), blocks: [{ ...base().blocks[1], entryScope: 'invalid' }] })).toThrow('Contenido');
+  });
   it('guarda y copia la presentación por apartado sin borrar textos adaptados',async()=>{
     const id=await createCv('Presentación');
     const cv=base();

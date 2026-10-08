@@ -6,6 +6,7 @@
   let { block = $bindable(), catalog }: { block: CvBlock; catalog: CvEntry[] } = $props();
   let search = $state('');
   let type = $state('');
+  const skillsOnly = $derived(block.entryScope === 'skills');
   const normalize = (s: string) => s.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
   const lookup = $derived(new Map(catalog.map(e => [e.key, e])));
   const normalEntries=$derived(block.entries.filter(e=>e.entityType!=='skills'));
@@ -22,16 +23,24 @@
 </script>
 <div class="grid gap-4">
   <label class="grid gap-2 text-xs">Título {block.kind === 'text' ? '(opcional)' : 'del apartado'}<input bind:value={block.title} maxlength="300" class="w-full rounded-sm border border-rule bg-canvas p-3 font-title text-lg" /></label>
-  <label class="grid gap-2 text-xs">{block.kind === 'text' ? 'Texto narrativo' : 'Introducción al apartado (opcional)'}<textarea bind:value={block.body} rows={block.kind === 'text' ? 8 : 4} maxlength="30000" class="w-full rounded-sm border border-rule bg-canvas p-3 leading-relaxed" placeholder="Escribe en Markdown. Separa los párrafos con una línea en blanco."></textarea><span class="text-ink-dim">Markdown: *cursiva*, **negrita**, [texto del enlace](https://…). Listas con - o 1. El formato se conserva en la vista previa y el PDF.</span></label>
+  {#snippet narrativeField()}<label class="grid gap-2 text-xs">{block.kind === 'text' ? 'Texto narrativo' : 'Introducción al apartado (opcional)'}<textarea bind:value={block.body} rows={block.kind === 'text' ? 8 : 4} maxlength="30000" class="w-full rounded-sm border border-rule bg-canvas p-3 leading-relaxed" placeholder="Escribe en Markdown. Separa los párrafos con una línea en blanco."></textarea><span class="text-ink-dim">Markdown: *cursiva*, **negrita**, [texto del enlace](https://…). Listas con - o 1. El formato se conserva en la vista previa y el PDF.</span></label>{/snippet}
+  {#if block.kind === 'text'}{@render narrativeField()}{:else}<details open={Boolean(block.body)} class="rounded-sm border border-rule p-3"><summary class="cursor-pointer text-xs text-ink-dim">Introducción al apartado (opcional)</summary><div class="mt-3">{@render narrativeField()}</div></details>{/if}
   {#if block.kind === 'entries'}
-    <div class="flex items-center justify-between gap-3"><h3 class="m-0 text-sm">{block.entries.length} méritos seleccionados</h3>{#if normalEntries.length}<Button type="button" size="sm" variant="ghost" onclick={sort}>Ordenar otros méritos por fecha ↓</Button>{/if}</div>
-    <details open={block.entries.some(e=>e.entityType==='skills')} class="border border-rule p-4"><summary class="cursor-pointer text-sm text-accent-strong">Seleccionar competencias por áreas ({block.entries.filter(e=>e.entityType==='skills').length})</summary><div class="mt-4"><CvSkillSelector bind:block {catalog} /></div></details>
+    <div class="flex flex-wrap items-center justify-between gap-3"><h3 class="m-0 text-sm">{block.entries.length} {skillsOnly ? 'competencias seleccionadas' : 'méritos seleccionados'}</h3>{#if normalEntries.length}<Button type="button" size="sm" variant="ghost" onclick={sort}>Ordenar por fecha ↓</Button>{/if}</div>
+    {#if skillsOnly || block.entries.some(e=>e.entityType==='skills')}
+      <div class="rounded-sm border border-rule bg-[var(--admin-surface)] p-4"><CvSkillSelector bind:block {catalog} /></div>
+    {/if}
     {#if normalEntries.length}
     <SortableList items={normalEntries} onreorder={reorderNormal} getKey={e => e.key} getLabel={e => lookup.get(`${e.entityType}:${e.entityId}`)?.title || 'Mérito eliminado'}>
       {#snippet children(selection)}
         {@const entry = lookup.get(`${selection.entityType}:${selection.entityId}`)}
+        <details>
+          <summary class="cursor-pointer">
+            <span class="block font-title text-lg">{entry?.title || 'Mérito eliminado'}</span>
+            {#if entry}<span class="mt-1 block text-[0.65rem] text-ink-dim">{cvEntityLabels[entry.entityType]} · {entry.date} {entry.isPublic ? '' : '· Privado en la web'}</span>{/if}
+            <span class="mt-2 block text-[0.65rem] text-accent-strong">Detalles y adaptación para este CV</span>
+          </summary>
         {#if entry}
-          <p class="m-0 font-title text-lg">{entry.title}</p><p class="mt-1 text-[0.65rem] text-ink-dim">{cvEntityLabels[entry.entityType]} · {entry.date} {entry.isPublic ? '' : '· Privado en la web'}</p>
           <p class="text-[0.65rem] leading-relaxed text-ink-dim">{entry.detail}</p>
           <a href={`/admin/entradas/${selection.entityType}/${selection.entityId}`} target="_blank" rel="noopener" class="text-[0.65rem] text-accent-strong">Editar registro original ↗</a>
         {:else}<p class="text-warning" role="alert">Este registro ya no existe: {selection.entityType}:{selection.entityId}. Retíralo para exportar.</p>{/if}
@@ -50,10 +59,12 @@
           {/if}
         {/if}
         <label class="mt-3 grid gap-2 text-[0.65rem]">Comentario adicional para este CV<textarea bind:value={selection.commentary} rows="2" maxlength="10000" class="w-full rounded-sm border border-rule bg-canvas p-2"></textarea></label>
+        </details>
       {/snippet}
       {#snippet actions(selection)}<Button type="button" size="sm" variant="ghost" onclick={() => block.entries = block.entries.filter(e => e.key !== selection.key)}>Quitar</Button>{/snippet}
     </SortableList>
     {/if}
+    {#if !skillsOnly}
     <details class="rounded-sm border border-rule p-4">
       <summary class="cursor-pointer text-sm text-accent-strong">+ Añadir méritos de la base de datos</summary>
       <div class="mt-4 grid gap-3 sm:grid-cols-2">
@@ -65,5 +76,6 @@
         {#each available as entry (entry.key)}<li class="flex items-center justify-between gap-3 border-t border-rule py-3"><div><p class="m-0 font-title text-base">{entry.title}</p><p class="mt-1 text-[0.65rem] text-ink-dim">{cvEntityLabels[entry.entityType]} · {entry.date}</p></div><Button type="button" size="sm" onclick={() => add(entry)}>Añadir</Button></li>{:else}<li class="py-4 text-xs text-ink-faint">No hay más resultados.</li>{/each}
       </ul>
     </details>
+    {/if}
   {/if}
 </div>

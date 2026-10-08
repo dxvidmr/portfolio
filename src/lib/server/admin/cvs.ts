@@ -140,14 +140,14 @@ export async function getCv(id: number, reader: Reader = db): Promise<CvProfile>
   const blocks = sets[1].rows;
   const entries = sets[2].rows;
   return { id, version: Number(row.version), name: value(row.name), title: value(row.title), personName: value(row.person_name), affiliation: value(row.affiliation), website: value(row.website), position: value(row.position), email: value(row.email), language: row.language as 'es' | 'en',
-    blocks: blocks.map(b => ({ key: String(b.id), kind: b.kind as 'text' | 'entries', title: value(b.title), body: value(b.body), skillsDisplay: b.skills_display as 'names'|'descriptions',
+    blocks: blocks.map(b => ({ key: String(b.id), kind: b.kind as 'text' | 'entries', title: value(b.title), body: value(b.body), entryScope: b.entry_scope as 'merits'|'skills', skillsDisplay: b.skills_display as 'names'|'descriptions',
       entries: entries.filter(e => e.block_id === b.id).map(e => ({ key: String(e.id), entityType: e.entity_type as CvEntityType, entityId: Number(e.entity_id), commentary: value(e.commentary),
         skillOptions: JSON.parse(value(e.skill_options)), contributionMode: e.contribution_mode as 'inherit' | 'custom' | 'hidden', contributionText: value(e.contribution_text) })) })) };
 }
 async function writeBlocks(tx: Transaction, cv: Omit<CvProfile, 'id'>, id: number) {
   if (!cv.blocks.length) return;
   const blocks = await tx.batch(cv.blocks.map((b,i) => ({
-    sql:'INSERT INTO cv_blocks(cv_id,kind,title,body,sort_order,skills_display) VALUES (?,?,?,?,?,?)',args:[id,b.kind,b.title,b.body,i,b.skillsDisplay ?? 'names']
+    sql:'INSERT INTO cv_blocks(cv_id,kind,title,body,sort_order,skills_display,entry_scope) VALUES (?,?,?,?,?,?,?)',args:[id,b.kind,b.title,b.body,i,b.skillsDisplay ?? 'names',b.entryScope ?? 'merits']
   })));
   const entries = cv.blocks.flatMap((b,i) => b.entries.map((e,j) => ({
     sql:'INSERT INTO cv_block_entries(block_id,entity_type,entity_id,commentary,sort_order,contribution_mode,contribution_text,skill_options) VALUES (?,?,?,?,?,?,?,?)',
