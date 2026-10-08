@@ -34,6 +34,6 @@
   {/if}
   {#if entry.contribution}<div class="cv-contribution cv-technical-contribution mt-2 text-[0.78rem]"><CvProse body={entry.contribution} /></div>{/if}
   {#if entry.url}
-    <a href={entry.url} aria-label={(en ? 'View resource: ' : 'Ver recurso: ')+entry.title} class="cv-link cv-technical-link mt-2 inline-block max-w-full text-[0.7rem] break-words text-[#41583d] underline decoration-[#a6b0a2] underline-offset-3"><span class="font-semibold">{en ? 'View resource' : 'Ver recurso'} ↗</span>{' '}<span>{linkLabel(entry.url)}</span></a>
+    <a href={entry.url} aria-label={(en ? 'View resource: ' : 'Ver recurso: ')+entry.title} class="cv-link cv-technical-link mt-2 inline-block max-w-full text-[0.7rem] break-words text-[#41583d] no-underline"><span class="font-semibold">{en ? 'View resource' : 'Ver recurso'} ↗</span>{' '}<span>{linkLabel(entry.url)}</span></a>
   {/if}
 </div>

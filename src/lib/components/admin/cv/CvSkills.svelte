@@ -31,7 +31,7 @@
             <h4 class="cv-skill-title m-0 font-title text-[0.95rem] leading-snug font-medium text-[#171916]">{entry.title}</h4>
             {#if entry.contribution}<div class="cv-skill-description mt-1 text-[0.75rem] leading-relaxed text-[#50534d]"><CvProse body={entry.contribution} /></div>{/if}
             {#if p?.kind==='skill' && p.resources.length}<p class="cv-skill-resources mt-2 mb-0 font-mono text-[0.58rem] leading-relaxed text-[#536a4f]"><span class="font-semibold">{language==='en' ? 'Resources: ' : 'Recursos: '}</span>{p.resources.map(r=>r.label).join(', ')}</p>{/if}
-            {#if p?.kind==='skill' && p.evidence.length}<p class="mt-1 mb-0 text-[0.65rem] leading-relaxed">{#each p.evidence as example,i}{i ? '; ' : ''}{#if example.url}<a href={example.url} class="text-[#536a4f] underline underline-offset-2">{example.label} ↗</a>{:else}{example.label}{/if}{/each}</p>{/if}
+            {#if p?.kind==='skill' && p.evidence.length}<p class="mt-1 mb-0 text-[0.65rem] leading-relaxed">{#each p.evidence as example,i}{i ? '; ' : ''}{#if example.url}<a href={example.url} class="text-[#536a4f] no-underline">{example.label} ↗</a>{:else}{example.label}{/if}{/each}</p>{/if}
             {#if entry.commentary}<div class="mt-1 text-[0.72rem]"><CvProse body={entry.commentary} /></div>{/if}
           </div>
         {/each}

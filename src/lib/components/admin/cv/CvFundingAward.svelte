@@ -21,7 +21,7 @@
     <h3 class="cv-funding-title m-0 font-title text-[1rem] leading-snug font-medium">{entry.title}</h3>
     {#if p.awardingBody || amount}<p class="cv-funding-body mt-1 mb-0 text-[0.76rem] leading-relaxed text-[#50534d]">{p.awardingBody}{p.awardingBody && amount ? ' · ' : ''}{#if amount}<span class="cv-funding-amount font-mono font-medium whitespace-nowrap text-[#41583d]">{amount}</span>{/if}</p>{/if}
     {#if p.context}<p class="cv-funding-context mt-1 mb-0 text-[0.72rem] leading-relaxed text-[#657060]">{p.context}</p>{/if}
-    {#if entry.url}<a href={entry.url} class="cv-link mt-1 inline-block text-[0.7rem] text-[#536a4f] underline underline-offset-2">{language === 'en' ? 'Details' : 'Más información'} ↗</a>{/if}
+    {#if entry.url}<a href={entry.url} class="cv-link mt-1 inline-block text-[0.7rem] text-[#536a4f] no-underline">{language === 'en' ? 'Details' : 'Más información'} ↗</a>{/if}
     {#if entry.contribution}<div class="cv-contribution mt-1"><CvProse body={entry.contribution} /></div>{/if}
     <CvProse body={entry.commentary} />
   </div>

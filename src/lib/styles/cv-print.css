@@ -8,3 +8,7 @@
   html, body { width: 210mm; margin: 0 !important; padding: 0 !important; }
   .admin-shell { min-height: 0 !important; }
 }
+
+/* Enlaces del CV: color y flecha, sin subrayado, para que no compitan con el texto. */
+.cv-document .cv-prose a { text-decoration: none; }
+.cv-document .cv-prose a::after { content: '\00a0\2197'; font-size: 0.75em; }

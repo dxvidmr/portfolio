@@ -20,7 +20,7 @@
 <AcademicPath locale={language} print {items}>
   {#snippet extra(index: number)}
     {@const entry = sortedEntries[index]}
-    {#if entry.url}<a href={entry.url} class="cv-link mt-1 inline-block max-w-full text-[0.7rem] break-words text-[#536a4f] underline underline-offset-2">{entry.url.replace(/^https?:\/\//,'').replace(/\/$/,'')} ↗</a>{/if}
+    {#if entry.url}<a href={entry.url} class="cv-link mt-1 inline-block max-w-full text-[0.7rem] break-words text-[#536a4f] no-underline">{entry.url.replace(/^https?:\/\//,'').replace(/\/$/,'')} ↗</a>{/if}
     {#if entry.contribution}<div class="cv-contribution mt-1"><CvProse body={entry.contribution} /></div>{/if}
     <CvProse body={entry.commentary} />
   {/snippet}

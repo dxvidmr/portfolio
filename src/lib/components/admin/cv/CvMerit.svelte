@@ -17,6 +17,12 @@
     const parts = authors.split(',');
     return parts.length === 2 && normalizedName(`${parts[1]} ${parts[0]}`) === normalizedName(personName);
   };
+  // «Apellido, Nombre» es un solo editor; varias comas, «;» o una conjunción indican varios.
+  const editorAbbreviation = (editors: string) => {
+    const parts = editors.split(',').map((part) => part.trim()).filter(Boolean);
+    const several = /;|\s(?:y|e|and|&)\s/i.test(editors) || parts.length > 2 || (parts.length === 2 && parts.every((part) => part.includes(' ')));
+    return several ? 'eds.' : 'ed.';
+  };
   const talkAuthors = $derived(p?.kind === 'talk' && !isSoleAuthor(p.authors) ? p.authors : '');
   const eventVenue = $derived(p?.kind === 'talk'
     ? [p.institution && !folded(p.event).includes(folded(p.institution)) ? p.institution : '', p.city, entry.date].filter(Boolean).join(', ')
@@ -30,8 +36,8 @@
   {#if p?.kind === 'publication'}
     <p class="cv-reference m-0 pl-4 -indent-4 text-[0.85rem] leading-relaxed">
       {#if p.authors}<span class="cv-reference-authors font-semibold"><CvAuthors text={p.authors} {personName} /></span>{' '}{/if}{#if entry.date}<span class="cv-reference-year text-[#536a4f]">({entry.date})</span>{/if}{p.authors || entry.date ? '. ' : ''}<span class="cv-reference-title font-title text-[1rem] font-medium">«{entry.title}»</span>.{' '}
-      {#if p.editors}{en ? 'In ' : 'En '}{p.editors} (eds.),{' '}{/if}{#if p.container}<cite class="italic">{p.container}</cite>{/if}{#if locator}{p.container ? ', ' : ''}{locator}{/if}{#if p.publisher}{p.container || locator ? '. ' : ''}{p.publisher}{/if}{p.container || locator || p.publisher ? '.' : ''}
-      {#if entry.url}{' '}<a href={entry.url} aria-label={`${publicationLink}: ${entry.title}`} class="cv-reference-link ml-1 font-mono text-[0.62rem] whitespace-nowrap text-[#536a4f] underline decoration-[#c3c6c2] underline-offset-2">{publicationLink} ↗</a>{/if}
+      {#if p.editors}{en ? 'In ' : 'En '}{p.editors} ({editorAbbreviation(p.editors)}),{' '}{/if}{#if p.container}<cite class="italic">{p.container}</cite>{/if}{#if locator}{p.container ? ', ' : ''}{locator}{/if}{#if p.publisher}{p.container || locator ? '. ' : ''}{p.publisher}{/if}{p.container || locator || p.publisher ? '.' : ''}
+      {#if entry.url}{' '}<a href={entry.url} aria-label={`${publicationLink}: ${entry.title}`} class="cv-reference-link ml-1 font-mono text-[0.62rem] whitespace-nowrap text-[#536a4f] no-underline">{publicationLink} ↗</a>{/if}
     </p>
   {:else if p?.kind === 'talk'}
     {#if p.contributionType || p.selectionMode}
@@ -53,7 +59,7 @@
   {:else if p?.kind === 'skill'}
     <h3 class="cv-entry-title m-0 font-title text-[1rem] font-medium">{entry.title}</h3>
     {#if p.resources.length}<p class="mt-1 mb-0 text-[0.7rem] text-[#536a4f]">{p.resources.map(r=>r.label).join(', ')}</p>{/if}
-    {#if p.evidence.length}<p class="mt-1 mb-0 text-[0.7rem]">{#each p.evidence as example,i}{i ? '; ' : ''}{#if example.url}<a href={example.url} class="underline underline-offset-2">{example.label} ↗</a>{:else}{example.label}{/if}{/each}</p>{/if}
+    {#if p.evidence.length}<p class="mt-1 mb-0 text-[0.7rem]">{#each p.evidence as example,i}{i ? '; ' : ''}{#if example.url}<a href={example.url} class="text-[#536a4f] no-underline">{example.label} ↗</a>{:else}{example.label}{/if}{/each}</p>{/if}
   {:else if p?.kind === 'technical'}
     <CvTechnicalWork {entry} presentation={p} {language} />
   {:else if p?.kind === 'funding'}
