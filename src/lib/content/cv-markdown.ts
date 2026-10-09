@@ -1,5 +1,6 @@
 import { Marked } from 'marked';
 import { renderInlineMarkup } from './inline-markup';
+import { CV_ARROW_SVG } from './cv-format';
 
 const escapeAttribute = (text: string) => text.replaceAll('&', '&amp;').replaceAll('"', '&quot;').replaceAll('<', '&lt;').replaceAll('>', '&gt;');
 const markdown = new Marked({
@@ -11,7 +12,7 @@ const markdown = new Marked({
     link({ href, title, tokens }) {
       const label = this.parser.parseInline(tokens);
       if (!/^(https?:\/\/|mailto:|\/(?!\/)|#)/i.test(href)) return label;
-      return `<a href="${escapeAttribute(href)}"${title ? ` title="${escapeAttribute(title)}"` : ''}>${label}</a>`;
+      return `<a href="${escapeAttribute(href)}"${title ? ` title="${escapeAttribute(title)}"` : ''}>${label}${CV_ARROW_SVG}</a>`;
     },
     image({ text }) { return renderInlineMarkup(text); },
     heading({ tokens }) { return `<h4>${this.parser.parseInline(tokens)}</h4>\n`; }

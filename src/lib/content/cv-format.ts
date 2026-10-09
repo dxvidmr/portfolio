@@ -46,3 +46,8 @@ export function formatCvRange(start: unknown, end: unknown, language: Language):
 	if (a.m === b.m) return `${a.d}-${b.d} ${MONTHS[language][a.m]} ${a.y}`;
 	return `${dayMonth(a, language)} - ${dayMonth(b, language)} ${a.y}`;
 }
+
+// Flecha de enlace dibujada en SVG: las fuentes incrustadas en el PDF (subconjunto latino)
+// no incluyen «↗», y el Chromium del servidor no tiene otra fuente de la que tomarla.
+export const CV_ARROW_SVG =
+	'<svg class="cv-arrow" viewBox="0 0 12 12" width="0.7em" height="0.7em" aria-hidden="true" focusable="false"><path d="M3.5 8.5l5-5M4.5 3.5h4v4" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>';

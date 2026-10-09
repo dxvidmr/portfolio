@@ -1,4 +1,5 @@
 <script lang="ts">
+  import CvArrow from './CvArrow.svelte';
 	import InlineTitle from '$lib/components/InlineTitle.svelte';
   import { CV_SEPARATOR } from '$lib/content/cv-format';
   import type { CvEntry, CvPresentation } from '$lib/types/cv';
@@ -37,6 +38,6 @@
   {/if}
   {#if entry.contribution}<div class="cv-contribution cv-technical-contribution mt-2 text-[0.78rem]"><CvProse body={entry.contribution} /></div>{/if}
   {#if entry.url}
-    <a href={entry.url} aria-label={(en ? 'View resource: ' : 'Ver recurso: ')+entry.title} class="cv-link cv-technical-link mt-2 inline-block max-w-full text-[0.7rem] break-words text-[#41583d] no-underline"><span class="font-semibold">{en ? 'View resource' : 'Ver recurso'} ↗</span>{' '}<span>{linkLabel(entry.url)}</span></a>
+    <a href={entry.url} aria-label={(en ? 'View resource: ' : 'Ver recurso: ')+entry.title} class="cv-link cv-technical-link mt-2 inline-block max-w-full text-[0.7rem] break-words text-[#41583d] no-underline"><span class="font-semibold">{en ? 'View resource' : 'Ver recurso'}<CvArrow /></span>{' '}<span>{linkLabel(entry.url)}</span></a>
   {/if}
 </div>

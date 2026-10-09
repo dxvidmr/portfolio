@@ -9,6 +9,6 @@
   .admin-shell { min-height: 0 !important; }
 }
 
-/* Enlaces del CV: color y flecha, sin subrayado, para que no compitan con el texto. */
+/* Enlaces del CV: color y flecha (SVG, ver CV_ARROW_SVG), sin subrayado, para que no compitan con el texto. */
 .cv-document .cv-prose a { text-decoration: none; }
-.cv-document .cv-prose a::after { content: '\00a0\2197'; font-size: 0.75em; }
+.cv-arrow { display: inline-block; margin-left: 0.2em; vertical-align: -0.05em; }

@@ -6,7 +6,7 @@ describe('Markdown del CV', () => {
     const html = renderCvMarkdown('Los *Anales* y **edición**: [feniX-ML](https://github.com/prolopeuab/feniX-ML).\n\n- Modelado\n- Documentación');
     expect(html).toContain('<em>Anales</em>');
     expect(html).toContain('<strong>edición</strong>');
-    expect(html).toContain('<a href="https://github.com/prolopeuab/feniX-ML">feniX-ML</a>');
+    expect(html).toContain('<a href="https://github.com/prolopeuab/feniX-ML">feniX-ML<svg class="cv-arrow"');
     expect(html).toContain('<li>Documentación</li>');
   });
   it('mantiene las cursivas HTML sencillas existentes', () => {

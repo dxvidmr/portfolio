@@ -1,4 +1,5 @@
 <script lang="ts">
+  import CvArrow from './CvArrow.svelte';
   import AcademicPath from '$lib/components/AcademicPath.svelte';
   import CvProse from './CvProse.svelte';
   import type { CvEntry } from '$lib/types/cv';
@@ -20,7 +21,7 @@
 <AcademicPath locale={language} print {items}>
   {#snippet extra(index: number)}
     {@const entry = sortedEntries[index]}
-    {#if entry.url}<a href={entry.url} class="cv-link mt-1 inline-block max-w-full text-[0.7rem] break-words text-[#536a4f] no-underline">{entry.url.replace(/^https?:\/\//,'').replace(/\/$/,'')} ↗</a>{/if}
+    {#if entry.url}<a href={entry.url} class="cv-link mt-1 inline-block max-w-full text-[0.7rem] break-words text-[#536a4f] no-underline">{entry.url.replace(/^https?:\/\//,'').replace(/\/$/,'')}<CvArrow /></a>{/if}
     {#if entry.contribution}<div class="cv-contribution mt-1"><CvProse body={entry.contribution} /></div>{/if}
     <CvProse body={entry.commentary} />
   {/snippet}

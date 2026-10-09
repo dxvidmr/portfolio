@@ -1,4 +1,5 @@
 <script lang="ts">
+  import CvArrow from './CvArrow.svelte';
 	import InlineTitle from '$lib/components/InlineTitle.svelte';
 	import { plainInlineTitle } from '$lib/content/inline-markup';
   import type { CvEntry } from '$lib/types/cv';
@@ -51,7 +52,7 @@
     <p class="cv-reference m-0 pl-4 -indent-4 text-[0.85rem] leading-relaxed">
       {#if p.authors}<span class="cv-reference-authors font-semibold"><CvAuthors text={p.authors} {personName} /></span>{' '}{/if}{#if entry.date}<span class="cv-reference-year text-[#536a4f]">({entry.date})</span>{/if}{p.authors || entry.date ? '. ' : ''}<span class="cv-reference-title font-title text-[1rem] font-medium">«<InlineTitle text={entry.title} />»</span>.{' '}
       {#if p.editors}{en ? 'In ' : 'En '}{p.editors} ({editorAbbreviation(p.editors)}),{' '}{/if}{#if p.container}<cite class="italic"><InlineTitle text={p.container} /></cite>{/if}{#if locator}{p.container ? ', ' : ''}{locator}{/if}{#if p.publisher}{p.container || locator ? '. ' : ''}{p.publisher}{/if}{p.container || locator || p.publisher ? '.' : ''}
-      {#if entry.url}{' '}<a href={entry.url} aria-label={`${publicationLink}: ${plainInlineTitle(entry.title)}`} class="cv-reference-link ml-1 font-mono text-[0.62rem] whitespace-nowrap text-[#536a4f] no-underline">{publicationLink} ↗</a>{/if}
+      {#if entry.url}{' '}<a href={entry.url} aria-label={`${publicationLink}: ${plainInlineTitle(entry.title)}`} class="cv-reference-link ml-1 font-mono text-[0.62rem] whitespace-nowrap text-[#536a4f] no-underline">{publicationLink}<CvArrow /></a>{/if}
     </p>
   {:else if p?.kind === 'talk'}
     {#if p.contributionType || invited || talkDay}
@@ -69,7 +70,7 @@
     {#if p.sessionTitle || p.sessionFormat}<p class="cv-session mt-1 mb-0 text-[0.75rem] leading-relaxed text-[#50534d]">{compact(p.sessionTitle, p.sessionFormat)}</p>{/if}
   {:else if p?.kind === 'project'}
     {#if entry.date}<p class="cv-project-period mt-0 mb-1 font-mono text-[0.72rem] leading-snug font-medium text-[#41583d]" aria-label={en ? `Project period: ${entry.date}` : `Periodo del proyecto: ${entry.date}`}>{entry.date}</p>{/if}
-    <h3 class="cv-entry-title m-0 font-title text-[1.1rem] leading-snug font-medium">{#if entry.url}<a href={entry.url} class="text-inherit no-underline hover:underline underline-offset-2"><InlineTitle text={entry.title} /></a>{:else}<InlineTitle text={entry.title} />{/if}</h3>
+    <h3 class="cv-entry-title m-0 font-title text-[1.1rem] leading-snug font-medium">{#if entry.url}<a href={entry.url} class="text-inherit no-underline"><InlineTitle text={entry.title} /><span class="text-[#536a4f]"><CvArrow /></span></a>{:else}<InlineTitle text={entry.title} />{/if}</h3>
     {#if p.role}<p class="cv-project-role mt-1 mb-0 text-[0.78rem] leading-snug font-medium text-[#41583d]">{p.role}</p>{/if}
     {#if p.institution || p.principalInvestigators}<p class="cv-project-context mt-1 mb-0 text-[0.78rem] leading-relaxed">{p.institution}{#if p.principalInvestigators}{p.institution ? '. ' : ''}<span class="text-[#50534d]">{en ? 'PI: ' : 'IP: '}{p.principalInvestigators}</span>{/if}</p>{/if}
     {#if p.programme || p.code}<p class="cv-project-programme mt-1 mb-0 text-[0.75rem] leading-relaxed text-[#50534d]">{p.programme}{p.programme && p.code ? CV_SEPARATOR : ''}<span class="cv-project-code font-mono text-[0.65rem]">{p.code}</span></p>{/if}
@@ -77,7 +78,7 @@
   {:else if p?.kind === 'skill'}
     <h3 class="cv-entry-title m-0 font-title text-[1rem] font-medium"><InlineTitle text={entry.title} /></h3>
     {#if p.resources.length}<p class="mt-1 mb-0 text-[0.7rem] text-[#536a4f]">{p.resources.map(r=>r.label).join(', ')}</p>{/if}
-    {#if p.evidence.length}<p class="mt-1 mb-0 text-[0.7rem]">{#each p.evidence as example,i}{i ? '; ' : ''}{#if example.url}<a href={example.url} class="text-[#536a4f] no-underline">{example.label} ↗</a>{:else}{example.label}{/if}{/each}</p>{/if}
+    {#if p.evidence.length}<p class="mt-1 mb-0 text-[0.7rem]">{#each p.evidence as example,i}{i ? '; ' : ''}{#if example.url}<a href={example.url} class="text-[#536a4f] no-underline">{example.label}<CvArrow /></a>{:else}{example.label}{/if}{/each}</p>{/if}
   {:else if p?.kind === 'technical'}
     <CvTechnicalWork {entry} presentation={p} {language} />
   {:else if p?.kind === 'funding'}
@@ -114,7 +115,7 @@
   {/if}
   <!-- En las listas, lo que sigue se alinea con la columna de contenido, no con la de la fecha. -->
   <div class:cv-list-extra={listEntry || p?.kind === 'eventOrganization'}>
-    {#if entry.url && p?.kind !== 'publication' && p?.kind !== 'project' && p?.kind !== 'technical' && p?.kind !== 'funding'}<a href={entry.url} class="cv-link mt-1 inline-block max-w-full text-[0.7rem] break-words text-[#536a4f] no-underline">{linkLabel(entry.url)} ↗</a>{/if}
+    {#if entry.url && p?.kind !== 'publication' && p?.kind !== 'project' && p?.kind !== 'technical' && p?.kind !== 'funding'}<a href={entry.url} class="cv-link mt-1 inline-block max-w-full text-[0.7rem] break-words text-[#536a4f] no-underline">{linkLabel(entry.url)}<CvArrow /></a>{/if}
     {#if entry.contribution && p?.kind !== 'technical' && p?.kind !== 'funding'}<div class="cv-contribution mt-1 text-[0.78rem]"><CvProse body={entry.contribution} /></div>{/if}
     {#if p?.kind !== 'funding'}<CvProse body={entry.commentary} />{/if}
   </div>

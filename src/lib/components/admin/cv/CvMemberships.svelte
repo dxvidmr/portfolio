@@ -1,4 +1,5 @@
 <script lang="ts">
+  import CvArrow from './CvArrow.svelte';
 	import InlineTitle from '$lib/components/InlineTitle.svelte';
   import type { CvSnapshot } from '$lib/types/cv';
   import CvProse from './CvProse.svelte';
@@ -15,7 +16,7 @@
         </div>
       {#if entry.contribution}<CvProse body={entry.contribution} />{/if}
       <CvProse body={entry.commentary} />
-      {#if entry.url}<a href={entry.url} class="cv-link mt-1 inline-block max-w-full text-[0.7rem] break-words text-[#536a4f]">{entry.url.replace(/^https?:\/\//,'').replace(/\/$/,'')} ↗</a>{/if}
+      {#if entry.url}<a href={entry.url} class="cv-link mt-1 inline-block max-w-full text-[0.7rem] break-words text-[#536a4f]">{entry.url.replace(/^https?:\/\//,'').replace(/\/$/,'')}<CvArrow /></a>{/if}
       </li>
     {/each}
   </ul>
