@@ -415,7 +415,7 @@
 			</div>
 
 			<div class="relative grid grid-cols-[minmax(240px,4fr)_minmax(0,7fr)] items-start gap-[clamp(34px,7vw,112px)] before:pointer-events-none before:absolute before:inset-[-5vw] before:z-[-1] before:bg-[color-mix(in_srgb,var(--bg)_44%,transparent)] before:[backdrop-filter:blur(7px)] before:[mask-image:radial-gradient(ellipse_at_center,#000_38%,transparent_78%)] before:content-[''] max-[780px]:grid-cols-1 max-[780px]:gap-[42px]">
-				<figure class="sticky top-[104px] m-0 max-[780px]:relative max-[780px]:top-auto max-[780px]:w-full">
+				<figure class="m-0 max-[780px]:w-full">
 					<div
 						class="relative block w-full overflow-hidden rounded-ui border border-rule-strong bg-[#777]"
 						onpointerenter={previewAlternatePortrait}
@@ -477,9 +477,14 @@
 							<li class="label inline-flex items-center gap-3 after:text-rule-strong after:content-['/'] last:after:content-none max-[520px]:rounded-full max-[520px]:border max-[520px]:border-rule max-[520px]:px-2.5 max-[520px]:py-1.5 max-[520px]:text-[.68rem] max-[520px]:after:hidden">{area}</li>
 						{/each}
 					</ul>
-					<CurrentAffiliations {locale} />
-					<AcademicPath {locale} />
 				</div>
+			</div>
+
+			<!-- Segunda banda, a todo el ancho: lo que haces ahora y de dónde vienes. Sin columnas fijas:
+			     la foto ya no se queda clavada junto a contenido que no le corresponde. -->
+			<div class="mt-[clamp(64px,9vw,128px)] grid grid-cols-[minmax(0,5fr)_minmax(0,7fr)] items-start gap-[clamp(34px,6vw,96px)] max-[900px]:grid-cols-1">
+				<CurrentAffiliations {locale} />
+				<AcademicPath {locale} />
 			</div>
 
 			<footer class="mt-[clamp(28px,4vw,54px)] grid grid-cols-[minmax(260px,.8fr)_minmax(0,1.2fr)] items-start gap-[clamp(30px,6vw,92px)] border-t border-rule bg-[linear-gradient(to_bottom,color-mix(in_srgb,var(--bg)_72%,transparent),color-mix(in_srgb,var(--bg)_92%,transparent))] py-[clamp(24px,3vw,38px)] [backdrop-filter:blur(12px)] max-[780px]:grid-cols-1 max-[780px]:items-start">
