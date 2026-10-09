@@ -6,6 +6,8 @@
 	import EntryMetadata from '$lib/components/EntryMetadata.svelte';
 	import EditorialBackground from '$lib/components/EditorialBackground.svelte';
 	import SiteHeader from '$lib/components/SiteHeader.svelte';
+	import { CV_SEPARATOR } from '$lib/content/cv-format';
+	import { plainInlineTitle } from '$lib/content/inline-markup';
 	import MoveUpRight from '@lucide/svelte/icons/move-up-right';
 
 	let { data } = $props();
@@ -27,6 +29,7 @@
 			allFem: 'Todas',
 			allMasc: 'Todos',
 			noDate: 's/f',
+			expected: 'Prevista',
 			empty: 'No hay resultados para esos filtros.',
 			sectionLabels: {
 				publications: 'Publicaciones',
@@ -57,6 +60,7 @@
 			allFem: 'All',
 			allMasc: 'All',
 			noDate: 'n.d.',
+			expected: 'Expected',
 			empty: 'No results for those filters.',
 			sectionLabels: {
 				publications: 'Publications',
@@ -98,8 +102,16 @@
 					locale === 'en' ? 'Native language' : 'Lengua materna'
 				]
 				.filter(Boolean)
-				.join(' · ')
+				.join(CV_SEPARATOR)
 			: (locale === 'en' ? item.detail_label_en : item.detail_label_es) ?? item.detail;
+	const foldText = (value: string) => value.normalize('NFD').replace(/\p{Diacritic}/gu, '').toLocaleLowerCase('es').replace(/[.\s]+$/, '').trim();
+	// Detalle que no repite el nombre del mérito (servicios y conferencias con el mismo título).
+	const detailText = (item: CvItem) => {
+		const detail = itemDetail(item);
+		return detail && foldText(detail) !== foldText(plainInlineTitle(itemTitle(item))) ? detail : '';
+	};
+	const yearLabel = (item: CvItem) =>
+		item.hide_year ? '' : item.year ? (item.expected ? `${ui.expected} ${item.year}` : item.year) : ui.noDate;
 	const typeOptionsFor = (items: CvItem[]) =>
 		Array.from(
 			items
@@ -225,7 +237,7 @@
 					{/if}
 					<ol class="m-0 list-none border-t border-rule p-0">
 					{#each section.items as item (item.entity_id)}
-						<li class="grid grid-cols-[minmax(130px,.36fr)_minmax(0,1fr)] gap-[clamp(18px,3vw,40px)] border-b border-rule py-[clamp(18px,2.6vw,28px)] max-[700px]:grid-cols-1 max-[700px]:gap-2">
+						<li class="grid {section.items.some((entry) => typeLabel(entry)) ? 'grid-cols-[minmax(130px,.36fr)_minmax(0,1fr)]' : 'grid-cols-[minmax(64px,auto)_minmax(0,1fr)]'} gap-[clamp(18px,3vw,40px)] border-b border-rule py-[clamp(18px,2.6vw,28px)] max-[700px]:grid-cols-1 max-[700px]:gap-2">
 							<div class="grid grid-cols-[minmax(0,1fr)_auto] gap-3">
 								<span class="grid content-start justify-items-start gap-1.5">
 									{#if typeLabel(item)}<span class="text-[.86rem] leading-[1.3] text-ink-dim">{typeLabel(item)}</span>{/if}
@@ -233,7 +245,7 @@
 										<span class="label bg-accent-wash px-1.5 py-0.5 text-accent-strong">{ui.invited}</span>
 									{/if}
 								</span>
-								<span class="label text-right text-ink-faint">{item.hide_year ? '' : item.year ?? ui.noDate}</span>
+								<span class="label text-right text-ink-faint">{yearLabel(item)}</span>
 							</div>
 							<div class="min-w-0">
 								<h3 class="m-0 text-[clamp(1.05rem,1.5vw,1.3rem)] font-medium leading-[1.2] tracking-[-0.01em]">
@@ -248,12 +260,12 @@
 										<InlineTitle text={itemTitle(item)} />
 									{/if}
 								</h3>
-								{#if item.metadata || itemDetail(item) || item.doi}
+								{#if item.metadata || detailText(item) || item.doi}
 									<p class="mt-2 mb-0 max-w-[72ch] text-[.76rem] leading-[1.5] text-ink-faint">
 										{#if item.metadata}
-											<EntryMetadata metadata={item.metadata} {locale} hideInvitation />
-										{:else if itemDetail(item)}
-											{itemDetail(item)}
+											<EntryMetadata metadata={item.metadata} {locale} hideInvitation title={itemTitle(item)} />
+										{:else if detailText(item)}
+											{detailText(item)}
 										{/if}
 										{#if item.doi}
 											<a class="ml-1 font-mono text-[.7rem] text-ink-faint hover:text-accent-strong focus-visible:text-accent-strong" href={item.doi_url ?? undefined} target="_blank" rel="noreferrer">DOI {item.doi} ↗</a>

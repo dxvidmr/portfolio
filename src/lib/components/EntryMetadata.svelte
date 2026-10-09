@@ -4,9 +4,11 @@
 	import type { EntryMetadata as EntryMetadataValue } from '$lib/types/entry-metadata';
 	import PracticeMetadata from './PracticeMetadata.svelte';
 	import { CV_SEPARATOR, formatCvRange } from '$lib/content/cv-format';
+	import { plainInlineTitle } from '$lib/content/inline-markup';
 
 	// hideInvitation: la página ya muestra «Por invitación» como distintivo y no se repite aquí.
-	let { metadata, locale, hideInvitation = false }: { metadata: EntryMetadataValue; locale: Locale; hideInvitation?: boolean } = $props();
+	// title: nombre del mérito, para no repetirlo cuando el evento se llama igual.
+	let { metadata, locale, hideInvitation = false, title = '' }: { metadata: EntryMetadataValue; locale: Locale; hideInvitation?: boolean; title?: string } = $props();
 
 	const withoutTerminalPunctuation = (value: string) => value.trim().replace(/[.,;:]\s*$/, '');
 	const sentence = (value: string) => `${withoutTerminalPunctuation(value)}.`;
@@ -91,13 +93,13 @@
 	{#if publicationContext(metadata).length}<span> {publicationContext(metadata).join('; ')}.</span>{/if}
 {:else if metadata.kind === 'event'}
 	{#if metadata.authors && !isSoleAuthor(metadata.authors)}<span>{#each authorSegments(withoutTerminalPunctuation(metadata.authors)) as segment, index (index)}{#if segment.own}<span class="underline decoration-[.08em] underline-offset-[.14em]">{segment.text}</span>{:else}{segment.text}{/if}{/each}. </span>{/if}
-	{#if metadata.event_title}<em><InlineTitle text={withoutTerminalPunctuation(metadata.event_title)} /></em><span>{eventPlace(metadata) ? '. ' : '.'}</span>{/if}{#if eventPlace(metadata)}<span>{eventPlace(metadata)}.</span>{/if}
+	{#if metadata.event_title && folded(withoutTerminalPunctuation(metadata.event_title)) !== folded(withoutTerminalPunctuation(plainInlineTitle(title)))}<em><InlineTitle text={withoutTerminalPunctuation(metadata.event_title)} /></em><span>{eventPlace(metadata) ? '. ' : '.'}</span>{/if}{#if eventPlace(metadata)}<span>{eventPlace(metadata)}.</span>{/if}
 	{#if shownSelection(metadata) || eventSession(metadata) || metadata.session_title}<span> {#if shownSelection(metadata)}{shownSelection(metadata)}{/if}{#if eventSession(metadata)}{shownSelection(metadata) ? ', ' : ''}{eventSession(metadata)}{/if}{#if metadata.session_title}{shownSelection(metadata) || eventSession(metadata) ? ': ' : ''}{withoutTerminalPunctuation(metadata.session_title)}{/if}.</span>{/if}
 {:else if metadata.kind === 'stay'}
 	{#if stayLine(metadata)}<span>{sentence(stayLine(metadata))}</span>{/if}
 	{#if metadata.funding.length}
 		<span class="mt-1 block"><span class="text-accent-strong">{locale === 'es' ? 'Financiación' : 'Funding'}:</span> {#each metadata.funding as funding, index (funding.title)}{#if index > 0}{'; '}{/if}<span>{fundingTypeLabel(funding)} | {compactFundingBody(funding.awarding_body, funding.title)}</span>{/each}.</span>
 	{/if}
-{:else}
+{:else if folded(withoutTerminalPunctuation(metadata.text)) !== folded(withoutTerminalPunctuation(plainInlineTitle(title)))}
 	<span>{sentence(metadata.text)}</span>
 {/if}

@@ -90,7 +90,8 @@ const sections = [
 		title: 'Formación',
 		sql: `SELECT ed.id AS entity_id, ed.degree_title AS title, NULL AS type, NULL AS type_label_es, NULL AS type_label_en,
 		             ed.institution AS detail,
-		             COALESCE(substr(ed.date_end, 1, 4), substr(ed.date_start, 1, 4)) AS year, ed.url
+		             COALESCE(substr(ed.date_end, 1, 4), substr(ed.date_start, 1, 4)) AS year, ed.url,
+		             CASE WHEN ed.date_end > date('now') THEN 1 ELSE 0 END AS expected
 		      FROM education ed
 		      JOIN entries e ON e.entity_type = 'education' AND e.entity_id = ed.id AND e.public = 1
 		      ORDER BY year DESC, title ASC`
@@ -233,6 +234,7 @@ export const load: PageServerLoad = async () => {
 						detail_label_es: normalize(row.detail_label_es),
 						detail_label_en: normalize(row.detail_label_en),
 						is_native: Number(row.is_native) === 1,
+						expected: Number(row.expected) === 1,
 						hide_year: section.key === 'skills' || section.key === 'languages',
 						metadata: entryMetadataFromRow({ ...row, entity_type: section.key }),
 						year: normalize(row.year),

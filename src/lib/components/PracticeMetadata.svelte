@@ -1,14 +1,15 @@
 <script lang="ts">
 	import InlineTitle from '$lib/components/InlineTitle.svelte';
+	import { CV_SEPARATOR } from '$lib/content/cv-format';
   import type { EntryMetadata } from '$lib/types/entry-metadata';
   let { metadata, locale }: { metadata: Extract<EntryMetadata, {kind: 'project' | 'professional'}>; locale: 'es' | 'en' } = $props();
-  const join = (...parts: (string | null)[]) => [...new Set(parts.filter(Boolean))].join(' · ');
+  const join = (...parts: (string | null)[]) => [...new Set(parts.filter(Boolean))].join(CV_SEPARATOR);
   const en = $derived(locale === 'en');
   const contribution = $derived(en ? metadata.contribution_en || metadata.contribution_es : metadata.contribution_es);
 </script>
 {#if metadata.kind === 'project'}
   <span class="block">{join(en ? metadata.role_en : metadata.role_es, metadata.institution, en ? metadata.nature_en : metadata.nature_es)}</span>
-  <span class="block">{join(en ? metadata.programme_en : metadata.programme_es, metadata.code, metadata.investigators ? `${en ? 'PI' : 'IP'}: ${metadata.investigators}` : null)}</span>
+  <span class="block">{join(metadata.code, metadata.investigators ? `${en ? 'PI' : 'IP'}: ${metadata.investigators}` : null)}</span>
 {:else}
   <span class="block">{join(en ? metadata.modality_en : metadata.modality_es, metadata.recipient)}</span>
   {#if metadata.projects?.length}
