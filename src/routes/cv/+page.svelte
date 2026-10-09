@@ -30,13 +30,14 @@
 			allMasc: 'Todos',
 			noDate: 's/f',
 			expected: 'Prevista',
+			inPortfolio: 'En el portfolio',
 			empty: 'No hay resultados para esos filtros.',
 			sectionLabels: {
 				publications: 'Publicaciones',
 				talks: 'Comunicaciones',
 				teaching: 'Docencia',
 				projects: 'Proyectos de investigación',
-				technical_works: 'Experiencia técnica y profesional',
+				technical_works: 'Trabajos técnicos',
 				education: 'Formación',
 				research_stays: 'Estancias',
 				funding_awards: 'Financiación y premios',
@@ -61,13 +62,14 @@
 			allMasc: 'All',
 			noDate: 'n.d.',
 			expected: 'Expected',
+			inPortfolio: 'In the portfolio',
 			empty: 'No results for those filters.',
 			sectionLabels: {
 				publications: 'Publications',
 				talks: 'Talks',
 				teaching: 'Teaching',
 				projects: 'Research projects',
-				technical_works: 'Technical and professional experience',
+				technical_works: 'Technical work',
 				education: 'Education',
 				research_stays: 'Research stays',
 				funding_awards: 'Funding and awards',
@@ -289,6 +291,13 @@
 											{/each}
 										</ul>
 									{/if}
+								{/if}
+								{#if item.portfolio.length}
+									<ul class="mt-2.5 mb-0 flex list-none flex-wrap gap-x-4 gap-y-1 p-0">
+										{#each item.portfolio as ficha (ficha.slug)}
+											<li><a href={localizedPath(`/portfolio/${ficha.slug}`, locale)} class="label text-accent-strong hover:text-ink">{ui.inPortfolio}: {locale === 'en' ? ficha.title_en : ficha.title_es} →</a></li>
+										{/each}
+									</ul>
 								{/if}
 								{#if item.links.length}
 									<div class="mt-2.5 flex flex-wrap gap-x-4 gap-y-1">

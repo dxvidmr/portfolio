@@ -79,7 +79,7 @@ const sections = [
 		      ORDER BY year DESC, research_project.title ASC`
 	},
 	{
-		key: 'technical_works', title: 'Experiencia técnica y profesional',
+		key: 'technical_works', title: 'Trabajos técnicos',
 		sql: `SELECT technical.id AS entity_id,technical.title,technical.work_type AS type,
 		  tv.label_es AS type_label_es,tv.label_en AS type_label_en,technical.recipient AS detail,
 		  substr(technical.date_start,1,4) AS year,technical.url,${publicTechnicalContextSql.select}
@@ -269,7 +269,7 @@ function groupMemberships<T extends { title: string; type: string | null; year: 
 }
 
 export const load: PageServerLoad = async () => {
-	const [results, publicLinks] = await Promise.all([
+	const [results, publicLinks, technicalPortfolio] = await Promise.all([
 		Promise.all(
 		sections.map(async (section) => {
 			const res = await db.execute(section.sql);
@@ -307,10 +307,19 @@ export const load: PageServerLoad = async () => {
 			return result;
 		})
 		),
-		getPublicAdditionalLinks()
+		getPublicAdditionalLinks(),
+		// Trabajos técnicos: la ficha del portfolio que los narra (una ficha puede reunir varios).
+		db.execute(`SELECT pi.entity_id, p.slug, p.title_es, p.title_en FROM portfolio_items pi
+		            JOIN portfolio_projects p ON p.slug = pi.portfolio_slug AND p.publication_status = 'published'
+		            WHERE pi.entity_type = 'technical_works' ORDER BY p.sort_order, p.slug`)
 	]);
 	const skillDetails=await getSkillDetails(db,'es',true);
 	const linksByEntry = groupPublicAdditionalLinks(publicLinks);
+	const portfolioByWork = new Map<number, { slug: string; title_es: string; title_en: string }[]>();
+	for (const row of technicalPortfolio.rows) {
+		const id = Number(row.entity_id);
+		portfolioByWork.set(id, [...(portfolioByWork.get(id) ?? []), { slug: String(row.slug), title_es: String(row.title_es), title_en: String(row.title_en) }]);
+	}
 	const enrichedResults = results.map((section) => ({
 		...section,
 		items: section.items.map((item) => {
@@ -332,6 +341,7 @@ export const load: PageServerLoad = async () => {
 			return {
 				...item,
  skillDetails: section.key === 'skills' ? skillDetails.get(item.entity_id) : undefined,
+				portfolio: section.key === 'technical_works' ? (portfolioByWork.get(item.entity_id) ?? []) : [],
 				links,
 				target_url: targetUrl
 			};
