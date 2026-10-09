@@ -57,7 +57,7 @@
     {#if block.title || block.body || block.entries.length}
       <section class="cv-section mt-8" class:cv-section-brief={block.entries.length > 0 && block.entries.length <= 4 && block.entries.every(e=>['teaching','memberships','service_activities'].includes(e.entityType))}>
         <div class="cv-section-header">
-        {#if selected}<p class="cv-selection-label mt-0 mb-1 font-mono text-[0.55rem] tracking-[0.08em] text-[#657060] uppercase">{snapshot.language==='en' ? 'Selection' : 'Selección'}</p>{/if}
+        {#if selected}<p class="cv-selection-label mt-0 mb-1 font-mono text-[0.55rem] tracking-[0.08em] text-[#50534d] uppercase">{snapshot.language==='en' ? 'Selection' : 'Selección'}</p>{/if}
         {#if block.title}<h2 class="cv-heading mb-5 flex items-baseline gap-3 border-b border-[#c3c6c2] pb-2 font-title text-[1.45rem] font-normal"><span class="cv-index font-mono text-[0.62rem] text-[#536a4f]">{String(index + 1).padStart(2, '0')}</span>{sectionTitle}</h2>{/if}
         </div>
         <CvProse body={block.body} />

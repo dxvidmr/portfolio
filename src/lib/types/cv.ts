@@ -15,13 +15,13 @@ export type CvProfile = {
 };
 export type CvPresentation =
   | { kind: 'responsibility'; organization: string; role: string }
-  | { kind: 'eventOrganization'; role: string; venue: string; dates: string }
+  | { kind: 'eventOrganization'; role: string; venue: string; city?: string; dates: string }
   | { kind: 'funding'; awardType: string; awardingBody: string; context: string; amount?: number | null; currency?: string }
   | { kind: 'skill'; area: string; resources: {key:string;label:string}[]; evidence: {key:string;label:string;url:string}[] }
   | { kind: 'education'; year: string; dateBasis: 'start' | 'end'; ongoing: boolean; expected?: boolean }
   | { kind: 'publication'; authors: string; editors: string; publicationType: string;
       container: string; publisher: string; volume: string; issue: string; pages: string }
-  | { kind: 'talk'; authors: string; contributionType: string; selectionMode: string;
+  | { kind: 'talk'; authors: string; contributionType: string; selectionMode: string; invited?: boolean; eventDates?: string; talkDate?: string;
       event: string; institution: string; city: string; sessionFormat: string; sessionTitle: string }
   | { kind: 'project'; role: string; institution: string; code: string; principalInvestigators: string; description: string; programme?: string; nature?: string }
   | { kind: 'technical'; workType: string; modality: string; recipient: string;

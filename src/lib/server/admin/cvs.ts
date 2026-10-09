@@ -1,4 +1,5 @@
 import { isFutureDate, meritPeriod } from '$lib/content/periods';
+import { cvJoin } from '$lib/content/cv-format';
 import { db } from '$lib/server/db';
 import { error } from '@sveltejs/kit';
 import type { Client, Transaction } from '@libsql/client';
@@ -10,8 +11,10 @@ import { technicalContext } from '$lib/server/technical-context';
 
 type Reader = Pick<Client | Transaction, 'execute' | 'batch'>;
 const value = (v: unknown) => v == null ? '' : String(v);
-const join = (...parts: unknown[]) => parts.map(value).filter(Boolean).join(' · ');
+const join = (...parts: unknown[]) => cvJoin(...parts.map(value));
 const displayDate = (v: unknown) => value(v).replace(/\b(\d{4})-(\d{2})-(\d{2})\b/g, '$3/$2/$1');
+const isShortPeriod = (start: string, end: string) =>
+  /^\d{4}-\d{2}-\d{2}$/.test(start) && /^\d{4}-\d{2}-\d{2}$/.test(end) && (Date.parse(end) - Date.parse(start)) / 86_400_000 <= 31;
 const range = (a: unknown, b: unknown) => !b || a === b ? displayDate(a) : [displayDate(a), displayDate(b)].filter(Boolean).join(' - ');
 const safeUrl = (v: unknown) => {
   const url = value(v).trim();
@@ -56,7 +59,8 @@ export async function getCvCatalog(reader: Reader = db, language: 'es' | 'en' = 
         url ||= safeUrl(r.doi ? `https://doi.org/${value(r.doi).replace(/^https?:\/\/(dx\.)?doi\.org\//, '')}` : '');
       } else if (type === 'talks') {
         const event = events.get(Number(r.canonical_event_id));
-        presentation = { kind: 'talk', authors: value(r.authors_text), contributionType: label(r.contribution_type), selectionMode: label(r.selection_mode),
+        presentation = { kind: 'talk', authors: value(r.authors_text), contributionType: label(r.contribution_type), selectionMode: label(r.selection_mode), invited: r.selection_mode === 'selection_invited',
+          eventDates: range(event?.date_start, event?.date_end), talkDate: r.date_override ? range(r.date_override, r.date_end_override) : '',
           event: value(event?.title), institution: value(event?.institution), city: value(event?.city), sessionFormat: label(r.session_format), sessionTitle: value(r.session_title) };
         sortDate = value(r.date_override || event?.date_start);
         date = range(r.date_override || event?.date_start, r.date_end_override || (r.date_override ? null : event?.date_end));
@@ -112,11 +116,14 @@ export async function getCvCatalog(reader: Reader = db, language: 'es' | 'en' = 
           presentation = { kind: 'responsibility', organization: value(r.venue_or_journal), role: title };
         } else if (r.activity_type === 'event_organization') {
           const event=events.get(Number(r.canonical_event_id));
-          presentation = { kind: 'eventOrganization', role: label(r.role), venue: value(r.venue_or_journal || event?.institution),
+          presentation = { kind: 'eventOrganization', role: label(r.role), venue: value(r.venue_or_journal || event?.institution), city: value(event?.city || r.city),
             dates: range(event?.date_start || r.date_start,event?.date_end || r.date_end) };
         }
       }
-      if (['memberships','service_activities','teaching'].includes(type)) date=meritPeriod(value(r.date_start),value(r.date_end),language);
+      // La docencia puntual (talleres, seminarios: hasta un mes) conserva sus fechas exactas; la de un curso, el curso académico.
+      if (type === 'teaching' && isShortPeriod(value(r.date_start), value(r.date_end || r.date_start))) date = range(r.date_start, r.date_end);
+      else if (type === 'teaching' && r.academic_year) date = value(r.academic_year);
+      else if (['memberships','service_activities','teaching'].includes(type)) date=meritPeriod(value(r.date_start),value(r.date_end),language);
       const key = `${type}:${r.id}`;
       result.push({ key, entityType: type, entityId: Number(r.id), title, detail, date, sortDate, url, isPublic: controls.get(key) || false, ...(presentation ? { presentation } : {}), contribution });
     }
