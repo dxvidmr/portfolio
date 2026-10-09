@@ -145,6 +145,27 @@
 		(locale === 'en' ? item.subtype_label_en : item.subtype_label_es) ??
 		item.subtype?.replaceAll('_', ' ') ??
 		null;
+	// Capítulos de «Sobre mí»: tarjetas apiladas en ordenador; pestañas y carrusel en móvil.
+	const aboutChapters = $derived(locale === 'es' ? ['Perfil', 'Afiliaciones', 'Recorrido'] : ['Profile', 'Affiliations', 'Path']);
+	const chapterCardClass =
+		'sticky rounded-ui border border-rule bg-canvas p-[clamp(22px,3vw,40px)] shadow-[0_-18px_44px_-30px_rgba(23,25,22,.42)] max-[780px]:static max-[780px]:flex-[0_0_86%] max-[780px]:snap-start max-[780px]:p-5 max-[780px]:shadow-none';
+	let activeChapter = $state(0);
+	let chaptersEl = $state<HTMLDivElement | null>(null);
+	const showChapter = (index: number) => {
+		activeChapter = index;
+		const card = chaptersEl?.children[index] as HTMLElement | undefined;
+		if (chaptersEl && card) chaptersEl.scrollTo({ left: card.offsetLeft - chaptersEl.offsetLeft, behavior: 'smooth' });
+	};
+	const syncChapter = () => {
+		if (!chaptersEl || !window.matchMedia('(max-width: 780px)').matches) return;
+		const start = chaptersEl.getBoundingClientRect().left;
+		const cards = Array.from(chaptersEl.children) as HTMLElement[];
+		activeChapter = cards.reduce(
+			(best, card, index) =>
+				Math.abs(card.getBoundingClientRect().left - start) < Math.abs(cards[best].getBoundingClientRect().left - start) ? index : best,
+			0
+		);
+	};
 	const academicIcons: Record<string, string> = {
 		orcid: 'ai-orcid',
 		scholar: 'ai-google-scholar',
@@ -415,7 +436,7 @@
 			</div>
 
 			<div class="relative grid grid-cols-[minmax(240px,4fr)_minmax(0,7fr)] items-start gap-[clamp(34px,7vw,112px)] before:pointer-events-none before:absolute before:inset-[-5vw] before:z-[-1] before:bg-[color-mix(in_srgb,var(--bg)_44%,transparent)] before:[backdrop-filter:blur(7px)] before:[mask-image:radial-gradient(ellipse_at_center,#000_38%,transparent_78%)] before:content-[''] max-[780px]:grid-cols-1 max-[780px]:gap-[42px]">
-				<figure class="m-0 max-[780px]:w-full">
+				<figure class="sticky top-[104px] m-0 max-[780px]:static max-[780px]:w-full">
 					<div
 						class="relative block w-full overflow-hidden rounded-ui border border-rule-strong bg-[#777]"
 						onpointerenter={previewAlternatePortrait}
@@ -424,7 +445,7 @@
 						aria-label={ui.portraitAlt}
 					>
 						<img
-							class={`block h-auto w-full [transition:opacity_700ms_ease] motion-reduce:transition-none ${activePortrait === 'researcher' ? 'opacity-100' : 'opacity-0'}`}
+							class={`block h-auto max-h-[calc(100svh-380px)] min-h-[240px] w-full object-cover object-[50%_28%] [transition:opacity_700ms_ease] motion-reduce:transition-none max-[780px]:max-h-none ${activePortrait === 'researcher' ? 'opacity-100' : 'opacity-0'}`}
 							src="/images/about/david-merino-recalde-researcher.jpg"
 							alt=""
 							width="820"
@@ -470,21 +491,43 @@
 					</figcaption>
 				</figure>
 
-				<div class="min-w-0 pt-[clamp(8px,2vw,28px)] max-[780px]:pt-0">
-					<p class="mt-0 mb-[clamp(26px,4vw,48px)] max-w-[34ch] font-title text-[clamp(1.35rem,2.3vw,2rem)] leading-[1.3] tracking-[-0.015em] text-ink">{ui.aboutText}</p>
-					<ul class="mt-0 mb-[clamp(34px,5vw,56px)] flex list-none flex-wrap gap-x-3 gap-y-[7px] p-0 max-[520px]:gap-1.5">
-						{#each t(profile.areas, locale) as area (area)}
-							<li class="label inline-flex items-center gap-3 after:text-rule-strong after:content-['/'] last:after:content-none max-[520px]:rounded-full max-[520px]:border max-[520px]:border-rule max-[520px]:px-2.5 max-[520px]:py-1.5 max-[520px]:text-[.68rem] max-[520px]:after:hidden">{area}</li>
+				<div class="min-w-0">
+					<!-- Móvil: pestañas que siguen al carrusel de capítulos. -->
+					<div class="mb-5 hidden gap-6 max-[780px]:flex" role="tablist" aria-label={ui.aboutTitle}>
+						{#each aboutChapters as chapter, index (chapter)}
+							<button
+								type="button"
+								role="tab"
+								aria-selected={activeChapter === index}
+								class={`label cursor-pointer border-0 border-b bg-transparent p-0 pb-1 [transition:color_300ms_ease,border-color_300ms_ease] ${activeChapter === index ? 'border-accent-strong text-accent-strong' : 'border-transparent text-ink-faint'}`}
+								onclick={() => showChapter(index)}
+							>{chapter}</button>
 						{/each}
-					</ul>
+					</div>
+					<!-- Ordenador: cada capítulo se queda fijo al llegar arriba y el siguiente lo cubre.
+					     Móvil: carrusel horizontal con desplazamiento por capítulos. -->
+					<div
+						class="grid gap-[26vh] pb-[8vh] max-[780px]:mr-[calc(-1*var(--gutter))] max-[780px]:flex max-[780px]:gap-3 max-[780px]:overflow-x-auto max-[780px]:overscroll-x-contain max-[780px]:snap-x max-[780px]:snap-mandatory max-[780px]:pr-[var(--gutter)] max-[780px]:pb-2"
+						bind:this={chaptersEl}
+						onscroll={syncChapter}
+					>
+						<article class={chapterCardClass} style:top="104px" aria-label={aboutChapters[0]}>
+							<span class="label">{aboutChapters[0]}</span>
+							<p class="mt-4 mb-[clamp(22px,3vw,36px)] max-w-[34ch] font-title text-[clamp(1.3rem,2.1vw,1.85rem)] leading-[1.3] tracking-[-0.015em] text-ink max-[780px]:text-[1.15rem]">{ui.aboutText}</p>
+					<ul class="m-0 flex list-none flex-wrap gap-x-3 gap-y-[7px] p-0 max-[520px]:gap-1.5">
+								{#each t(profile.areas, locale) as area (area)}
+									<li class="label inline-flex items-center gap-3 after:text-rule-strong after:content-['/'] last:after:content-none max-[520px]:rounded-full max-[520px]:border max-[520px]:border-rule max-[520px]:px-2.5 max-[520px]:py-1.5 max-[520px]:text-[.68rem] max-[520px]:after:hidden">{area}</li>
+								{/each}
+							</ul>
+						</article>
+						<article class={chapterCardClass} style:top="124px" aria-label={aboutChapters[1]}>
+							<CurrentAffiliations {locale} />
+						</article>
+						<article class={chapterCardClass} style:top="144px" aria-label={aboutChapters[2]}>
+							<AcademicPath {locale} />
+						</article>
+					</div>
 				</div>
-			</div>
-
-			<!-- Segunda banda, a todo el ancho: lo que haces ahora y de dónde vienes. Sin columnas fijas:
-			     la foto ya no se queda clavada junto a contenido que no le corresponde. -->
-			<div class="mt-[clamp(64px,9vw,128px)] grid grid-cols-[minmax(0,5fr)_minmax(0,7fr)] items-start gap-[clamp(34px,6vw,96px)] max-[900px]:grid-cols-1">
-				<CurrentAffiliations {locale} />
-				<AcademicPath {locale} />
 			</div>
 
 			<footer class="mt-[clamp(28px,4vw,54px)] grid grid-cols-[minmax(260px,.8fr)_minmax(0,1.2fr)] items-start gap-[clamp(30px,6vw,92px)] border-t border-rule bg-[linear-gradient(to_bottom,color-mix(in_srgb,var(--bg)_72%,transparent),color-mix(in_srgb,var(--bg)_92%,transparent))] py-[clamp(24px,3vw,38px)] [backdrop-filter:blur(12px)] max-[780px]:grid-cols-1 max-[780px]:items-start">
