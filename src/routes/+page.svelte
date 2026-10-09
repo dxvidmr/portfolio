@@ -145,19 +145,37 @@
 		(locale === 'en' ? item.subtype_label_en : item.subtype_label_es) ??
 		item.subtype?.replaceAll('_', ' ') ??
 		null;
-	// Capítulos de «Sobre mí»: tarjetas apiladas en ordenador; pestañas y carrusel en móvil.
+	// Capítulos de «Sobre mí». Ordenador: el avance por la sección elige el capítulo que se muestra
+	// en el panel fijo. Móvil: pestañas sobre un carrusel horizontal.
 	const aboutChapters = $derived(locale === 'es' ? ['Perfil', 'Afiliaciones', 'Recorrido'] : ['Profile', 'Affiliations', 'Path']);
-	const chapterCardClass =
-		'sticky rounded-ui border border-rule bg-canvas p-[clamp(22px,3vw,40px)] shadow-[0_-18px_44px_-30px_rgba(23,25,22,.42)] max-[780px]:static max-[780px]:flex-[0_0_86%] max-[780px]:snap-start max-[780px]:p-5 max-[780px]:shadow-none';
 	let activeChapter = $state(0);
 	let chaptersEl = $state<HTMLDivElement | null>(null);
+	let chapterTrack = $state<HTMLDivElement | null>(null);
+	const isMobile = () => window.matchMedia('(max-width: 780px)').matches;
+	const chapterClass = (index: number) =>
+		`[grid-area:1/1] min-w-0 [transition:opacity_520ms_ease,transform_640ms_cubic-bezier(.16,1,.3,1)] motion-reduce:transition-none max-[780px]:flex-[0_0_86%] max-[780px]:snap-start max-[780px]:!translate-y-0 max-[780px]:!opacity-100 max-[780px]:!pointer-events-auto ${
+			activeChapter === index ? 'translate-y-0 opacity-100' : 'pointer-events-none translate-y-4 opacity-0'
+		}`;
+	// Recorrido que corresponde a cada capítulo dentro de la pista: [inicio, fin] en píxeles de scroll.
+	const chapterTravel = () => {
+		if (!chapterTrack) return null;
+		const rect = chapterTrack.getBoundingClientRect();
+		const panel = chapterTrack.firstElementChild as HTMLElement | null;
+		const travel = Math.max(1, rect.height - (panel?.offsetHeight ?? 0));
+		return { top: rect.top + window.scrollY - 104, travel };
+	};
 	const showChapter = (index: number) => {
 		activeChapter = index;
-		const card = chaptersEl?.children[index] as HTMLElement | undefined;
-		if (chaptersEl && card) chaptersEl.scrollTo({ left: card.offsetLeft - chaptersEl.offsetLeft, behavior: 'smooth' });
+		if (isMobile()) {
+			const card = chaptersEl?.children[index] as HTMLElement | undefined;
+			if (chaptersEl && card) chaptersEl.scrollTo({ left: card.offsetLeft - chaptersEl.offsetLeft, behavior: 'smooth' });
+			return;
+		}
+		const track = chapterTravel();
+		if (track) window.scrollTo({ top: track.top + ((index + 0.5) / aboutChapters.length) * track.travel, behavior: 'smooth' });
 	};
 	const syncChapter = () => {
-		if (!chaptersEl || !window.matchMedia('(max-width: 780px)').matches) return;
+		if (!chaptersEl || !isMobile()) return;
 		const start = chaptersEl.getBoundingClientRect().left;
 		const cards = Array.from(chaptersEl.children) as HTMLElement[];
 		activeChapter = cards.reduce(
@@ -166,6 +184,28 @@
 			0
 		);
 	};
+	$effect(() => {
+		let frame = 0;
+		const update = () => {
+			frame = 0;
+			if (isMobile()) return;
+			const track = chapterTravel();
+			if (!track) return;
+			const progress = Math.min(0.999, Math.max(0, (window.scrollY - track.top) / track.travel));
+			activeChapter = Math.floor(progress * aboutChapters.length);
+		};
+		const onScroll = () => {
+			if (!frame) frame = window.requestAnimationFrame(update);
+		};
+		update();
+		window.addEventListener('scroll', onScroll, { passive: true });
+		window.addEventListener('resize', onScroll, { passive: true });
+		return () => {
+			window.cancelAnimationFrame(frame);
+			window.removeEventListener('scroll', onScroll);
+			window.removeEventListener('resize', onScroll);
+		};
+	});
 	const academicIcons: Record<string, string> = {
 		orcid: 'ai-orcid',
 		scholar: 'ai-google-scholar',
@@ -491,41 +531,45 @@
 					</figcaption>
 				</figure>
 
-				<div class="min-w-0">
-					<!-- Móvil: pestañas que siguen al carrusel de capítulos. -->
-					<div class="mb-5 hidden gap-6 max-[780px]:flex" role="tablist" aria-label={ui.aboutTitle}>
-						{#each aboutChapters as chapter, index (chapter)}
-							<button
-								type="button"
-								role="tab"
-								aria-selected={activeChapter === index}
-								class={`label cursor-pointer border-0 border-b bg-transparent p-0 pb-1 [transition:color_300ms_ease,border-color_300ms_ease] ${activeChapter === index ? 'border-accent-strong text-accent-strong' : 'border-transparent text-ink-faint'}`}
-								onclick={() => showChapter(index)}
-							>{chapter}</button>
-						{/each}
-					</div>
-					<!-- Ordenador: cada capítulo se queda fijo al llegar arriba y el siguiente lo cubre.
-					     Móvil: carrusel horizontal con desplazamiento por capítulos. -->
-					<div
-						class="grid gap-[26vh] pb-[8vh] max-[780px]:mr-[calc(-1*var(--gutter))] max-[780px]:flex max-[780px]:gap-3 max-[780px]:overflow-x-auto max-[780px]:overscroll-x-contain max-[780px]:snap-x max-[780px]:snap-mandatory max-[780px]:pr-[var(--gutter)] max-[780px]:pb-2"
-						bind:this={chaptersEl}
-						onscroll={syncChapter}
-					>
-						<article class={chapterCardClass} style:top="104px" aria-label={aboutChapters[0]}>
-							<span class="label">{aboutChapters[0]}</span>
-							<p class="mt-4 mb-[clamp(22px,3vw,36px)] max-w-[34ch] font-title text-[clamp(1.3rem,2.1vw,1.85rem)] leading-[1.3] tracking-[-0.015em] text-ink max-[780px]:text-[1.15rem]">{ui.aboutText}</p>
+				<!-- Ordenador: el recorrido por la sección elige el capítulo, que se sustituye en un panel fijo
+				     junto a la foto. Móvil: pestañas sobre un carrusel horizontal. -->
+				<div
+					class="relative min-w-0 max-[780px]:!h-auto"
+					style:height={`${aboutChapters.length * 78}svh`}
+					bind:this={chapterTrack}
+				>
+					<div class="sticky top-[104px] max-[780px]:static">
+						<div class="mb-[clamp(20px,3vw,34px)] flex gap-6" role="tablist" aria-label={ui.aboutTitle}>
+							{#each aboutChapters as chapter, index (chapter)}
+								<button
+									type="button"
+									role="tab"
+									aria-selected={activeChapter === index}
+									class={`label cursor-pointer border-0 border-b bg-transparent p-0 pb-1 [transition:color_300ms_ease,border-color_300ms_ease] ${activeChapter === index ? 'border-accent-strong text-accent-strong' : 'border-transparent text-ink-faint hover:text-ink-dim'}`}
+									onclick={() => showChapter(index)}
+								>{chapter}</button>
+							{/each}
+						</div>
+						<div
+							class="grid max-[780px]:mr-[calc(-1*var(--gutter))] max-[780px]:flex max-[780px]:gap-8 max-[780px]:overflow-x-auto max-[780px]:overscroll-x-contain max-[780px]:snap-x max-[780px]:snap-mandatory max-[780px]:pr-[var(--gutter)] max-[780px]:pb-2"
+							bind:this={chaptersEl}
+							onscroll={syncChapter}
+						>
+							<div class={chapterClass(0)} aria-label={aboutChapters[0]}>
+								<p class="mt-0 mb-[clamp(22px,3vw,36px)] max-w-[34ch] font-title text-[clamp(1.3rem,2.1vw,1.85rem)] leading-[1.3] tracking-[-0.015em] text-ink max-[780px]:text-[1.15rem]">{ui.aboutText}</p>
 					<ul class="m-0 flex list-none flex-wrap gap-x-3 gap-y-[7px] p-0 max-[520px]:gap-1.5">
 								{#each t(profile.areas, locale) as area (area)}
 									<li class="label inline-flex items-center gap-3 after:text-rule-strong after:content-['/'] last:after:content-none max-[520px]:rounded-full max-[520px]:border max-[520px]:border-rule max-[520px]:px-2.5 max-[520px]:py-1.5 max-[520px]:text-[.68rem] max-[520px]:after:hidden">{area}</li>
 								{/each}
 							</ul>
-						</article>
-						<article class={chapterCardClass} style:top="124px" aria-label={aboutChapters[1]}>
-							<CurrentAffiliations {locale} />
-						</article>
-						<article class={chapterCardClass} style:top="144px" aria-label={aboutChapters[2]}>
-							<AcademicPath {locale} />
-						</article>
+							</div>
+							<div class={chapterClass(1)} aria-label={aboutChapters[1]}>
+								<CurrentAffiliations {locale} />
+							</div>
+							<div class={chapterClass(2)} aria-label={aboutChapters[2]}>
+								<AcademicPath {locale} />
+							</div>
+						</div>
 					</div>
 				</div>
 			</div>
