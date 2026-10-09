@@ -56,12 +56,15 @@ const sections = [
 	{
 		key: 'teaching',
 		title: 'Docencia',
-		sql: `SELECT t.id AS entity_id, t.title, t.teaching_type AS type, tv.label_es AS type_label_es, tv.label_en AS type_label_en,
-		             t.institution AS detail,
+		sql: `SELECT t.id AS entity_id, t.title, t.teaching_type || COALESCE(':' || t.teaching_level, '') AS type,
+		             tv.label_es || COALESCE(', ' || lower(level.label_es), '') AS type_label_es,
+		             tv.label_en || COALESCE(', ' || lower(level.label_en), '') AS type_label_en,
+		             t.institution AS detail, t.hours,
 		             COALESCE(substr(t.date_start, 1, 4), substr(t.academic_year, 1, 4)) AS year, t.url
 		      FROM teaching t
 		      JOIN entries e ON e.entity_type = 'teaching' AND e.entity_id = t.id AND e.public = 1
 		      LEFT JOIN type_vocab tv ON tv.code = t.teaching_type
+		      LEFT JOIN type_vocab level ON level.code = t.teaching_level
 		      ORDER BY year DESC, t.title ASC`
 	},
 	{
@@ -147,26 +150,29 @@ const sections = [
 	{
 		key: 'courses',
 		title: 'Cursos y formación complementaria',
-		sql: `SELECT c.id AS entity_id, c.title, NULL AS type, NULL AS type_label_es, NULL AS type_label_en,
+		sql: `SELECT c.id AS entity_id, c.title, c.course_type AS type, tv.label_es AS type_label_es, tv.label_en AS type_label_en, c.hours,
 		             TRIM(c.institution || CASE WHEN NULLIF(TRIM(c.program_context), '') IS NOT NULL THEN ', ' || c.program_context ELSE '' END) AS detail,
 		             COALESCE(substr(c.date_end, 1, 4), substr(c.date_start, 1, 4)) AS year, c.url
 		      FROM courses c
 		      JOIN entries e ON e.entity_type = 'courses' AND e.entity_id = c.id AND e.public = 1
+		      LEFT JOIN type_vocab tv ON tv.code = c.course_type
 		      ORDER BY year DESC, c.title ASC`
 	},
 	{
 		key: 'memberships',
 		title: 'Asociaciones científicas',
 		sql: `SELECT m.id AS entity_id, m.organization AS title,
-		             m.role AS type,
-		             membership_role.label_es AS type_label_es,
-		             membership_role.label_en AS type_label_en,
-		             m.role_details AS detail,
+		             COALESCE(role_group.code, m.role) AS type,
+		             COALESCE(role_group.label_es, membership_role.label_es) AS type_label_es,
+		             COALESCE(role_group.label_en, membership_role.label_en) AS type_label_en,
+		             membership_role.label_es AS role_label_es, membership_role.label_en AS role_label_en,
+		             m.role_details AS detail, m.date_start, m.date_end,
 		             substr(m.date_start, 1, 4) AS year, NULL AS url
 		      FROM memberships m
 		      LEFT JOIN type_vocab membership_role
 		        ON membership_role.code = m.role
 		       AND membership_role.domain = 'membership_role'
+		      LEFT JOIN type_vocab role_group ON role_group.code = membership_role.group_code
 		      JOIN entries e ON e.entity_type = 'memberships' AND e.entity_id = m.id AND e.public = 1
 		      ORDER BY year DESC, m.organization ASC`
 	},
@@ -212,12 +218,62 @@ const normalizeDoi = (value: unknown) => {
 	return doi || null;
 };
 
+const yearOf = (value: unknown) => normalize(value)?.slice(0, 4) ?? '';
+const span = (start: unknown, end: unknown) => {
+	const from = yearOf(start);
+	const to = yearOf(end);
+	return to && to !== from ? `${from}-${to}` : from;
+};
+
+// Asociaciones: una línea por organización y grupo (miembro o junta directiva), con cada rol y
+// sus periodos, como en el CV en PDF.
+function groupMemberships<T extends { title: string; type: string | null; year: string | null; detail: string | null; year_label: string | null; detail_label_es: string | null; detail_label_en: string | null }>(
+	rows: Record<string, unknown>[],
+	items: T[]
+) {
+	const groups = new Map<string, { item: T; rows: Record<string, unknown>[] }>();
+	items.forEach((item, index) => {
+		const key = `${item.title}|${item.type}`;
+		if (!groups.has(key)) groups.set(key, { item, rows: [] });
+		groups.get(key)!.rows.push(rows[index]);
+	});
+	return [...groups.values()].map(({ item, rows: group }) => {
+		const sorted = [...group].sort((a, b) => String(a.date_start ?? '').localeCompare(String(b.date_start ?? '')));
+		const describe = (language: 'es' | 'en') => {
+			const roles = new Map<string, string[]>();
+			for (const row of sorted) {
+				const label = normalize(row[`role_label_${language}`]) ?? '';
+				const period = normalize(row.date_end) ? span(row.date_start, row.date_end) : `${language === 'es' ? 'desde' : 'since'} ${yearOf(row.date_start)}`;
+				roles.set(label, [...(roles.get(label) ?? []), period]);
+			}
+			const typeLabel = normalize(sorted[0][`type_label_${language}`]);
+			// El rol que coincide con el grupo («Miembro») no se repite: sus fechas ya van en la columna.
+			const lines = [...roles.entries()].filter(([label]) => label && label !== typeLabel).map(([label, periods]) => `${label} (${periods.join(', ')})`);
+			const details = sorted.map((row) => normalize(row.detail)).filter(Boolean);
+			return [...lines, ...details].join(' | ');
+		};
+		const starts = sorted.map((row) => yearOf(row.date_start)).filter(Boolean);
+		const ends = sorted.map((row) => yearOf(row.date_end));
+		const open = ends.some((end) => !end);
+		const first = starts[0] ?? '';
+		const last = open ? '' : ends.sort().at(-1) ?? '';
+		return {
+			...item,
+			year: starts.at(-1) ?? item.year,
+			year_label: open ? `${first}-` : last && last !== first ? `${first}-${last}` : first,
+			detail: describe('es'),
+			detail_label_es: describe('es'),
+			detail_label_en: describe('en')
+		};
+	}).sort((a, b) => Number(b.year) - Number(a.year));
+}
+
 export const load: PageServerLoad = async () => {
 	const [results, publicLinks] = await Promise.all([
 		Promise.all(
 		sections.map(async (section) => {
 			const res = await db.execute(section.sql);
-			return {
+			const result = {
 				key: section.key,
 				title: section.title,
 				items: res.rows.map((row) => {
@@ -235,8 +291,11 @@ export const load: PageServerLoad = async () => {
 						detail_label_en: normalize(row.detail_label_en),
 						is_native: Number(row.is_native) === 1,
 						expected: Number(row.expected) === 1,
+						hours: row.hours == null ? null : Number(row.hours),
+						year_label: null as string | null,
 						hide_year: section.key === 'skills' || section.key === 'languages',
-						metadata: entryMetadataFromRow({ ...row, entity_type: section.key }),
+						// «plain» repite el detalle; aquí se compone con horas o roles agrupados.
+						metadata: ['teaching', 'courses', 'memberships'].includes(section.key) ? null : entryMetadataFromRow({ ...row, entity_type: section.key }),
 						year: normalize(row.year),
 						doi,
 						doi_url: doi ? `https://doi.org/${doi}` : null,
@@ -244,6 +303,8 @@ export const load: PageServerLoad = async () => {
 					};
 				})
 			};
+			if (section.key === 'memberships') result.items = groupMemberships(res.rows, result.items);
+			return result;
 		})
 		),
 		getPublicAdditionalLinks()

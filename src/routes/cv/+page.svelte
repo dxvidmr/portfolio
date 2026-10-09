@@ -95,8 +95,13 @@
 		locale === 'en' ? link.label_en : link.label_es;
 	const itemTitle = (item: CvItem) =>
 		(locale === 'en' ? item.title_label_en : item.title_label_es) ?? item.title;
+	// Horas de docencia o de curso: distinguen un taller de una asignatura semestral.
+	const hoursText = (item: CvItem) =>
+		item.hours ? `${new Intl.NumberFormat(locale, { maximumFractionDigits: 1 }).format(item.hours)} h` : '';
 	const itemDetail = (item: CvItem) =>
-		item.is_native
+		item.hours
+			? [(locale === 'en' ? item.detail_label_en : item.detail_label_es) ?? item.detail, hoursText(item)].filter(Boolean).join(CV_SEPARATOR)
+			: item.is_native
 			? [
 					(locale === 'en' ? item.detail_label_en : item.detail_label_es) ?? item.detail,
 					locale === 'en' ? 'Native language' : 'Lengua materna'
@@ -111,7 +116,10 @@
 		return detail && foldText(detail) !== foldText(plainInlineTitle(itemTitle(item))) ? detail : '';
 	};
 	const yearLabel = (item: CvItem) =>
-		item.hide_year ? '' : item.year ? (item.expected ? `${ui.expected} ${item.year}` : item.year) : ui.noDate;
+		item.hide_year ? '' : item.year_label ? item.year_label : item.year ? (item.expected ? `${ui.expected} ${item.year}` : item.year) : ui.noDate;
+	// Competencias: como ejemplos, solo las fichas del portfolio; los méritos ya están en su sección.
+	const portfolioExamples = (item: CvItem) =>
+		(item.skillDetails?.evidence ?? []).filter((example) => example.key.startsWith('portfolio:'));
 	const typeOptionsFor = (items: CvItem[]) =>
 		Array.from(
 			items
@@ -274,11 +282,13 @@
 								{/if}
 								{#if item.skillDetails}
 									{#if item.skillDetails.resources.length}<p class="mt-2 mb-0 text-[.76rem] text-ink-faint">{item.skillDetails.resources.map((r) => (locale === 'en' ? r.labelEn : r.label)).join(', ')}</p>{/if}
-									<ul class="mt-2 mb-0 flex list-none flex-wrap gap-x-4 gap-y-1 p-0">
-										{#each item.skillDetails.evidence as example}
-											<li class="label">{#if example.url}<a href={example.url} class="text-accent-strong hover:text-ink">{locale === 'en' ? example.labelEn : example.label} ↗</a>{:else}{locale === 'en' ? example.labelEn : example.label}{/if}</li>
-										{/each}
-									</ul>
+									{#if portfolioExamples(item).length}
+										<ul class="mt-2.5 mb-0 flex list-none flex-wrap gap-x-4 gap-y-1 p-0">
+											{#each portfolioExamples(item) as example (example.key)}
+												<li><a href={localizedPath(`/portfolio/${example.key.slice('portfolio:'.length)}`, locale)} class="label text-accent-strong hover:text-ink">{locale === 'en' ? example.labelEn : example.label} →</a></li>
+											{/each}
+										</ul>
+									{/if}
 								{/if}
 								{#if item.links.length}
 									<div class="mt-2.5 flex flex-wrap gap-x-4 gap-y-1">
