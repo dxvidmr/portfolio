@@ -8,8 +8,7 @@
 
 	// hideInvitation: la página ya muestra «Por invitación» como distintivo y no se repite aquí.
 	// title: nombre del mérito, para no repetirlo cuando el evento se llama igual.
-	// compact: trabajos técnicos en una línea, sin descripción.
-	let { metadata, locale, hideInvitation = false, title = '', compact = false }: { metadata: EntryMetadataValue; locale: Locale; hideInvitation?: boolean; title?: string; compact?: boolean } = $props();
+	let { metadata, locale, hideInvitation = false, title = '' }: { metadata: EntryMetadataValue; locale: Locale; hideInvitation?: boolean; title?: string } = $props();
 
 	const withoutTerminalPunctuation = (value: string) => value.trim().replace(/[.,;:]\s*$/, '');
 	const sentence = (value: string) => `${withoutTerminalPunctuation(value)}.`;
@@ -79,7 +78,7 @@
 </script>
 
 {#if metadata.kind === 'project' || metadata.kind === 'professional'}
-	<PracticeMetadata {metadata} {locale} {compact} />
+	<PracticeMetadata {metadata} {locale} title={plainInlineTitle(title)} />
 {:else if metadata.kind === 'publication'}
 	{#if isEditorialPublication(metadata.my_role) && metadata.editors}
 		<span>{editorialLead(metadata.my_role)} {#each authorSegments(withoutTerminalPunctuation(metadata.editors)) as segment, index (index)}{#if segment.own && !isSoleAuthor(metadata.editors)}<span class="underline decoration-[.08em] underline-offset-[.14em]">{segment.text}</span>{:else}{segment.text}{/if}{/each}. </span>

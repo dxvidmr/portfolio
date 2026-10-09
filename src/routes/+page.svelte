@@ -593,7 +593,7 @@
 								<p class="m-0 font-title text-[clamp(1.15rem,1.9vw,1.6rem)] leading-[1.15] tracking-[-0.015em] text-ink"><InlineTitle text={e.title} /></p>
 							{/if}
 							{#if e.metadata}
-								<p class="mt-[10px] mb-0 max-w-[72ch] text-[.72rem] leading-[1.45] text-ink-faint"><EntryMetadata metadata={e.metadata} {locale} hideInvitation /></p>
+								<p class="mt-[10px] mb-0 max-w-[72ch] text-[.72rem] leading-[1.45] text-ink-faint"><EntryMetadata metadata={e.metadata} {locale} hideInvitation title={e.title} /></p>
 							{/if}
 						</div>
 					</li>

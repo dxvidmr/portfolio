@@ -302,7 +302,7 @@
 										{:else}
 											<p class="m-0 flex justify-between gap-[18px] font-title text-[clamp(1.15rem,2.2vw,1.8rem)] leading-[1.1] text-ink"><InlineTitle text={item.title} /></p>
 										{/if}
-										{#if item.metadata}<p class="mt-[9px] mb-0 max-w-[72ch] text-[.72rem] leading-[1.45] text-ink-faint"><EntryMetadata metadata={item.metadata} {locale} /></p>{/if}
+										{#if item.metadata}<p class="mt-[9px] mb-0 max-w-[72ch] text-[.72rem] leading-[1.45] text-ink-faint"><EntryMetadata metadata={item.metadata} {locale} title={item.title} /></p>{/if}
 										{#if item.links.length}
 											<div class="mt-2.5 flex flex-wrap gap-1.5">
 												{#each item.links as link (link.url)}

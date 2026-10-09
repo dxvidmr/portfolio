@@ -314,7 +314,7 @@
 								{#if item.metadata || detailText(item) || item.doi}
 									<p class="mt-2 mb-0 max-w-[72ch] text-[.76rem] leading-[1.5] text-ink-faint">
 										{#if item.metadata}
-											<EntryMetadata metadata={item.metadata} {locale} hideInvitation title={itemTitle(item)} compact={section.key === 'technical_works'} />
+											<EntryMetadata metadata={item.metadata} {locale} hideInvitation title={itemTitle(item)} />
 										{:else if detailText(item)}
 											{detailText(item)}
 										{/if}
