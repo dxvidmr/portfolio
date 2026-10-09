@@ -76,7 +76,11 @@ export const entryMetadataFromRow = (row: Record<string, unknown>): EntryMetadat
 			selection_label_en: nullable(row.metadata_selection_label_en),
 			session_label_es: nullable(row.metadata_session_label_es),
 			session_label_en: nullable(row.metadata_session_label_en),
-			session_title: nullable(row.metadata_session_title)
+			session_title: nullable(row.metadata_session_title),
+			date_start: nullable(row.metadata_event_date_start),
+			date_end: nullable(row.metadata_event_date_end),
+			// Por código de vocabulario, no por la etiqueta, que puede editarse.
+			invited: row.metadata_selection_mode === 'selection_invited'
 		};
 		return Object.values(metadata).some((value) => value != null && value !== 'event')
 			? metadata
@@ -85,7 +89,13 @@ export const entryMetadataFromRow = (row: Record<string, unknown>): EntryMetadat
 	const detail = nullable(row.detail);
 	if (entityType === 'research_stays') {
 		const funding = fundingFromRow(row.metadata_funding);
-		return detail || funding.length > 0 ? { kind: 'stay', text: detail, funding } : null;
+		const stay = {
+			date_start: nullable(row.metadata_stay_date_start),
+			date_end: nullable(row.metadata_stay_date_end),
+			supervisor: nullable(row.metadata_stay_supervisor),
+			city: nullable(row.metadata_stay_city)
+		};
+		return detail || funding.length > 0 || stay.date_start ? { kind: 'stay', text: detail, funding, ...stay } : null;
 	}
 	return detail ? { kind: 'plain', text: detail } : null;
 };
@@ -167,6 +177,13 @@ export const publicEntryMetadataSql = (entityRef: 'e' | 'pi') => ({
 		       session_format.label_es AS metadata_session_label_es,
 		       session_format.label_en AS metadata_session_label_en,
 		       event.session_title AS metadata_session_title,
+		       canonical_event.date_start AS metadata_event_date_start,
+		       canonical_event.date_end AS metadata_event_date_end,
+		       event.selection_mode AS metadata_selection_mode,
+		       stay.date_start AS metadata_stay_date_start,
+		       stay.date_end AS metadata_stay_date_end,
+		       stay.supervisor AS metadata_stay_supervisor,
+		       stay.city AS metadata_stay_city,
 		       ${publicFundingMetadataSql(entityRef)} AS metadata_funding,
 		       CASE
 		         WHEN ${entityRef}.entity_type = 'publications' THEN

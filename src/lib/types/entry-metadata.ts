@@ -40,6 +40,9 @@ export type EntryMetadata =
 			session_label_es: string | null;
 			session_label_en: string | null;
 			session_title: string | null;
+			date_start?: string | null;
+			date_end?: string | null;
+			invited?: boolean;
 	  }
 	| {
 			kind: 'stay';
@@ -51,6 +54,10 @@ export type EntryMetadata =
 				awarding_body: string | null;
 				title: string;
 			}>;
+			date_start?: string | null;
+			date_end?: string | null;
+			supervisor?: string | null;
+			city?: string | null;
 	  }
 	| {
 			kind: 'plain';

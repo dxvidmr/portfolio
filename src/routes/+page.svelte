@@ -175,7 +175,8 @@
 			profilesLabel: 'Perfiles y redes',
 			cvTitle: 'CV',
 			recentLabel: 'Actualidad',
-			recentTitle: 'Actividad reciente',
+			recentTitle: 'Actividad destacada',
+			invited: 'Por invitación',
 			cvCta: 'Ver el CV completo',
 			tags: 'Etiquetas',
 			affiliation: 'Universitat Autònoma de Barcelona',
@@ -202,7 +203,8 @@
 			profilesLabel: 'Profiles and networks',
 			cvTitle: 'CV',
 			recentLabel: 'Now',
-			recentTitle: 'Recent activity',
+			recentTitle: 'Highlights',
+			invited: 'Invited',
 			cvCta: 'View the full CV',
 			tags: 'Tags',
 			affiliation: 'Universitat Autònoma de Barcelona',
@@ -517,14 +519,17 @@
 				<ol class="m-0 list-none border-t border-rule p-0">
 				{#each data.recentActivity as e, i (e.entity_type + e.entity_id)}
 					<li class="relative grid grid-cols-[minmax(190px,.62fr)_minmax(0,1.38fr)] gap-[clamp(20px,4vw,60px)] border-b border-rule py-[clamp(22px,3vw,36px)] max-[700px]:grid-cols-1 max-[700px]:gap-4">
-						<div class="label grid grid-cols-[minmax(0,1fr)_42px] gap-3 text-ink-faint">
-							<span class="grid content-start gap-[5px]">
-								<span class="text-accent-strong">{entityLabel(e.entity_type, locale)}</span>
-								{#if activitySubtypeLabel(e)}
-									<span class="text-left leading-[1.3] text-ink-dim">{activitySubtypeLabel(e)}</span>
-								{/if}
-							</span>
-							<span class="text-right">{yr(e.sort_date)}</span>
+						<div class="grid grid-cols-[minmax(0,1fr)_42px] gap-3">
+								<span class="grid content-start justify-items-start gap-1.5">
+									<span class="label text-accent-strong">{entityLabel(e.entity_type, locale)}</span>
+									{#if activitySubtypeLabel(e)}
+										<span class="text-[.9rem] leading-[1.3] text-ink-dim">{activitySubtypeLabel(e)}</span>
+									{/if}
+									{#if e.metadata?.kind === 'event' && e.metadata.invited}
+										<span class="label mt-1 bg-accent-wash px-1.5 py-0.5 text-accent-strong">{ui.invited}</span>
+									{/if}
+								</span>
+								<span class="label text-right text-ink-faint">{yr(e.sort_date)}</span>
 						</div>
 						<div class="min-w-0">
 							{#if e.target_url}
@@ -538,7 +543,7 @@
 								<p class="m-0 font-title text-[clamp(1.15rem,1.9vw,1.6rem)] leading-[1.15] tracking-[-0.015em] text-ink"><InlineTitle text={e.title} /></p>
 							{/if}
 							{#if e.metadata}
-								<p class="mt-[10px] mb-0 max-w-[72ch] text-[.72rem] leading-[1.45] text-ink-faint"><EntryMetadata metadata={e.metadata} {locale} /></p>
+								<p class="mt-[10px] mb-0 max-w-[72ch] text-[.72rem] leading-[1.45] text-ink-faint"><EntryMetadata metadata={e.metadata} {locale} hideInvitation /></p>
 							{/if}
 						</div>
 					</li>

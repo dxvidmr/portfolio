@@ -208,7 +208,7 @@
 				<h3 class="mt-1 mb-0 text-sm font-medium text-ink">Portada</h3>
 			</div>
 			{#if data.control.showHome}
-				<p class="m-0 text-sm leading-relaxed text-ink-dim">Seleccionado para «Actividad reciente» en la portada.</p>
+				<p class="m-0 text-sm leading-relaxed text-ink-dim">Seleccionado para «Actividad destacada» en la portada.</p>
 				<form method="POST" action="?/actividad">
 					<input type="hidden" name="enabled" value="0" />
 					<Button type="submit" variant="danger"><X size={15} strokeWidth={1.7} aria-hidden="true" />Quitar de la portada</Button>

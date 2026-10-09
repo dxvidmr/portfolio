@@ -64,7 +64,7 @@
 
 <AdminPageHeader
 	title="Portada"
-	description="Méritos del bloque «Actividad reciente» de la web."
+	description="Méritos del bloque «Actividad destacada» de la web."
 >
 	{#snippet actions()}
 		<ButtonLink href="/admin/meritos?actividad=no" data-sveltekit-preload-data="off">Añadir desde méritos</ButtonLink>
