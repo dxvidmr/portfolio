@@ -12,13 +12,13 @@ export const profile = {
 			title: 'Personal investigador en formación',
 			department: 'Departamento de Filología Española',
 			institution: 'Universitat Autònoma de Barcelona',
-			funding: 'Contrato predoctoral FI–Joan Oró · AGAUR'
+			funding: 'Contrato predoctoral FI–Joan Oró | AGAUR'
 		},
 		en: {
 			title: 'Doctoral Researcher',
 			department: 'Department of Spanish Philology',
 			institution: 'Universitat Autònoma de Barcelona',
-			funding: 'FI Joan Oró Fellow · AGAUR'
+			funding: 'FI Joan Oró Fellow | AGAUR'
 		}
 	} as Bi<{ title: string; department: string; institution: string; funding: string }>,
 	currentAffiliations: {
@@ -27,7 +27,7 @@ export const profile = {
 				name: 'PROLOPE',
 				url: 'https://prolope.uab.cat/',
 				role: 'Miembro del equipo',
-				context: 'Grupo de investigación · Universitat Autònoma de Barcelona',
+				context: 'Grupo de investigación | Universitat Autònoma de Barcelona',
 				project: {
 					title: 'La integral dramática de Lope de Vega: textos, métodos, problemas, proyección (II)',
 					code: 'PID2024-155554NB-I00'
@@ -37,7 +37,7 @@ export const profile = {
 				name: 'METADRAMA',
 				url: 'https://www.ub.edu/metadrama/',
 				role: 'Miembro del equipo',
-				context: 'Aula de teatro y grupo de investigación · Universitat de Barcelona',
+				context: 'Aula de teatro y grupo de investigación | Universitat de Barcelona',
 				project: {
 					title: 'Teatro áureo en diacronía: estudio, edición y puesta en escena del verso clásico',
 					code: 'PID2024-161481NB-I00'
@@ -46,14 +46,14 @@ export const profile = {
 			{
 				name: 'Humanidades Digitales Hispánicas',
 				url: 'https://humanidadesdigitaleshispanicas.es/',
-				role: 'Vocal de la Junta Directiva · Comunicación y difusión',
+				role: 'Vocal de la Junta Directiva | Comunicación y difusión',
 				context: 'Desde 2021'
 			},
 			{
 				name: 'Anuario Lope de Vega',
 				url: 'https://revistes.uab.cat/anuariolopedevega/',
 				role: 'Editor de la sección de reseñas',
-				context: 'Desde 2024 · Universitat Autònoma de Barcelona'
+				context: 'Desde 2024 | Universitat Autònoma de Barcelona'
 			}
 		],
 		en: [
@@ -61,7 +61,7 @@ export const profile = {
 				name: 'PROLOPE',
 				url: 'https://prolope.uab.cat/',
 				role: 'Team member',
-				context: 'Research group · Universitat Autònoma de Barcelona',
+				context: 'Research group | Universitat Autònoma de Barcelona',
 				project: {
 					title: 'La integral dramática de Lope de Vega: textos, métodos, problemas, proyección (II)',
 					code: 'PID2024-155554NB-I00'
@@ -71,7 +71,7 @@ export const profile = {
 				name: 'METADRAMA',
 				url: 'https://www.ub.edu/metadrama/',
 				role: 'Team member',
-				context: 'Theatre laboratory and research group · Universitat de Barcelona',
+				context: 'Theatre laboratory and research group | Universitat de Barcelona',
 				project: {
 					title: 'Teatro áureo en diacronía: estudio, edición y puesta en escena del verso clásico',
 					code: 'PID2024-161481NB-I00'
@@ -80,14 +80,14 @@ export const profile = {
 			{
 				name: 'Humanidades Digitales Hispánicas',
 				url: 'https://humanidadesdigitaleshispanicas.es/',
-				role: 'Board member · Communications and outreach',
+				role: 'Board member | Communications and outreach',
 				context: 'Since 2021'
 			},
 			{
 				name: 'Anuario Lope de Vega',
 				url: 'https://revistes.uab.cat/anuariolopedevega/',
 				role: 'Reviews Editor',
-				context: 'Since 2024 · Universitat Autònoma de Barcelona'
+				context: 'Since 2024 | Universitat Autònoma de Barcelona'
 			}
 		]
 	} as Bi<
@@ -126,7 +126,7 @@ export const profile = {
 			{
 				period: 'desde 2023',
 				degree: 'Doctorado en Filología Española',
-				institution: 'Universitat Autònoma de Barcelona · PROLOPE',
+				institution: 'Universitat Autònoma de Barcelona | PROLOPE',
 				detail: 'Contrato predoctoral FI–Joan Oró (AGAUR).',
 				code: 'FIL'
 			},
@@ -156,7 +156,7 @@ export const profile = {
 			{
 				period: 'since 2023',
 				degree: 'PhD in Spanish Philology',
-				institution: 'Universitat Autònoma de Barcelona · PROLOPE',
+				institution: 'Universitat Autònoma de Barcelona | PROLOPE',
 				detail: 'FI–Joan Oró predoctoral fellowship (AGAUR).',
 				code: 'PHL'
 			},

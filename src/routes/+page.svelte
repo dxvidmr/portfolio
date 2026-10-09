@@ -158,7 +158,7 @@
 	};
 	const sectionClass = 'wrap scroll-mt-[76px] py-[clamp(48px,8vw,96px)]';
 	const sectionHeadClass = 'mb-[26px] grid gap-3';
-	const sectionTitleClass = 'max-w-[760px] text-[clamp(1.45rem,4vw,3rem)] leading-[1.05]';
+	const sectionTitleClass = 'max-w-[760px] text-[clamp(1.4rem,2.8vw,2.15rem)] leading-[1.1] tracking-[-0.02em]';
 	const ui = $derived({
 		es: {
 			navPortfolio: 'Portfolio',
@@ -309,10 +309,10 @@
 					{/each}
 				</strong>
 			</a>
-			<nav class="meta flex items-center gap-[clamp(14px,2.3vw,30px)] max-[780px]:hidden" aria-label="Principal">
-				<a class="inline-flex items-baseline gap-[7px] text-ink-dim max-[780px]:gap-0 max-[780px]:text-[.62rem] max-[520px]:text-[.57rem] max-[520px]:tracking-[.08em] max-[420px]:text-[.52rem] max-[420px]:tracking-[.05em]" href="#portfolio"><span class="text-[.58rem] tracking-normal text-accent max-[780px]:hidden">01</span>{ui.navPortfolio}</a>
-				<a class="inline-flex items-baseline gap-[7px] text-ink-dim max-[780px]:gap-0 max-[780px]:text-[.62rem] max-[520px]:text-[.57rem] max-[520px]:tracking-[.08em] max-[420px]:text-[.52rem] max-[420px]:tracking-[.05em]" href="#about"><span class="text-[.58rem] tracking-normal text-accent max-[780px]:hidden">02</span>{ui.navAbout}</a>
-				<a class="inline-flex items-baseline gap-[7px] text-ink-dim max-[780px]:gap-0 max-[780px]:text-[.62rem] max-[520px]:text-[.57rem] max-[520px]:tracking-[.08em] max-[420px]:text-[.52rem] max-[420px]:tracking-[.05em]" href="#cv"><span class="text-[.58rem] tracking-normal text-accent max-[780px]:hidden">03</span>CV</a>
+			<nav class="flex items-center gap-[clamp(16px,2.4vw,32px)] font-mono text-[.78rem] max-[780px]:hidden" aria-label="Principal">
+				<a class="text-ink-dim hover:text-ink" href="#portfolio">{ui.navPortfolio}</a>
+				<a class="text-ink-dim hover:text-ink" href="#about">{ui.navAbout}</a>
+				<a class="text-ink-dim hover:text-ink" href="#cv">CV</a>
 				<SiteControls />
 			</nav>
 			<button
@@ -347,7 +347,7 @@
 			<div class="grid max-w-[1080px] grid-cols-[minmax(0,1fr)] content-center max-[780px]:grid-cols-1 max-[780px]:items-start">
 				<div class="relative isolate min-w-0 before:pointer-events-none before:absolute before:inset-[clamp(-5rem,-7vw,-3rem)_-9vw] before:z-[-1] before:bg-[radial-gradient(ellipse_at_38%_48%,color-mix(in_srgb,var(--bg)_98%,transparent)_0_42%,color-mix(in_srgb,var(--bg)_84%,transparent)_58%,transparent_80%)] before:content-['']" data-text-bg-avoid>
 					<h1
-						class={`absolute inset-x-0 z-10 m-0 flex flex-wrap gap-x-[.28em] gap-y-0 font-title text-[clamp(3.2rem,7.15vw,7.2rem)] font-normal leading-[.87] tracking-[-.06em] max-[780px]:text-[clamp(3rem,13.5vw,5.6rem)] max-[780px]:leading-[.9] max-[520px]:text-[clamp(2.8rem,13.6vw,4.4rem)] ${introStarted ? 'visible' : 'invisible'}`}
+						class={`absolute inset-x-0 z-10 m-0 flex flex-wrap gap-x-[.28em] gap-y-0 font-title text-[clamp(3.2rem,7.15vw,7.2rem)] font-medium leading-[.92] tracking-[-.045em] max-[780px]:text-[clamp(3rem,13.5vw,5.6rem)] max-[780px]:leading-[.9] max-[520px]:text-[clamp(2.8rem,13.6vw,4.4rem)] ${introStarted ? 'visible' : 'invisible'}`}
 						bind:this={heroName}
 						style:top={`${subtextOffset}px`}
 						style:opacity={heroNameOpacity}
@@ -368,8 +368,8 @@
 						style:opacity={statementProgress}
 						style:transform={`translate3d(0, ${(1 - statementProgress) * 32}px, 0)`}
 					>
-						<p class="m-0 font-title text-[clamp(3.2rem,7.15vw,7.2rem)] font-normal leading-[.87] tracking-[-.06em] max-[780px]:text-[clamp(3rem,13.5vw,5.6rem)] max-[780px]:leading-[.9] max-[520px]:text-[clamp(2.8rem,13.6vw,4.4rem)]">
-							<span class="block">{ui.thesisLine1Before}<em class="inline-block bg-accent [background-image:var(--accent-grain)] [background-size:180px_180px] [background-blend-mode:soft-light] px-[.13em] pt-[.01em] pb-[.03em] font-normal italic tracking-[-.04em] text-[var(--on-accent)]">{ui.thesisAccent}</em></span>
+						<p class="m-0 font-title text-[clamp(3.2rem,7.15vw,7.2rem)] font-medium leading-[.92] tracking-[-.045em] max-[780px]:text-[clamp(3rem,13.5vw,5.6rem)] max-[780px]:leading-[.9] max-[520px]:text-[clamp(2.8rem,13.6vw,4.4rem)]">
+							<span class="block">{ui.thesisLine1Before}{ui.thesisAccent}</span>
 							<span class="block">{ui.thesisLine2}</span>
 							<span class="block">{ui.thesisLine3}</span>
 						</p>
@@ -377,7 +377,7 @@
 
 					<div class={introStarted ? 'visible' : 'invisible'}>
 						<p class={`mt-[clamp(25px,4vh,40px)] mb-0 max-w-[54ch] font-title text-[clamp(1.05rem,1.5vw,1.3rem)] leading-[1.35] text-ink-dim max-[520px]:text-base ${introStarted ? '[animation:home-intro-from-bottom_980ms_cubic-bezier(.16,1,.3,1)_500ms_backwards] motion-reduce:animate-none' : ''}`}>{ui.heroSummary}</p>
-						<p class={`meta mt-3 mb-0 block text-ink-dim ${introStarted ? '[animation:home-intro-from-bottom_920ms_cubic-bezier(.16,1,.3,1)_610ms_backwards] motion-reduce:animate-none' : ''}`}>{ui.affiliation}</p>
+						<p class={`mt-3 mb-0 block font-mono text-[.78rem] text-ink-dim ${introStarted ? '[animation:home-intro-from-bottom_920ms_cubic-bezier(.16,1,.3,1)_610ms_backwards] motion-reduce:animate-none' : ''}`}>{ui.affiliation}</p>
 					</div>
 				</div>
 			</div>
@@ -402,15 +402,13 @@
 	<main class="relative z-[1] pb-[88px]">
 		<section id="portfolio" class={sectionClass}>
 			<div class={sectionHeadClass}>
-				<span class="meta tag">{ui.navPortfolio}</span>
 				<h2 class={sectionTitleClass}>{ui.selectedWork}</h2>
 			</div>
 			<SelectedWorks {locale} relatedItems={data.portfolioItems} projectIndex={data.portfolioProjects} />
 		</section>
 
-		<section id="about" class={`${sectionClass} relative isolate before:pointer-events-none before:absolute before:top-[16%] before:left-[-10vw] before:z-[-2] before:aspect-square before:w-[min(52vw,720px)] before:rounded-full before:bg-accent before:opacity-[.11] before:[filter:blur(150px)] before:content-['']`}>
+		<section id="about" class={`${sectionClass} relative isolate overflow-x-clip before:pointer-events-none before:absolute before:top-[16%] before:left-[-10vw] before:z-[-2] before:aspect-square before:w-[min(52vw,720px)] before:rounded-full before:bg-accent before:opacity-[.11] before:[filter:blur(150px)] before:content-['']`}>
 			<div class={`${sectionHeadClass} mb-[clamp(38px,6vw,78px)]`}>
-				<span class="meta tag">{ui.aboutLabel}</span>
 				<h2 class={sectionTitleClass}>{ui.aboutTitle}</h2>
 			</div>
 
@@ -442,9 +440,9 @@
 						/>
 					</div>
 					<figcaption class="mt-2.5 grid gap-4">
-						<span class="flex min-w-0 items-center gap-2 font-mono text-[.62rem] tracking-meta uppercase">
+						<span class="flex min-w-0 items-center gap-2 font-mono text-[.72rem]">
 							<button
-								class={`cursor-pointer border-0 border-b bg-transparent p-0 pb-0.5 font-mono font-semibold tracking-meta uppercase [transition:color_700ms_ease,border-color_700ms_ease] ${activePortrait === 'researcher' ? 'border-accent-strong text-accent-strong' : 'border-transparent text-ink-faint'}`}
+								class={`cursor-pointer border-0 border-b bg-transparent p-0 pb-0.5 font-mono font-medium [transition:color_700ms_ease,border-color_700ms_ease] ${activePortrait === 'researcher' ? 'border-accent-strong text-accent-strong' : 'border-transparent text-ink-faint'}`}
 								type="button"
 								onclick={(event) => selectPortrait('researcher', event)}
 								onpointerenter={(event) => previewPortrait('researcher', event)}
@@ -453,7 +451,7 @@
 							>{ui.portraitResearcher}</button>
 							<span class="text-ink-faint opacity-50" aria-hidden="true">/</span>
 							<button
-								class={`cursor-pointer border-0 border-b bg-transparent p-0 pb-0.5 font-mono font-semibold tracking-meta uppercase [transition:color_700ms_ease,border-color_700ms_ease] ${activePortrait === 'performer' ? 'border-accent-strong text-accent-strong' : 'border-transparent text-ink-faint'}`}
+								class={`cursor-pointer border-0 border-b bg-transparent p-0 pb-0.5 font-mono font-medium [transition:color_700ms_ease,border-color_700ms_ease] ${activePortrait === 'performer' ? 'border-accent-strong text-accent-strong' : 'border-transparent text-ink-faint'}`}
 								type="button"
 								onclick={(event) => selectPortrait('performer', event)}
 								onpointerenter={(event) => previewPortrait('performer', event)}
@@ -464,17 +462,17 @@
 						<div class="mt-4 border-l-2 border-accent-strong pl-4">
 							<p class="m-0 max-w-[24ch] font-title text-[clamp(1.05rem,1.6vw,1.3rem)] leading-[1.2] text-ink">{currentRole.title}</p>
 							<p class="mt-2 mb-0 text-[.72rem] leading-[1.4] text-ink-dim">{currentRole.department}</p>
-							<p class="meta mt-1.5 mb-0 leading-[1.4] text-ink-faint">{currentRole.institution}</p>
+							<p class="label mt-1.5 mb-0 text-ink-faint">{currentRole.institution}</p>
 							<p class="mt-3 mb-0 border-t border-rule pt-3 text-[.66rem] leading-[1.4] text-accent-strong">{currentRole.funding}</p>
 						</div>
 					</figcaption>
 				</figure>
 
 				<div class="min-w-0 pt-[clamp(8px,2vw,28px)] max-[780px]:pt-0">
-					<p class="mt-0 mb-[clamp(26px,4vw,48px)] max-w-[36ch] font-title text-[clamp(1.35rem,2.2vw,2rem)] leading-[1.32] text-ink">{ui.aboutText}</p>
+					<p class="mt-0 mb-[clamp(26px,4vw,48px)] max-w-[44ch] font-title text-[clamp(1.1rem,1.6vw,1.4rem)] leading-[1.45] text-ink">{ui.aboutText}</p>
 					<ul class="mt-0 mb-[clamp(34px,5vw,56px)] flex list-none flex-wrap gap-x-3 gap-y-[7px] p-0 max-[520px]:gap-1.5">
 						{#each t(profile.areas, locale) as area (area)}
-							<li class="inline-flex items-center gap-3 text-[.7rem] tracking-[.06em] text-ink-dim uppercase after:text-accent-strong after:content-['/'] last:after:content-none max-[520px]:rounded-full max-[520px]:border max-[520px]:border-rule max-[520px]:px-2.5 max-[520px]:py-1.5 max-[520px]:text-[.58rem] max-[520px]:after:hidden">{area}</li>
+							<li class="inline-flex items-center gap-3 font-mono text-[.72rem] text-ink-dim after:text-rule-strong after:content-['/'] last:after:content-none max-[520px]:rounded-full max-[520px]:border max-[520px]:border-rule max-[520px]:px-2.5 max-[520px]:py-1.5 max-[520px]:text-[.68rem] max-[520px]:after:hidden">{area}</li>
 						{/each}
 					</ul>
 					<CurrentAffiliations {locale} />
@@ -482,16 +480,16 @@
 				</div>
 			</div>
 
-			<footer class="mt-[clamp(28px,4vw,54px)] grid grid-cols-[minmax(260px,.8fr)_minmax(0,1.2fr)] items-end gap-[clamp(30px,6vw,92px)] border-y border-t-rule-strong border-b-rule bg-[linear-gradient(to_bottom,color-mix(in_srgb,var(--bg)_72%,transparent),color-mix(in_srgb,var(--bg)_92%,transparent))] py-[clamp(24px,3vw,38px)] [backdrop-filter:blur(12px)] max-[780px]:grid-cols-1 max-[780px]:items-start">
+			<footer class="mt-[clamp(28px,4vw,54px)] grid grid-cols-[minmax(260px,.8fr)_minmax(0,1.2fr)] items-end gap-[clamp(30px,6vw,92px)] border-t border-rule bg-[linear-gradient(to_bottom,color-mix(in_srgb,var(--bg)_72%,transparent),color-mix(in_srgb,var(--bg)_92%,transparent))] py-[clamp(24px,3vw,38px)] [backdrop-filter:blur(12px)] max-[780px]:grid-cols-1 max-[780px]:items-start">
 				<div class="grid justify-items-start gap-1">
-					<span class="meta tag mb-2.5">{ui.contactTitle}</span>
+					<span class="label mb-2.5">{ui.contactTitle}</span>
 					<a class="font-title text-[clamp(1.1rem,2vw,1.55rem)] leading-[1.2]" href={'mailto:' + profile.contact.mail}>{profile.contact.mail}</a>
-					<a class="text-[.68rem] text-ink-faint" href={'mailto:' + profile.contact.mailAlt}>{profile.contact.mailAlt}</a>
+					<a class="font-mono text-[.72rem] text-ink-faint" href={'mailto:' + profile.contact.mailAlt}>{profile.contact.mailAlt}</a>
 				</div>
 				<nav class="flex flex-wrap items-center justify-end gap-x-[18px] gap-y-[5px] max-[780px]:justify-start" aria-label={ui.profilesLabel}>
-					<span class="meta tag mb-2.5 flex-[0_0_100%] text-right max-[780px]:text-left">{ui.profilesLabel}</span>
+					<span class="label mb-2.5 flex-[0_0_100%] text-right max-[780px]:text-left">{ui.profilesLabel}</span>
 					{#each profile.profiles as item (item.id)}
-						<a class="inline-flex items-center gap-1.5 py-1 text-[.66rem] text-ink-dim hover:text-accent-strong" href={item.url} target="_blank" rel="noreferrer" title={`${item.label}: ${item.handle}`}>
+						<a class="inline-flex items-center gap-1.5 py-1 font-mono text-[.7rem] text-ink-dim hover:text-accent-strong" href={item.url} target="_blank" rel="noreferrer" title={`${item.label}: ${item.handle}`}>
 							{#if academicIcons[item.id]}
 								<i class="ai {academicIcons[item.id]} min-w-[22px] text-center text-xl font-bold leading-none not-italic text-accent-strong" aria-hidden="true"></i>
 							{:else if socialIcons[item.id]}
@@ -508,43 +506,41 @@
 			<div class={`${sectionHeadClass} mb-[clamp(42px,6vw,72px)]`}>
 				<h2 class={sectionTitleClass}>{ui.cvTitle}</h2>
 			</div>
-			<a class="group mb-[clamp(42px,6vw,72px)] flex items-center justify-between gap-6 border-y border-rule-strong py-[18px] text-ink no-underline [transition:color_180ms_ease,border-color_180ms_ease] hover:border-accent-strong hover:text-accent-strong focus-visible:border-accent-strong focus-visible:text-accent-strong" href={localizedPath('/cv', locale)}>
-				<strong class="font-title text-[clamp(1.2rem,2.2vw,1.65rem)] font-medium leading-[1.1]">{ui.cvCta}</strong>
+			<a class="group mb-[clamp(42px,6vw,72px)] flex items-center justify-between gap-6 py-[12px] text-ink no-underline [transition:color_180ms_ease] hover:text-accent-strong focus-visible:text-accent-strong" href={localizedPath('/cv', locale)}>
+				<strong class="font-title text-[clamp(1.1rem,1.8vw,1.4rem)] font-medium leading-[1.15]">{ui.cvCta}</strong>
 				<span class="grid h-8 w-8 flex-[0_0_2rem] place-items-center text-accent-strong [transition:transform_220ms_cubic-bezier(.22,1,.36,1)] group-hover:translate-x-1 group-focus-visible:translate-x-1 motion-reduce:transition-none" aria-hidden="true">
 					<ArrowRight size={24} strokeWidth={1.5} />
 				</span>
 			</a>
 			<section aria-labelledby="recent-activity-title">
 				<header class="mb-[26px] grid gap-3">
-					<span class="meta tag">{ui.recentLabel}</span>
-					<h3 class="max-w-[760px] text-[clamp(1.35rem,3vw,2.25rem)] leading-[1.05]" id="recent-activity-title">{ui.recentTitle}</h3>
+					<h3 class="max-w-[760px] text-[clamp(1.15rem,2vw,1.5rem)] leading-[1.15] tracking-[-0.01em]" id="recent-activity-title">{ui.recentTitle}</h3>
 				</header>
-				<ol class="m-0 list-none border-t border-rule p-0">
+				<ol class="m-0 grid list-none gap-[clamp(22px,3vw,34px)] p-0">
 				{#each data.recentActivity as e, i (e.entity_type + e.entity_id)}
-					<li class="relative grid grid-cols-[minmax(190px,.62fr)_minmax(0,1.38fr)] gap-[clamp(20px,4vw,60px)] border-b border-rule py-[clamp(20px,3vw,32px)] max-[700px]:grid-cols-1 max-[700px]:gap-4">
-						<div class="meta grid grid-cols-[28px_minmax(0,1fr)_42px] gap-3 text-ink-faint">
-							<span>{String(i + 1).padStart(2, '0')}</span>
+					<li class="relative grid grid-cols-[minmax(190px,.62fr)_minmax(0,1.38fr)] gap-[clamp(20px,4vw,60px)] max-[700px]:grid-cols-1 max-[700px]:gap-4">
+						<div class="label grid grid-cols-[minmax(0,1fr)_42px] gap-3 text-ink-faint">
 							<span class="grid gap-[5px]">
 								<span class="text-accent-strong">{entityLabel(e.entity_type, locale)}</span>
 								{#if activitySubtypeLabel(e)}
-									<span class="text-left text-[.62rem] leading-[1.3] text-ink-dim">{activitySubtypeLabel(e)}</span>
+									<span class="text-left leading-[1.3] text-ink-dim">{activitySubtypeLabel(e)}</span>
 								{/if}
 							</span>
 							<span class="text-right">{yr(e.sort_date)}</span>
 						</div>
 						<div class="min-w-0">
 							{#if e.target_url}
-								<a class="group m-0 flex items-start justify-between gap-[18px] font-title text-[clamp(1.15rem,2.2vw,1.8rem)] leading-[1.1] text-ink no-underline" href={e.target_url} target="_blank" rel="noreferrer">
+								<a class="group m-0 flex items-start justify-between gap-[18px] font-title text-[clamp(1.05rem,1.5vw,1.3rem)] leading-[1.2] text-ink no-underline" href={e.target_url} target="_blank" rel="noreferrer">
 									<span><InlineTitle text={e.title} /></span>
 									<span class="mt-[2px] grid h-[22px] w-[22px] flex-[0_0_22px] place-items-center text-accent-strong [transition:transform_180ms_ease] group-hover:translate-x-0.5 group-hover:translate-y-[-2px] group-focus-visible:translate-x-0.5 group-focus-visible:translate-y-[-2px] motion-reduce:transition-none" aria-hidden="true">
 										<MoveUpRight size={22} strokeWidth={1.7} />
 									</span>
 								</a>
 							{:else}
-								<p class="m-0 font-title text-[clamp(1.15rem,2.2vw,1.8rem)] leading-[1.1] text-ink"><InlineTitle text={e.title} /></p>
+								<p class="m-0 font-title text-[clamp(1.05rem,1.5vw,1.3rem)] leading-[1.2] text-ink"><InlineTitle text={e.title} /></p>
 							{/if}
 							{#if e.metadata}
-								<p class="mt-[9px] mb-0 max-w-[72ch] text-[.72rem] leading-[1.45] text-ink-faint"><EntryMetadata metadata={e.metadata} {locale} /></p>
+								<p class="mt-[7px] mb-0 max-w-[72ch] text-[.82rem] leading-[1.5] text-ink-dim"><EntryMetadata metadata={e.metadata} {locale} /></p>
 							{/if}
 						</div>
 					</li>

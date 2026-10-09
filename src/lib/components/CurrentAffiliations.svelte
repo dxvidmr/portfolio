@@ -13,7 +13,7 @@
 </script>
 
 <section class="mb-[clamp(48px,7vw,84px)]">
-	<h3 class="meta m-0">{title}</h3>
+	<h3 class="label m-0 font-normal">{title}</h3>
 
 	<ul class="mt-[clamp(22px,3vw,32px)] mb-0 grid list-none grid-cols-2 gap-x-[clamp(28px,5vw,58px)] gap-y-[clamp(28px,4vw,42px)] p-0 max-[620px]:grid-cols-1">
 		{#each affiliations as affiliation (affiliation.name)}
@@ -31,7 +31,7 @@
 					<p class="mt-1 mb-0 text-[.64rem] leading-[1.45] text-ink-faint">{affiliation.context}</p>
 					{#if affiliation.project}
 						<p class="mt-3 mb-0 text-[.64rem] leading-[1.45] text-ink-dim">
-							<span class="font-mono text-[.57rem] tracking-meta text-accent-strong uppercase">{projectLabel}</span>
+							<span class="font-mono text-[.7rem] text-accent-strong">{projectLabel}</span>
 							<span class="mt-1 block font-title text-[.78rem] leading-[1.35] text-ink-dim">
 								<InlineTitle text={affiliation.project.title} />
 							</span>

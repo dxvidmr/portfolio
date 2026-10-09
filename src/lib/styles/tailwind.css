@@ -27,7 +27,8 @@
 	--color-danger-soft: var(--admin-danger-soft, color-mix(in srgb, #a54848 12%, transparent));
 	--color-warning: var(--tone-amber);
 
-	--font-title: var(--font-editorial);
+	--font-title: var(--font-display);
+	--font-sans: var(--font-text);
 	--font-mono: var(--font-code);
 
 	--radius-ui: var(--radius);

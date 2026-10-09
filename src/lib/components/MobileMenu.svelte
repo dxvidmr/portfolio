@@ -18,7 +18,7 @@
 		returnFocus: HTMLButtonElement | null;
 		locale: Locale;
 		name: string;
-		links: Array<{ href: string; label: string; number: string; current?: boolean }>;
+		links: Array<{ href: string; label: string; number?: string; current?: boolean }>;
 		/** Sustituye a los controles de la web pública en el pie del menú. */
 		footer?: Snippet;
 	} = $props();
@@ -106,13 +106,12 @@
 		>
 			{#each links as link, index (link.href)}
 				<a
-					class="group grid grid-cols-[34px_minmax(0,1fr)_auto] items-baseline gap-3 border-b border-rule py-[clamp(14px,2.8vh,24px)] text-ink no-underline last:border-b-0 hover:text-accent-strong focus-visible:text-accent-strong aria-[current=page]:text-accent-strong"
+					class="group grid grid-cols-[minmax(0,1fr)_auto] items-baseline gap-3 border-b border-rule py-[clamp(14px,2.8vh,24px)] text-ink no-underline last:border-b-0 hover:text-accent-strong focus-visible:text-accent-strong aria-[current=page]:text-accent-strong"
 					href={link.href}
 					aria-current={link.current ? 'page' : undefined}
 					onclick={() => closeMenu(false)}
 					style:animation={`project-modal-in 520ms ${index * 55}ms cubic-bezier(.16,1,.3,1) both`}
 				>
-					<span class="meta text-accent-strong">{link.number}</span>
 					<span class="font-title text-[clamp(2.55rem,13vw,4.8rem)] leading-[.86] tracking-[-.045em]">
 						{link.label}
 					</span>

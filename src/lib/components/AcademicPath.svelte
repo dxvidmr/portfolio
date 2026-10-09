@@ -78,7 +78,7 @@
 	bind:this={root}
 >
 	<div class="sticky top-[clamp(88px,13vh,126px)]">
-		<header><span class="meta">{label}</span></header>
+		<header><span class="label">{label}</span></header>
 
 		<div
 			class="pt-[clamp(26px,4vw,42px)]"
@@ -105,7 +105,7 @@
 							onclick={() => selectEntry(index)}
 						>
 							<span
-								class={`pt-[2px] text-[0.68rem] uppercase [font-variant-numeric:tabular-nums] [transition:color_220ms_ease] ${selected === index ? 'text-accent-strong' : 'text-ink-faint'}`}
+								class={`pt-[2px] font-mono text-[0.72rem] [font-variant-numeric:tabular-nums] [transition:color_220ms_ease] ${selected === index ? 'text-accent-strong' : 'text-ink-faint'}`}
 							>
 								{entry.period}
 							</span>

@@ -1,4 +1,8 @@
 @import url('https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,700;1,9..144,400&display=swap') layer(vendor);
+@import '@fontsource/public-sans/400.css' layer(vendor);
+@import '@fontsource/public-sans/400-italic.css' layer(vendor);
+@import '@fontsource/public-sans/500.css' layer(vendor);
+@import '@fontsource/public-sans/600.css' layer(vendor);
 @import '@fontsource/jetbrains-mono/latin-400.css' layer(vendor);
 @import '@fontsource/jetbrains-mono/latin-500.css' layer(vendor);
 @import '@fontsource/jetbrains-mono/latin-700.css' layer(vendor);
@@ -51,6 +55,10 @@
 
 	--font-editorial: 'Fraunces', 'Newsreader', 'Iowan Old Style', 'Palatino Linotype', 'Book Antiqua', Georgia, serif;
 	--font-code: 'JetBrains Mono', ui-monospace, 'SFMono-Regular', 'Cascadia Mono', 'Menlo', monospace;
+	/* Papeles tipográficos: sans para títulos y lectura; mono para datos e instrumentos (menú,
+	   etiquetas, fechas, temas). Los títulos tienen su propia variable para poder probar otra familia. */
+	--font-text: 'Public Sans', 'Helvetica Neue', Arial, sans-serif;
+	--font-display: var(--font-text);
 
 	--radius: 8px; /* redondeo ligero, no líneas rectas perfectas */
 	--radius-sm: 4px;
@@ -101,6 +109,8 @@ html[data-theme='dark'] {
 
 html {
 	color-scheme: light;
+	/* Los halos decorativos de algunas secciones sobresalen por la derecha; sin esto aparece scroll horizontal. */
+	overflow-x: clip;
 	-webkit-text-size-adjust: 100%;
 }
 
@@ -112,7 +122,7 @@ body {
 	margin: 0;
 	background: var(--bg);
 	color: var(--fg);
-	font-family: var(--font-code);
+	font-family: var(--font-text);
 	font-size: var(--fs-body);
 	line-height: 1.5;
 	font-weight: 400;
@@ -186,6 +196,7 @@ img {
 @layer components {
 /* ---- Etiquetas de metadato: "líneas de instrumento" ---- */
 .meta {
+	font-family: var(--font-code);
 	font-size: var(--fs-meta);
 	letter-spacing: var(--tracking-instrument);
 	text-transform: uppercase;
@@ -194,6 +205,14 @@ img {
 }
 .meta--faint {
 	color: var(--fg-faint);
+}
+/* Etiqueta de la web pública: dato o instrumento en mono, sin mayúsculas ni espaciado.
+   (.meta sigue siendo la del panel.) */
+.label {
+	font-family: var(--font-code);
+	font-size: 0.72rem;
+	line-height: 1.4;
+	color: var(--fg-dim);
 }
 /* Etiqueta entre llaves tipo {MAIL} */
 .tag::before { content: '{'; }
@@ -210,7 +229,7 @@ hr,
 
 @layer base {
 h1, h2, h3, h4 {
-	font-family: var(--font-editorial);
+	font-family: var(--font-display);
 	font-weight: 500;
 	margin: 0;
 	letter-spacing: -0.025em;

@@ -74,7 +74,7 @@
 {:else if metadata.kind === 'stay'}
 	{#if metadata.text}<span>{sentence(metadata.text)}</span>{/if}
 	{#if metadata.funding.length}
-		<span class="mt-1 block"><span class="text-accent-strong">{locale === 'es' ? 'Financiación' : 'Funding'}:</span> {#each metadata.funding as funding, index (funding.title)}{#if index > 0}<span>; </span>{/if}<span>{fundingTypeLabel(funding)} · {compactFundingBody(funding.awarding_body, funding.title)}</span>{/each}.</span>
+		<span class="mt-1 block"><span class="text-accent-strong">{locale === 'es' ? 'Financiación' : 'Funding'}:</span> {#each metadata.funding as funding, index (funding.title)}{#if index > 0}{'; '}{/if}<span>{fundingTypeLabel(funding)} | {compactFundingBody(funding.awarding_body, funding.title)}</span>{/each}.</span>
 	{/if}
 {:else}
 	<span>{sentence(metadata.text)}</span>
