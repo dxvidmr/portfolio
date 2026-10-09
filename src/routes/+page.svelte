@@ -156,9 +156,9 @@
 		x: 'fa-x-twitter',
 		instagram: 'fa-instagram'
 	};
-	const sectionClass = 'wrap scroll-mt-[76px] py-[clamp(48px,8vw,96px)]';
-	const sectionHeadClass = 'mb-[26px] grid gap-3';
-	const sectionTitleClass = 'max-w-[760px] text-[clamp(1.4rem,2.8vw,2.15rem)] leading-[1.1] tracking-[-0.02em]';
+	const sectionClass = 'wrap scroll-mt-[76px] py-[clamp(80px,12vw,180px)]';
+	const sectionHeadClass = 'mb-[clamp(40px,6vw,88px)] grid gap-3';
+	const sectionTitleClass = 'section-title max-w-[14ch] text-[clamp(2.6rem,6vw,5.2rem)] font-medium leading-[0.95] tracking-[-0.04em]';
 	const ui = $derived({
 		es: {
 			navPortfolio: 'Portfolio',
@@ -309,7 +309,7 @@
 					{/each}
 				</strong>
 			</a>
-			<nav class="flex items-center gap-[clamp(16px,2.4vw,32px)] font-mono text-[.78rem] max-[780px]:hidden" aria-label="Principal">
+			<nav class="label flex items-center gap-[clamp(16px,2.4vw,32px)] max-[780px]:hidden" aria-label="Principal">
 				<a class="text-ink-dim hover:text-ink" href="#portfolio">{ui.navPortfolio}</a>
 				<a class="text-ink-dim hover:text-ink" href="#about">{ui.navAbout}</a>
 				<a class="text-ink-dim hover:text-ink" href="#cv">CV</a>
@@ -377,7 +377,7 @@
 
 					<div class={introStarted ? 'visible' : 'invisible'}>
 						<p class={`mt-[clamp(25px,4vh,40px)] mb-0 max-w-[54ch] font-title text-[clamp(1.05rem,1.5vw,1.3rem)] leading-[1.35] text-ink-dim max-[520px]:text-base ${introStarted ? '[animation:home-intro-from-bottom_980ms_cubic-bezier(.16,1,.3,1)_500ms_backwards] motion-reduce:animate-none' : ''}`}>{ui.heroSummary}</p>
-						<p class={`mt-3 mb-0 block font-mono text-[.78rem] text-ink-dim ${introStarted ? '[animation:home-intro-from-bottom_920ms_cubic-bezier(.16,1,.3,1)_610ms_backwards] motion-reduce:animate-none' : ''}`}>{ui.affiliation}</p>
+						<p class={`label mt-4 mb-0 block ${introStarted ? '[animation:home-intro-from-bottom_920ms_cubic-bezier(.16,1,.3,1)_610ms_backwards] motion-reduce:animate-none' : ''}`}>{ui.affiliation}</p>
 					</div>
 				</div>
 			</div>
@@ -440,9 +440,9 @@
 						/>
 					</div>
 					<figcaption class="mt-2.5 grid gap-4">
-						<span class="flex min-w-0 items-center gap-2 font-mono text-[.72rem]">
+						<span class="label flex min-w-0 items-center gap-2">
 							<button
-								class={`cursor-pointer border-0 border-b bg-transparent p-0 pb-0.5 font-mono font-medium [transition:color_700ms_ease,border-color_700ms_ease] ${activePortrait === 'researcher' ? 'border-accent-strong text-accent-strong' : 'border-transparent text-ink-faint'}`}
+								class={`cursor-pointer border-0 border-b bg-transparent p-0 pb-0.5 font-mono font-semibold tracking-[.08em] uppercase [transition:color_700ms_ease,border-color_700ms_ease] ${activePortrait === 'researcher' ? 'border-accent-strong text-accent-strong' : 'border-transparent text-ink-faint'}`}
 								type="button"
 								onclick={(event) => selectPortrait('researcher', event)}
 								onpointerenter={(event) => previewPortrait('researcher', event)}
@@ -451,7 +451,7 @@
 							>{ui.portraitResearcher}</button>
 							<span class="text-ink-faint opacity-50" aria-hidden="true">/</span>
 							<button
-								class={`cursor-pointer border-0 border-b bg-transparent p-0 pb-0.5 font-mono font-medium [transition:color_700ms_ease,border-color_700ms_ease] ${activePortrait === 'performer' ? 'border-accent-strong text-accent-strong' : 'border-transparent text-ink-faint'}`}
+								class={`cursor-pointer border-0 border-b bg-transparent p-0 pb-0.5 font-mono font-semibold tracking-[.08em] uppercase [transition:color_700ms_ease,border-color_700ms_ease] ${activePortrait === 'performer' ? 'border-accent-strong text-accent-strong' : 'border-transparent text-ink-faint'}`}
 								type="button"
 								onclick={(event) => selectPortrait('performer', event)}
 								onpointerenter={(event) => previewPortrait('performer', event)}
@@ -469,10 +469,10 @@
 				</figure>
 
 				<div class="min-w-0 pt-[clamp(8px,2vw,28px)] max-[780px]:pt-0">
-					<p class="mt-0 mb-[clamp(26px,4vw,48px)] max-w-[44ch] font-title text-[clamp(1.1rem,1.6vw,1.4rem)] leading-[1.45] text-ink">{ui.aboutText}</p>
+					<p class="mt-0 mb-[clamp(26px,4vw,48px)] max-w-[34ch] font-title text-[clamp(1.35rem,2.3vw,2rem)] leading-[1.3] tracking-[-0.015em] text-ink">{ui.aboutText}</p>
 					<ul class="mt-0 mb-[clamp(34px,5vw,56px)] flex list-none flex-wrap gap-x-3 gap-y-[7px] p-0 max-[520px]:gap-1.5">
 						{#each t(profile.areas, locale) as area (area)}
-							<li class="inline-flex items-center gap-3 font-mono text-[.72rem] text-ink-dim after:text-rule-strong after:content-['/'] last:after:content-none max-[520px]:rounded-full max-[520px]:border max-[520px]:border-rule max-[520px]:px-2.5 max-[520px]:py-1.5 max-[520px]:text-[.68rem] max-[520px]:after:hidden">{area}</li>
+							<li class="label inline-flex items-center gap-3 after:text-rule-strong after:content-['/'] last:after:content-none max-[520px]:rounded-full max-[520px]:border max-[520px]:border-rule max-[520px]:px-2.5 max-[520px]:py-1.5 max-[520px]:text-[.68rem] max-[520px]:after:hidden">{area}</li>
 						{/each}
 					</ul>
 					<CurrentAffiliations {locale} />
@@ -480,20 +480,20 @@
 				</div>
 			</div>
 
-			<footer class="mt-[clamp(28px,4vw,54px)] grid grid-cols-[minmax(260px,.8fr)_minmax(0,1.2fr)] items-end gap-[clamp(30px,6vw,92px)] border-t border-rule bg-[linear-gradient(to_bottom,color-mix(in_srgb,var(--bg)_72%,transparent),color-mix(in_srgb,var(--bg)_92%,transparent))] py-[clamp(24px,3vw,38px)] [backdrop-filter:blur(12px)] max-[780px]:grid-cols-1 max-[780px]:items-start">
+			<footer class="mt-[clamp(28px,4vw,54px)] grid grid-cols-[minmax(260px,.8fr)_minmax(0,1.2fr)] items-start gap-[clamp(30px,6vw,92px)] border-t border-rule bg-[linear-gradient(to_bottom,color-mix(in_srgb,var(--bg)_72%,transparent),color-mix(in_srgb,var(--bg)_92%,transparent))] py-[clamp(24px,3vw,38px)] [backdrop-filter:blur(12px)] max-[780px]:grid-cols-1 max-[780px]:items-start">
 				<div class="grid justify-items-start gap-1">
 					<span class="label mb-2.5">{ui.contactTitle}</span>
 					<a class="font-title text-[clamp(1.1rem,2vw,1.55rem)] leading-[1.2]" href={'mailto:' + profile.contact.mail}>{profile.contact.mail}</a>
 					<a class="font-mono text-[.72rem] text-ink-faint" href={'mailto:' + profile.contact.mailAlt}>{profile.contact.mailAlt}</a>
 				</div>
-				<nav class="flex flex-wrap items-center justify-end gap-x-[18px] gap-y-[5px] max-[780px]:justify-start" aria-label={ui.profilesLabel}>
-					<span class="label mb-2.5 flex-[0_0_100%] text-right max-[780px]:text-left">{ui.profilesLabel}</span>
+				<nav class="grid grid-cols-[repeat(auto-fill,minmax(8.5rem,1fr))] gap-x-6 gap-y-2" aria-label={ui.profilesLabel}>
+					<span class="label col-span-full mb-2.5">{ui.profilesLabel}</span>
 					{#each profile.profiles as item (item.id)}
-						<a class="inline-flex items-center gap-1.5 py-1 font-mono text-[.7rem] text-ink-dim hover:text-accent-strong" href={item.url} target="_blank" rel="noreferrer" title={`${item.label}: ${item.handle}`}>
+						<a class="label inline-flex items-center gap-2 py-1 hover:text-accent-strong" href={item.url} target="_blank" rel="noreferrer" title={`${item.label}: ${item.handle}`}>
 							{#if academicIcons[item.id]}
-								<i class="ai {academicIcons[item.id]} min-w-[22px] text-center text-xl font-bold leading-none not-italic text-accent-strong" aria-hidden="true"></i>
+								<i class="ai {academicIcons[item.id]} min-w-[18px] text-center text-base font-bold leading-none not-italic text-accent-strong" aria-hidden="true"></i>
 							{:else if socialIcons[item.id]}
-								<i class="fa-brands {socialIcons[item.id]} min-w-[22px] text-center text-xl font-bold leading-none not-italic text-accent-strong" aria-hidden="true"></i>
+								<i class="fa-brands {socialIcons[item.id]} min-w-[18px] text-center text-base font-bold leading-none not-italic text-accent-strong" aria-hidden="true"></i>
 							{/if}
 							<span>{item.label}</span>
 						</a>
@@ -503,24 +503,22 @@
 		</section>
 
 		<section id="cv" class={sectionClass}>
-			<div class={`${sectionHeadClass} mb-[clamp(42px,6vw,72px)]`}>
+			<div class={`${sectionHeadClass} grid-cols-[minmax(0,1fr)_auto] items-end gap-6 max-[620px]:grid-cols-1`}>
 				<h2 class={sectionTitleClass}>{ui.cvTitle}</h2>
+				<a class="group label inline-flex items-center gap-2 pb-[.6em] text-accent-strong no-underline hover:text-ink focus-visible:text-ink" href={localizedPath('/cv', locale)}>
+					{ui.cvCta}
+					<span class="[transition:transform_220ms_cubic-bezier(.22,1,.36,1)] group-hover:translate-x-1 group-focus-visible:translate-x-1 motion-reduce:transition-none" aria-hidden="true"><ArrowRight size={16} strokeWidth={1.6} /></span>
+				</a>
 			</div>
-			<a class="group mb-[clamp(42px,6vw,72px)] flex items-center justify-between gap-6 py-[12px] text-ink no-underline [transition:color_180ms_ease] hover:text-accent-strong focus-visible:text-accent-strong" href={localizedPath('/cv', locale)}>
-				<strong class="font-title text-[clamp(1.1rem,1.8vw,1.4rem)] font-medium leading-[1.15]">{ui.cvCta}</strong>
-				<span class="grid h-8 w-8 flex-[0_0_2rem] place-items-center text-accent-strong [transition:transform_220ms_cubic-bezier(.22,1,.36,1)] group-hover:translate-x-1 group-focus-visible:translate-x-1 motion-reduce:transition-none" aria-hidden="true">
-					<ArrowRight size={24} strokeWidth={1.5} />
-				</span>
-			</a>
 			<section aria-labelledby="recent-activity-title">
-				<header class="mb-[26px] grid gap-3">
-					<h3 class="max-w-[760px] text-[clamp(1.15rem,2vw,1.5rem)] leading-[1.15] tracking-[-0.01em]" id="recent-activity-title">{ui.recentTitle}</h3>
+				<header class="mb-5 grid gap-3">
+					<h3 class="label m-0 font-normal" id="recent-activity-title">{ui.recentTitle}</h3>
 				</header>
-				<ol class="m-0 grid list-none gap-[clamp(22px,3vw,34px)] p-0">
+				<ol class="m-0 list-none border-t border-rule p-0">
 				{#each data.recentActivity as e, i (e.entity_type + e.entity_id)}
-					<li class="relative grid grid-cols-[minmax(190px,.62fr)_minmax(0,1.38fr)] gap-[clamp(20px,4vw,60px)] max-[700px]:grid-cols-1 max-[700px]:gap-4">
+					<li class="relative grid grid-cols-[minmax(190px,.62fr)_minmax(0,1.38fr)] gap-[clamp(20px,4vw,60px)] border-b border-rule py-[clamp(22px,3vw,36px)] max-[700px]:grid-cols-1 max-[700px]:gap-4">
 						<div class="label grid grid-cols-[minmax(0,1fr)_42px] gap-3 text-ink-faint">
-							<span class="grid gap-[5px]">
+							<span class="grid content-start gap-[5px]">
 								<span class="text-accent-strong">{entityLabel(e.entity_type, locale)}</span>
 								{#if activitySubtypeLabel(e)}
 									<span class="text-left leading-[1.3] text-ink-dim">{activitySubtypeLabel(e)}</span>
@@ -530,17 +528,17 @@
 						</div>
 						<div class="min-w-0">
 							{#if e.target_url}
-								<a class="group m-0 flex items-start justify-between gap-[18px] font-title text-[clamp(1.05rem,1.5vw,1.3rem)] leading-[1.2] text-ink no-underline" href={e.target_url} target="_blank" rel="noreferrer">
+								<a class="group m-0 flex items-start justify-between gap-[18px] font-title text-[clamp(1.15rem,1.9vw,1.6rem)] leading-[1.15] tracking-[-0.015em] text-ink no-underline" href={e.target_url} target="_blank" rel="noreferrer">
 									<span><InlineTitle text={e.title} /></span>
 									<span class="mt-[2px] grid h-[22px] w-[22px] flex-[0_0_22px] place-items-center text-accent-strong [transition:transform_180ms_ease] group-hover:translate-x-0.5 group-hover:translate-y-[-2px] group-focus-visible:translate-x-0.5 group-focus-visible:translate-y-[-2px] motion-reduce:transition-none" aria-hidden="true">
 										<MoveUpRight size={22} strokeWidth={1.7} />
 									</span>
 								</a>
 							{:else}
-								<p class="m-0 font-title text-[clamp(1.05rem,1.5vw,1.3rem)] leading-[1.2] text-ink"><InlineTitle text={e.title} /></p>
+								<p class="m-0 font-title text-[clamp(1.15rem,1.9vw,1.6rem)] leading-[1.15] tracking-[-0.015em] text-ink"><InlineTitle text={e.title} /></p>
 							{/if}
 							{#if e.metadata}
-								<p class="mt-[7px] mb-0 max-w-[72ch] text-[.82rem] leading-[1.5] text-ink-dim"><EntryMetadata metadata={e.metadata} {locale} /></p>
+								<p class="mt-[10px] mb-0 max-w-[72ch] text-[.72rem] leading-[1.45] text-ink-faint"><EntryMetadata metadata={e.metadata} {locale} /></p>
 							{/if}
 						</div>
 					</li>

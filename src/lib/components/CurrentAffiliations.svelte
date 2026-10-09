@@ -31,7 +31,7 @@
 					<p class="mt-1 mb-0 text-[.64rem] leading-[1.45] text-ink-faint">{affiliation.context}</p>
 					{#if affiliation.project}
 						<p class="mt-3 mb-0 text-[.64rem] leading-[1.45] text-ink-dim">
-							<span class="font-mono text-[.7rem] text-accent-strong">{projectLabel}</span>
+							<span class="label text-accent-strong">{projectLabel}</span>
 							<span class="mt-1 block font-title text-[.78rem] leading-[1.35] text-ink-dim">
 								<InlineTitle text={affiliation.project.title} />
 							</span>

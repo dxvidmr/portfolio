@@ -156,7 +156,7 @@
 				data-project-index={index}
 			>
 				<a
-					class="grid grid-cols-[minmax(0,1fr)_auto] items-baseline gap-[clamp(12px,2vw,24px)] py-[clamp(12px,1.6vw,20px)] text-inherit no-underline max-[700px]:h-full max-[700px]:min-h-[92px] max-[700px]:grid-cols-[minmax(0,1fr)] max-[700px]:gap-x-2.5 max-[700px]:px-3 max-[700px]:py-3"
+					class="grid grid-cols-[minmax(0,1fr)_auto] items-baseline gap-[clamp(12px,2vw,24px)] py-[clamp(16px,2.4vw,30px)] text-inherit no-underline max-[700px]:h-full max-[700px]:min-h-[92px] max-[700px]:grid-cols-[minmax(0,1fr)] max-[700px]:gap-x-2.5 max-[700px]:px-3 max-[700px]:py-3"
 					href={localizedPath(`/portfolio/${project.slug}`, locale)}
 					aria-current={activeIndex === index ? 'true' : undefined}
 					onmouseenter={() => (activeIndex = index)}
@@ -165,12 +165,12 @@
 				>
 					<span class="grid min-w-0 gap-2">
 						<span
-							class={`font-mono text-[.72rem] [transition:color_180ms_ease] max-[700px]:hidden ${activeIndex === index ? 'text-ink-dim' : 'text-ink-faint'}`}
+							class={`label [transition:color_180ms_ease] max-[700px]:hidden ${activeIndex === index ? 'text-ink-dim' : 'text-ink-faint'}`}
 						>
 							{projectText(project.kind, locale)}
 						</span>
 						<span
-							class={`font-title text-[clamp(1.35rem,2.3vw,2rem)] font-medium leading-[1.12] tracking-[-0.02em] [transition:color_180ms_ease] motion-reduce:transition-none max-[700px]:text-[clamp(1.2rem,5.6vw,1.6rem)] ${activeIndex === index ? 'text-accent-strong' : ''}`}
+							class={`font-title text-[clamp(1.6rem,3vw,2.7rem)] font-medium leading-[1.02] tracking-[-0.03em] [transition:color_180ms_ease] motion-reduce:transition-none max-[700px]:text-[clamp(1.2rem,5.6vw,1.6rem)] ${activeIndex === index ? 'text-accent-strong' : ''}`}
 						>
 							<InlineTitle text={projectText(project.title, locale)} />
 						</span>
@@ -220,7 +220,7 @@
 						>
 							{#each activeProject.tags as tag (tag.code)}
 								<li
-									class="font-mono text-[.7rem] after:pl-[10px] after:text-rule-strong after:content-['/'] last:after:content-none max-[700px]:text-[.72rem] max-[700px]:after:pl-2"
+									class="label after:pl-[10px] after:text-rule-strong after:content-['/'] last:after:content-none max-[700px]:text-[.72rem] max-[700px]:after:pl-2"
 								>
 									{projectText(tag, locale)}
 								</li>
@@ -229,7 +229,7 @@
 				</div>
 			{/key}
 			<a
-				class="group mt-[22px] flex items-center justify-between gap-[18px] py-[10px] font-mono text-[.78rem] text-ink no-underline max-[700px]:order-4 max-[700px]:min-h-[54px] max-[700px]:w-full"
+				class="group mt-[22px] flex items-center justify-between gap-[18px] py-[10px] label text-ink no-underline max-[700px]:order-4 max-[700px]:min-h-[54px] max-[700px]:w-full"
 				href={localizedPath(`/portfolio/${activeProject.slug}`, locale)}
 				onclick={(event) => openProject(event, activeIndex)}
 			>

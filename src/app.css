@@ -210,9 +210,22 @@ img {
    (.meta sigue siendo la del panel.) */
 .label {
 	font-family: var(--font-code);
-	font-size: 0.72rem;
+	font-size: 0.66rem;
 	line-height: 1.4;
+	letter-spacing: 0.08em;
+	text-transform: uppercase;
 	color: var(--fg-dim);
+}
+/* Títulos de sección: grandes, con el signo de sección de las ediciones como marca. */
+.section-title::before {
+	content: '§';
+	margin-right: 0.35em;
+	font-family: var(--font-code);
+	font-size: 0.32em;
+	font-weight: 400;
+	letter-spacing: 0;
+	vertical-align: 0.95em;
+	color: var(--accent-strong);
 }
 /* Etiqueta entre llaves tipo {MAIL} */
 .tag::before { content: '{'; }
