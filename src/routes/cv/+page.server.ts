@@ -71,7 +71,7 @@ const sections = [
 		key: 'projects',
 		title: 'Proyectos de investigación',
 		sql: `SELECT research_project.id AS entity_id, research_project.title, research_project.programme_code AS type, tv.label_es AS type_label_es, tv.label_en AS type_label_en,
-		             research_project.institution AS detail, substr(research_project.date_start, 1, 4) AS year, research_project.url, ${publicProjectMetadataSql}
+		             research_project.institution AS detail, substr(research_project.date_start, 1, 4) AS year, research_project.date_start AS period_start, research_project.date_end AS period_end, research_project.url, ${publicProjectMetadataSql}
 		      FROM projects research_project
 		      JOIN entries e ON e.entity_type = 'projects' AND e.entity_id = research_project.id AND e.public = 1
 		      LEFT JOIN type_vocab tv ON tv.code = research_project.programme_code
@@ -292,7 +292,8 @@ export const load: PageServerLoad = async () => {
 						is_native: Number(row.is_native) === 1,
 						expected: Number(row.expected) === 1,
 						hours: row.hours == null ? null : Number(row.hours),
-						year_label: null as string | null,
+						// Periodo completo cuando la sección lo da (proyectos): «2025-2028».
+						year_label: row.period_start ? span(row.period_start, row.period_end) : (null as string | null),
 						hide_year: section.key === 'skills' || section.key === 'languages',
 						// «plain» repite el detalle; aquí se compone con horas o roles agrupados.
 						metadata: ['teaching', 'courses', 'memberships'].includes(section.key) ? null : entryMetadataFromRow({ ...row, entity_type: section.key }),
