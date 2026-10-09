@@ -4,9 +4,15 @@
   import type { EntryMetadata } from '$lib/types/entry-metadata';
   // title: nombre del mérito, para no repetir en el contexto lo que ya dice.
   let { metadata, locale, title = '' }: { metadata: Extract<EntryMetadata, {kind: 'project' | 'professional'}>; locale: 'es' | 'en'; title?: string } = $props();
-  const join = (...parts: (string | null)[]) => [...new Set(parts.filter(Boolean))].join(CV_SEPARATOR);
   const en = $derived(locale === 'en');
-  const contribution = $derived(en ? metadata.contribution_en || metadata.contribution_es : metadata.contribution_es);
+  const projectRows = (value: Extract<EntryMetadata, { kind: 'project' }>) =>
+    [
+      { label: en ? 'Role' : 'Rol', value: en ? value.role_en : value.role_es },
+      { label: en ? 'Institution' : 'Entidad', value: value.institution },
+      { label: en ? 'Type' : 'Tipo', value: en ? value.nature_en : value.nature_es },
+      { label: en ? 'Code' : 'Código', value: value.code },
+      { label: en ? 'PI' : 'IP', value: value.investigators }
+    ].filter((row): row is { label: string; value: string } => Boolean(row.value));
   // Trabajos técnicos: modalidad y un dato de contexto (grupo destinatario, financiación,
   // responsable o institución, por ese orden).
   const professionalLine = (value: Extract<EntryMetadata, { kind: 'professional' }>) => {
@@ -24,9 +30,12 @@
   };
 </script>
 {#if metadata.kind === 'project'}
-  <span class="block">{join(en ? metadata.role_en : metadata.role_es, metadata.institution, en ? metadata.nature_en : metadata.nature_es)}</span>
-  <span class="block">{join(metadata.code, metadata.investigators ? `${en ? 'PI' : 'IP'}: ${metadata.investigators}` : null)}</span>
-  {#if contribution}<span class="mt-1 block whitespace-pre-line">{contribution}</span>{/if}
+  <!-- Proyectos: un dato por fila con su etiqueta; la descripción queda para el CV exportado. -->
+  <span class="mt-1 grid grid-cols-[max-content_minmax(0,1fr)] gap-x-3 gap-y-0.5">
+    {#each projectRows(metadata) as row (row.label)}
+      <span class="label leading-[1.7]">{row.label}</span><span>{row.value}</span>
+    {/each}
+  </span>
 {:else if professionalLine(metadata)}
   <span>{professionalLine(metadata)}</span>
 {/if}
