@@ -1,4 +1,5 @@
 <script lang="ts">
+	import InlineTitle from '$lib/components/InlineTitle.svelte';
 	import ButtonLink from '$lib/components/ui/ButtonLink.svelte';
 
 	interface RoleItem {
@@ -48,7 +49,7 @@
 				<li class="border-b border-rule last:border-b-0">
 					<a class="group grid gap-2 px-4 py-3.5 text-ink" href={item.href}>
 						<div class="flex items-start justify-between gap-3">
-							<strong class="text-xs leading-[1.4] group-hover:text-accent-strong">{item.title}</strong>
+							<strong class="text-xs leading-[1.4] group-hover:text-accent-strong"><InlineTitle text={item.title} /></strong>
 							<span class={`shrink-0 text-[0.6rem] uppercase ${item.isPublic ? 'text-accent-strong' : 'text-ink-faint'}`}>
 								{item.isPublic ? 'Pública' : 'Privada'}
 							</span>

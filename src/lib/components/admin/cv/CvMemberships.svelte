@@ -1,10 +1,11 @@
 <script lang="ts">
+	import InlineTitle from '$lib/components/InlineTitle.svelte';
   import type { CvSnapshot } from '$lib/types/cv';
   import CvProse from './CvProse.svelte';
   let { entries }: { entries: CvSnapshot['blocks'][number]['entries'] } = $props();
 </script>
 <div class="cv-entry cv-entry-brief my-4" data-entry-type="memberships">
-  <h3 class="cv-brief-title m-0 font-title text-base leading-snug font-medium">{entries[0].title}</h3>
+  <h3 class="cv-brief-title m-0 font-title text-base leading-snug font-medium"><InlineTitle text={entries[0].title} /></h3>
   <ul class="m-0 mt-2 list-none p-0">
     {#each entries as entry (entry.key)}
       <li class="cv-membership-mandate mt-1">

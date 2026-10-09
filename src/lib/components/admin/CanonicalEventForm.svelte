@@ -30,7 +30,7 @@
 	}
 
 	const fields: EventField[] = [
-		{ name: 'title', label: 'Nombre del evento', required: true, wide: true },
+		{ name: 'title', label: 'Nombre del evento', required: true, wide: true, help: 'Títulos de obras en cursiva con asteriscos: *Fuenteovejuna*' },
 		{
 			name: 'date_start',
 			label: 'Inicio del evento',

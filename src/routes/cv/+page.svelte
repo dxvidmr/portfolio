@@ -1,4 +1,5 @@
 <script lang="ts">
+	import InlineTitle from '$lib/components/InlineTitle.svelte';
 	import { page } from '$app/state';
 	import { localeFromPathname, localizedPath } from '$lib/i18n';
 	import SiteControls from '$lib/components/SiteControls.svelte';
@@ -228,13 +229,13 @@
 									<h3 class="text-base leading-[1.35]">
 										{#if item.target_url}
 											<a class="group flex items-start justify-between gap-4" href={item.target_url} target="_blank" rel="noreferrer">
-												<span>{itemTitle(item)}</span>
+												<span><InlineTitle text={itemTitle(item)} /></span>
 												<span class="mt-px grid h-5 w-5 flex-[0_0_20px] place-items-center text-accent-strong [transition:transform_180ms_ease] group-hover:translate-x-0.5 group-hover:translate-y-[-2px] group-focus-visible:translate-x-0.5 group-focus-visible:translate-y-[-2px] motion-reduce:transition-none" aria-hidden="true">
 													<MoveUpRight size={19} strokeWidth={1.7} />
 												</span>
 											</a>
 										{:else}
-											{itemTitle(item)}
+											<InlineTitle text={itemTitle(item)} />
 										{/if}
 									</h3>
 									{#if item.metadata || itemDetail(item) || item.doi}

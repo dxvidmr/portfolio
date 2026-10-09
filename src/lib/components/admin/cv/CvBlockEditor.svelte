@@ -1,4 +1,6 @@
 <script lang="ts">
+	import InlineTitle from '$lib/components/InlineTitle.svelte';
+	import { plainInlineTitle } from '$lib/content/inline-markup';
   import CvSkillSelector from './CvSkillSelector.svelte';
   import SortableList from '$lib/components/admin/SortableList.svelte';
   import Button from '$lib/components/ui/Button.svelte';
@@ -12,7 +14,7 @@
   const normalEntries=$derived(block.entries.filter(e=>e.entityType!=='skills'));
   const reorderNormal=(next:typeof normalEntries)=>{let i=0;block.entries=block.entries.map(e=>e.entityType==='skills'?e:next[i++]);};
   const available = $derived(catalog.filter(e => e.entityType!=='skills' && (!type || e.entityType === type)
-    && normalize(`${e.title} ${e.detail}`).includes(normalize(search))
+    && normalize(`${plainInlineTitle(e.title)} ${e.detail}`).includes(normalize(search))
     && !block.entries.some(s => s.entityType === e.entityType && s.entityId === e.entityId)));
   const add = (entry: CvEntry) => {
     block.entries = [...block.entries, { key: crypto.randomUUID(), entityType: entry.entityType, entityId: entry.entityId, commentary: '', contributionMode: 'inherit', contributionText: '' }];
@@ -36,7 +38,7 @@
         {@const entry = lookup.get(`${selection.entityType}:${selection.entityId}`)}
         <details>
           <summary class="cursor-pointer">
-            <span class="block font-title text-lg">{entry?.title || 'Mérito eliminado'}</span>
+            <span class="block font-title text-lg">{#if entry}<InlineTitle text={entry.title} />{:else}Mérito eliminado{/if}</span>
             {#if entry}<span class="mt-1 block text-[0.65rem] text-ink-dim">{cvEntityLabels[entry.entityType]} · {entry.date} {entry.isPublic ? '' : '· Privado en la web'}</span>{/if}
             <span class="mt-2 block text-[0.65rem] text-accent-strong">Detalles y adaptación para este CV</span>
           </summary>
@@ -73,7 +75,7 @@
       </div>
       <p class="text-xs text-ink-faint">{available.length} disponibles. Puedes combinar tipos en un mismo apartado.</p>
       <ul class="m-0 max-h-80 list-none overflow-y-auto p-0">
-        {#each available as entry (entry.key)}<li class="flex items-center justify-between gap-3 border-t border-rule py-3"><div><p class="m-0 font-title text-base">{entry.title}</p><p class="mt-1 text-[0.65rem] text-ink-dim">{cvEntityLabels[entry.entityType]} · {entry.date}</p></div><Button type="button" size="sm" onclick={() => add(entry)}>Añadir</Button></li>{:else}<li class="py-4 text-xs text-ink-faint">No hay más resultados.</li>{/each}
+        {#each available as entry (entry.key)}<li class="flex items-center justify-between gap-3 border-t border-rule py-3"><div><p class="m-0 font-title text-base"><InlineTitle text={entry.title} /></p><p class="mt-1 text-[0.65rem] text-ink-dim">{cvEntityLabels[entry.entityType]} · {entry.date}</p></div><Button type="button" size="sm" onclick={() => add(entry)}>Añadir</Button></li>{:else}<li class="py-4 text-xs text-ink-faint">No hay más resultados.</li>{/each}
       </ul>
     </details>
     {/if}

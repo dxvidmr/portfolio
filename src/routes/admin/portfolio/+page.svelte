@@ -1,4 +1,5 @@
 <script lang="ts">
+	import InlineTitle from '$lib/components/InlineTitle.svelte';
 	import { enhance } from '$app/forms';
 	import type { SubmitFunction } from '@sveltejs/kit';
 	import { untrack } from 'svelte';
@@ -62,7 +63,7 @@
 		{#snippet children(project)}
 			<a class="group grid min-w-0 gap-1 text-inherit no-underline" href={`/admin/portfolio/${project.slug}`}>
 				<span class="flex flex-wrap items-baseline gap-x-3 gap-y-1">
-					<strong class="font-title text-lg font-medium text-ink group-hover:text-accent-strong">{project.title.es}</strong>
+					<strong class="font-title text-lg font-medium text-ink group-hover:text-accent-strong"><InlineTitle text={project.title.es} /></strong>
 					<span class="font-mono text-[0.62rem] text-ink-faint">{project.period}</span>
 				</span>
 				<span class="flex flex-wrap gap-x-3 gap-y-1 font-mono text-[0.62rem]">

@@ -1,4 +1,5 @@
 <script lang="ts">
+	import InlineTitle from '$lib/components/InlineTitle.svelte';
 	import type { Locale } from '$lib/paraglide/runtime';
 	import { profile, t } from '$lib/content/profile';
 
@@ -32,7 +33,7 @@
 						<p class="mt-3 mb-0 text-[.64rem] leading-[1.45] text-ink-dim">
 							<span class="font-mono text-[.57rem] tracking-meta text-accent-strong uppercase">{projectLabel}</span>
 							<span class="mt-1 block font-title text-[.78rem] leading-[1.35] text-ink-dim">
-								{affiliation.project.title}
+								<InlineTitle text={affiliation.project.title} />
 							</span>
 							<span class="mt-1 block font-mono text-[.56rem] text-ink-faint">{affiliation.project.code}</span>
 						</p>

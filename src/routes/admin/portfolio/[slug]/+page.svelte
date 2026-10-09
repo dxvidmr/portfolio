@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { plainInlineTitle } from '$lib/content/inline-markup';
 	import AdminToast from '$lib/components/AdminToast.svelte';
 	import AdminPageHeader from '$lib/components/admin/AdminPageHeader.svelte';
 	import PortfolioProjectForm from '$lib/components/admin/PortfolioProjectForm.svelte';
@@ -9,7 +10,7 @@
 	let { data, form }: { data: PageData; form: ActionData } = $props();
 </script>
 
-<svelte:head><title>{data.project.title.es} · Portfolio · cv/admin</title></svelte:head>
+<svelte:head><title>{plainInlineTitle(data.project.title.es)} · Portfolio · cv/admin</title></svelte:head>
 
 {#if form?.message}
 	{#key form}<AdminToast message={form.message} success={form.success} />{/key}

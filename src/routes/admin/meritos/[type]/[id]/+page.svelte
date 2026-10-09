@@ -1,4 +1,6 @@
 <script lang="ts">
+	import InlineTitle from '$lib/components/InlineTitle.svelte';
+	import { plainInlineTitle } from '$lib/content/inline-markup';
 	import { page } from '$app/state';
 	import type { ActionData, PageData } from './$types';
 	import EntityForm from '$lib/components/admin/EntityForm.svelte';
@@ -101,7 +103,7 @@
 </script>
 
 <svelte:head>
-	<title>{data.heading} · cv/admin</title>
+	<title>{plainInlineTitle(data.heading)} · cv/admin</title>
 </svelte:head>
 
 <ButtonLink
@@ -232,7 +234,7 @@
 					{#each data.portfolioRelations as relation (relation.slug)}
 						<li>
 							<a class="text-xs leading-snug text-ink hover:text-accent" href={`/admin/portfolio/${relation.slug}`}>
-								{relation.featured ? '★ ' : ''}{relation.title}
+								{relation.featured ? '★ ' : ''}<InlineTitle text={relation.title} />
 							</a>
 						</li>
 					{/each}
@@ -284,7 +286,7 @@
 										class="grid min-w-0 gap-1 text-xs leading-snug text-ink hover:text-accent"
 										href={`/admin/meritos/${item.entityType}/${item.entityId}`}
 									>
-										<span>{item.title}</span>
+										<span><InlineTitle text={item.title} /></span>
 										<small class="text-[0.65rem] text-ink-faint">{item.sortDate ?? 'Sin fecha'}</small>
 									</a>
 									<span

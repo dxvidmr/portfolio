@@ -1,4 +1,6 @@
 <script lang="ts">
+	import InlineTitle from '$lib/components/InlineTitle.svelte';
+	import { plainInlineTitle } from '$lib/content/inline-markup';
 	import { enhance } from '$app/forms';
 	import type { SubmitFunction } from '@sveltejs/kit';
 	import { untrack } from 'svelte';
@@ -47,7 +49,7 @@
 	const compareEntries = (a: Entry, b: Entry) => {
 		if (a.sortDate == null && b.sortDate != null) return 1;
 		if (a.sortDate != null && b.sortDate == null) return -1;
-		return (b.sortDate ?? '').localeCompare(a.sortDate ?? '') || a.title.localeCompare(b.title, 'es');
+		return (b.sortDate ?? '').localeCompare(a.sortDate ?? '') || plainInlineTitle(a.title).localeCompare(plainInlineTitle(b.title), 'es');
 	};
 
 	let typeOptions = $derived.by(() => {
@@ -67,7 +69,7 @@
 		return entries
 			.filter((entry) => !related.has(entryKey(entry)))
 			.filter((entry) => !type || entry.entityType === type)
-			.filter((entry) => !normalizedQuery || normalize(`${entry.title} ${entry.typeLabel}`).includes(normalizedQuery))
+			.filter((entry) => !normalizedQuery || normalize(`${plainInlineTitle(entry.title)} ${entry.typeLabel}`).includes(normalizedQuery))
 			.sort(compareEntries);
 	});
 	const entryRelationCount = (entry: Entry) =>
@@ -135,11 +137,11 @@
 			<ol class="m-0 list-none border-t border-rule p-0">
 				{#each currentRelations as item (`${item.relation.entityType}:${item.relation.entityId}`)}
 					<li class="flex min-w-0 items-center justify-between gap-4 border-b border-rule px-2 py-3 max-[620px]:flex-col max-[620px]:items-start">
-						<div class="min-w-0"><div class="mb-1 flex flex-wrap gap-x-3 gap-y-1 text-[0.62rem] text-ink-faint"><span>{item.entry.typeLabel}</span><span>{item.entry.sortDate ?? 'sin fecha'}</span>{#if !item.entry.isPublic}<span class="text-warning">Privada</span>{/if}</div><strong class="block text-xs font-medium leading-snug text-ink">{item.entry.title}</strong></div>
+						<div class="min-w-0"><div class="mb-1 flex flex-wrap gap-x-3 gap-y-1 text-[0.62rem] text-ink-faint"><span>{item.entry.typeLabel}</span><span>{item.entry.sortDate ?? 'sin fecha'}</span>{#if !item.entry.isPublic}<span class="text-warning">Privada</span>{/if}</div><strong class="block text-xs font-medium leading-snug text-ink"><InlineTitle text={item.entry.title} /></strong></div>
 						<div class="flex shrink-0 gap-1.5">
 							<form method="POST" action="?/featured" use:enhance={featuredSubmit(item.relation)}>
 								<input type="hidden" name="portfolioSlug" value={portfolioSlug} /><input type="hidden" name="entityType" value={item.relation.entityType} /><input type="hidden" name="entityId" value={item.relation.entityId} />
-								<Button type="submit" variant="ghost" size="icon" class={item.relation.featured ? 'text-warning hover:text-warning' : 'text-rule-strong'} disabled={isPending('featured', item.relation)} aria-label={`${item.relation.featured ? 'Desactivar destacado de' : 'Destacar'} ${item.entry.title}`} title={item.relation.featured ? 'Desactivar destacado' : 'Destacar en la ficha'}>★</Button>
+								<Button type="submit" variant="ghost" size="icon" class={item.relation.featured ? 'text-warning hover:text-warning' : 'text-rule-strong'} disabled={isPending('featured', item.relation)} aria-label={`${item.relation.featured ? 'Desactivar destacado de' : 'Destacar'} ${plainInlineTitle(item.entry.title)}`} title={item.relation.featured ? 'Desactivar destacado' : 'Destacar en la ficha'}>★</Button>
 							</form>
 							<form method="POST" action="?/remove" use:enhance={removeSubmit(item.relation)}>
 								<input type="hidden" name="portfolioSlug" value={portfolioSlug} /><input type="hidden" name="entityType" value={item.relation.entityType} /><input type="hidden" name="entityId" value={item.relation.entityId} />
@@ -165,7 +167,7 @@
 			<ul class="m-0 max-h-[55rem] list-none overflow-y-auto border-t border-rule p-0">
 				{#each availableEntries as entry (entryKey(entry))}
 					<li class="flex min-w-0 items-center justify-between gap-4 border-b border-rule px-2 py-3 max-[620px]:flex-col max-[620px]:items-start">
-						<div class="min-w-0"><div class="mb-1 flex flex-wrap gap-x-3 gap-y-1 text-[0.62rem] text-ink-faint"><span>{entry.typeLabel}</span><span>{entry.sortDate ?? 'sin fecha'}</span>{#if !entry.isPublic}<span class="text-warning">Privada</span>{/if}{#if entryRelationCount(entry) > 0}<span>{entryRelationCount(entry)} {entryRelationCount(entry) === 1 ? 'ficha' : 'fichas'}</span>{/if}</div><strong class="block text-xs font-medium leading-snug text-ink">{entry.title}</strong></div>
+						<div class="min-w-0"><div class="mb-1 flex flex-wrap gap-x-3 gap-y-1 text-[0.62rem] text-ink-faint"><span>{entry.typeLabel}</span><span>{entry.sortDate ?? 'sin fecha'}</span>{#if !entry.isPublic}<span class="text-warning">Privada</span>{/if}{#if entryRelationCount(entry) > 0}<span>{entryRelationCount(entry)} {entryRelationCount(entry) === 1 ? 'ficha' : 'fichas'}</span>{/if}</div><strong class="block text-xs font-medium leading-snug text-ink"><InlineTitle text={entry.title} /></strong></div>
 						<form method="POST" action="?/add" use:enhance={addSubmit(entry)}><input type="hidden" name="portfolioSlug" value={portfolioSlug} /><input type="hidden" name="entityType" value={entry.entityType} /><input type="hidden" name="entityId" value={entry.entityId} /><Button type="submit" variant="primary" size="sm" class="min-w-24 max-[620px]:w-full" disabled={isPending('add', { portfolioSlug, entityType: entry.entityType, entityId: entry.entityId })}>+ Añadir</Button></form>
 					</li>
 				{/each}

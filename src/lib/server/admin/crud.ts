@@ -49,7 +49,7 @@ async function getFkOptions(entity: FkEntity): Promise<SelectOption[]> {
     return (await db.execute('SELECT id,name_es,nature FROM skill_resources ORDER BY name_es')).rows.map(r=>({value:String(r.id),label:String(r.name_es),meta:({method:'Método',standard:'Estándar',language:'Lenguaje',tool:'Herramienta',platform:'Plataforma'} as Record<string,string>)[String(r.nature)]}));
   }
   if (entity === 'skill_evidence') {
-    return (await db.execute("SELECT c.rowid AS id,e.title_cache,e.entity_type FROM entries e JOIN entry_controls c ON c.entity_type=e.entity_type AND c.entity_id=e.entity_id WHERE e.entity_type IN ('technical_works','publications','talks','teaching','courses','projects','academic_works') ORDER BY e.title_cache")).rows.map(r=>({value:String(r.id),label:String(r.title_cache),meta:entityDefinitions[r.entity_type as EntityType]}));
+    return (await db.execute("SELECT c.rowid AS id,e.title_cache,e.entity_type FROM entries e JOIN entry_controls c ON c.entity_type=e.entity_type AND c.entity_id=e.entity_id WHERE e.entity_type IN ('technical_works','publications','talks','teaching','courses','projects','academic_works') ORDER BY REPLACE(e.title_cache, '*', '') COLLATE NOCASE")).rows.map(r=>({value:String(r.id),label:String(r.title_cache),meta:entityDefinitions[r.entity_type as EntityType]}));
   }
   if (entity === 'skill_portfolio') {
     return (await db.execute('SELECT rowid AS id,title_es FROM portfolio_projects ORDER BY sort_order')).rows.map(r=>({value:String(r.id),label:String(r.title_es)}));
@@ -60,7 +60,7 @@ async function getFkOptions(entity: FkEntity): Promise<SelectOption[]> {
 			        p.project_code, p.institution, p.funding_body, p.principal_investigators_text,
 			        programme.label_es AS programme
 			 FROM projects p LEFT JOIN type_vocab programme ON programme.code=p.programme_code
-			 ORDER BY title COLLATE NOCASE`
+			 ORDER BY REPLACE(p.title, '*', '') COLLATE NOCASE`
 		);
 		return res.rows.map((row) => ({
 			value: String(row.id),

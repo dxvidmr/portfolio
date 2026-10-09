@@ -47,7 +47,7 @@
 			<option value="archived">Archivado · retirado</option>
 		</Select>
 	</AdminField>
-	<AdminField label="Título (ES)"><Input name="titleEs" required value={project?.title.es ?? ''} /></AdminField>
+	<AdminField label="Título (ES)" help="Títulos de obras en cursiva con asteriscos: *Fuenteovejuna*"><Input name="titleEs" required value={project?.title.es ?? ''} /></AdminField>
 	<AdminField label="Título (EN)"><Input name="titleEn" value={project?.title.en ?? ''} /></AdminField>
 	<AdminField label="Tipo estructural" required help="Indica si la ficha representa un proyecto concreto, una línea de trabajo o una infraestructura.">
 		<Select name="kindCode" required value={project?.kind.code ?? ''}>

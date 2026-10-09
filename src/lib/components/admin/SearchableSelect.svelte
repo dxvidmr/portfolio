@@ -3,6 +3,7 @@
 	import Search from '@lucide/svelte/icons/search';
 	import CalendarDays from '@lucide/svelte/icons/calendar-days';
 	import Input from '$lib/components/ui/Input.svelte';
+	import { plainInlineTitle } from '$lib/content/inline-markup';
 
 	type Option = { value: string; label: string; meta?: string };
 
@@ -24,16 +25,18 @@
 		invalid?: boolean;
 	} = $props();
 
+	// Las etiquetas pueden traer *cursivas* de títulos; en una lista de texto se muestran limpias.
+	const cleanOptions = $derived(options.map((option) => ({ ...option, label: plainInlineTitle(option.label) })));
 	const listId = $derived(`${id}-options`);
-	const initial = untrack(() => ({ value, label: options.find((option) => option.value === value)?.label ?? '' }));
+	const initial = untrack(() => ({ value, label: cleanOptions.find((option) => option.value === value)?.label ?? '' }));
 	let selectedValue = $state(initial.value);
 	let query = $state(initial.label);
-	const selectedOption = $derived(options.find((option) => option.value === selectedValue));
+	const selectedOption = $derived(cleanOptions.find((option) => option.value === selectedValue));
 
 	const syncSelection = (event: Event) => {
 		const target = event.currentTarget as HTMLInputElement;
 		query = target.value;
-		selectedValue = options.find((option) => option.label === query)?.value ?? '';
+		selectedValue = cleanOptions.find((option) => option.label === query)?.value ?? '';
 		target.setCustomValidity(
 			query && !selectedValue ? 'Selecciona una opción de la lista' : required && !selectedValue ? 'Selecciona una opción' : ''
 		);
@@ -79,7 +82,7 @@
 	{/if}
 	<input type="hidden" {name} value={selectedValue} />
 	<datalist id={listId}>
-		{#each options as option (option.value)}
+		{#each cleanOptions as option (option.value)}
 			<option value={option.label}>{option.label}</option>
 		{/each}
 	</datalist>

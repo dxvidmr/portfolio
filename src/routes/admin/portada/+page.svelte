@@ -1,4 +1,5 @@
 <script lang="ts">
+	import InlineTitle from '$lib/components/InlineTitle.svelte';
 	import { enhance } from '$app/forms';
 	import type { SubmitFunction } from '@sveltejs/kit';
 	import LoaderCircle from '@lucide/svelte/icons/loader-circle';
@@ -133,7 +134,7 @@
 		reorderable={data.orderMode === 'manual'}
 	>
 		{#snippet children(entry)}
-			<strong class="block font-title text-lg font-medium text-ink">{entry.title}</strong>
+			<strong class="block font-title text-lg font-medium text-ink"><InlineTitle text={entry.title} /></strong>
 			<span class="mt-1 block font-mono text-[0.62rem] text-ink-faint">{entry.typeLabel} · {entry.sortDate ?? 'sin fecha'}</span>
 		{/snippet}
 		{#snippet actions(entry)}

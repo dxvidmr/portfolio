@@ -1,4 +1,5 @@
 <script lang="ts">
+	import InlineTitle from '$lib/components/InlineTitle.svelte';
 	import type { PageData } from './$types';
 	import ButtonLink from '$lib/components/ui/ButtonLink.svelte';
 
@@ -65,7 +66,7 @@
 					href={`/admin/meritos/${entry.entityType}/${entry.entityId}`}
 					class="group flex w-full items-baseline justify-between gap-4 px-1 py-[0.85rem] max-[620px]:flex-col max-[620px]:items-start"
 				>
-					<span class="text-ink group-hover:text-accent-strong">{entry.title}</span>
+					<span class="text-ink group-hover:text-accent-strong"><InlineTitle text={entry.title} /></span>
 					<span class="text-xs text-ink-faint"
 						>{entry.typeLabel} · {entry.updatedAt ?? entry.sortDate ?? 'sin fecha'}</span
 					>

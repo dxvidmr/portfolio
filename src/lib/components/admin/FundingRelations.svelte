@@ -1,4 +1,6 @@
 <script lang="ts">
+	import InlineTitle from '$lib/components/InlineTitle.svelte';
+	import { plainInlineTitle } from '$lib/content/inline-markup';
 	import { enhance } from '$app/forms';
 	import type { SubmitFunction } from '@sveltejs/kit';
 	import type {
@@ -64,7 +66,7 @@
 			.filter((candidate) =>
 				!normalizedQuery
 					? true
-					: normalize(`${candidateTitle(candidate)} ${candidateType(candidate)}`).includes(normalizedQuery)
+					: normalize(`${plainInlineTitle(candidateTitle(candidate))} ${candidateType(candidate)}`).includes(normalizedQuery)
 			);
 	});
 
@@ -178,7 +180,7 @@
 										{candidatePublic(candidate) ? 'Pública' : 'Privada'}
 									</span>
 								</div>
-								<strong class="block text-[0.76rem] leading-[1.35] text-ink">{candidateTitle(candidate)}</strong>
+								<strong class="block text-[0.76rem] leading-[1.35] text-ink"><InlineTitle text={candidateTitle(candidate)} /></strong>
 								<small class="mt-[0.3rem] block text-[0.62rem] text-ink-faint">{kindLabel(candidate.suggestedKind)}</small>
 							</div>
 							<form

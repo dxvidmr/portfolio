@@ -38,7 +38,9 @@
   const inputId = $derived(`campo-${field.name}`);
 	const errorId = $derived(`error-${field.name}`);
 	const helpId = $derived(`ayuda-${field.name}`);
-	const help = $derived(field.help);
+	// Los campos de título admiten *cursiva* para obras (InlineTitle); se recuerda si no hay otra ayuda.
+	const titleHint = 'Títulos de obras en cursiva con asteriscos: *Fuenteovejuna*';
+	const help = $derived(field.help ?? (field.kind === 'text' && /(^|_)title$/.test(field.name) ? titleHint : undefined));
 	const visibleOptions = $derived((field.choices ?? options).filter(option => {
 		const condition = field.optionConditions?.[option.value];
 		return !condition || condition.values.includes(allValues[condition.field] ?? '');

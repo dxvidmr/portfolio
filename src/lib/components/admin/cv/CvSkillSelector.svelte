@@ -1,4 +1,6 @@
 <script lang="ts">
+  import InlineTitle from '$lib/components/InlineTitle.svelte';
+	import { plainInlineTitle } from '$lib/content/inline-markup';
   import Button from '$lib/components/ui/Button.svelte';
   import type {CvBlock,CvEntry} from '$lib/types/cv';
   let {block=$bindable(),catalog}:{block:CvBlock;catalog:CvEntry[]}=$props();
@@ -13,7 +15,7 @@
       if(!groups.has(area)) groups.set(area,[]);
       if(!groups.get(area)!.some(e=>e.entityId===entry.entityId)) groups.get(area)!.push(entry);
     }
-    return [...groups].map(([area,entries])=>({area,entries,visible:entries.filter(e=>fold(`${area} ${e.title} ${e.contribution}`).includes(fold(search))),count:entries.filter(e=>selected.has(e.entityId)).length}));
+    return [...groups].map(([area,entries])=>({area,entries,visible:entries.filter(e=>fold(`${area} ${plainInlineTitle(e.title)} ${e.contribution}`).includes(fold(search))),count:entries.filter(e=>selected.has(e.entityId)).length}));
   });
   const choose=(entry:CvEntry,enabled:boolean)=>{
     if(enabled&&!selected.has(entry.entityId)) block.entries=[...block.entries,{key:crypto.randomUUID(),entityType:'skills',entityId:entry.entityId,commentary:'',contributionMode:'inherit',contributionText:'',skillOptions:{resources:[],evidence:[]}}];
@@ -56,7 +58,7 @@
       {#each group.visible as entry (entry.entityId)}
         {@const selection=selected.get(entry.entityId)}
         <div class="border-t border-rule py-3">
-          <label class="flex items-start gap-3"><input type="checkbox" class="mt-1 accent-accent-strong" checked={Boolean(selection)} onchange={e=>choose(entry,e.currentTarget.checked)} /><span><span class="font-title text-base">{entry.title}</span><span class="mt-1 block text-xs leading-relaxed text-ink-dim">{entry.contribution}</span></span></label>
+          <label class="flex items-start gap-3"><input type="checkbox" class="mt-1 accent-accent-strong" checked={Boolean(selection)} onchange={e=>choose(entry,e.currentTarget.checked)} /><span><span class="font-title text-base"><InlineTitle text={entry.title} /></span><span class="mt-1 block text-xs leading-relaxed text-ink-dim">{entry.contribution}</span></span></label>
           {#if selection}
             <div class="mt-2 flex gap-2"><Button type="button" size="sm" variant="ghost" onclick={()=>moveSkill(entry,group.entries,-1)}>Subir ↑</Button><Button type="button" size="sm" variant="ghost" onclick={()=>moveSkill(entry,group.entries,1)}>Bajar ↓</Button></div>
             <details class="mt-2 text-xs">

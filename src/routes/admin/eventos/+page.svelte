@@ -1,4 +1,6 @@
 <script lang="ts">
+	import InlineTitle from '$lib/components/InlineTitle.svelte';
+	import { plainInlineTitle } from '$lib/content/inline-markup';
 	import ListFilter from '@lucide/svelte/icons/list-filter';
 	import AdminPageHeader from '$lib/components/admin/AdminPageHeader.svelte';
 	import ButtonLink from '$lib/components/ui/ButtonLink.svelte';
@@ -22,7 +24,7 @@
 		const q = normalize(query.trim());
 		const validYear = /^\d{4}$/.test(year.trim()) ? year.trim() : '';
 		return data.events
-			.filter((event) => !q || normalize(`${event.title} ${event.place ?? ''} ${event.year ?? ''}`).includes(q))
+			.filter((event) => !q || normalize(`${plainInlineTitle(event.title)} ${event.place ?? ''} ${event.year ?? ''}`).includes(q))
 			.filter((event) => !validYear || String(event.year ?? event.sortDate?.slice(0, 4) ?? '') === validYear)
 			.filter((event) => {
 				if (activity === 'contribution') return event.contributionCount > 0;
@@ -34,11 +36,11 @@
 				return true;
 			})
 			.toSorted((a, b) => {
-				if (sortBy === 'name') return a.title.localeCompare(b.title, 'es');
-				if (a.sortDate == null && b.sortDate == null) return a.title.localeCompare(b.title, 'es');
+				if (sortBy === 'name') return plainInlineTitle(a.title).localeCompare(plainInlineTitle(b.title), 'es');
+				if (a.sortDate == null && b.sortDate == null) return plainInlineTitle(a.title).localeCompare(plainInlineTitle(b.title), 'es');
 				if (a.sortDate == null) return 1;
 				if (b.sortDate == null) return -1;
-				return b.sortDate.localeCompare(a.sortDate) || a.title.localeCompare(b.title, 'es');
+				return b.sortDate.localeCompare(a.sortDate) || plainInlineTitle(a.title).localeCompare(plainInlineTitle(b.title), 'es');
 			});
 	});
 
@@ -112,7 +114,7 @@
 			<a class="group flex items-center justify-between gap-4 border-b border-rule px-1 py-4 text-ink max-[650px]:flex-col max-[650px]:items-start" href={`/admin/eventos/${event.id}`}>
 				<div class="grid min-w-0 gap-[0.3rem]">
 					<span class="text-[0.65rem] text-ink-faint">{event.sortDate ?? 'Sin fecha'}</span>
-					<strong class="text-[0.82rem] leading-[1.35] group-hover:text-accent-strong">{event.title}</strong>
+					<strong class="text-[0.82rem] leading-[1.35] group-hover:text-accent-strong"><InlineTitle text={event.title} /></strong>
 					{#if event.place}<small class="text-[0.65rem] text-ink-faint">{event.place}</small>{/if}
 				</div>
 				<div class="flex flex-none flex-wrap justify-end gap-1.5 max-[650px]:justify-start">

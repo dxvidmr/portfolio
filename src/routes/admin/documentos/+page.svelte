@@ -1,4 +1,6 @@
 <script lang="ts">
+	import InlineTitle from '$lib/components/InlineTitle.svelte';
+	import { plainInlineTitle } from '$lib/content/inline-markup';
 	import type { ActionData, PageData } from './$types';
 	import AdminPageHeader from '$lib/components/admin/AdminPageHeader.svelte';
 	import AdminField from '$lib/components/admin/AdminField.svelte';
@@ -32,7 +34,7 @@
 			if (
 				q &&
 				!normalize(
-					`${document.title} ${document.entryTitle} ${document.eventTitle ?? ''} ${document.issuedBy} ${document.documentTypeLabel}`
+					`${document.title} ${plainInlineTitle(document.entryTitle)} ${plainInlineTitle(document.eventTitle)} ${document.issuedBy} ${document.documentTypeLabel}`
 				).includes(q)
 			) return false;
 			if (entityType && document.entityType !== entityType) return false;
@@ -191,13 +193,13 @@
 								{document.title || document.documentTypeLabel}
 							</strong>
 							{#if document.eventTitle}
-								<small class="mt-1 block max-w-[22rem] text-ink-faint">{document.eventTitle}</small>
+								<small class="mt-1 block max-w-[22rem] text-ink-faint"><InlineTitle text={document.eventTitle} /></small>
 							{/if}
 						</td>
 						<td class="border-b border-rule p-3 align-top text-ink-dim">{document.documentTypeLabel}</td>
 						<td class="border-b border-rule p-3 align-top">
 							<a class="grid gap-1 text-ink hover:text-accent-strong" href={`/admin/meritos/${document.entityType}/${document.entityId}`}>
-								<span>{document.entryTitle}</span>
+								<span><InlineTitle text={document.entryTitle} /></span>
 								<small class="text-ink-faint">{document.typeLabel}</small>
 							</a>
 						</td>

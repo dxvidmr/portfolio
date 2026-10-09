@@ -1,4 +1,5 @@
 <script lang="ts">
+	import InlineTitle from '$lib/components/InlineTitle.svelte';
 	import { onMount } from 'svelte';
 	import ArrowRight from '@lucide/svelte/icons/arrow-right';
 	import ChevronDown from '@lucide/svelte/icons/chevron-down';
@@ -534,13 +535,13 @@
 						<div class="min-w-0">
 							{#if e.target_url}
 								<a class="group m-0 flex items-start justify-between gap-[18px] font-title text-[clamp(1.15rem,2.2vw,1.8rem)] leading-[1.1] text-ink no-underline" href={e.target_url} target="_blank" rel="noreferrer">
-									<span>{e.title}</span>
+									<span><InlineTitle text={e.title} /></span>
 									<span class="mt-[2px] grid h-[22px] w-[22px] flex-[0_0_22px] place-items-center text-accent-strong [transition:transform_180ms_ease] group-hover:translate-x-0.5 group-hover:translate-y-[-2px] group-focus-visible:translate-x-0.5 group-focus-visible:translate-y-[-2px] motion-reduce:transition-none" aria-hidden="true">
 										<MoveUpRight size={22} strokeWidth={1.7} />
 									</span>
 								</a>
 							{:else}
-								<p class="m-0 font-title text-[clamp(1.15rem,2.2vw,1.8rem)] leading-[1.1] text-ink">{e.title}</p>
+								<p class="m-0 font-title text-[clamp(1.15rem,2.2vw,1.8rem)] leading-[1.1] text-ink"><InlineTitle text={e.title} /></p>
 							{/if}
 							{#if e.metadata}
 								<p class="mt-[9px] mb-0 max-w-[72ch] text-[.72rem] leading-[1.45] text-ink-faint"><EntryMetadata metadata={e.metadata} {locale} /></p>

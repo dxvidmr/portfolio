@@ -1,4 +1,5 @@
 <script lang="ts">
+	import InlineTitle from '$lib/components/InlineTitle.svelte';
 	import { onMount } from 'svelte';
 	import ChevronDown from '@lucide/svelte/icons/chevron-down';
 	import ChevronLeft from '@lucide/svelte/icons/chevron-left';
@@ -175,7 +176,7 @@
 							class="mt-[18px] mb-0 max-w-[10ch] text-[clamp(3.2rem,8vw,7.8rem)] leading-[.86] tracking-[-.045em] max-[700px]:text-[clamp(3rem,15vw,5.5rem)] max-[420px]:text-[clamp(2.65rem,13vw,4rem)]"
 							id="project-modal-title"
 						>
-							{projectText(project.title, locale)}
+							<InlineTitle text={projectText(project.title, locale)} />
 						</h2>
 						<p class="mt-[30px] mb-0 max-w-[58ch] text-[clamp(.92rem,1.35vw,1.12rem)] leading-[1.55] text-ink-dim [&_b]:font-bold [&_em]:italic [&_i]:italic [&_strong]:font-bold">
 							{@html renderInlineMarkup(projectText(project.summary, locale))}
@@ -295,11 +296,11 @@
 									<div>
 										{#if item.url}
 											<a class="group m-0 flex justify-between gap-[18px] font-title text-[clamp(1.15rem,2.2vw,1.8rem)] leading-[1.1] text-ink" href={item.url} target="_blank" rel="noreferrer">
-												{item.title}
+												<InlineTitle text={item.title} />
 												<span class="grid h-[22px] w-[22px] flex-[0_0_22px] place-items-center text-accent-strong [transition:transform_180ms_ease] group-hover:translate-x-0.5 group-hover:translate-y-[-2px]" aria-hidden="true"><MoveUpRight size={22} strokeWidth={1.7} /></span>
 											</a>
 										{:else}
-											<p class="m-0 flex justify-between gap-[18px] font-title text-[clamp(1.15rem,2.2vw,1.8rem)] leading-[1.1] text-ink">{item.title}</p>
+											<p class="m-0 flex justify-between gap-[18px] font-title text-[clamp(1.15rem,2.2vw,1.8rem)] leading-[1.1] text-ink"><InlineTitle text={item.title} /></p>
 										{/if}
 										{#if item.metadata}<p class="mt-[9px] mb-0 max-w-[72ch] text-[.72rem] leading-[1.45] text-ink-faint"><EntryMetadata metadata={item.metadata} {locale} /></p>{/if}
 										{#if item.links.length}

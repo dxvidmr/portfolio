@@ -145,6 +145,11 @@ body:has(.cv-page) {
 }
 
 @layer base {
+/* Un título de obra dentro de un texto ya en cursiva (congreso, revista) va en redonda. */
+:is(i, em, cite, .italic) :is(i, em) {
+	font-style: normal;
+}
+
 a {
 	color: inherit;
 	text-decoration: none;

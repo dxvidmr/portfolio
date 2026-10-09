@@ -1,4 +1,6 @@
 <script lang="ts">
+	import InlineTitle from '$lib/components/InlineTitle.svelte';
+	import { plainInlineTitle } from '$lib/content/inline-markup';
 	import MoveUpRight from '@lucide/svelte/icons/move-up-right';
 	import { goto, pushState, replaceState } from '$app/navigation';
 	import { page } from '$app/state';
@@ -171,7 +173,7 @@
 						<span
 							class={`font-title text-[clamp(1.9rem,3.9vw,4.4rem)] font-[450] leading-[0.9] tracking-[-0.04em] [transition:color_180ms_ease,transform_320ms_cubic-bezier(.16,1,.3,1)] motion-reduce:transition-none max-[700px]:text-[clamp(1.55rem,7.8vw,2.35rem)] ${activeIndex === index ? 'translate-x-[9px] text-accent-strong max-[700px]:translate-x-0' : ''}`}
 						>
-							{projectText(project.title, locale)}
+							<InlineTitle text={projectText(project.title, locale)} />
 						</span>
 					</span>
 					<span
@@ -200,7 +202,7 @@
 							class="block text-inherit no-underline"
 							href={localizedPath(`/portfolio/${activeProject.slug}`, locale)}
 							onclick={(event) => openProject(event, activeIndex)}
-							aria-label={`${copy.open}: ${projectText(activeProject.title, locale)}`}
+							aria-label={`${copy.open}: ${plainInlineTitle(projectText(activeProject.title, locale))}`}
 						>
 							<ProjectVisual
 								visual={activeProject.visual}

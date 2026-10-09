@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { plainInlineTitle } from '$lib/content/inline-markup';
 	import type { ActionData, PageData } from './$types';
 	import CanonicalEventForm from '$lib/components/admin/CanonicalEventForm.svelte';
 	import AdminToast from '$lib/components/AdminToast.svelte';
@@ -46,7 +47,7 @@
 	);
 </script>
 
-<svelte:head><title>{data.event.values.title} · Eventos · cv/admin</title></svelte:head>
+<svelte:head><title>{plainInlineTitle(data.event.values.title)} · Eventos · cv/admin</title></svelte:head>
 
 <ButtonLink variant="ghost" size="sm" href="/admin/eventos" class="mb-4 px-0"
 	>← Volver a eventos</ButtonLink

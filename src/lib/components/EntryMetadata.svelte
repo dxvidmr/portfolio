@@ -1,4 +1,5 @@
 <script lang="ts">
+	import InlineTitle from '$lib/components/InlineTitle.svelte';
 	import type { Locale } from '$lib/paraglide/runtime';
 	import type { EntryMetadata as EntryMetadataValue } from '$lib/types/entry-metadata';
 	import PracticeMetadata from './PracticeMetadata.svelte';
@@ -61,14 +62,14 @@
 		<span>{#each authorSegments(withoutTerminalPunctuation(metadata.authors)) as segment, index (index)}{#if segment.own}<span class="underline decoration-[.08em] underline-offset-[.14em]">{segment.text}</span>{:else}{segment.text}{/if}{/each}. </span>
 	{/if}
 	{#if metadata.container_title}
-		{#if metadata.container_kind === 'book'}<span>{locale === 'es' ? 'En ' : 'In '}</span>{/if}<em>{withoutTerminalPunctuation(metadata.container_title)}</em>{#if metadata.editors}<span>, {locale === 'es' ? 'editado por' : 'edited by'} {withoutTerminalPunctuation(metadata.editors)}</span>{/if}{#if metadata.volume}<span>, vol. {withoutTerminalPunctuation(metadata.volume)}</span>{/if}{#if metadata.issue}<span>, {locale === 'es' ? 'n.º' : 'no.'} {withoutTerminalPunctuation(metadata.issue)}</span>{/if}{#if metadata.pages}<span>{metadata.container_kind === 'book' ? ', ' : ': '}{withoutTerminalPunctuation(metadata.pages)}</span>{/if}{#if metadata.publisher}<span>. {withoutTerminalPunctuation(metadata.publisher)}</span>{/if}<span>.</span>
+		{#if metadata.container_kind === 'book'}<span>{locale === 'es' ? 'En ' : 'In '}</span>{/if}<em><InlineTitle text={withoutTerminalPunctuation(metadata.container_title)} /></em>{#if metadata.editors}<span>, {locale === 'es' ? 'editado por' : 'edited by'} {withoutTerminalPunctuation(metadata.editors)}</span>{/if}{#if metadata.volume}<span>, vol. {withoutTerminalPunctuation(metadata.volume)}</span>{/if}{#if metadata.issue}<span>, {locale === 'es' ? 'n.º' : 'no.'} {withoutTerminalPunctuation(metadata.issue)}</span>{/if}{#if metadata.pages}<span>{metadata.container_kind === 'book' ? ', ' : ': '}{withoutTerminalPunctuation(metadata.pages)}</span>{/if}{#if metadata.publisher}<span>. {withoutTerminalPunctuation(metadata.publisher)}</span>{/if}<span>.</span>
 	{:else if metadata.publisher}
 		<span>{sentence(metadata.publisher)}</span>
 	{/if}
 	{#if publicationContext(metadata).length}<span> {publicationContext(metadata).join('; ')}.</span>{/if}
 {:else if metadata.kind === 'event'}
 	{#if metadata.authors && !isSoleAuthor(metadata.authors)}<span>{#each authorSegments(withoutTerminalPunctuation(metadata.authors)) as segment, index (index)}{#if segment.own}<span class="underline decoration-[.08em] underline-offset-[.14em]">{segment.text}</span>{:else}{segment.text}{/if}{/each}. </span>{/if}
-	{#if metadata.event_title}<em>{withoutTerminalPunctuation(metadata.event_title)}</em><span>{metadata.institution || metadata.country ? '. ' : '.'}</span>{/if}{#if metadata.institution}<span>{withoutTerminalPunctuation(metadata.institution)}</span>{/if}{#if metadata.country}<span>{metadata.institution ? ' (' : ''}{withoutTerminalPunctuation(metadata.country)}{metadata.institution ? ')' : ''}</span>{/if}{#if metadata.institution || metadata.country}<span>.</span>{/if}
+	{#if metadata.event_title}<em><InlineTitle text={withoutTerminalPunctuation(metadata.event_title)} /></em><span>{metadata.institution || metadata.country ? '. ' : '.'}</span>{/if}{#if metadata.institution}<span>{withoutTerminalPunctuation(metadata.institution)}</span>{/if}{#if metadata.country}<span>{metadata.institution ? ' (' : ''}{withoutTerminalPunctuation(metadata.country)}{metadata.institution ? ')' : ''}</span>{/if}{#if metadata.institution || metadata.country}<span>.</span>{/if}
 	{#if eventSelection(metadata) || eventSession(metadata) || metadata.session_title}<span> {#if eventSelection(metadata)}{eventSelection(metadata)}{/if}{#if eventSession(metadata)}{eventSelection(metadata) ? ', ' : ''}{eventSession(metadata)}{/if}{#if metadata.session_title}{eventSelection(metadata) || eventSession(metadata) ? ': ' : ''}{withoutTerminalPunctuation(metadata.session_title)}{/if}.</span>{/if}
 {:else if metadata.kind === 'stay'}
 	{#if metadata.text}<span>{sentence(metadata.text)}</span>{/if}

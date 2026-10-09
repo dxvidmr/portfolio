@@ -1,4 +1,5 @@
 <script lang="ts">
+	import InlineTitle from '$lib/components/InlineTitle.svelte';
   import type { EntryMetadata } from '$lib/types/entry-metadata';
   let { metadata, locale }: { metadata: Extract<EntryMetadata, {kind: 'project' | 'professional'}>; locale: 'es' | 'en' } = $props();
   const join = (...parts: (string | null)[]) => [...new Set(parts.filter(Boolean))].join(' · ');
@@ -12,7 +13,7 @@
   <span class="block">{join(en ? metadata.modality_en : metadata.modality_es, metadata.recipient)}</span>
   {#if metadata.projects?.length}
     {#each metadata.projects as project}
-      <span class="block italic">{project.title}</span>
+      <span class="block italic"><InlineTitle text={project.title} /></span>
       <span class="block">{join(project.institution,en ? project.programme_en : project.programme_es,project.code,project.responsibles)}</span>
     {/each}
   {:else}

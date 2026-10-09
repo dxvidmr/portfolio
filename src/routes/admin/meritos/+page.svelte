@@ -1,4 +1,6 @@
 <script lang="ts">
+	import InlineTitle from '$lib/components/InlineTitle.svelte';
+	import { plainInlineTitle } from '$lib/content/inline-markup';
 	import { enhance } from '$app/forms';
 	import { page } from '$app/state';
 	import type { SubmitFunction } from '@sveltejs/kit';
@@ -39,15 +41,15 @@
 	const comparators: Record<typeof sortBy, (a: Entry, b: Entry) => number> = {
 		// Fecha transversal descendente, sin fecha al final (orden del servidor).
 		fecha: (a, b) => {
-			if (a.sortDate == null && b.sortDate == null) return a.title.localeCompare(b.title, 'es');
+			if (a.sortDate == null && b.sortDate == null) return plainInlineTitle(a.title).localeCompare(plainInlineTitle(b.title), 'es');
 			if (a.sortDate == null) return 1;
 			if (b.sortDate == null) return -1;
 			return b.sortDate.localeCompare(a.sortDate);
 		},
-		nombre: (a, b) => a.title.localeCompare(b.title, 'es'),
+		nombre: (a, b) => plainInlineTitle(a.title).localeCompare(plainInlineTitle(b.title), 'es'),
 		// Última actualización del control descendente; sin control al final.
 		actualizacion: (a, b) => {
-			if (a.updatedAt == null && b.updatedAt == null) return a.title.localeCompare(b.title, 'es');
+			if (a.updatedAt == null && b.updatedAt == null) return plainInlineTitle(a.title).localeCompare(plainInlineTitle(b.title), 'es');
 			if (a.updatedAt == null) return 1;
 			if (b.updatedAt == null) return -1;
 			return b.updatedAt.localeCompare(a.updatedAt);
@@ -59,7 +61,7 @@
 		const validYear = /^\d{4}$/.test(year.trim()) ? year.trim() : '';
 		return entries
 			.filter((entry) => {
-				if (normalizedQuery && !normalize(entry.title).includes(normalizedQuery)) return false;
+				if (normalizedQuery && !normalize(plainInlineTitle(entry.title)).includes(normalizedQuery)) return false;
 				if (type && entry.entityType !== type) return false;
 				if (validYear && entry.sortDate?.slice(0, 4) !== validYear) return false;
 				if (visibility === 'public' && !entry.isPublic) return false;
@@ -233,10 +235,10 @@
 								href={`/admin/meritos/${entry.entityType}/${entry.entityId}`}
 								data-sveltekit-preload-data="off"
 							>
-								<strong class="mb-1 block font-medium text-ink group-hover:text-accent-strong">{entry.title}</strong>
+								<strong class="mb-1 block font-medium text-ink group-hover:text-accent-strong"><InlineTitle text={entry.title} /></strong>
 							</a>
 						{:else}
-							<strong class="mb-1 block font-medium text-ink">{entry.title}</strong>
+							<strong class="mb-1 block font-medium text-ink"><InlineTitle text={entry.title} /></strong>
 						{/if}
 						<span class="block text-[0.7rem] text-ink-faint">{entry.typeLabel} · #{entry.entityId}</span>
 					</td>
@@ -256,7 +258,7 @@
 								name="enabled"
 								value={entry.isPublic ? '0' : '1'}
 								disabled={isPending(entry, 'public')}
-								aria-label={`${entry.isPublic ? 'Despublicar' : 'Publicar'} ${entry.title}`}
+								aria-label={`${entry.isPublic ? 'Despublicar' : 'Publicar'} ${plainInlineTitle(entry.title)}`}
 							>
 								{entry.isPublic ? 'Sí' : 'No'}
 							</Button>
@@ -279,7 +281,7 @@
 								name="enabled"
 								value={entry.showHome ? '0' : '1'}
 								disabled={isPending(entry, 'home')}
-								aria-label={`${entry.showHome ? 'Eliminar de' : 'Añadir a'} portada: ${entry.title}`}
+								aria-label={`${entry.showHome ? 'Eliminar de' : 'Añadir a'} portada: ${plainInlineTitle(entry.title)}`}
 							>
 								{entry.showHome ? 'Sí' : 'No'}
 							</Button>

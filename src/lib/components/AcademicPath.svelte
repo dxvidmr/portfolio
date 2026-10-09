@@ -1,4 +1,5 @@
 <script lang="ts">
+	import InlineTitle from '$lib/components/InlineTitle.svelte';
 	import { onMount } from 'svelte';
 	import type { Snippet } from 'svelte';
 	import type { Locale } from '$lib/paraglide/runtime';
@@ -63,7 +64,7 @@
 						{#if items?.[index].status}<span class="block whitespace-nowrap font-sans">{items[index].status}</span>{/if}
 					</span>
 					<div class="min-w-0">
-						<h3 class="cv-education-title m-0 font-title text-[1.1rem] leading-snug font-medium">{entry.degree}{#if items?.[index].degreeSuffix}<span class="cv-education-qualifier font-sans text-[0.78rem] font-normal text-[#50534d]">{items[index].degreeSuffix}</span>{/if}</h3>
+						<h3 class="cv-education-title m-0 font-title text-[1.1rem] leading-snug font-medium"><InlineTitle text={entry.degree} />{#if items?.[index].degreeSuffix}<span class="cv-education-qualifier font-sans text-[0.78rem] font-normal text-[#50534d]">{items[index].degreeSuffix}</span>{/if}</h3>
 						{#if entry.institution}<p class="cv-education-institution mt-1 mb-0 text-[0.78rem] leading-relaxed text-[#50534d]">{entry.institution}</p>{/if}
 						{#if extra}{@render extra(index)}{/if}
 					</div>

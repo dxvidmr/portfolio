@@ -1,4 +1,5 @@
 <script lang="ts">
+	import InlineTitle from '$lib/components/InlineTitle.svelte';
 	import type { Snippet } from 'svelte';
 
 	let {
@@ -23,7 +24,7 @@
 		{#if eyebrow}
 			<p class="m-0 text-meta tracking-[0.1em] text-ink-faint uppercase">{eyebrow}</p>
 		{/if}
-		<h1 class="mt-1 mb-0 text-[clamp(1.7rem,3vw,2.45rem)]! leading-[1.05]">{title}</h1>
+		<h1 class="mt-1 mb-0 text-[clamp(1.7rem,3vw,2.45rem)]! leading-[1.05]"><InlineTitle text={title} /></h1>
 	</div>
 	{#if actions}
 		<div class="flex items-center gap-4">

@@ -1,4 +1,5 @@
 <script lang="ts">
+	import InlineTitle from '$lib/components/InlineTitle.svelte';
   import { CV_SEPARATOR } from '$lib/content/cv-format';
   import type { CvEntry, CvPresentation } from '$lib/types/cv';
   import CvProse from './CvProse.svelte';
@@ -18,14 +19,14 @@
 </script>
 <div class="cv-technical-card bg-[#f3f3ef] px-4 py-3">
   {#if period}<p class="cv-date mt-0 mb-1 font-mono text-[0.72rem] leading-snug font-medium text-[#41583d]">{period}</p>{/if}
-  <h3 class="cv-technical-title m-0 font-title text-[1.1rem] leading-snug font-medium">{entry.title}</h3>
+  <h3 class="cv-technical-title m-0 font-title text-[1.1rem] leading-snug font-medium"><InlineTitle text={entry.title} /></h3>
   {#if recipient}
     <p class="cv-technical-context mt-1 mb-0 text-[0.75rem] leading-relaxed text-[#50534d]">{recipient}</p>
   {/if}
   {#if p.projects?.length}
     <div class="cv-technical-background mt-1 text-[0.7rem] leading-relaxed text-[#50534d]">
       {#each p.projects as project}
-        <p class="m-0 mt-1"><span class="italic">{project.title}</span>{project.code ? ` (${project.code})` : ''}</p>
+        <p class="m-0 mt-1"><span class="italic"><InlineTitle text={project.title} /></span>{project.code ? ` (${project.code})` : ''}</p>
       {/each}
     </div>
   {:else if contextName || contextDetails}
