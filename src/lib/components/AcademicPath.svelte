@@ -17,6 +17,10 @@
 	const selectEntry = (next: number) => {
 		selected = next;
 	};
+	// Sin ratón ni foco encima, vuelve a resaltarse lo actual (el último hito).
+	const resetEntry = () => {
+		selected = entries.length - 1;
+	};
 </script>
 
 {#if print}
@@ -49,6 +53,8 @@
 			class="pt-[clamp(18px,2.5vw,28px)]"
 		>
 			<ol
+				onmouseleave={resetEntry}
+				onfocusout={(event) => { if (!event.currentTarget.contains(event.relatedTarget as Node | null)) resetEntry(); }}
 				class="relative m-0 grid max-w-[760px] list-none gap-[3px] pt-0 pr-0 pb-0 pl-[14px] before:absolute before:top-[11px] before:bottom-[11px] before:left-[3px] before:w-px before:bg-rule before:content-['']"
 			>
 				{#each entries as entry, index (entry.period)}
