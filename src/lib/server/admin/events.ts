@@ -115,6 +115,13 @@ export function parseCanonicalEventForm(formData: FormData): ParsedEventForm {
 	if (values.date_end && values.date_start && values.date_end < values.date_start) {
 		errors.date_end = 'La fecha de fin debe ser posterior al inicio';
 	}
+	if (!values.modality) errors.modality = 'Indica la modalidad';
+	// Los eventos en línea no tienen lugar; el resto lo necesita para normalizar ciudad y país.
+	if (values.modality === 'event_online') {
+		Object.assign(values, { city: '', country: '', country_code: '', geoname_id: '', latitude: '', longitude: '' });
+	} else if (values.modality && !values.city) {
+		errors.location = 'Busca y selecciona la localidad del evento';
+	}
 	if (values.geoname_id && !/^\d+$/.test(values.geoname_id)) {
 		errors.location = 'La localización de GeoNames no es válida';
 	}

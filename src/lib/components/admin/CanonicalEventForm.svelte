@@ -16,6 +16,9 @@
 		modalityOptions?: Array<{ value: string; label: string }>;
 	} = $props();
 
+	// svelte-ignore state_referenced_locally
+	let modality = $state(values.modality ?? '');
+
 	interface EventField {
 		name: keyof CanonicalEventValues;
 		label: string;
@@ -36,7 +39,7 @@
 		},
 		{ name: 'date_end', label: 'Fin del evento', placeholder: 'AAAA, AAAA-MM o AAAA-MM-DD' },
 		{ name: 'institution', label: 'Institución o entidad organizadora' },
-		{ name: 'modality', label: 'Modalidad', placeholder: 'Presencial, en línea, híbrida…' },
+		{ name: 'modality', label: 'Modalidad', required: true },
 		{ name: 'url', label: 'URL del evento', type: 'url', wide: true }
 	];
 </script>
@@ -51,7 +54,7 @@
 			help={field.help}
 		>
 			{#if field.name === 'modality'}
-				<Select name="modality" value={values.modality ?? ''} aria-invalid={errors.modality ? 'true' : undefined}>
+				<Select name="modality" bind:value={modality} required aria-invalid={errors.modality ? 'true' : undefined}>
 					<option value="">—</option>
 					{#each modalityOptions as option (option.value)}
 						<option value={option.value}>{option.label}</option>
@@ -69,7 +72,8 @@
 			{/if}
 		</AdminField>
 	{/each}
-	<AdminField label="Localización" wide error={errors.location}>
+	{#if modality !== 'event_online'}
+	<AdminField label="Localización" required wide error={errors.location}>
 		<GeoNamesLocationField
 			id="evento-localizacion"
 			values={{
@@ -83,6 +87,7 @@
 			invalid={Boolean(errors.location)}
 		/>
 	</AdminField>
+	{/if}
 	<AdminField
 		label="Notas privadas"
 		wide
