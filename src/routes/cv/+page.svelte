@@ -122,6 +122,23 @@
 	// Competencias: como ejemplos, solo las fichas del portfolio; los méritos ya están en su sección.
 	const portfolioExamples = (item: CvItem) =>
 		(item.skillDetails?.evidence ?? []).filter((example) => example.key.startsWith('portfolio:'));
+	// Competencias en la web: una fila por área con los nombres, las herramientas y las fichas
+	// del portfolio de esa área. Las descripciones quedan para el CV exportado.
+	const skillAreas = (items: CvItem[]) => {
+		const areas = new Map<string, { key: string; label: string; items: CvItem[] }>();
+		for (const item of items) {
+			const key = item.type ?? 'other';
+			if (!areas.has(key)) areas.set(key, { key, label: typeLabel(item) ?? '', items: [] });
+			areas.get(key)!.items.push(item);
+		}
+		return [...areas.values()].map((area) => {
+			const unique = <T,>(values: T[], id: (value: T) => string) => [...new Map(values.map((value) => [id(value), value])).values()];
+			const resources = unique(area.items.flatMap((item) => item.skillDetails?.resources ?? []), (resource) => resource.key)
+				.map((resource) => (locale === 'en' ? resource.labelEn : resource.label))
+				.sort((a, b) => a.localeCompare(b, locale));
+			return { ...area, resources, examples: unique(area.items.flatMap(portfolioExamples), (example) => example.key) };
+		});
+	};
 	const typeOptionsFor = (items: CvItem[]) =>
 		Array.from(
 			items
@@ -245,6 +262,30 @@
 							{/each}
 						</div>
 					{/if}
+					{#if section.key === 'skills'}
+					<ol class="m-0 list-none border-t border-rule p-0">
+						{#each skillAreas(section.items) as area (area.key)}
+							<li class="grid grid-cols-[minmax(130px,.36fr)_minmax(0,1fr)] gap-[clamp(18px,3vw,40px)] border-b border-rule py-[clamp(18px,2.6vw,28px)] max-[700px]:grid-cols-1 max-[700px]:gap-2">
+								<span class="text-[.86rem] leading-[1.3] text-ink-dim">{area.label}</span>
+								<div class="min-w-0">
+									<ul class="m-0 grid list-none gap-1.5 p-0">
+										{#each area.items as item (item.entity_id)}
+											<li class="text-[clamp(1.05rem,1.5vw,1.3rem)] font-medium leading-[1.25] tracking-[-0.01em]"><InlineTitle text={itemTitle(item)} /></li>
+										{/each}
+									</ul>
+									{#if area.resources.length}<p class="mt-3 mb-0 max-w-[72ch] text-[.76rem] leading-[1.5] text-ink-faint">{area.resources.join(', ')}</p>{/if}
+									{#if area.examples.length}
+										<ul class="mt-2.5 mb-0 flex list-none flex-wrap gap-x-4 gap-y-1 p-0">
+											{#each area.examples as example (example.key)}
+												<li><a href={localizedPath(`/portfolio/${example.key.slice('portfolio:'.length)}`, locale)} class="label text-accent-strong hover:text-ink">{locale === 'en' ? example.labelEn : example.label} →</a></li>
+											{/each}
+										</ul>
+									{/if}
+								</div>
+							</li>
+						{/each}
+					</ol>
+					{:else}
 					<ol class="m-0 list-none border-t border-rule p-0">
 					{#each section.items as item (item.entity_id)}
 						<li class="grid {section.items.some((entry) => typeLabel(entry)) ? 'grid-cols-[minmax(130px,.36fr)_minmax(0,1fr)]' : 'grid-cols-[minmax(64px,auto)_minmax(0,1fr)]'} gap-[clamp(18px,3vw,40px)] border-b border-rule py-[clamp(18px,2.6vw,28px)] max-[700px]:grid-cols-1 max-[700px]:gap-2">
@@ -310,6 +351,7 @@
 						</li>
 					{/each}
 					</ol>
+					{/if}
 				</div>
 			</section>
 		{:else}
