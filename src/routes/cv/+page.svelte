@@ -216,8 +216,7 @@
 				</div>
 				<div class="min-w-0">
 					{#if section.typeOptions.length > 1}
-						<!-- En pantallas anchas, fijos a la altura del título de la sección. -->
-						<div class="mb-5 flex flex-wrap gap-x-4 gap-y-2 min-[1101px]:sticky min-[1101px]:top-[96px] min-[1101px]:z-[2] min-[1101px]:mb-0 min-[1101px]:bg-[color-mix(in_srgb,var(--bg)_90%,transparent)] min-[1101px]:pt-1 min-[1101px]:pb-4 min-[1101px]:[backdrop-filter:blur(10px)]" role="tablist" aria-label={ui.type}>
+						<div class="mb-5 flex flex-wrap gap-x-4 gap-y-2" role="tablist" aria-label={ui.type}>
 							{@render tab(ui.allMasc, section.activeType === 'all', () => setSectionType(section.key, 'all'))}
 							{#each section.typeOptions as type (type.value)}
 								{@render tab(type.label, section.activeType === type.value, () => setSectionType(section.key, type.value))}
