@@ -41,7 +41,9 @@ const sections = [
 		             canonical.country AS metadata_country,
 		             selection.label_es AS metadata_selection_label_es, selection.label_en AS metadata_selection_label_en,
 		             session.label_es AS metadata_session_label_es, session.label_en AS metadata_session_label_en,
-		             a.session_title AS metadata_session_title
+		             a.session_title AS metadata_session_title,
+		             canonical.date_start AS metadata_event_date_start, canonical.date_end AS metadata_event_date_end,
+		             a.selection_mode AS metadata_selection_mode
 		      FROM talks a
 		      JOIN entries e ON e.entity_type = 'talks' AND e.entity_id = a.id AND e.public = 1
 		      LEFT JOIN type_vocab tv ON tv.code = a.contribution_type
@@ -99,7 +101,9 @@ const sections = [
 		sql: `SELECT r.id AS entity_id, r.institution AS title, NULL AS type, NULL AS type_label_es, NULL AS type_label_en,
 		             r.faculty_or_dept AS detail,
 		             substr(r.date_start, 1, 4) AS year, r.url,
-		             ${publicFundingMetadataSql('r')} AS metadata_funding
+		             ${publicFundingMetadataSql('r')} AS metadata_funding,
+		             r.date_start AS metadata_stay_date_start, r.date_end AS metadata_stay_date_end,
+		             r.supervisor AS metadata_stay_supervisor, r.city AS metadata_stay_city
 		      FROM research_stays r
 		      JOIN entries e ON e.entity_type = 'research_stays' AND e.entity_id = r.id AND e.public = 1
 		      ORDER BY year DESC, title ASC`

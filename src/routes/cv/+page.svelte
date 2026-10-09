@@ -5,7 +5,7 @@
 	import SiteControls from '$lib/components/SiteControls.svelte';
 	import EntryMetadata from '$lib/components/EntryMetadata.svelte';
 	import EditorialBackground from '$lib/components/EditorialBackground.svelte';
-	import FilterChip from '$lib/components/FilterChip.svelte';
+	import SiteHeader from '$lib/components/SiteHeader.svelte';
 	import MoveUpRight from '@lucide/svelte/icons/move-up-right';
 
 	let { data } = $props();
@@ -17,6 +17,7 @@
 	const ui = $derived({
 		es: {
 			back: 'Volver',
+			invited: 'Por invitación',
 			title: 'Currículum completo',
 			intro: '',
 			filters: 'Filtros del CV',
@@ -46,6 +47,7 @@
 		},
 		en: {
 			back: 'Back',
+			invited: 'Invited',
 			title: 'Full curriculum vitae',
 			intro: '',
 			filters: 'CV filters',
@@ -143,34 +145,37 @@
 	);
 </script>
 
+{#snippet tab(label: string, active: boolean, onselect: () => void)}
+	<button
+		type="button"
+		role="tab"
+		aria-selected={active}
+		class={`label cursor-pointer border-0 border-b bg-transparent p-0 pb-1 [transition:color_200ms_ease,border-color_200ms_ease] ${active ? 'border-accent-strong text-accent-strong' : 'border-transparent text-ink-faint hover:text-ink-dim'}`}
+		onclick={onselect}
+	>{label}</button>
+{/snippet}
+
 <div class="cv-page relative isolate min-h-screen">
 	<EditorialBackground />
+	<SiteHeader {locale} current="cv" />
 
-<main class="wrap relative z-[1] pt-[clamp(24px,5vh,56px)] pb-[88px]" id="cv">
-	<header class="grid min-h-[54vh] content-center gap-[18px] border-b border-rule max-[520px]:min-h-[42svh]">
-		<div class="flex flex-wrap items-baseline justify-between gap-4">
-			<a class="meta text-ink-dim" href={localizedPath('/', locale)}>{ui.back}</a>
-			<SiteControls />
-		</div>
-		<span class="meta tag">CV</span>
-		<h1 class="max-w-[10ch] text-[clamp(3rem,9vw,7rem)] leading-[0.95] uppercase">{ui.title}</h1>
-		<p class="m-0 max-w-[72ch] text-ink-dim">{ui.intro}</p>
+<main class="wrap relative z-[1] pt-[clamp(56px,10vw,140px)] pb-[clamp(80px,12vw,160px)]" id="cv">
+	<header class="mb-[clamp(48px,7vw,104px)]">
+		<h1 class="section-title m-0 max-w-[12ch] text-[clamp(3.4rem,11vw,9rem)] font-medium leading-[.9] tracking-[-0.05em]">{ui.title}</h1>
+		{#if ui.intro}<p class="mt-6 mb-0 max-w-[62ch] text-[.9rem] leading-[1.6] text-ink-dim">{ui.intro}</p>{/if}
 	</header>
 
-	<section class="border-b border-rule py-[clamp(18px,3vw,28px)]" aria-label={ui.filters}>
-		<div class="flex items-start justify-between gap-[clamp(24px,4vw,56px)] max-[840px]:hidden">
-			<fieldset class="m-0 min-w-0 flex-1 border-0 p-0">
-				<legend class="meta mb-2.5 p-0">{ui.section}</legend>
-				<div class="flex flex-wrap gap-2">
-				<FilterChip label={ui.allFem} active={selectedSection === 'all'} variant="all" onclick={() => setSection('all')} />
+	<section class="mb-[clamp(48px,7vw,96px)]" aria-label={ui.filters}>
+		<div class="flex items-end justify-between gap-[clamp(24px,4vw,56px)] max-[840px]:hidden">
+			<div class="flex flex-wrap gap-x-5 gap-y-2.5" role="tablist" aria-label={ui.section}>
+				{@render tab(ui.allFem, selectedSection === 'all', () => setSection('all'))}
 				{#each data.sections as section (section.key)}
-					<FilterChip label={sectionLabel(section.key, section.title)} active={selectedSection === section.key} onclick={() => setSection(section.key)} />
+					{@render tab(sectionLabel(section.key, section.title), selectedSection === section.key, () => setSection(section.key))}
 				{/each}
-				</div>
-			</fieldset>
-			<label class="block flex-[0_0_auto]">
-				<span class="meta mb-2.5 block text-ink-faint">{ui.year}</span>
-				<select class="min-h-[34px] min-w-[88px] border-0 border-b border-rule-strong bg-transparent py-1 pr-7 pl-0 text-[.76rem] text-ink-dim" bind:value={selectedYear}>
+			</div>
+			<label class="flex flex-[0_0_auto] items-baseline gap-3">
+				<span class="label text-ink-faint">{ui.year}</span>
+				<select class="min-h-[30px] min-w-[88px] border-0 border-b border-rule-strong bg-transparent py-1 pr-7 pl-0 font-mono text-[.72rem] text-ink-dim" bind:value={selectedYear}>
 					<option value="all">{ui.allMasc}</option>
 					{#each data.years as year (year)}
 						<option value={year}>{year}</option>
@@ -181,8 +186,8 @@
 
 		<div class="hidden grid-cols-2 gap-3 max-[840px]:grid max-[520px]:grid-cols-1">
 			<label class="grid gap-2">
-				<span class="meta">{ui.section}</span>
-				<select class="min-h-[38px] w-full rounded-ui-sm border border-rule-strong bg-panel px-[10px] py-[7px]" bind:value={selectedSection} onchange={() => (selectedTypes = {})}>
+				<span class="label">{ui.section}</span>
+				<select class="min-h-[38px] w-full border-0 border-b border-rule-strong bg-transparent py-[7px] font-mono text-[.78rem]" bind:value={selectedSection} onchange={() => (selectedTypes = {})}>
 					<option value="all">{ui.allFem}</option>
 					{#each data.sections as section (section.key)}
 						<option value={section.key}>{sectionLabel(section.key, section.title)}</option>
@@ -190,93 +195,87 @@
 				</select>
 			</label>
 			<label class="grid gap-2">
-				<span class="meta">{ui.year}</span>
-				<select class="min-h-[38px] w-full rounded-ui-sm border border-rule-strong bg-panel px-[10px] py-[7px]" bind:value={selectedYear}>
+				<span class="label">{ui.year}</span>
+				<select class="min-h-[38px] w-full border-0 border-b border-rule-strong bg-transparent py-[7px] font-mono text-[.78rem]" bind:value={selectedYear}>
 					<option value="all">{ui.allMasc}</option>
 					{#each data.years as year (year)}
 						<option value={year}>{year}</option>
 					{/each}
 				</select>
 			</label>
-			</div>
+		</div>
 	</section>
 
-	<div class="grid gap-[clamp(36px,6vw,72px)] pt-[clamp(36px,6vw,72px)]">
+	<div class="grid gap-[clamp(72px,10vw,140px)]">
 		{#each visibleSections as section (section.key)}
-			<section class="grid grid-cols-[260px_minmax(0,1fr)] gap-[clamp(18px,4vw,48px)] max-[840px]:grid-cols-1">
-				<div class="sticky top-6 grid self-start content-start gap-3 max-[840px]:static">
-					<span class="meta tag">{section.items.length}</span>
-					<h2 class="text-[clamp(1.3rem,3vw,2rem)] leading-[1.1]">{sectionLabel(section.key, section.title)}</h2>
+			<!-- Ordenador: el título de la sección se queda fijo a la izquierda. Pantallas estrechas: encima. -->
+			<section class="grid grid-cols-[minmax(240px,320px)_minmax(0,1fr)] gap-[clamp(24px,5vw,72px)] max-[1100px]:grid-cols-1 max-[1100px]:gap-6">
+				<div class="sticky top-[96px] grid self-start content-start gap-3 max-[1100px]:static">
+					<span class="label text-ink-faint">{section.items.length}</span>
+					<h2 class="section-title m-0 text-[clamp(1.7rem,2.3vw,2.4rem)] font-medium leading-[1.02] tracking-[-0.03em] hyphens-auto max-[1100px]:text-[clamp(1.9rem,6vw,3rem)]">{sectionLabel(section.key, section.title)}</h2>
 				</div>
 				<div class="min-w-0">
 					{#if section.typeOptions.length > 1}
-						<fieldset class="m-0 mb-3 grid gap-2 border-0 p-0">
-							<legend class="meta mb-2 p-0 text-ink-faint">{ui.type}</legend>
-							<div class="flex flex-wrap gap-1.5">
-								<FilterChip label={ui.allMasc} active={section.activeType === 'all'} variant="all" onclick={() => setSectionType(section.key, 'all')} />
-								{#each section.typeOptions as type (type.value)}
-									<FilterChip label={type.label} active={section.activeType === type.value} onclick={() => setSectionType(section.key, type.value)} />
-								{/each}
-							</div>
-						</fieldset>
+						<div class="mb-5 flex flex-wrap gap-x-4 gap-y-2" role="tablist" aria-label={ui.type}>
+							{@render tab(ui.allMasc, section.activeType === 'all', () => setSectionType(section.key, 'all'))}
+							{#each section.typeOptions as type (type.value)}
+								{@render tab(type.label, section.activeType === type.value, () => setSectionType(section.key, type.value))}
+							{/each}
+						</div>
 					{/if}
-					<ol class="m-0 list-none p-0">
+					<ol class="m-0 list-none border-t border-rule p-0">
 					{#each section.items as item (item.entity_id)}
-						<li class="grid grid-cols-[minmax(0,1fr)_180px] gap-[18px] border-b border-rule py-[18px] max-[840px]:grid-cols-1 max-[840px]:gap-2">
-							<div class="grid grid-cols-[64px_minmax(0,1fr)] gap-[18px] max-[840px]:grid-cols-1 max-[840px]:gap-2">
-								<span class="tabular-nums text-[.72rem] text-ink-faint">{item.hide_year ? '' : item.year ?? ui.noDate}</span>
-								<div>
-									<h3 class="text-base leading-[1.35]">
-										{#if item.target_url}
-											<a class="group flex items-start justify-between gap-4" href={item.target_url} target="_blank" rel="noreferrer">
-												<span><InlineTitle text={itemTitle(item)} /></span>
-												<span class="mt-px grid h-5 w-5 flex-[0_0_20px] place-items-center text-accent-strong [transition:transform_180ms_ease] group-hover:translate-x-0.5 group-hover:translate-y-[-2px] group-focus-visible:translate-x-0.5 group-focus-visible:translate-y-[-2px] motion-reduce:transition-none" aria-hidden="true">
-													<MoveUpRight size={19} strokeWidth={1.7} />
-												</span>
-											</a>
-										{:else}
-											<InlineTitle text={itemTitle(item)} />
-										{/if}
-									</h3>
-									{#if item.metadata || itemDetail(item) || item.doi}
-										<p class="mt-[7px] mb-0 text-ink-dim">
-											{#if item.metadata}
-												<EntryMetadata metadata={item.metadata} {locale} />
-											{:else if itemDetail(item)}
-												{itemDetail(item)}
-											{/if}
-											{#if item.doi}
-												<a class={item.metadata || itemDetail(item) ? 'ml-1 text-ink-faint hover:text-accent focus-visible:text-accent' : 'text-ink-faint hover:text-accent focus-visible:text-accent'} href={item.doi_url ?? undefined} target="_blank" rel="noreferrer">DOI: {item.doi}</a>
-											{/if}
-										</p>
+						<li class="grid grid-cols-[minmax(130px,.36fr)_minmax(0,1fr)] gap-[clamp(18px,3vw,40px)] border-b border-rule py-[clamp(18px,2.6vw,28px)] max-[700px]:grid-cols-1 max-[700px]:gap-2">
+							<div class="grid grid-cols-[minmax(0,1fr)_auto] gap-3">
+								<span class="grid content-start justify-items-start gap-1.5">
+									{#if typeLabel(item)}<span class="text-[.86rem] leading-[1.3] text-ink-dim">{typeLabel(item)}</span>{/if}
+									{#if item.metadata?.kind === 'event' && item.metadata.invited}
+										<span class="label bg-accent-wash px-1.5 py-0.5 text-accent-strong">{ui.invited}</span>
 									{/if}
-									{#if item.skillDetails}
-                  {#if item.skillDetails.resources.length}<p class="mt-2 text-sm text-ink-dim">{item.skillDetails.resources.map(r=>locale==='en' ? r.labelEn : r.label).join(', ')}</p>{/if}
-                  <ul class="mt-2 list-none space-y-1 p-0 text-sm">{#each item.skillDetails.evidence as example}<li>{#if example.url}<a href={example.url} class="text-accent-strong underline underline-offset-2">{locale==='en' ? example.labelEn : example.label} ↗</a>{:else}{locale==='en' ? example.labelEn : example.label}{/if}</li>{/each}</ul>
-                {/if}
-                {#if item.links.length}
-										<div class="mt-2 flex flex-wrap gap-1.5">
-											{#each item.links as link (link.url)}
-												<a
-													class={`border px-1.5 py-[3px] text-[0.68rem] ${
-														link.is_primary
-															? 'border-accent text-accent'
-															: 'border-rule text-ink-dim hover:border-accent hover:text-accent focus-visible:border-accent focus-visible:text-accent'
-													}`}
-													href={link.url}
-													target="_blank"
-													rel="noreferrer"
-												>
-													{linkLabel(link)}
-												</a>
-											{/each}
-										</div>
-									{/if}
-								</div>
+								</span>
+								<span class="label text-right text-ink-faint">{item.hide_year ? '' : item.year ?? ui.noDate}</span>
 							</div>
-							{#if typeLabel(item)}
-								<span class="meta justify-self-end text-right text-ink-dim max-[840px]:order-[-1] max-[840px]:justify-self-start max-[840px]:text-left">{typeLabel(item)}</span>
-							{/if}
+							<div class="min-w-0">
+								<h3 class="m-0 text-[clamp(1.05rem,1.5vw,1.3rem)] font-medium leading-[1.2] tracking-[-0.01em]">
+									{#if item.target_url}
+										<a class="group flex items-start justify-between gap-4" href={item.target_url} target="_blank" rel="noreferrer">
+											<span><InlineTitle text={itemTitle(item)} /></span>
+											<span class="mt-px grid h-5 w-5 flex-[0_0_20px] place-items-center text-accent-strong [transition:transform_180ms_ease] group-hover:translate-x-0.5 group-hover:translate-y-[-2px] group-focus-visible:translate-x-0.5 group-focus-visible:translate-y-[-2px] motion-reduce:transition-none" aria-hidden="true">
+												<MoveUpRight size={19} strokeWidth={1.7} />
+											</span>
+										</a>
+									{:else}
+										<InlineTitle text={itemTitle(item)} />
+									{/if}
+								</h3>
+								{#if item.metadata || itemDetail(item) || item.doi}
+									<p class="mt-2 mb-0 max-w-[72ch] text-[.76rem] leading-[1.5] text-ink-faint">
+										{#if item.metadata}
+											<EntryMetadata metadata={item.metadata} {locale} hideInvitation />
+										{:else if itemDetail(item)}
+											{itemDetail(item)}
+										{/if}
+										{#if item.doi}
+											<a class="ml-1 font-mono text-[.7rem] text-ink-faint hover:text-accent-strong focus-visible:text-accent-strong" href={item.doi_url ?? undefined} target="_blank" rel="noreferrer">DOI {item.doi} ↗</a>
+										{/if}
+									</p>
+								{/if}
+								{#if item.skillDetails}
+									{#if item.skillDetails.resources.length}<p class="mt-2 mb-0 text-[.76rem] text-ink-faint">{item.skillDetails.resources.map((r) => (locale === 'en' ? r.labelEn : r.label)).join(', ')}</p>{/if}
+									<ul class="mt-2 mb-0 flex list-none flex-wrap gap-x-4 gap-y-1 p-0">
+										{#each item.skillDetails.evidence as example}
+											<li class="label">{#if example.url}<a href={example.url} class="text-accent-strong hover:text-ink">{locale === 'en' ? example.labelEn : example.label} ↗</a>{:else}{locale === 'en' ? example.labelEn : example.label}{/if}</li>
+										{/each}
+									</ul>
+								{/if}
+								{#if item.links.length}
+									<div class="mt-2.5 flex flex-wrap gap-x-4 gap-y-1">
+										{#each item.links as link (link.url)}
+											<a class={`label hover:text-ink ${link.is_primary ? 'text-accent-strong' : 'text-ink-dim'}`} href={link.url} target="_blank" rel="noreferrer">{linkLabel(link)} ↗</a>
+										{/each}
+									</div>
+								{/if}
+							</div>
 						</li>
 					{/each}
 					</ol>
