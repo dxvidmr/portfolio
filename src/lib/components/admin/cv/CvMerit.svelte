@@ -36,21 +36,8 @@
     ? [place(p.institution && !folded(p.event).includes(folded(p.institution)) ? p.institution : '', p.city), p.eventDates ?? entry.date].filter(Boolean).join(', ')
     : '');
   const talkDay = $derived(p?.kind === 'talk' && p.talkDate && p.talkDate !== p.eventDates ? p.talkDate : '');
-  const monthNames = { es: ['ene.', 'feb.', 'mar.', 'abr.', 'may.', 'jun.', 'jul.', 'ago.', 'sept.', 'oct.', 'nov.', 'dic.'], en: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'] };
-  // «dd/mm/aaaa» o «dd/mm/aaaa - dd/mm/aaaa» → el año para la columna y los días abreviados para el detalle.
-  const splitDates = (text: string) => {
-    const dates = [...text.matchAll(/(\d{2})\/(\d{2})\/(\d{4})/g)].map((m) => ({ d: Number(m[1]), m: Number(m[2]) - 1, y: m[3] }));
-    if (!dates.length) return { year: '', days: text };
-    const names = monthNames[language];
-    const day = (x: (typeof dates)[number]) => (en ? `${names[x.m]} ${x.d}` : `${x.d} ${names[x.m]}`);
-    const [a, b] = [dates[0], dates[dates.length - 1]];
-    const sameDay = a.d === b.d && a.m === b.m && a.y === b.y;
-    const days = sameDay ? day(a)
-      : a.y !== b.y ? `${day(a)} ${a.y} - ${day(b)} ${b.y}`
-      : a.m === b.m ? (en ? `${names[a.m]} ${a.d}-${b.d}` : `${a.d}-${b.d} ${names[a.m]}`)
-      : `${day(a)} - ${day(b)}`;
-    return { year: a.y === b.y ? a.y : `${a.y}-${b.y}`, days };
-  };
+  // En la columna de fecha, los intervalos se parten por el guion en dos líneas.
+  const dateLines = (date: string) => date.split(' - ');
   const listEntry = $derived(['teaching', 'memberships', 'service_activities', 'courses'].includes(entry.entityType));
   const locator = $derived(p?.kind === 'publication'
     ? [p.volume ? `${p.volume}${p.issue ? ` (${p.issue})` : ''}` : p.issue, p.pages ? `pp. ${p.pages}` : ''].filter(Boolean).join(', ')
@@ -100,20 +87,19 @@
       {#if entry.date}<span class="cv-brief-period font-mono text-[0.65rem] text-[#536a4f]">{entry.date}</span>{/if}
     </div>
   {:else if p?.kind === 'eventOrganization'}
-    {@const when = splitDates(p.dates)}
     <div class="cv-list-row grid grid-cols-[88px_minmax(0,1fr)] items-start gap-4">
       <div class="pt-0.5 text-[#536a4f]">
-        {#if when.year}<span class="cv-list-date block font-mono text-[0.72rem] leading-snug">{when.year}</span>{/if}
+        {#if p.dates}<span class="cv-list-date block font-mono text-[0.72rem] leading-snug">{#each dateLines(p.dates) as line, i (i)}<span class="block">{i ? '- ' : ''}{line}</span>{/each}</span>{/if}
         {#if p.role}<span class="cv-list-label mt-1 block text-[0.6rem] leading-snug tracking-[0.04em] uppercase">{p.role}</span>{/if}
       </div>
       <div class="min-w-0">
         <h3 class="cv-list-title m-0 font-title text-base leading-snug font-medium">{entry.title}</h3>
-        {#if p.venue || when.days}<p class="cv-list-detail mt-1 mb-0 text-[0.75rem] leading-relaxed text-[#50534d]">{compact(place(p.venue, p.city), when.days)}</p>{/if}
+        {#if p.venue || p.city}<p class="cv-list-detail mt-1 mb-0 text-[0.75rem] leading-relaxed text-[#50534d]">{place(p.venue, p.city)}</p>{/if}
       </div>
     </div>
   {:else if listEntry}
     <div class="cv-list-row grid grid-cols-[88px_minmax(0,1fr)] items-start gap-4">
-      <span class="cv-list-date pt-0.5 font-mono text-[0.72rem] leading-snug text-[#536a4f]">{entry.date}</span>
+      <span class="cv-list-date pt-0.5 font-mono text-[0.72rem] leading-snug text-[#536a4f]">{#each dateLines(entry.date) as line, i (i)}<span class="block">{i ? '- ' : ''}{line}</span>{/each}</span>
       <div class="min-w-0">
         <h3 class="cv-list-title m-0 font-title text-base leading-snug font-medium">{entry.title}</h3>
         {#if entry.detail}<p class="cv-list-detail mt-1 mb-0 text-[0.75rem] leading-relaxed text-[#50534d]">{entry.detail}</p>{/if}

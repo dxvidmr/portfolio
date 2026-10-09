@@ -1,5 +1,5 @@
 import { isFutureDate, meritPeriod } from '$lib/content/periods';
-import { cvJoin } from '$lib/content/cv-format';
+import { CV_SEPARATOR, cvJoin, formatCvRange } from '$lib/content/cv-format';
 import { db } from '$lib/server/db';
 import { error } from '@sveltejs/kit';
 import type { Client, Transaction } from '@libsql/client';
@@ -12,10 +12,9 @@ import { technicalContext } from '$lib/server/technical-context';
 type Reader = Pick<Client | Transaction, 'execute' | 'batch'>;
 const value = (v: unknown) => v == null ? '' : String(v);
 const join = (...parts: unknown[]) => cvJoin(...parts.map(value));
-const displayDate = (v: unknown) => value(v).replace(/\b(\d{4})-(\d{2})-(\d{2})\b/g, '$3/$2/$1');
 const isShortPeriod = (start: string, end: string) =>
   /^\d{4}-\d{2}-\d{2}$/.test(start) && /^\d{4}-\d{2}-\d{2}$/.test(end) && (Date.parse(end) - Date.parse(start)) / 86_400_000 <= 31;
-const range = (a: unknown, b: unknown) => !b || a === b ? displayDate(a) : [displayDate(a), displayDate(b)].filter(Boolean).join(' - ');
+const range = (a: unknown, b: unknown, language: 'es' | 'en') => formatCvRange(a, b, language);
 const safeUrl = (v: unknown) => {
   const url = value(v).trim();
   if (/\s/.test(url)) return '';
@@ -46,7 +45,7 @@ export async function getCvCatalog(reader: Reader = db, language: 'es' | 'en' = 
     for (const r of rows) {
       let title = value(r.title || r.degree_title || r.organization || r.name_es || label(r.language) || r.language || r.institution);
       let detail = join(r.institution);
-      let date = range(r.date_start, r.date_end) || value(r.year || r.academic_year);
+      let date = range(r.date_start, r.date_end, language) || value(r.year || r.academic_year);
       let sortDate = value(r.date_start || r.date_end || r.year || r.academic_year);
       let url = safeUrl(r.url);
       let presentation: CvPresentation | undefined;
@@ -60,10 +59,10 @@ export async function getCvCatalog(reader: Reader = db, language: 'es' | 'en' = 
       } else if (type === 'talks') {
         const event = events.get(Number(r.canonical_event_id));
         presentation = { kind: 'talk', authors: value(r.authors_text), contributionType: label(r.contribution_type), selectionMode: label(r.selection_mode), invited: r.selection_mode === 'selection_invited',
-          eventDates: range(event?.date_start, event?.date_end), talkDate: r.date_override ? range(r.date_override, r.date_end_override) : '',
+          eventDates: range(event?.date_start, event?.date_end, language), talkDate: r.date_override ? range(r.date_override, r.date_end_override, language) : '',
           event: value(event?.title), institution: value(event?.institution), city: value(event?.city), sessionFormat: label(r.session_format), sessionTitle: value(r.session_title) };
         sortDate = value(r.date_override || event?.date_start);
-        date = range(r.date_override || event?.date_start, r.date_end_override || (r.date_override ? null : event?.date_end));
+        date = range(r.date_override || event?.date_start, r.date_end_override || (r.date_override ? null : event?.date_end), language);
         detail = join(r.authors_text, label(r.contribution_type), label(r.selection_mode), event?.title === title ? '' : event?.title, event?.institution, event?.city, label(r.session_format), r.session_title);
         url ||= safeUrl(event?.url);
       } else if (type === 'projects') {
@@ -91,7 +90,7 @@ export async function getCvCatalog(reader: Reader = db, language: 'es' | 'en' = 
         const year = value(r.date_end || r.date_start).match(/^\d{4}/)?.[0] || '';
         presentation = { kind: 'education', year, dateBasis: r.date_end ? 'end' : 'start', ongoing, expected };
         sortDate = value(r.date_end || r.date_start);
-        date = year ? `${r.date_end ? (language === 'en' ? 'Completed' : 'Finalización') : (language === 'en' ? 'Started' : 'Inicio')}: ${year}${expected ? (language === 'en' ? ' · expected' : ' · prevista') : ongoing ? (language === 'en' ? ' · ongoing' : ' · en curso') : ''}` : '';
+        date = year ? `${r.date_end ? (language === 'en' ? 'Completed' : 'Finalización') : (language === 'en' ? 'Started' : 'Inicio')}: ${year}${expected ? `${CV_SEPARATOR}${language === 'en' ? 'expected' : 'prevista'}` : ongoing ? `${CV_SEPARATOR}${language === 'en' ? 'ongoing' : 'en curso'}` : ''}` : '';
       } else if (type === 'research_stays') detail = join(r.faculty_or_dept, r.supervisor, r.city);
       else if (type === 'skills') {
         title=value(language==='en' ? r.name_en || r.name_es : r.name_es);
@@ -117,11 +116,11 @@ export async function getCvCatalog(reader: Reader = db, language: 'es' | 'en' = 
         } else if (r.activity_type === 'event_organization') {
           const event=events.get(Number(r.canonical_event_id));
           presentation = { kind: 'eventOrganization', role: label(r.role), venue: value(r.venue_or_journal || event?.institution), city: value(event?.city || r.city),
-            dates: range(event?.date_start || r.date_start,event?.date_end || r.date_end) };
+            dates: range(event?.date_start || r.date_start, event?.date_end || r.date_end, language) };
         }
       }
       // La docencia puntual (talleres, seminarios: hasta un mes) conserva sus fechas exactas; la de un curso, el curso académico.
-      if (type === 'teaching' && isShortPeriod(value(r.date_start), value(r.date_end || r.date_start))) date = range(r.date_start, r.date_end);
+      if (type === 'teaching' && isShortPeriod(value(r.date_start), value(r.date_end || r.date_start))) date = range(r.date_start, r.date_end, language);
       else if (type === 'teaching' && r.academic_year) date = value(r.academic_year);
       else if (['memberships','service_activities','teaching'].includes(type)) date=meritPeriod(value(r.date_start),value(r.date_end),language);
       const key = `${type}:${r.id}`;
