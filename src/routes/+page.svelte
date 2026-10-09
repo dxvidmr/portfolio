@@ -477,15 +477,16 @@
 
 			<div class="relative grid grid-cols-[minmax(240px,4fr)_minmax(0,7fr)] items-start gap-[clamp(34px,7vw,112px)] before:pointer-events-none before:absolute before:inset-[-5vw] before:z-[-1] before:bg-[color-mix(in_srgb,var(--bg)_44%,transparent)] before:[backdrop-filter:blur(7px)] before:[mask-image:radial-gradient(ellipse_at_center,#000_38%,transparent_78%)] before:content-[''] max-[780px]:grid-cols-1 max-[780px]:gap-[42px]">
 				<figure class="sticky top-[104px] m-0 max-[780px]:static max-[780px]:w-full">
+					<!-- Proporción 4:5 fija: si no cabe de alto, la foto se estrecha en lugar de recortarse. -->
 					<div
-						class="relative block w-full overflow-hidden rounded-ui border border-rule-strong bg-[#777]"
+						class="relative block w-[min(100%,max(200px,calc((100svh-380px)*0.8)))] overflow-hidden rounded-ui border border-rule-strong bg-[#777] max-[780px]:w-full"
 						onpointerenter={previewAlternatePortrait}
 						onpointerleave={clearPortraitPreview}
 						role="img"
 						aria-label={ui.portraitAlt}
 					>
 						<img
-							class={`block h-auto max-h-[calc(100svh-380px)] min-h-[240px] w-full object-cover object-[50%_28%] [transition:opacity_700ms_ease] motion-reduce:transition-none max-[780px]:max-h-none ${activePortrait === 'researcher' ? 'opacity-100' : 'opacity-0'}`}
+							class={`block h-auto w-full [transition:opacity_700ms_ease] motion-reduce:transition-none ${activePortrait === 'researcher' ? 'opacity-100' : 'opacity-0'}`}
 							src="/images/about/david-merino-recalde-researcher.jpg"
 							alt=""
 							width="820"
