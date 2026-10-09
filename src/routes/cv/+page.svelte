@@ -159,7 +159,7 @@
 	<EditorialBackground />
 	<SiteHeader {locale} current="cv" />
 
-<main class="wrap relative z-[1] pt-[clamp(56px,10vw,140px)] pb-[clamp(80px,12vw,160px)]" id="cv">
+<main class="wrap relative z-[1] pt-[calc(72px+clamp(40px,8vw,120px))] pb-[clamp(80px,12vw,160px)]" id="cv">
 	<header class="mb-[clamp(48px,7vw,104px)]">
 		<h1 class="section-title m-0 max-w-[12ch] text-[clamp(3.4rem,11vw,9rem)] font-medium leading-[.9] tracking-[-0.05em]">{ui.title}</h1>
 		{#if ui.intro}<p class="mt-6 mb-0 max-w-[62ch] text-[.9rem] leading-[1.6] text-ink-dim">{ui.intro}</p>{/if}
@@ -216,7 +216,8 @@
 				</div>
 				<div class="min-w-0">
 					{#if section.typeOptions.length > 1}
-						<div class="mb-5 flex flex-wrap gap-x-4 gap-y-2" role="tablist" aria-label={ui.type}>
+						<!-- En pantallas anchas, fijos a la altura del título de la sección. -->
+						<div class="mb-5 flex flex-wrap gap-x-4 gap-y-2 min-[1101px]:sticky min-[1101px]:top-[96px] min-[1101px]:z-[2] min-[1101px]:mb-0 min-[1101px]:bg-[color-mix(in_srgb,var(--bg)_90%,transparent)] min-[1101px]:pt-1 min-[1101px]:pb-4 min-[1101px]:[backdrop-filter:blur(10px)]" role="tablist" aria-label={ui.type}>
 							{@render tab(ui.allMasc, section.activeType === 'all', () => setSectionType(section.key, 'all'))}
 							{#each section.typeOptions as type (type.value)}
 								{@render tab(type.label, section.activeType === type.value, () => setSectionType(section.key, type.value))}

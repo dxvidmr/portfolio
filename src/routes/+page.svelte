@@ -3,7 +3,6 @@
 	import { onMount } from 'svelte';
 	import ArrowRight from '@lucide/svelte/icons/arrow-right';
 	import ChevronDown from '@lucide/svelte/icons/chevron-down';
-	import Menu from '@lucide/svelte/icons/menu';
 	import MoveUpRight from '@lucide/svelte/icons/move-up-right';
 	import { page } from '$app/state';
 	import { localeFromPathname, localizedPath } from '$lib/i18n';
@@ -12,7 +11,7 @@
 	import AcademicPath from '$lib/components/AcademicPath.svelte';
 	import CurrentAffiliations from '$lib/components/CurrentAffiliations.svelte';
 	import EntryMetadata from '$lib/components/EntryMetadata.svelte';
-	import MobileMenu from '$lib/components/MobileMenu.svelte';
+	import SiteHeader from '$lib/components/SiteHeader.svelte';
 	import SelectedWorks from '$lib/components/SelectedWorks.svelte';
 	import SiteControls from '$lib/components/SiteControls.svelte';
 	import EditorialBackground from '$lib/components/EditorialBackground.svelte';
@@ -22,8 +21,6 @@
 	let headerScrolled = $state(false);
 	let introStarted = $state(false);
 	let introReady = $state(false);
-	let mobileMenuOpen = $state(false);
-	let mobileMenuButton = $state<HTMLButtonElement | null>(null);
 	type PortraitMode = 'researcher' | 'performer';
 
 	let portraitMode = $state<PortraitMode>('researcher');
@@ -355,55 +352,15 @@
 	<EditorialBackground onIntroComplete={completeIntro} />
 
 	{#if !projectModalOpen}
-	<header
-		class={`site-header fixed inset-x-0 top-0 z-20 border-b border-transparent py-3.5 [transition:transform_260ms_cubic-bezier(.22,1,.36,1),padding_220ms_ease,background-color_220ms_ease,border-color_220ms_ease] motion-reduce:duration-[1ms] max-[780px]:bg-[var(--surface-glass)] max-[780px]:py-2 max-[780px]:[backdrop-filter:blur(14px)] ${headerHidden ? '[transform:translateY(-110%)]' : ''} ${headerScrolled ? 'border-rule bg-[var(--surface-glass)] py-2 [backdrop-filter:blur(14px)]' : ''} ${introReady ? '[animation:home-intro-from-top_880ms_cubic-bezier(.16,1,.3,1)_backwards] motion-reduce:animate-none' : 'invisible'}`}
-	>
-		<div class="wrap flex items-center justify-between gap-6 max-[780px]:gap-2.5 max-[420px]:gap-1.5">
-			<a
-				class="flex min-w-0 items-center hover:text-inherit"
-				href={localizedPath('/', locale)}
-				aria-label={profile.name}
-				bind:this={headerBrand}
-				style:opacity={headerBrandOpacity}
-			>
-				<strong class="inline-flex gap-[.28em] whitespace-nowrap font-title text-[1.02rem] font-normal leading-[1.1] max-[520px]:text-[.9rem]">
-					{#each profile.name.split(' ') as word (word)}
-						<span class="header-name-word">{word}</span>
-					{/each}
-				</strong>
-			</a>
-			<nav class="label flex items-center gap-[clamp(16px,2.4vw,32px)] max-[780px]:hidden" aria-label="Principal">
-				<a class="text-ink-dim hover:text-ink" href="#portfolio">{ui.navPortfolio}</a>
-				<a class="text-ink-dim hover:text-ink" href="#about">{ui.navAbout}</a>
-				<a class="text-ink-dim hover:text-ink" href="#cv">CV</a>
-				<SiteControls />
-			</nav>
-			<button
-				class="hidden h-[38px] w-[38px] cursor-pointer place-items-center rounded-full border-0 bg-[color-mix(in_srgb,var(--surface-glass)_48%,transparent)] text-ink [backdrop-filter:blur(18px)_saturate(1.04)] [transition:color_180ms_ease,background-color_180ms_ease] hover:text-accent-strong focus-visible:text-accent-strong motion-reduce:transition-none max-[780px]:grid"
-				bind:this={mobileMenuButton}
-				type="button"
-				onclick={() => (mobileMenuOpen = true)}
-				aria-label={locale === 'es' ? 'Abrir menú' : 'Open menu'}
-				aria-expanded={mobileMenuOpen}
-			>
-				<Menu size={24} strokeWidth={1.5} aria-hidden="true" />
-			</button>
-		</div>
-	</header>
+		<SiteHeader
+			{locale}
+			onHome
+			scrolled={headerScrolled}
+			hidden={headerHidden}
+			brandOpacity={headerBrandOpacity}
+			bind:brand={headerBrand}
+		/>
 	{/if}
-
-	<MobileMenu
-		open={mobileMenuOpen}
-		onclose={() => (mobileMenuOpen = false)}
-		returnFocus={mobileMenuButton}
-		{locale}
-		name={profile.name}
-		links={[
-			{ href: '#portfolio', label: ui.navPortfolio, number: '01' },
-			{ href: '#about', label: ui.navAbout, number: '02' },
-			{ href: '#cv', label: 'CV', number: '03' }
-		]}
-	/>
 
 	<section class="relative z-[1] h-[220svh]" bind:this={heroSection}>
 		<div class="wrap sticky top-0 grid h-svh grid-rows-[1fr_auto] gap-[clamp(32px,6vh,64px)] overflow-hidden pt-[clamp(112px,16vh,168px)] pb-[clamp(22px,4vh,42px)] max-[780px]:pt-[104px]">
