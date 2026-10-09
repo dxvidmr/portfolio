@@ -63,6 +63,16 @@ export const TAXONOMY_DOMAINS: TaxonomyDomainDef[] = [
 		consumers: [{ table: 'teaching', column: 'teaching_type' }]
 	},
 	{
+		domain: 'teaching_level',
+		label: 'Niveles de docencia',
+		consumers: [{ table: 'teaching', column: 'teaching_level' }]
+	},
+	{
+		domain: 'course_type',
+		label: 'Tipos de curso recibido',
+		consumers: [{ table: 'courses', column: 'course_type' }]
+	},
+	{
 		domain: 'activity_type',
 		label: 'Tipos de actividad de servicio',
 		consumers: [{ table: 'service_activities', column: 'activity_type' }]
@@ -119,6 +129,11 @@ export const TAXONOMY_DOMAINS: TaxonomyDomainDef[] = [
 		domain: 'membership_role',
 		label: 'Roles en asociaciones',
 		consumers: [{ table: 'memberships', column: 'role' }]
+	},
+	{
+		domain: 'membership_role_group',
+		label: 'Grupos de roles en asociaciones',
+		consumers: [{ table: 'type_vocab', column: 'group_code' }]
 	},
 	{
 		domain: 'link_type',

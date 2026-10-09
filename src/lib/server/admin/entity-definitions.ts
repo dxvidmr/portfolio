@@ -41,6 +41,9 @@ export type VocabDomain =
 	| 'contribution_selection'
 	| 'session_format'
 	| 'teaching_type'
+	| 'teaching_level'
+	| 'course_type'
+	| 'membership_role_group'
 	| 'activity_type'
 	| 'award_type'
 	| 'project_programme'
@@ -432,7 +435,7 @@ export const entityForms = {
 	},
 	teaching: {
 		groups: [
-			{ id: 'teaching-main', title: 'Docencia', fields: ['teaching_type', 'title', 'institution'] },
+			{ id: 'teaching-main', title: 'Docencia', fields: ['teaching_type', 'teaching_level', 'title', 'institution'] },
 			{
 				id: 'teaching-details',
 				title: 'Datos docentes',
@@ -448,6 +451,10 @@ export const entityForms = {
 			f('teaching_type', 'Tipo de docencia', 'vocab', {
 				required: true,
 				vocabDomain: 'teaching_type'
+			}),
+			f('teaching_level', 'Nivel', 'vocab', {
+				vocabDomain: 'teaching_level',
+				help: 'Grado, máster, doctorado o formación no reglada'
 			}),
 			f('title', 'Título', 'text', { required: true }),
 			f('institution', 'Institución', 'text', { required: true }),
@@ -755,7 +762,7 @@ export const entityForms = {
 			{
 				id: 'course-main',
 				title: 'Curso',
-				fields: ['title', 'institution', 'program_context']
+				fields: ['course_type', 'title', 'institution', 'program_context']
 			},
 			{
 				id: 'course-period',
@@ -764,6 +771,7 @@ export const entityForms = {
 			}
 		],
 		fields: [
+			f('course_type', 'Tipo de curso', 'vocab', { vocabDomain: 'course_type' }),
 			f('title', 'Título', 'text', { required: true, wide: true }),
 			f('institution', 'Institución', 'text', { required: true }),
 			f('program_context', 'Contexto del programa', 'text'),

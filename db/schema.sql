@@ -11,7 +11,8 @@ CREATE TABLE type_vocab (
   domain TEXT NOT NULL,
   label_es TEXT NOT NULL,
   label_en TEXT NOT NULL,
-  sort_order INTEGER NOT NULL DEFAULT 0
+  sort_order INTEGER NOT NULL DEFAULT 0,
+  group_code TEXT REFERENCES type_vocab(code)
 );
 
 CREATE INDEX idx_type_vocab_domain
@@ -79,6 +80,7 @@ CREATE TABLE research_stays (
 
 CREATE TABLE courses (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
+  course_type TEXT REFERENCES type_vocab(code),
   title TEXT NOT NULL,
   institution TEXT NOT NULL,
   program_context TEXT,
@@ -239,6 +241,7 @@ CREATE INDEX idx_academic_works_education
 CREATE TABLE teaching (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
   teaching_type TEXT NOT NULL REFERENCES type_vocab(code),
+  teaching_level TEXT REFERENCES type_vocab(code),
   title TEXT NOT NULL,
   institution TEXT NOT NULL,
   course_code TEXT,
