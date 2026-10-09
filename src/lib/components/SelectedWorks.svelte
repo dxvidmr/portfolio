@@ -109,6 +109,15 @@
 		});
 	};
 
+	// Retardo de intención: al recorrer la lista deprisa la columna no pasa por todos los proyectos;
+	// solo cambia cuando el ratón se detiene un momento sobre un título.
+	let hoverTimer: ReturnType<typeof setTimeout> | undefined;
+	const hoverProject = (index: number) => {
+		clearTimeout(hoverTimer);
+		hoverTimer = setTimeout(() => (activeIndex = index), 110);
+	};
+	const cancelHover = () => clearTimeout(hoverTimer);
+
 	const closeModal = () => {
 		const state = page.state as Record<string, unknown>;
 		if (shallowProjectSlug && typeof state.portfolioBase === 'string') {
@@ -159,7 +168,8 @@
 					class="grid grid-cols-[minmax(0,1fr)_auto] items-baseline gap-[clamp(12px,2vw,24px)] py-[clamp(16px,2.4vw,30px)] text-inherit no-underline max-[700px]:h-full max-[700px]:min-h-[92px] max-[700px]:grid-cols-[minmax(0,1fr)] max-[700px]:gap-x-2.5 max-[700px]:px-3 max-[700px]:py-3"
 					href={localizedPath(`/portfolio/${project.slug}`, locale)}
 					aria-current={activeIndex === index ? 'true' : undefined}
-					onmouseenter={() => (activeIndex = index)}
+					onmouseenter={() => hoverProject(index)}
+					onmouseleave={cancelHover}
 					onfocus={() => (activeIndex = index)}
 					onclick={(event) => openProject(event, index)}
 				>
@@ -185,8 +195,8 @@
 		{/each}
 	</ol>
 
-	<!-- En ordenador la columna solo muestra el visual y el resumen, que cambian con un fundido al
-	     pasar por los títulos; temas y enlace a la ficha quedan para el móvil. -->
+	<!-- En ordenador la columna muestra el visual, el resumen y los temas, que cambian con un fundido al
+	     pasar por los títulos; el enlace a la ficha queda para el móvil. -->
 	<aside
 		class="relative h-full max-[700px]:contents"
 		aria-live="polite"
@@ -217,7 +227,7 @@
 							class="mt-[18px] mb-0 max-w-[58ch] text-[.86rem] leading-[1.6] text-ink-dim max-[700px]:mt-3.5 max-[700px]:text-[.92rem] max-[700px]:leading-[1.5] [&_b]:font-bold [&_em]:italic [&_i]:italic [&_strong]:font-bold"
 						>{@html renderInlineMarkup(projectText(activeProject.summary, locale))}</p>
 						<ul
-							class="mt-4 mb-0 flex list-none flex-wrap gap-x-[14px] gap-y-1.5 p-0 text-ink-faint min-[701px]:hidden max-[700px]:mt-3 max-[700px]:gap-x-2.5 max-[700px]:gap-y-1"
+							class="mt-4 mb-0 flex list-none flex-wrap gap-x-[14px] gap-y-1.5 p-0 text-ink-faint max-[700px]:mt-3 max-[700px]:gap-x-2.5 max-[700px]:gap-y-1"
 							aria-label={locale === 'es' ? 'Temas' : 'Topics'}
 						>
 							{#each activeProject.tags as tag (tag.code)}
