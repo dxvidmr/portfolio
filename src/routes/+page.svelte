@@ -415,7 +415,8 @@
 						</p>
 					</div>
 
-					<div class={introStarted ? 'visible' : 'invisible'}>
+					<!-- Subtítulo y afiliación acompañan al nombre; se van al entrar la frase de la segunda pantalla. -->
+					<div class={introStarted ? 'visible' : 'invisible'} style:opacity={1 - statementProgress}>
 						<p class={`mt-[clamp(25px,4vh,40px)] mb-0 max-w-[54ch] font-title text-[clamp(1.05rem,1.5vw,1.3rem)] leading-[1.35] text-ink-dim max-[520px]:text-base ${introStarted ? '[animation:home-intro-from-bottom_980ms_cubic-bezier(.16,1,.3,1)_500ms_backwards] motion-reduce:animate-none' : ''}`}>{ui.heroSummary}</p>
 						<p class={`label mt-4 mb-0 block ${introStarted ? '[animation:home-intro-from-bottom_920ms_cubic-bezier(.16,1,.3,1)_610ms_backwards] motion-reduce:animate-none' : ''}`}>{ui.affiliation}</p>
 					</div>
