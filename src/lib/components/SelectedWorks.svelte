@@ -165,7 +165,7 @@
 				data-project-index={index}
 			>
 				<a
-					class="grid grid-cols-[minmax(0,1fr)_auto] items-baseline gap-[clamp(12px,2vw,24px)] py-[clamp(16px,2.4vw,30px)] text-inherit no-underline max-[700px]:h-full max-[700px]:min-h-[92px] max-[700px]:grid-cols-[minmax(0,1fr)] max-[700px]:gap-x-2.5 max-[700px]:px-3 max-[700px]:py-3"
+					class="grid grid-cols-[minmax(0,1fr)] items-baseline gap-[clamp(12px,2vw,24px)] py-[clamp(16px,2.4vw,30px)] text-inherit no-underline max-[700px]:h-full max-[700px]:min-h-[92px] max-[700px]:grid-cols-[minmax(0,1fr)] max-[700px]:gap-x-2.5 max-[700px]:px-3 max-[700px]:py-3"
 					href={localizedPath(`/portfolio/${project.slug}`, locale)}
 					aria-current={activeIndex === index ? 'true' : undefined}
 					onmouseenter={() => hoverProject(index)}
@@ -175,7 +175,7 @@
 				>
 					<span class="grid min-w-0 gap-2">
 						<span
-							class={`label [transition:color_180ms_ease] max-[700px]:hidden ${activeIndex === index ? 'text-ink-dim' : 'text-ink-faint'}`}
+							class={`label [transition:color_180ms_ease] ${activeIndex === index ? 'text-ink-dim' : 'text-ink-faint'}`}
 						>
 							{projectText(project.kind, locale)}
 						</span>
@@ -184,11 +184,6 @@
 						>
 							<InlineTitle text={projectText(project.title, locale)} />
 						</span>
-					</span>
-					<span
-						class="justify-self-end max-[700px]:hidden"
-					>
-						<span class="font-mono text-[.72rem] text-ink-faint">{project.year}</span>
 					</span>
 				</a>
 			</li>
@@ -216,6 +211,7 @@
 								visual={activeProject.visual}
 								label={projectText(activeProject.kind, locale)}
 								period={activeProject.year}
+								showMeta={false}
 								mobileTall
 							/>
 						</a>
