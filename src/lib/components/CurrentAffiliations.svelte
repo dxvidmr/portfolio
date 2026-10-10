@@ -12,10 +12,11 @@
 	const affiliations = $derived(t(profile.currentAffiliations, locale));
 </script>
 
-<section class="mb-[clamp(48px,7vw,84px)]">
-	<h3 class="label m-0 font-normal">{title}</h3>
+<!-- El título lo da la pestaña; queda para lectores de pantalla. -->
+<section>
+	<h3 class="sr-only">{title}</h3>
 
-	<ul class="mt-[clamp(22px,3vw,32px)] mb-0 grid list-none grid-cols-2 gap-x-[clamp(28px,5vw,58px)] gap-y-[clamp(28px,4vw,42px)] p-0 max-[620px]:grid-cols-1">
+	<ul class="m-0 grid list-none grid-cols-2 gap-x-[clamp(28px,5vw,58px)] gap-y-[clamp(28px,4vw,42px)] p-0 max-[620px]:grid-cols-1">
 		{#each affiliations as affiliation (affiliation.name)}
 			<li class="min-w-0">
 				<a

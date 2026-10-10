@@ -47,11 +47,8 @@
      Por defecto, el actual (el último). -->
 <section aria-label={label}>
 	<div>
-		<header><span class="label">{label}</span></header>
-
-		<div
-			class="pt-[clamp(18px,2.5vw,28px)]"
-		>
+		<!-- El título lo da la pestaña de «Sobre mí»; la sección conserva su aria-label. -->
+		<div>
 			<ol
 				onmouseleave={resetEntry}
 				onfocusout={(event) => { if (!event.currentTarget.contains(event.relatedTarget as Node | null)) resetEntry(); }}

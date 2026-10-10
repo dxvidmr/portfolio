@@ -148,6 +148,26 @@
 	let activeChapter = $state(0);
 	let chaptersEl = $state<HTMLDivElement | null>(null);
 	let chapterTrack = $state<HTMLDivElement | null>(null);
+	let aboutFigure = $state<HTMLElement | null>(null);
+	// Altura a la que se fijan foto y panel: centrados en la pantalla, sin subir bajo la cabecera.
+	let aboutStickyTop = $state(104);
+	$effect(() => {
+		const panel = chapterTrack?.firstElementChild as HTMLElement | null;
+		if (!aboutFigure || !panel) return;
+		const update = () => {
+			const height = Math.max(aboutFigure!.offsetHeight, panel.offsetHeight);
+			aboutStickyTop = Math.round(Math.max(72, (window.innerHeight - height) / 2));
+		};
+		const observer = new ResizeObserver(update);
+		observer.observe(aboutFigure);
+		observer.observe(panel);
+		window.addEventListener('resize', update);
+		update();
+		return () => {
+			observer.disconnect();
+			window.removeEventListener('resize', update);
+		};
+	});
 	const isMobile = () => window.matchMedia('(max-width: 780px)').matches;
 	const chapterClass = (index: number) =>
 		`[grid-area:1/1] min-w-0 [transition:opacity_520ms_ease,transform_640ms_cubic-bezier(.16,1,.3,1)] motion-reduce:transition-none max-[780px]:flex-[0_0_86%] max-[780px]:snap-start max-[780px]:!translate-y-0 max-[780px]:!opacity-100 max-[780px]:!pointer-events-auto ${
@@ -159,7 +179,7 @@
 		const rect = chapterTrack.getBoundingClientRect();
 		const panel = chapterTrack.firstElementChild as HTMLElement | null;
 		const travel = Math.max(1, rect.height - (panel?.offsetHeight ?? 0));
-		return { top: rect.top + window.scrollY - 104, travel };
+		return { top: rect.top + window.scrollY - aboutStickyTop, travel };
 	};
 	const showChapter = (index: number) => {
 		activeChapter = index;
@@ -433,7 +453,7 @@
 			</div>
 
 			<div class="relative grid grid-cols-[minmax(240px,4fr)_minmax(0,7fr)] items-start gap-[clamp(34px,7vw,112px)] before:pointer-events-none before:absolute before:inset-[-5vw] before:z-[-1] before:bg-[color-mix(in_srgb,var(--bg)_44%,transparent)] before:[backdrop-filter:blur(7px)] before:[mask-image:radial-gradient(ellipse_at_center,#000_38%,transparent_78%)] before:content-[''] max-[780px]:grid-cols-1 max-[780px]:gap-[42px]">
-				<figure class="sticky top-[104px] m-0 max-[780px]:static max-[780px]:w-full">
+				<figure class="sticky m-0 max-[780px]:static max-[780px]:w-full" style:top={`${aboutStickyTop}px`} bind:this={aboutFigure}>
 					<!-- Proporción 4:5 fija: si no cabe de alto, la foto se estrecha en lugar de recortarse. -->
 					<div
 						class="relative block w-[min(100%,max(200px,calc((100svh-380px)*0.8)))] overflow-hidden rounded-ui border border-rule-strong bg-[#777] max-[780px]:w-full"
@@ -480,7 +500,7 @@
 								aria-pressed={portraitMode === 'performer'}
 							>{ui.portraitPerformer}</button>
 						</span>
-						<div class="mt-4 border-l-2 border-accent-strong pl-4">
+						<div class="mt-4 w-fit max-w-full border-l-2 border-accent-strong pl-4">
 							<p class="m-0 max-w-[24ch] font-title text-[clamp(1.05rem,1.6vw,1.3rem)] leading-[1.2] text-ink">{currentRole.title}</p>
 							<p class="mt-2 mb-0 text-[.72rem] leading-[1.4] text-ink-dim">{currentRole.department}</p>
 							<p class="label mt-1.5 mb-0 text-ink-faint">{currentRole.institution}</p>
@@ -496,7 +516,7 @@
 					style:height={`${aboutChapters.length * 78}svh`}
 					bind:this={chapterTrack}
 				>
-					<div class="sticky top-[104px] max-[780px]:static">
+					<div class="sticky max-[780px]:static" style:top={`${aboutStickyTop}px`}>
 						<div class="mb-[clamp(20px,3vw,34px)] flex gap-6" role="tablist" aria-label={ui.aboutTitle}>
 							{#each aboutChapters as chapter, index (chapter)}
 								<button
