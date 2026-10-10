@@ -41,7 +41,11 @@
 	const clamp = (value: number) => Math.min(1, Math.max(0, value));
 	const ease = (value: number) => value * value * (3 - 2 * value);
 	const nameProgress = $derived(ease(clamp(heroProgress / 0.52)));
-	const statementProgress = $derived(ease(clamp((heroProgress - 0.3) / 0.28)));
+	// Paso a la segunda pantalla en tres tiempos, sin solapes: subtítulo y afiliación se esconden
+	// hacia arriba tras su máscara mientras el nombre sube a la cabecera; un respiro; y la frase
+	// emerge línea a línea desde abajo con el mismo gesto.
+	const subtextExit = (index: number) => ease(clamp((heroProgress - index * 0.05) / 0.17));
+	const statementLine = (index: number) => ease(clamp((heroProgress - 0.36 - index * 0.07) / 0.2));
 	const heroNameOpacity = $derived(1 - ease(clamp((heroProgress - 0.3) / 0.22)));
 	const headerBrandOpacity = $derived(ease(clamp((heroProgress - 0.4) / 0.12)));
 	const scrollCueOpacity = $derived(1 - ease(clamp(heroProgress / 0.16)));
@@ -405,20 +409,32 @@
 						id="hero-statement"
 						class="pointer-events-none"
 						bind:this={heroStatement}
-						style:opacity={statementProgress}
-						style:transform={`translate3d(0, ${(1 - statementProgress) * 32}px, 0)`}
 					>
 						<p class="m-0 font-title text-[clamp(3.2rem,7.15vw,7.2rem)] font-medium leading-[.92] tracking-[-.045em] max-[780px]:text-[clamp(3rem,13.5vw,5.6rem)] max-[780px]:leading-[.9] max-[520px]:text-[clamp(2.8rem,13.6vw,4.4rem)]">
-							<span class="block">{ui.thesisLine1Before}{ui.thesisAccent}</span>
-							<span class="block">{ui.thesisLine2}</span>
-							<span class="block">{ui.thesisLine3}</span>
+							{#each [`${ui.thesisLine1Before}${ui.thesisAccent}`, ui.thesisLine2, ui.thesisLine3] as line, index (index)}
+								<span class="-mb-[.12em] block overflow-hidden pb-[.12em]">
+									<span
+										class="block will-change-transform motion-reduce:!transform-none"
+										style:opacity={statementLine(index)}
+										style:transform={`translate3d(0, ${(1 - statementLine(index)) * 105}%, 0)`}
+									>{line}</span>
+								</span>
+							{/each}
 						</p>
 					</div>
 
-					<!-- Subtítulo y afiliación acompañan al nombre; se van al entrar la frase de la segunda pantalla. -->
-					<div class={introStarted ? 'visible' : 'invisible'} style:opacity={1 - statementProgress}>
-						<p class={`mt-[clamp(25px,4vh,40px)] mb-0 max-w-[54ch] font-title text-[clamp(1.05rem,1.5vw,1.3rem)] leading-[1.35] text-ink-dim max-[520px]:text-base ${introStarted ? '[animation:home-intro-from-bottom_980ms_cubic-bezier(.16,1,.3,1)_500ms_backwards] motion-reduce:animate-none' : ''}`}>{ui.heroSummary}</p>
-						<p class={`label mt-4 mb-0 block ${introStarted ? '[animation:home-intro-from-bottom_920ms_cubic-bezier(.16,1,.3,1)_610ms_backwards] motion-reduce:animate-none' : ''}`}>{ui.affiliation}</p>
+					<!-- Subtítulo y afiliación acompañan al nombre y se esconden con él antes de que entre la frase. -->
+					<div class={introStarted ? 'visible' : 'invisible'}>
+						<div class="mt-[clamp(25px,4vh,40px)] overflow-hidden">
+						<div class="will-change-transform motion-reduce:!transform-none" style:opacity={1 - subtextExit(0)} style:transform={`translate3d(0, ${-subtextExit(0) * 105}%, 0)`}>
+						<p class={`m-0 max-w-[54ch] font-title text-[clamp(1.05rem,1.5vw,1.3rem)] leading-[1.35] text-ink-dim max-[520px]:text-base ${introStarted ? '[animation:home-intro-from-bottom_980ms_cubic-bezier(.16,1,.3,1)_500ms_backwards] motion-reduce:animate-none' : ''}`}>{ui.heroSummary}</p>
+						</div>
+						</div>
+						<div class="mt-4 overflow-hidden">
+						<div class="will-change-transform motion-reduce:!transform-none" style:opacity={1 - subtextExit(1)} style:transform={`translate3d(0, ${-subtextExit(1) * 105}%, 0)`}>
+						<p class={`label m-0 block ${introStarted ? '[animation:home-intro-from-bottom_920ms_cubic-bezier(.16,1,.3,1)_610ms_backwards] motion-reduce:animate-none' : ''}`}>{ui.affiliation}</p>
+						</div>
+						</div>
 					</div>
 				</div>
 			</div>
