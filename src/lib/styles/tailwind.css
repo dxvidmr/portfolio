@@ -46,6 +46,12 @@
 	45% { transform: translate3d(-58px, 0, 0) rotate(-4deg); }
 }
 
+/* Móvil: amago de deslizamiento lateral (capítulos de «Sobre mí» cuando no caben fijos). */
+@keyframes swipe-hint {
+	0%, 100% { transform: translate3d(0, 0, 0); }
+	45% { transform: translate3d(-56px, 0, 0); }
+}
+
 @keyframes editorial-preview-in {
 	from {
 		opacity: 0;

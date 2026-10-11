@@ -159,12 +159,17 @@
 	// Móvil: posición continua del carrusel (0 = primer capítulo) y si se está en vista móvil.
 	let chapterSlide = $state(0);
 	let mobileView = $state(false);
+	// Si el capítulo más alto no cabe en la pantalla, en vez de fijar el panel los capítulos se
+	// deslizan con el dedo y la página sigue bajando para leer lo que no cabe.
+	let aboutSwipe = $state(false);
+	let aboutSwipeHint = $state(false);
 	$effect(() => {
 		const panel = chapterTrack?.firstElementChild as HTMLElement | null;
 		if (!aboutFigure || !panel) return;
 		const update = () => {
 			// En móvil la foto va encima, sin fijar: solo cuenta el panel.
 			const height = isMobile() ? panel.offsetHeight : Math.max(aboutFigure!.offsetHeight, panel.offsetHeight);
+			aboutSwipe = isMobile() && panel.offsetHeight > window.innerHeight - 88;
 			aboutStickyTop = Math.round(Math.max(72, (window.innerHeight - height) / 2));
 		};
 		const observer = new ResizeObserver(update);
@@ -191,12 +196,34 @@
 	};
 	const showChapter = (index: number) => {
 		activeChapter = index;
+		if (aboutSwipe && chaptersEl) {
+			chaptersEl.scrollTo({ left: index * chaptersEl.clientWidth, behavior: 'smooth' });
+			return;
+		}
 		const track = chapterTravel();
 		if (!track) return;
 		const progress = isMobile() ? index / (aboutChapters.length - 1) : (index + 0.5) / aboutChapters.length;
 		window.scrollTo({ top: track.top + progress * track.travel, behavior: 'smooth' });
 	};
 	// Móvil: cada capítulo se queda quieto la mitad de su tramo y el resto se desliza hacia el siguiente.
+	const syncSwipeChapter = () => {
+		if (aboutSwipe && chaptersEl) activeChapter = Math.round(chaptersEl.scrollLeft / Math.max(1, chaptersEl.clientWidth));
+	};
+	// Modo deslizable: la primera vez que los capítulos entran en pantalla hacen un amago lateral.
+	$effect(() => {
+		const element = chaptersEl;
+		if (!aboutSwipe || !element || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+		const observer = new IntersectionObserver(
+			(entries) => {
+				if (!entries.some((entry) => entry.isIntersecting)) return;
+				observer.disconnect();
+				aboutSwipeHint = true;
+			},
+			{ threshold: 0.6 }
+		);
+		observer.observe(element);
+		return () => observer.disconnect();
+	});
 	const slidePosition = (progress: number) => {
 		const span = aboutChapters.length - 1;
 		const x = progress * span;
@@ -208,6 +235,7 @@
 		const update = () => {
 			frame = 0;
 			mobileView = isMobile();
+			if (aboutSwipe) return;
 			const track = chapterTravel();
 			if (!track) return;
 			if (mobileView) {
@@ -533,10 +561,10 @@
 				     junto a la foto. Móvil: el panel se fija bajo la foto y los capítulos se deslizan de lado. -->
 				<div
 					class="relative min-w-0"
-					style:height={`${aboutChapters.length * 78}svh`}
+					style:height={aboutSwipe ? undefined : `${aboutChapters.length * 78}svh`}
 					bind:this={chapterTrack}
 				>
-					<div class="sticky" style:top={`${aboutStickyTop}px`}>
+					<div class={aboutSwipe ? '' : 'sticky'} style:top={aboutSwipe ? undefined : `${aboutStickyTop}px`}>
 						<div
 							class="mb-[clamp(20px,3vw,34px)] flex gap-6"
 							role="tablist"
@@ -554,9 +582,13 @@
 						</div>
 						<div class="max-[780px]:mr-[calc(-1*var(--gutter))] max-[780px]:overflow-hidden">
 						<div
-							class="grid max-[780px]:flex max-[780px]:will-change-transform"
+							class={`grid max-[780px]:flex ${aboutSwipe ? 'snap-x snap-mandatory items-start overflow-x-auto overscroll-x-contain [scrollbar-width:none] [&::-webkit-scrollbar]:hidden [&>*]:snap-start' : 'max-[780px]:will-change-transform'} ${aboutSwipeHint ? '[animation:swipe-hint_1100ms_cubic-bezier(.45,0,.2,1)_300ms_both]' : ''}`}
 							bind:this={chaptersEl}
-							style:transform={mobileView ? `translate3d(${-chapterSlide * 100}%, 0, 0)` : undefined}
+							style:transform={mobileView && !aboutSwipe ? `translate3d(${-chapterSlide * 100}%, 0, 0)` : undefined}
+							onscroll={syncSwipeChapter}
+							onanimationend={(event) => {
+								if (event.target === event.currentTarget) aboutSwipeHint = false;
+							}}
 						>
 							<div class={chapterClass(0)} aria-label={aboutChapters[0]}>
 								<p class="mt-0 mb-[clamp(22px,3vw,36px)] max-w-[34ch] font-title text-[clamp(1.3rem,2.1vw,1.85rem)] leading-[1.3] tracking-[-0.015em] text-ink max-[780px]:text-[1.15rem]">{ui.aboutText}</p>
