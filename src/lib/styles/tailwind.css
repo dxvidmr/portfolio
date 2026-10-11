@@ -40,10 +40,10 @@
 	--tracking-meta: var(--tracking-instrument);
 }
 
-/* Móvil: amago de deslizamiento que indica que hay más trabajos a la derecha. */
-@keyframes swipe-hint {
-	0%, 100% { transform: translate3d(0, 0, 0); }
-	45% { transform: translate3d(-64px, 0, 0); }
+/* Móvil: amago de la pila de trabajos; la tarjeta de arriba se aparta y vuelve. */
+@keyframes deck-hint {
+	0%, 100% { transform: translate3d(0, 0, 0) rotate(0deg); }
+	45% { transform: translate3d(-58px, 0, 0) rotate(-4deg); }
 }
 
 @keyframes editorial-preview-in {
