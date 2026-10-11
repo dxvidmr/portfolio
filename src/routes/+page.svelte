@@ -203,6 +203,16 @@
 	const syncSwipeChapter = () => {
 		if (aboutSwipe && chaptersEl) activeChapter = Math.round(chaptersEl.scrollLeft / Math.max(1, chaptersEl.clientWidth));
 	};
+	// Móvil: el carrusel toma la altura del capítulo visible, para no dejar hueco bajo los cortos.
+	let chapterHeights = $state<number[]>([]);
+	$effect(() => {
+		const element = chaptersEl;
+		if (!aboutSwipe || !element) return;
+		const cards = Array.from(element.children) as HTMLElement[];
+		const observer = new ResizeObserver(() => (chapterHeights = cards.map((card) => card.offsetHeight)));
+		cards.forEach((card) => observer.observe(card));
+		return () => observer.disconnect();
+	});
 	// Modo deslizable: la primera vez que los capítulos entran en pantalla hacen un amago lateral.
 	$effect(() => {
 		const element = chaptersEl;
@@ -564,8 +574,9 @@
 						</div>
 						<div class="max-[780px]:mr-[calc(-1*var(--gutter))] max-[780px]:overflow-hidden">
 						<div
-							class={`grid max-[780px]:flex ${aboutSwipe ? 'snap-x snap-mandatory items-start overflow-x-auto overscroll-x-contain [scrollbar-width:none] [&::-webkit-scrollbar]:hidden [&>*]:snap-start' : ''} ${aboutSwipeHint ? '[animation:swipe-hint_1100ms_cubic-bezier(.45,0,.2,1)_300ms_both]' : ''}`}
+							class={`grid max-[780px]:flex ${aboutSwipe ? 'snap-x snap-mandatory items-start overflow-x-auto overflow-y-hidden overscroll-x-contain [transition:height_380ms_cubic-bezier(.2,.8,.2,1)] motion-reduce:transition-none [scrollbar-width:none] [&::-webkit-scrollbar]:hidden [&>*]:snap-start' : ''} ${aboutSwipeHint ? '[animation:swipe-hint_1100ms_cubic-bezier(.45,0,.2,1)_300ms_both]' : ''}`}
 							bind:this={chaptersEl}
+							style:height={aboutSwipe && chapterHeights[activeChapter] ? `${chapterHeights[activeChapter]}px` : undefined}
 							onscroll={syncSwipeChapter}
 							onanimationend={(event) => {
 								if (event.target === event.currentTarget) aboutSwipeHint = false;
