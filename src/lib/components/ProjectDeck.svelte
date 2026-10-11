@@ -44,17 +44,21 @@
 				z: 30
 			};
 		}
-		if (offset === 0) {
+		// Hacia la izquierda la de arriba sigue al dedo y la pila sube un escalón; hacia la derecha la
+		// de arriba se queda y baja a la pila mientras la anterior entra por encima. En los extremos,
+		// sin tarjeta a la que ir, la de arriba solo cede un poco.
+		const hasPrevious = activeIndex > 0;
+		const pull = dragX < 0 ? progress : 0;
+		const push = dragX > 0 && hasPrevious ? progress : 0;
+		if (offset === 0 && (dragX < 0 || !hasPrevious)) {
 			const rotate = (dragX / width()) * 9;
 			return { transform: `translate3d(${dragX}px, 0, 0) rotate(${rotate}deg)`, opacity: 1, z: 20 };
 		}
-		// En la pila: suben un escalón a medida que se arrastra la de arriba hacia la izquierda.
-		const lift = dragX < 0 ? progress : 0;
-		const depth = Math.min(offset, PILE + 1) - lift;
+		const depth = Math.min(offset, PILE + 1) - pull + push;
 		return {
 			transform: `translate3d(${depth * STEP}px, 0, 0) scale(${1 - depth * 0.035})`,
-			opacity: offset > PILE ? 0 : 1 - depth * 0.18,
-			z: 10 - offset
+			opacity: Math.max(0, depth > PILE ? (PILE + 1 - depth) * (1 - PILE * 0.18) : 1 - depth * 0.18),
+			z: 20 - offset
 		};
 	};
 
