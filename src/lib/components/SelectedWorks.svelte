@@ -172,7 +172,7 @@
 	class="grid grid-cols-[minmax(0,1.08fr)_minmax(360px,.92fr)] items-start gap-[clamp(48px,8vw,120px)] max-[900px]:grid-cols-[minmax(0,1.08fr)_minmax(290px,.92fr)] max-[900px]:gap-[30px] max-[700px]:flex max-[700px]:flex-col max-[700px]:gap-0"
 >
 	<ol
-		class="m-0 list-none p-0 max-[700px]:order-2 max-[700px]:mt-4 max-[700px]:flex max-[700px]:w-full max-[700px]:snap-x max-[700px]:snap-mandatory max-[700px]:overflow-x-auto max-[700px]:scroll-smooth max-[700px]:overscroll-x-contain max-[700px]:[scrollbar-width:none] max-[700px]:[&::-webkit-scrollbar]:hidden"
+		class="m-0 list-none p-0 max-[700px]:order-1 max-[700px]:flex max-[700px]:w-full max-[700px]:snap-x max-[700px]:snap-mandatory max-[700px]:overflow-x-auto max-[700px]:scroll-smooth max-[700px]:overscroll-x-contain max-[700px]:[scrollbar-width:none] max-[700px]:[&::-webkit-scrollbar]:hidden"
 		bind:this={mobileSelector}
 		onscroll={syncMobileSelection}
 		aria-label={copy.contents}
@@ -180,7 +180,9 @@
 		{#each visibleProjects as project, index (project.slug)}
 			<li
 				class={`max-[700px]:flex-[0_0_100%] max-[700px]:snap-start ${swipeHint ? 'max-[700px]:[animation:swipe-hint_1100ms_cubic-bezier(.45,0,.2,1)_350ms_both]' : ''}`}
-				onanimationend={() => (swipeHint = false)}
+				onanimationend={(event) => {
+					if (event.target === event.currentTarget) swipeHint = false;
+				}}
 				data-project-index={index}
 			>
 				<a
@@ -192,6 +194,21 @@
 					onfocus={() => (activeIndex = index)}
 					onclick={(event) => openProject(event, index)}
 				>
+					<!-- Móvil: la imagen forma parte de la ficha y se desliza con el título. Detrás, una pila
+					     de bordes indica cuántos trabajos quedan a la derecha (dos, uno o ninguno). -->
+					<span class="relative isolate mb-2 block pr-3 min-[701px]:hidden" aria-hidden="true">
+						{#each Array.from({ length: Math.min(2, visibleProjects.length - 1 - index) }, (_, layer) => layer) as layer (layer)}
+							<span
+								class="absolute rounded-ui border border-rule bg-[var(--visual-bg)]"
+								style:inset={layer === 0 ? '5px 6px 5px 8px' : '10px 0 10px 16px'}
+								style:z-index={-1 - layer}
+								style:opacity={layer === 0 ? 0.9 : 0.6}
+							></span>
+						{/each}
+						<span class="relative block">
+							<ProjectVisual visual={project.visual} label={projectText(project.kind, locale)} period={project.year} showMeta={false} mobileTall />
+						</span>
+					</span>
 					<span class="grid min-w-0 gap-2">
 						<span
 							class={`label [transition:color_180ms_ease] ${activeIndex === index ? 'text-ink-dim' : 'text-ink-faint'}`}
@@ -218,7 +235,7 @@
 		<div class="sticky top-[clamp(82px,11vh,118px)] max-[700px]:contents">
 			{#key activeProject.slug}
 				<div
-					class="[animation:editorial-preview-in_600ms_cubic-bezier(.16,1,.3,1)_both] motion-reduce:animate-none max-[700px]:order-1 max-[700px]:w-full"
+					class="[animation:editorial-preview-in_600ms_cubic-bezier(.16,1,.3,1)_both] motion-reduce:animate-none max-[700px]:hidden"
 				>
 						<a
 							class="block text-inherit no-underline"
