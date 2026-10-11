@@ -174,7 +174,7 @@
 	});
 	const isMobile = () => window.matchMedia('(max-width: 780px)').matches;
 	const chapterClass = (index: number) =>
-		`[grid-area:1/1] min-w-0 [transition:opacity_520ms_ease,transform_640ms_cubic-bezier(.16,1,.3,1)] motion-reduce:transition-none max-[780px]:flex-[0_0_86%] max-[780px]:snap-start max-[780px]:!translate-y-0 max-[780px]:!opacity-100 max-[780px]:!pointer-events-auto ${
+		`[grid-area:1/1] min-w-0 [transition:opacity_520ms_ease,transform_640ms_cubic-bezier(.16,1,.3,1)] motion-reduce:transition-none max-[780px]:[grid-area:auto] max-[780px]:scroll-mt-[124px] max-[780px]:!translate-y-0 max-[780px]:!opacity-100 max-[780px]:!pointer-events-auto ${
 			activeChapter === index ? 'translate-y-0 opacity-100' : 'pointer-events-none translate-y-4 opacity-0'
 		}`;
 	// Recorrido que corresponde a cada capítulo dentro de la pista: [inicio, fin] en píxeles de scroll.
@@ -188,28 +188,29 @@
 	const showChapter = (index: number) => {
 		activeChapter = index;
 		if (isMobile()) {
-			const card = chaptersEl?.children[index] as HTMLElement | undefined;
-			if (chaptersEl && card) chaptersEl.scrollTo({ left: card.offsetLeft - chaptersEl.offsetLeft, behavior: 'smooth' });
+			(chaptersEl?.children[index] as HTMLElement | undefined)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
 			return;
 		}
 		const track = chapterTravel();
 		if (track) window.scrollTo({ top: track.top + ((index + 0.5) / aboutChapters.length) * track.travel, behavior: 'smooth' });
 	};
+	// Móvil: los capítulos van uno debajo de otro y la pestaña activa es la del capítulo que llega
+	// a la altura de las pestañas fijas.
+	let chapterTabs = $state<HTMLDivElement | null>(null);
 	const syncChapter = () => {
-		if (!chaptersEl || !isMobile()) return;
-		const start = chaptersEl.getBoundingClientRect().left;
+		if (!chaptersEl || !chapterTabs) return;
+		const line = chapterTabs.getBoundingClientRect().bottom + 32;
 		const cards = Array.from(chaptersEl.children) as HTMLElement[];
-		activeChapter = cards.reduce(
-			(best, card, index) =>
-				Math.abs(card.getBoundingClientRect().left - start) < Math.abs(cards[best].getBoundingClientRect().left - start) ? index : best,
-			0
-		);
+		activeChapter = cards.reduce((current, card, index) => (card.getBoundingClientRect().top <= line ? index : current), 0);
 	};
 	$effect(() => {
 		let frame = 0;
 		const update = () => {
 			frame = 0;
-			if (isMobile()) return;
+			if (isMobile()) {
+				syncChapter();
+				return;
+			}
 			const track = chapterTravel();
 			if (!track) return;
 			const progress = Math.min(0.999, Math.max(0, (window.scrollY - track.top) / track.travel));
@@ -534,7 +535,13 @@
 					bind:this={chapterTrack}
 				>
 					<div class="sticky max-[780px]:static" style:top={`${aboutStickyTop}px`}>
-						<div class="mb-[clamp(20px,3vw,34px)] flex gap-6" role="tablist" aria-label={ui.aboutTitle}>
+						<!-- En móvil las pestañas quedan fijas bajo la cabecera (o arriba del todo si esta se oculta). -->
+						<div
+							class={`mb-[clamp(20px,3vw,34px)] flex gap-6 max-[780px]:sticky max-[780px]:z-10 max-[780px]:mx-[calc(-1*var(--gutter))] max-[780px]:bg-[var(--surface-glass)] max-[780px]:px-[var(--gutter)] max-[780px]:pt-3 max-[780px]:pb-2.5 max-[780px]:[backdrop-filter:blur(14px)] max-[780px]:[transition:top_260ms_cubic-bezier(.22,1,.36,1)] ${headerHidden ? 'max-[780px]:top-0' : 'max-[780px]:top-[54px]'}`}
+							role="tablist"
+							aria-label={ui.aboutTitle}
+							bind:this={chapterTabs}
+						>
 							{#each aboutChapters as chapter, index (chapter)}
 								<button
 									type="button"
@@ -546,9 +553,8 @@
 							{/each}
 						</div>
 						<div
-							class="grid max-[780px]:mr-[calc(-1*var(--gutter))] max-[780px]:flex max-[780px]:gap-8 max-[780px]:overflow-x-auto max-[780px]:overscroll-x-contain max-[780px]:snap-x max-[780px]:snap-mandatory max-[780px]:pr-[var(--gutter)] max-[780px]:pb-2"
+							class="grid max-[780px]:gap-[clamp(56px,14vw,80px)]"
 							bind:this={chaptersEl}
-							onscroll={syncChapter}
 						>
 							<div class={chapterClass(0)} aria-label={aboutChapters[0]}>
 								<p class="mt-0 mb-[clamp(22px,3vw,36px)] max-w-[34ch] font-title text-[clamp(1.3rem,2.1vw,1.85rem)] leading-[1.3] tracking-[-0.015em] text-ink max-[780px]:text-[1.15rem]">{ui.aboutText}</p>
