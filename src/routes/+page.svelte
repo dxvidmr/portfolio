@@ -147,7 +147,7 @@
 		item.subtype?.replaceAll('_', ' ') ??
 		null;
 	// Capítulos de «Sobre mí». Ordenador: el avance por la sección elige el capítulo que se muestra
-	// en el panel fijo. Móvil: pestañas sobre un carrusel horizontal.
+	// en el panel fijo. Móvil: el panel también se fija y el scroll vertical desliza los capítulos de lado.
 	const aboutChapters = $derived(locale === 'es' ? ['Perfil', 'Afiliaciones', 'Recorrido'] : ['Profile', 'Affiliations', 'Path']);
 	let activeChapter = $state(0);
 	let chaptersEl = $state<HTMLDivElement | null>(null);
@@ -155,11 +155,16 @@
 	let aboutFigure = $state<HTMLElement | null>(null);
 	// Altura a la que se fijan foto y panel: centrados en la pantalla, sin subir bajo la cabecera.
 	let aboutStickyTop = $state(104);
+	const isMobile = () => window.matchMedia('(max-width: 780px)').matches;
+	// Móvil: posición continua del carrusel (0 = primer capítulo) y si se está en vista móvil.
+	let chapterSlide = $state(0);
+	let mobileView = $state(false);
 	$effect(() => {
 		const panel = chapterTrack?.firstElementChild as HTMLElement | null;
 		if (!aboutFigure || !panel) return;
 		const update = () => {
-			const height = Math.max(aboutFigure!.offsetHeight, panel.offsetHeight);
+			// En móvil la foto va encima, sin fijar: solo cuenta el panel.
+			const height = isMobile() ? panel.offsetHeight : Math.max(aboutFigure!.offsetHeight, panel.offsetHeight);
 			aboutStickyTop = Math.round(Math.max(72, (window.innerHeight - height) / 2));
 		};
 		const observer = new ResizeObserver(update);
@@ -172,9 +177,8 @@
 			window.removeEventListener('resize', update);
 		};
 	});
-	const isMobile = () => window.matchMedia('(max-width: 780px)').matches;
 	const chapterClass = (index: number) =>
-		`[grid-area:1/1] min-w-0 [transition:opacity_520ms_ease,transform_640ms_cubic-bezier(.16,1,.3,1)] motion-reduce:transition-none max-[780px]:[grid-area:auto] max-[780px]:scroll-mt-[124px] max-[780px]:!translate-y-0 max-[780px]:!opacity-100 max-[780px]:!pointer-events-auto ${
+		`[grid-area:1/1] min-w-0 [transition:opacity_520ms_ease,transform_640ms_cubic-bezier(.16,1,.3,1)] motion-reduce:transition-none max-[780px]:[grid-area:auto] max-[780px]:flex-[0_0_100%] max-[780px]:pr-[var(--gutter)] max-[780px]:!translate-y-0 max-[780px]:!opacity-100 max-[780px]:!pointer-events-auto ${
 			activeChapter === index ? 'translate-y-0 opacity-100' : 'pointer-events-none translate-y-4 opacity-0'
 		}`;
 	// Recorrido que corresponde a cada capítulo dentro de la pista: [inicio, fin] en píxeles de scroll.
@@ -187,32 +191,30 @@
 	};
 	const showChapter = (index: number) => {
 		activeChapter = index;
-		if (isMobile()) {
-			(chaptersEl?.children[index] as HTMLElement | undefined)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-			return;
-		}
 		const track = chapterTravel();
-		if (track) window.scrollTo({ top: track.top + ((index + 0.5) / aboutChapters.length) * track.travel, behavior: 'smooth' });
+		if (!track) return;
+		const progress = isMobile() ? index / (aboutChapters.length - 1) : (index + 0.5) / aboutChapters.length;
+		window.scrollTo({ top: track.top + progress * track.travel, behavior: 'smooth' });
 	};
-	// Móvil: los capítulos van uno debajo de otro y la pestaña activa es la del capítulo que llega
-	// a la altura de las pestañas fijas.
-	let chapterTabs = $state<HTMLDivElement | null>(null);
-	const syncChapter = () => {
-		if (!chaptersEl || !chapterTabs) return;
-		const line = chapterTabs.getBoundingClientRect().bottom + 32;
-		const cards = Array.from(chaptersEl.children) as HTMLElement[];
-		activeChapter = cards.reduce((current, card, index) => (card.getBoundingClientRect().top <= line ? index : current), 0);
+	// Móvil: cada capítulo se queda quieto la mitad de su tramo y el resto se desliza hacia el siguiente.
+	const slidePosition = (progress: number) => {
+		const span = aboutChapters.length - 1;
+		const x = progress * span;
+		const step = Math.min(span - 1, Math.floor(x));
+		return step + ease(clamp((x - step - 0.25) / 0.5));
 	};
 	$effect(() => {
 		let frame = 0;
 		const update = () => {
 			frame = 0;
-			if (isMobile()) {
-				syncChapter();
-				return;
-			}
+			mobileView = isMobile();
 			const track = chapterTravel();
 			if (!track) return;
+			if (mobileView) {
+				chapterSlide = slidePosition(clamp((window.scrollY - track.top) / track.travel));
+				activeChapter = Math.round(chapterSlide);
+				return;
+			}
 			const progress = Math.min(0.999, Math.max(0, (window.scrollY - track.top) / track.travel));
 			activeChapter = Math.floor(progress * aboutChapters.length);
 		};
@@ -528,19 +530,17 @@
 				</figure>
 
 				<!-- Ordenador: el recorrido por la sección elige el capítulo, que se sustituye en un panel fijo
-				     junto a la foto. Móvil: pestañas sobre un carrusel horizontal. -->
+				     junto a la foto. Móvil: el panel se fija bajo la foto y los capítulos se deslizan de lado. -->
 				<div
-					class="relative min-w-0 max-[780px]:!h-auto"
+					class="relative min-w-0"
 					style:height={`${aboutChapters.length * 78}svh`}
 					bind:this={chapterTrack}
 				>
-					<div class="sticky max-[780px]:static" style:top={`${aboutStickyTop}px`}>
-						<!-- En móvil las pestañas quedan fijas bajo la cabecera (o arriba del todo si esta se oculta). -->
+					<div class="sticky" style:top={`${aboutStickyTop}px`}>
 						<div
-							class={`mb-[clamp(20px,3vw,34px)] flex gap-6 max-[780px]:sticky max-[780px]:z-10 max-[780px]:mx-[calc(-1*var(--gutter))] max-[780px]:bg-[var(--surface-glass)] max-[780px]:px-[var(--gutter)] max-[780px]:pt-3 max-[780px]:pb-2.5 max-[780px]:[backdrop-filter:blur(14px)] max-[780px]:[transition:top_260ms_cubic-bezier(.22,1,.36,1)] ${headerHidden ? 'max-[780px]:top-0' : 'max-[780px]:top-[54px]'}`}
+							class="mb-[clamp(20px,3vw,34px)] flex gap-6"
 							role="tablist"
 							aria-label={ui.aboutTitle}
-							bind:this={chapterTabs}
 						>
 							{#each aboutChapters as chapter, index (chapter)}
 								<button
@@ -552,9 +552,11 @@
 								>{chapter}</button>
 							{/each}
 						</div>
+						<div class="max-[780px]:mr-[calc(-1*var(--gutter))] max-[780px]:overflow-hidden">
 						<div
-							class="grid max-[780px]:gap-[clamp(56px,14vw,80px)]"
+							class="grid max-[780px]:flex max-[780px]:will-change-transform"
 							bind:this={chaptersEl}
+							style:transform={mobileView ? `translate3d(${-chapterSlide * 100}%, 0, 0)` : undefined}
 						>
 							<div class={chapterClass(0)} aria-label={aboutChapters[0]}>
 								<p class="mt-0 mb-[clamp(22px,3vw,36px)] max-w-[34ch] font-title text-[clamp(1.3rem,2.1vw,1.85rem)] leading-[1.3] tracking-[-0.015em] text-ink max-[780px]:text-[1.15rem]">{ui.aboutText}</p>
@@ -570,6 +572,7 @@
 							<div class={chapterClass(2)} aria-label={aboutChapters[2]}>
 								<AcademicPath {locale} />
 							</div>
+						</div>
 						</div>
 					</div>
 				</div>
