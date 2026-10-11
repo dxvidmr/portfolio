@@ -147,7 +147,7 @@
 		item.subtype?.replaceAll('_', ' ') ??
 		null;
 	// Capítulos de «Sobre mí». Ordenador: el avance por la sección elige el capítulo que se muestra
-	// en el panel fijo. Móvil: el panel también se fija y el scroll vertical desliza los capítulos de lado.
+	// en el panel fijo. Móvil: los capítulos se deslizan de lado con el dedo, con un amago la primera vez.
 	const aboutChapters = $derived(locale === 'es' ? ['Perfil', 'Afiliaciones', 'Recorrido'] : ['Profile', 'Affiliations', 'Path']);
 	let activeChapter = $state(0);
 	let chaptersEl = $state<HTMLDivElement | null>(null);
@@ -156,20 +156,15 @@
 	// Altura a la que se fijan foto y panel: centrados en la pantalla, sin subir bajo la cabecera.
 	let aboutStickyTop = $state(104);
 	const isMobile = () => window.matchMedia('(max-width: 780px)').matches;
-	// Móvil: posición continua del carrusel (0 = primer capítulo) y si se está en vista móvil.
-	let chapterSlide = $state(0);
-	let mobileView = $state(false);
-	// Si el capítulo más alto no cabe en la pantalla, en vez de fijar el panel los capítulos se
-	// deslizan con el dedo y la página sigue bajando para leer lo que no cabe.
+	// Móvil: capítulos deslizables con el dedo en lugar del panel fijo.
 	let aboutSwipe = $state(false);
 	let aboutSwipeHint = $state(false);
 	$effect(() => {
 		const panel = chapterTrack?.firstElementChild as HTMLElement | null;
 		if (!aboutFigure || !panel) return;
 		const update = () => {
-			// En móvil la foto va encima, sin fijar: solo cuenta el panel.
-			const height = isMobile() ? panel.offsetHeight : Math.max(aboutFigure!.offsetHeight, panel.offsetHeight);
-			aboutSwipe = isMobile() && panel.offsetHeight > window.innerHeight - 88;
+			aboutSwipe = isMobile();
+			const height = Math.max(aboutFigure!.offsetHeight, panel.offsetHeight);
 			aboutStickyTop = Math.round(Math.max(72, (window.innerHeight - height) / 2));
 		};
 		const observer = new ResizeObserver(update);
@@ -202,10 +197,9 @@
 		}
 		const track = chapterTravel();
 		if (!track) return;
-		const progress = isMobile() ? index / (aboutChapters.length - 1) : (index + 0.5) / aboutChapters.length;
-		window.scrollTo({ top: track.top + progress * track.travel, behavior: 'smooth' });
+		window.scrollTo({ top: track.top + ((index + 0.5) / aboutChapters.length) * track.travel, behavior: 'smooth' });
 	};
-	// Móvil: cada capítulo se queda quieto la mitad de su tramo y el resto se desliza hacia el siguiente.
+	// Móvil: la pestaña activa sigue al capítulo que ocupa el carrusel.
 	const syncSwipeChapter = () => {
 		if (aboutSwipe && chaptersEl) activeChapter = Math.round(chaptersEl.scrollLeft / Math.max(1, chaptersEl.clientWidth));
 	};
@@ -224,25 +218,13 @@
 		observer.observe(element);
 		return () => observer.disconnect();
 	});
-	const slidePosition = (progress: number) => {
-		const span = aboutChapters.length - 1;
-		const x = progress * span;
-		const step = Math.min(span - 1, Math.floor(x));
-		return step + ease(clamp((x - step - 0.25) / 0.5));
-	};
 	$effect(() => {
 		let frame = 0;
 		const update = () => {
 			frame = 0;
-			mobileView = isMobile();
 			if (aboutSwipe) return;
 			const track = chapterTravel();
 			if (!track) return;
-			if (mobileView) {
-				chapterSlide = slidePosition(clamp((window.scrollY - track.top) / track.travel));
-				activeChapter = Math.round(chapterSlide);
-				return;
-			}
 			const progress = Math.min(0.999, Math.max(0, (window.scrollY - track.top) / track.travel));
 			activeChapter = Math.floor(progress * aboutChapters.length);
 		};
@@ -558,7 +540,7 @@
 				</figure>
 
 				<!-- Ordenador: el recorrido por la sección elige el capítulo, que se sustituye en un panel fijo
-				     junto a la foto. Móvil: el panel se fija bajo la foto y los capítulos se deslizan de lado. -->
+				     junto a la foto. Móvil: pestañas sobre capítulos que se deslizan de lado con el dedo. -->
 				<div
 					class="relative min-w-0"
 					style:height={aboutSwipe ? undefined : `${aboutChapters.length * 78}svh`}
@@ -582,9 +564,8 @@
 						</div>
 						<div class="max-[780px]:mr-[calc(-1*var(--gutter))] max-[780px]:overflow-hidden">
 						<div
-							class={`grid max-[780px]:flex ${aboutSwipe ? 'snap-x snap-mandatory items-start overflow-x-auto overscroll-x-contain [scrollbar-width:none] [&::-webkit-scrollbar]:hidden [&>*]:snap-start' : 'max-[780px]:will-change-transform'} ${aboutSwipeHint ? '[animation:swipe-hint_1100ms_cubic-bezier(.45,0,.2,1)_300ms_both]' : ''}`}
+							class={`grid max-[780px]:flex ${aboutSwipe ? 'snap-x snap-mandatory items-start overflow-x-auto overscroll-x-contain [scrollbar-width:none] [&::-webkit-scrollbar]:hidden [&>*]:snap-start' : ''} ${aboutSwipeHint ? '[animation:swipe-hint_1100ms_cubic-bezier(.45,0,.2,1)_300ms_both]' : ''}`}
 							bind:this={chaptersEl}
-							style:transform={mobileView && !aboutSwipe ? `translate3d(${-chapterSlide * 100}%, 0, 0)` : undefined}
 							onscroll={syncSwipeChapter}
 							onanimationend={(event) => {
 								if (event.target === event.currentTarget) aboutSwipeHint = false;

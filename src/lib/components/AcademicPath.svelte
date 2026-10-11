@@ -52,7 +52,7 @@
 			<ol
 				onmouseleave={resetEntry}
 				onfocusout={(event) => { if (!event.currentTarget.contains(event.relatedTarget as Node | null)) resetEntry(); }}
-				class="relative m-0 grid max-w-[760px] list-none gap-[3px] pt-0 pr-0 pb-0 pl-[14px] before:absolute before:top-[11px] before:bottom-[11px] before:left-[3px] before:w-px before:bg-rule before:content-['']"
+				class="relative m-0 ml-1 grid max-w-[760px] list-none gap-[3px] pt-0 pr-0 pb-0 pl-[14px] before:absolute before:top-[11px] before:bottom-[11px] before:left-[3px] before:w-px before:bg-rule before:content-['']"
 			>
 				{#each entries as entry, index (entry.period)}
 					<li
