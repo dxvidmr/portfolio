@@ -64,8 +64,8 @@
 	<AdminField label="Estado mostrado (EN)"><Input name="statusEn" value={project?.status.en ?? ''} /></AdminField>
 	<AdminField label="Periodo"><Input name="period" required value={project?.period ?? ''} placeholder="2026—" /></AdminField>
 	<AdminField label="Orden"><Input name="sortOrder" type="number" min="0" value={project?.sortOrder ?? ''} /></AdminField>
-	<div class="col-span-full"><AdminField label="Descripción (ES)" help="Formato permitido: <i>/<em> para cursiva y <b>/<strong> para negrita."><Textarea name="summaryEs" required rows={3} value={project?.summary.es ?? ''} /></AdminField></div>
-	<div class="col-span-full"><AdminField label="Descripción (EN)" help="Formato permitido: <i>/<em> para cursiva y <b>/<strong> para negrita."><Textarea name="summaryEn" rows={3} value={project?.summary.en ?? ''} /></AdminField></div>
+	<div class="col-span-full"><AdminField label="Descripción (ES)" help="Títulos de obras en cursiva con asteriscos: *Fuenteovejuna*"><Textarea name="summaryEs" required rows={3} value={project?.summary.es ?? ''} /></AdminField></div>
+	<div class="col-span-full"><AdminField label="Descripción (EN)" help="Títulos de obras en cursiva con asteriscos: *Fuenteovejuna*"><Textarea name="summaryEn" rows={3} value={project?.summary.en ?? ''} /></AdminField></div>
 	<AdminField label="Línea de investigación" help="El tema de la ficha. Las líneas se editan en Taxonomías y son también las de «Sobre mí».">
 		<Select name="researchLine" value={project?.researchLine?.code ?? ''}>
 			<option value="">Sin línea</option>

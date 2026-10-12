@@ -9,7 +9,7 @@
 	import type { Locale } from '$lib/paraglide/runtime';
 	import { entityLabel } from '$lib/content/labels';
 	import { projectText, type PortfolioProject } from '$lib/content/projects';
-	import { renderInlineMarkup } from '$lib/content/inline-markup';
+	import { renderInlineTitle } from '$lib/content/inline-markup';
 	import type { PortfolioRelatedItem } from '$lib/types/portfolio';
 	import ProjectVisual from '$lib/components/ProjectVisual.svelte';
 	import ProjectStory from '$lib/components/projects/ProjectStory.svelte';
@@ -207,7 +207,7 @@
 							<InlineTitle text={projectText(project.title, locale)} />
 						</h2>
 						<p class="mt-[30px] mb-0 max-w-[58ch] text-[clamp(.92rem,1.35vw,1.12rem)] leading-[1.55] text-ink-dim [&_b]:font-bold [&_em]:italic [&_i]:italic [&_strong]:font-bold">
-							{@html renderInlineMarkup(projectText(project.summary, locale))}
+							{@html renderInlineTitle(projectText(project.summary, locale))}
 						</p>
 						<dl class="mt-[34px] mb-0 grid max-w-[620px] grid-cols-2 gap-x-[34px] gap-y-3.5 border-t border-rule pt-[18px] max-[700px]:grid-cols-1">
 							<div class="col-span-full grid gap-1"><dt class="meta text-ink-faint">{copy.period}</dt><dd class="m-0 text-[.78rem]">{[project.year, projectText(project.status, locale)].filter(Boolean).join(CV_SEPARATOR)}</dd></div>

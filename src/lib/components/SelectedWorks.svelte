@@ -7,7 +7,7 @@
 	import type { Locale } from '$lib/paraglide/runtime';
 	import { localizedPath } from '$lib/i18n';
 	import { projectFromMetadata, projectText } from '$lib/content/projects';
-	import { renderInlineMarkup } from '$lib/content/inline-markup';
+	import { renderInlineTitle } from '$lib/content/inline-markup';
 	import type { PortfolioProjectMetadata, PortfolioRelatedItem } from '$lib/types/portfolio';
 	import ProjectModal from '$lib/components/ProjectModal.svelte';
 	import ProjectVisual from '$lib/components/ProjectVisual.svelte';
@@ -229,7 +229,7 @@
 				>
 						<p
 							class="mt-[18px] mb-0 max-w-[58ch] text-[.86rem] leading-[1.6] text-ink-dim max-[700px]:mt-3.5 max-[700px]:text-[.92rem] max-[700px]:leading-[1.5] [&_b]:font-bold [&_em]:italic [&_i]:italic [&_strong]:font-bold"
-						>{@html renderInlineMarkup(projectText(activeProject.summary, locale))}</p>
+						>{@html renderInlineTitle(projectText(activeProject.summary, locale))}</p>
 						<ul
 							class="mt-4 mb-0 flex list-none flex-wrap gap-x-[14px] gap-y-1.5 p-0 text-ink-faint max-[700px]:mt-3 max-[700px]:gap-x-2.5 max-[700px]:gap-y-1"
 							aria-label={locale === 'es' ? 'Áreas' : 'Areas'}

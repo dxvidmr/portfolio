@@ -21,7 +21,7 @@ export function renderInlineMarkup(value: string): string {
 const ITALIC_MARK = /\*(?=\S)([^*\n]*?\S)\*/g;
 
 /**
- * Títulos de méritos, eventos y obras: admite *cursiva* (como los textos del CV)
+ * Títulos y textos breves (méritos, eventos, descripciones del portfolio): admite *cursiva* (como los textos del CV)
  * además de las etiquetas de renderInlineMarkup.
  */
 export function renderInlineTitle(value: string | null | undefined): string {
