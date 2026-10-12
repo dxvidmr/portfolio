@@ -36,7 +36,8 @@
 			<PortfolioProjectForm
 				project={data.project}
 				kindOptions={data.taxonomy.kinds}
-				tagOptions={data.taxonomy.tags}
+				researchLineOptions={data.taxonomy.researchLines}
+		skillAreas={data.taxonomy.skillAreas}
 				action="?/update"
 				submitLabel="Guardar datos"
 			/>

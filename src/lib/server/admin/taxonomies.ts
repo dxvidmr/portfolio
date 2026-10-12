@@ -151,9 +151,9 @@ export const TAXONOMY_DOMAINS: TaxonomyDomainDef[] = [
 		consumers: [{ table: 'portfolio_projects', column: 'kind_code' }]
 	},
 	{
-		domain: 'portfolio_tag',
-		label: 'Etiquetas del portfolio',
-		consumers: [{ table: 'portfolio_project_tags', column: 'tag_code' }]
+		domain: 'research_line',
+		label: 'Líneas de investigación',
+		consumers: [{ table: 'portfolio_projects', column: 'research_line' }]
 	}
 ];
 

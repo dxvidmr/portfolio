@@ -25,7 +25,8 @@
 <section class="border-t border-rule pt-5">
 	<PortfolioProjectForm
 		kindOptions={data.taxonomy.kinds}
-		tagOptions={data.taxonomy.tags}
+		researchLineOptions={data.taxonomy.researchLines}
+		skillAreas={data.taxonomy.skillAreas}
 		action="?/create"
 		submitLabel="Crear elemento"
 	/>

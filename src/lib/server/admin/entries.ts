@@ -63,8 +63,6 @@ const relationCountSql = `
     ELSE 0 END +
 	(SELECT COUNT(*) FROM portfolio_items AS pi
 	 WHERE pi.entity_type = source.entity_type AND pi.entity_id = source.entity_id)
-	+ (SELECT COUNT(*) FROM entity_tags AS et
-	   WHERE et.entity_type = source.entity_type AND et.entity_id = source.entity_id)
 	+ (SELECT COUNT(*) FROM documents AS document
 	   WHERE document.entity_type = source.entity_type AND document.entity_id = source.entity_id)
 	+ (SELECT COUNT(*) FROM links AS link

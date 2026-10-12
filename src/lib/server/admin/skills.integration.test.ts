@@ -14,6 +14,8 @@ describe('Modelo de capacidades',()=>{
         .replace("SELECT 'skills', id, name_es, NULL FROM skills","SELECT 'skills', id, category, NULL FROM skills")
         .replace(` skill_options TEXT NOT NULL DEFAULT '{"resources":[],"evidence":[]}' CHECK(json_valid(skill_options)),`,'');
       db.exec(old);
+      // Las etiquetas de méritos se eliminaron en 058; las migraciones antiguas aún las esperan.
+      db.exec('CREATE TABLE tags(id INTEGER PRIMARY KEY AUTOINCREMENT,slug TEXT UNIQUE NOT NULL,label_es TEXT NOT NULL,label_en TEXT NOT NULL);CREATE TABLE entity_tags(entity_type TEXT NOT NULL,entity_id INTEGER NOT NULL,tag_id INTEGER NOT NULL REFERENCES tags(id),PRIMARY KEY(entity_type,entity_id,tag_id));');
       db.exec(`PRAGMA foreign_keys=ON;
         INSERT INTO skills VALUES(1,'Tecnologías web','Svelte',1);
         INSERT INTO entry_controls(entity_type,entity_id,is_public) VALUES('skills',1,1);

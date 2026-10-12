@@ -364,23 +364,6 @@ BEGIN
   WHERE entity_type = 'event_attendance' AND entity_id = OLD.id;
 END;
 
-CREATE TABLE tags (
-  id INTEGER PRIMARY KEY AUTOINCREMENT,
-  slug TEXT UNIQUE NOT NULL,
-  label_es TEXT NOT NULL,
-  label_en TEXT NOT NULL
-);
-
-CREATE TABLE entity_tags (
-  entity_type TEXT NOT NULL,
-  entity_id INTEGER NOT NULL,
-  tag_id INTEGER NOT NULL REFERENCES tags(id),
-  PRIMARY KEY (entity_type, entity_id, tag_id)
-);
-
-CREATE INDEX idx_entity_tags_entity
-  ON entity_tags(entity_type, entity_id);
-
 INSERT INTO type_vocab (code, domain, label_es, label_en, sort_order) VALUES
   ('attendance_attendee', 'attendance_role', 'Oyente/asistente', 'Attendee', 10),
   ('attendance_listener', 'attendance_role', 'Oyente', 'Auditor', 20),
@@ -401,16 +384,10 @@ INSERT INTO type_vocab (code, domain, label_es, label_en, sort_order) VALUES
   ('portfolio_project', 'portfolio_kind', 'Proyecto', 'Project', 10),
   ('portfolio_line', 'portfolio_kind', 'Línea de trabajo', 'Line of work', 20),
   ('portfolio_infrastructure', 'portfolio_kind', 'Infraestructura', 'Infrastructure', 30),
-  ('portfolio_research', 'portfolio_tag', 'Investigación', 'Research', 10),
-  ('portfolio_digital_editing', 'portfolio_tag', 'Edición digital', 'Digital editing', 20),
-  ('portfolio_data_modelling', 'portfolio_tag', 'Modelado de datos', 'Data modelling', 30),
-  ('portfolio_computational_analysis', 'portfolio_tag', 'Análisis computacional', 'Computational analysis', 40),
-  ('portfolio_data_visualization', 'portfolio_tag', 'Visualización de datos', 'Data visualization', 50),
-  ('portfolio_web_development', 'portfolio_tag', 'Desarrollo web', 'Web development', 60),
-  ('portfolio_digital_corpora', 'portfolio_tag', 'Corpus digitales', 'Digital corpora', 70),
-  ('portfolio_knowledge_transfer', 'portfolio_tag', 'Transferencia', 'Knowledge transfer', 80),
-  ('portfolio_teaching', 'portfolio_tag', 'Docencia', 'Teaching', 90),
-  ('portfolio_performance_practice', 'portfolio_tag', 'Práctica escénica', 'Performance practice', 100);
+  ('research_line_theatre', 'research_line', 'Teatro clásico: escena y recepción', 'Classical theatre: performance & reception', 10),
+  ('research_line_archives', 'research_line', 'Archivos, corpus y edición digital', 'Archives, corpora & digital editing', 20),
+  ('research_line_data', 'research_line', 'Modelado y análisis de datos', 'Data modelling & analysis', 30),
+  ('research_line_infrastructure', 'research_line', 'Infraestructuras digitales sostenibles', 'Sustainable digital infrastructures', 40);
 
 CREATE TABLE portfolio_projects (
   slug TEXT PRIMARY KEY,
@@ -428,7 +405,8 @@ CREATE TABLE portfolio_projects (
     CHECK (publication_status IN ('draft', 'published', 'archived')),
   sort_order INTEGER NOT NULL DEFAULT 0,
   created_at TEXT NOT NULL DEFAULT (datetime('now')),
-  updated_at TEXT NOT NULL DEFAULT (datetime('now'))
+  updated_at TEXT NOT NULL DEFAULT (datetime('now')),
+  research_line TEXT REFERENCES type_vocab(code)
 );
 
 CREATE INDEX idx_portfolio_projects_publication
@@ -444,38 +422,10 @@ VALUES
   ('edicion-digital-corpus', 'Edición digital e infraestructuras textuales', 'Digital editions & textual infrastructures', 'portfolio_line', 'Desarrollo de herramientas, ediciones y corpus que conectan la edición filológica con la publicación web sostenible, el análisis computacional y la reutilización de textos y datos.', 'Development of tools, editions, and corpora connecting scholarly editing with sustainable web publishing, computational analysis, and the reuse of texts and data.', 'Línea activa', 'Active line of work', '2020—', '[]', 'published', 50),
   ('documento-escena', 'Práctica escénica', 'Performance practice', 'portfolio_line', 'Interpretación y creación escénica desde la <i>practice-based research</i> —investigación basada en la práctica—, con especial atención al teatro clásico.', '<i>Practice-based research</i> through acting and stage creation, with particular attention to classical theatre.', 'Línea activa', 'Active line of work', '2018—', '[]', 'published', 60);
 
-CREATE TABLE portfolio_project_tags (
-  portfolio_slug TEXT NOT NULL REFERENCES portfolio_projects(slug) ON DELETE CASCADE,
-  tag_code TEXT NOT NULL REFERENCES type_vocab(code),
-  sort_order INTEGER NOT NULL DEFAULT 0,
-  PRIMARY KEY (portfolio_slug, tag_code)
-);
-
-CREATE INDEX idx_portfolio_project_tags_slug
-  ON portfolio_project_tags(portfolio_slug, sort_order);
-
-INSERT INTO portfolio_project_tags (portfolio_slug, tag_code, sort_order) VALUES
-  ('todos-a-una', 'portfolio_research', 10),
-  ('todos-a-una', 'portfolio_digital_editing', 20),
-  ('todos-a-una', 'portfolio_data_modelling', 30),
-  ('todos-a-una', 'portfolio_knowledge_transfer', 40),
-  ('documento-escena', 'portfolio_research', 10),
-  ('documento-escena', 'portfolio_performance_practice', 20),
-  ('versologia-metadrama', 'portfolio_research', 10),
-  ('versologia-metadrama', 'portfolio_data_modelling', 20),
-  ('versologia-metadrama', 'portfolio_computational_analysis', 30),
-  ('versologia-metadrama', 'portfolio_data_visualization', 40),
-  ('versologia-metadrama', 'portfolio_web_development', 50),
-  ('etso-plataforma-web', 'portfolio_web_development', 10),
-  ('etso-plataforma-web', 'portfolio_digital_corpora', 20),
-  ('redes-personajes-teatrales', 'portfolio_research', 10),
-  ('redes-personajes-teatrales', 'portfolio_computational_analysis', 20),
-  ('redes-personajes-teatrales', 'portfolio_data_visualization', 30),
-  ('redes-personajes-teatrales', 'portfolio_knowledge_transfer', 40),
-  ('redes-personajes-teatrales', 'portfolio_teaching', 50),
-  ('edicion-digital-corpus', 'portfolio_digital_editing', 10),
-  ('edicion-digital-corpus', 'portfolio_web_development', 20),
-  ('edicion-digital-corpus', 'portfolio_digital_corpora', 30);
+UPDATE portfolio_projects SET research_line = 'research_line_theatre' WHERE slug IN ('todos-a-una', 'documento-escena');
+UPDATE portfolio_projects SET research_line = 'research_line_archives' WHERE slug = 'edicion-digital-corpus';
+UPDATE portfolio_projects SET research_line = 'research_line_data' WHERE slug IN ('redes-personajes-teatrales', 'versologia-metadrama');
+UPDATE portfolio_projects SET research_line = 'research_line_infrastructure' WHERE slug = 'etso-plataforma-web';
 
 CREATE TABLE portfolio_items (
   portfolio_slug TEXT NOT NULL REFERENCES portfolio_projects(slug) ON DELETE CASCADE,

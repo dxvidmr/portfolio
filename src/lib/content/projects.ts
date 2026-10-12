@@ -1,5 +1,5 @@
 import type { Locale } from '$lib/paraglide/runtime';
-import type { PortfolioProjectMetadata } from '$lib/types/portfolio';
+import type { PortfolioProjectMetadata, PortfolioSkill, PortfolioTaxonomyTerm } from '$lib/types/portfolio';
 
 type Bi<T> = { es: T; en: T };
 
@@ -25,7 +25,8 @@ export type PortfolioProject = {
 	summary: Bi<string>;
 	year: string;
 	status: Bi<string>;
-	tags: Array<Bi<string> & { code: string }>;
+	researchLine: PortfolioTaxonomyTerm | null;
+	skills: PortfolioSkill[];
 	visual: ProjectVisual;
 	links?: Array<{ label: Bi<string>; url: string }>;
 	sectionNav?: ProjectSectionNavItem[];
@@ -94,7 +95,8 @@ export function projectFromMetadata(metadata: PortfolioProjectMetadata): Portfol
 		summary: metadata.summary,
 		status: metadata.status,
 		year: metadata.period,
-		tags: metadata.tags,
+		researchLine: metadata.researchLine,
+		skills: metadata.skills,
 		links: metadata.links,
 		visual: narrative?.visual ?? 'generic',
 		sectionNav: narrative?.sectionNav

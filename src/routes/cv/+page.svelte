@@ -248,7 +248,7 @@
 	<div class="grid gap-[clamp(72px,10vw,140px)]">
 		{#each visibleSections as section (section.key)}
 			<!-- Ordenador: el título de la sección se queda fijo a la izquierda. Pantallas estrechas: encima. -->
-			<section class="grid grid-cols-[minmax(240px,320px)_minmax(0,1fr)] gap-[clamp(24px,5vw,72px)] max-[1100px]:grid-cols-1 max-[1100px]:gap-6">
+			<section id={section.key} class="scroll-mt-24 grid grid-cols-[minmax(240px,320px)_minmax(0,1fr)] gap-[clamp(24px,5vw,72px)] max-[1100px]:grid-cols-1 max-[1100px]:gap-6">
 				<div class="sticky top-[96px] grid self-start content-start gap-3 max-[1100px]:static">
 					<span class="label text-ink-faint">{section.items.length}</span>
 					<h2 class="section-title m-0 text-[clamp(1.7rem,2.3vw,2.4rem)] font-medium leading-[1.02] tracking-[-0.03em] hyphens-auto max-[1100px]:text-[clamp(1.9rem,6vw,3rem)]">{sectionLabel(section.key, section.title)}</h2>

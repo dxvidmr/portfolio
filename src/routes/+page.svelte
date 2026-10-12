@@ -585,7 +585,7 @@
 							<div class={chapterClass(0)} aria-label={aboutChapters[0]}>
 								<p class="mt-0 mb-[clamp(22px,3vw,36px)] max-w-[34ch] font-title text-[clamp(1.3rem,2.1vw,1.85rem)] leading-[1.3] tracking-[-0.015em] text-ink max-[780px]:text-[1.15rem]">{ui.aboutText}</p>
 					<ul class="m-0 flex list-none flex-wrap gap-x-3 gap-y-[7px] p-0 max-[520px]:gap-1.5">
-								{#each t(profile.areas, locale) as area (area)}
+								{#each data.researchLines.map((line) => line[locale]) as area (area)}
 									<li class="label inline-flex items-center gap-3 after:text-rule-strong after:content-['/'] last:after:content-none max-[520px]:rounded-full max-[520px]:border max-[520px]:border-rule max-[520px]:px-2.5 max-[520px]:py-1.5 max-[520px]:text-[.68rem] max-[520px]:after:hidden">{area}</li>
 								{/each}
 							</ul>

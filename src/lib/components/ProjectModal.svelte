@@ -15,6 +15,7 @@
 	import ProjectStory from '$lib/components/projects/ProjectStory.svelte';
 	import EntryMetadata from '$lib/components/EntryMetadata.svelte';
 	import { CV_SEPARATOR } from '$lib/content/cv-format';
+	import { localizedPath } from '$lib/i18n';
 
 	let {
 		project,
@@ -52,7 +53,8 @@
 					previous: 'Ficha anterior',
 					next: 'Ficha siguiente',
 					period: 'Periodo',
-					topics: 'Temas',
+					line: 'Línea de investigación',
+					skills: 'Competencias',
 					links: 'Enlaces',
 					sectionMenu: 'Menú de la ficha',
 					related: 'Méritos relacionados',
@@ -72,7 +74,8 @@
 					previous: 'Previous entry',
 					next: 'Next entry',
 					period: 'Period',
-					topics: 'Topics',
+					line: 'Research line',
+					skills: 'Skills',
 					links: 'Links',
 					sectionMenu: 'Entry menu',
 					related: 'Related work',
@@ -208,12 +211,16 @@
 						</p>
 						<dl class="mt-[34px] mb-0 grid max-w-[620px] grid-cols-2 gap-x-[34px] gap-y-3.5 border-t border-rule pt-[18px] max-[700px]:grid-cols-1">
 							<div class="col-span-full grid gap-1"><dt class="meta text-ink-faint">{copy.period}</dt><dd class="m-0 text-[.78rem]">{[project.year, projectText(project.status, locale)].filter(Boolean).join(CV_SEPARATOR)}</dd></div>
-							{#if project.tags.length}
+							{#if project.researchLine}
+								<div class="col-span-full grid gap-1"><dt class="meta text-ink-faint">{copy.line}</dt><dd class="m-0 text-[.78rem]">{projectText(project.researchLine, locale)}</dd></div>
+							{/if}
+							{#if project.skills.length}
+								<!-- Competencias vinculadas a la ficha; llevan al bloque de competencias del CV. -->
 								<div class="col-span-full grid gap-1">
-									<dt class="meta text-ink-faint">{copy.topics}</dt>
+									<dt class="meta text-ink-faint">{copy.skills}</dt>
 									<dd class="m-0 flex flex-wrap gap-x-[14px] gap-y-1.5 text-[.78rem] leading-[1.45] text-ink-dim">
-										{#each project.tags as tag (tag.code)}
-											<span class="after:pl-[14px] after:text-accent-strong after:content-['/'] last:after:content-none">{projectText(tag, locale)}</span>
+										{#each project.skills as skill (skill.id)}
+											<span class="after:pl-[14px] after:text-accent-strong after:content-['/'] last:after:content-none"><a class="text-ink-dim hover:text-accent-strong" href={`${localizedPath('/cv', locale)}#skills`}>{projectText(skill, locale)}</a></span>
 										{/each}
 									</dd>
 								</div>

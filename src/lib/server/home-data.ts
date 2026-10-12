@@ -22,6 +22,10 @@ export async function getHomeData() {
 	const portfolioItemsPromise = getPortfolioItems();
 	const portfolioProjectsPromise = getPortfolioProjects({ publicOnly: true });
 	const publicLinksPromise = getPublicAdditionalLinks();
+	// Líneas de investigación de «Sobre mí», editables en Taxonomías.
+	const researchLinesPromise = db.execute(
+		`SELECT label_es, label_en FROM type_vocab WHERE domain = 'research_line' ORDER BY sort_order, label_es`
+	);
 	const activityOrderMode = await orderModePromise;
 	const activityOrder =
 		activityOrderMode === 'manual'
@@ -36,12 +40,13 @@ export async function getHomeData() {
 		   AND e.show_home = 1
 		 ORDER BY ${activityOrder}`
 	);
-	const [recentRes, homeRes, portfolioItems, portfolioProjects, publicLinks] = await Promise.all([
+	const [recentRes, homeRes, portfolioItems, portfolioProjects, publicLinks, researchLinesRes] = await Promise.all([
 		recentPromise,
 		homePromise,
 		portfolioItemsPromise,
 		portfolioProjectsPromise,
-		publicLinksPromise
+		publicLinksPromise,
+		researchLinesPromise
 	]);
 
 	const linksByEntry = groupPublicAdditionalLinks(publicLinks);
@@ -75,5 +80,7 @@ export async function getHomeData() {
 		? homeRes.rows.map((row) => rowToEntry(row))
 		: entries.slice(0, 4);
 
-	return { entries, recentActivity, portfolioItems, portfolioProjects };
+	const researchLines = researchLinesRes.rows.map((row) => ({ es: String(row.label_es), en: String(row.label_en || row.label_es) }));
+
+	return { entries, recentActivity, portfolioItems, portfolioProjects, researchLines };
 }

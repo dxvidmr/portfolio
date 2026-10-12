@@ -23,7 +23,8 @@ export type PortfolioProjectInput = {
 	summary: { es: string; en: string };
 	status: { es: string; en: string };
 	period: string;
-	tagCodes: string[];
+	researchLine: string | null;
+	skillIds: number[];
 	links: Array<{ label: { es: string; en: string }; url: string }>;
 	publicationStatus: PortfolioPublicationStatus;
 	sortOrder: number | null;
@@ -31,7 +32,9 @@ export type PortfolioProjectInput = {
 
 export interface PortfolioTaxonomyOptions {
 	kinds: PortfolioTaxonomyOption[];
-	tags: PortfolioTaxonomyOption[];
+	researchLines: PortfolioTaxonomyOption[];
+	// Competencias agrupadas por área, para vincularlas desde la ficha.
+	skillAreas: Array<{ code: string; label: string; skills: PortfolioTaxonomyOption[] }>;
 }
 
 export interface PortfolioCandidate {
@@ -71,12 +74,13 @@ export function parsePortfolioProjectInput(formData: FormData): PortfolioProject
 	const statusEs = formText(formData, 'statusEs', 160) || 'Proyecto';
 	const statusEn = formText(formData, 'statusEn', 160) || statusEs;
 	const period = formText(formData, 'period', 80);
-	const tagCodes = [
+	const researchLine = formText(formData, 'researchLine', 64) || null;
+	const skillIds = [
 		...new Set(
 			formData
-				.getAll('tagCodes')
-				.map((tag) => String(tag).trim())
-				.filter(Boolean)
+				.getAll('skillIds')
+				.map((value) => Number(value))
+				.filter((value) => Number.isInteger(value) && value > 0)
 		)
 	];
 	const linkUrl = formText(formData, 'linkUrl', 2000);
@@ -97,8 +101,8 @@ export function parsePortfolioProjectInput(formData: FormData): PortfolioProject
 		!validTaxonomyCode(kindCode) ||
 		!summaryEs ||
 		!period ||
-		tagCodes.length > 10 ||
-		tagCodes.some((code) => !validTaxonomyCode(code))
+		(researchLine !== null && !validTaxonomyCode(researchLine)) ||
+		skillIds.length > 60
 	) return null;
 	if (sortOrder !== null && (!Number.isInteger(sortOrder) || sortOrder < 0 || sortOrder > 999999)) return null;
 	if (linkUrl) {
@@ -117,7 +121,8 @@ export function parsePortfolioProjectInput(formData: FormData): PortfolioProject
 		summary: { es: summaryEs, en: summaryEn },
 		status: { es: statusEs, en: statusEn },
 		period,
-		tagCodes,
+		researchLine,
+		skillIds,
 		links: linkUrl ? [{ label: { es: linkLabelEs || titleEs, en: linkLabelEn || titleEn }, url: linkUrl }] : [],
 		publicationStatus,
 		sortOrder
@@ -125,11 +130,24 @@ export function parsePortfolioProjectInput(formData: FormData): PortfolioProject
 }
 
 export async function getPortfolioTaxonomyOptions(): Promise<PortfolioTaxonomyOptions> {
-	const result = await db.execute(`
-		SELECT code, domain, label_es, label_en
-		FROM type_vocab
-		WHERE domain IN ('portfolio_kind', 'portfolio_tag')
-		ORDER BY domain, sort_order, label_es COLLATE NOCASE`);
+	const [result, skills] = await Promise.all([
+		db.execute(`
+			SELECT code, domain, label_es, label_en
+			FROM type_vocab
+			WHERE domain IN ('portfolio_kind', 'research_line')
+			ORDER BY domain, sort_order, label_es COLLATE NOCASE`),
+		db.execute(`
+			SELECT skill.id, skill.name_es, skill.name_en, area.code AS area_code, area.label_es AS area_label
+			FROM skills AS skill
+			LEFT JOIN type_vocab AS area ON area.code = skill.area
+			ORDER BY area.sort_order, skill.sort_order, skill.name_es`)
+	]);
+	const skillAreas = new Map<string, { code: string; label: string; skills: PortfolioTaxonomyOption[] }>();
+	for (const row of skills.rows) {
+		const code = String(row.area_code ?? 'sin_area');
+		if (!skillAreas.has(code)) skillAreas.set(code, { code, label: String(row.area_label ?? 'Sin área'), skills: [] });
+		skillAreas.get(code)!.skills.push({ code: String(row.id), labelEs: String(row.name_es), labelEn: String(row.name_en || row.name_es) });
+	}
 	const options = result.rows.map((row) => ({
 		code: String(row.code),
 		domain: String(row.domain),
@@ -140,9 +158,10 @@ export async function getPortfolioTaxonomyOptions(): Promise<PortfolioTaxonomyOp
 		kinds: options
 			.filter((option) => option.domain === 'portfolio_kind')
 			.map(({ code, labelEs, labelEn }) => ({ code, labelEs, labelEn })),
-		tags: options
-			.filter((option) => option.domain === 'portfolio_tag')
-			.map(({ code, labelEs, labelEn }) => ({ code, labelEs, labelEn }))
+		researchLines: options
+			.filter((option) => option.domain === 'research_line')
+			.map(({ code, labelEs, labelEn }) => ({ code, labelEs, labelEn })),
+		skillAreas: [...skillAreas.values()]
 	};
 }
 
@@ -243,7 +262,7 @@ async function assertPortfolioProjectExists(slug: string): Promise<void> {
 }
 
 async function assertPortfolioTaxonomies(project: PortfolioProjectInput): Promise<void> {
-	const codes = [project.kindCode, ...project.tagCodes];
+	const codes = [project.kindCode, ...(project.researchLine ? [project.researchLine] : [])];
 	const placeholders = codes.map(() => '?').join(', ');
 	const result = await db.execute({
 		sql: `SELECT code, domain FROM type_vocab WHERE code IN (${placeholders})`,
@@ -253,8 +272,15 @@ async function assertPortfolioTaxonomies(project: PortfolioProjectInput): Promis
 	if (domains.get(project.kindCode) !== 'portfolio_kind') {
 		throw new Error('El tipo de portfolio no pertenece a la taxonomía permitida');
 	}
-	if (project.tagCodes.some((code) => domains.get(code) !== 'portfolio_tag')) {
-		throw new Error('Alguna etiqueta no pertenece a la taxonomía de portfolio');
+	if (project.researchLine && domains.get(project.researchLine) !== 'research_line') {
+		throw new Error('La línea de investigación no pertenece a su taxonomía');
+	}
+	if (project.skillIds.length) {
+		const found = await db.execute({
+			sql: `SELECT COUNT(*) AS total FROM skills WHERE id IN (${project.skillIds.map(() => '?').join(', ')})`,
+			args: project.skillIds
+		});
+		if (Number(found.rows[0]?.total) !== project.skillIds.length) throw new Error('Alguna competencia no existe');
 	}
 }
 
@@ -313,12 +339,15 @@ const projectArgs = (project: PortfolioProjectInput, sortOrder: number) => [
 	sortOrder
 ];
 
-const tagStatements = (project: PortfolioProjectInput) =>
-	project.tagCodes.map((tagCode, index) => ({
-		sql: `INSERT INTO portfolio_project_tags (portfolio_slug, tag_code, sort_order)
-		      VALUES (?, ?, ?)`,
-		args: [project.slug, tagCode, (index + 1) * 10]
-	}));
+// Línea de investigación y competencias: la misma relación que se edita desde cada competencia.
+const lineAndSkillStatements = (project: PortfolioProjectInput) => [
+	{ sql: 'UPDATE portfolio_projects SET research_line = ? WHERE slug = ?', args: [project.researchLine, project.slug] },
+	{ sql: 'DELETE FROM skill_portfolio_links WHERE portfolio_slug = ?', args: [project.slug] },
+	...project.skillIds.map((skillId) => ({
+		sql: 'INSERT INTO skill_portfolio_links (skill_id, portfolio_slug) VALUES (?, ?)',
+		args: [skillId, project.slug]
+	}))
+];
 
 export async function createPortfolioProject(project: PortfolioProjectInput): Promise<void> {
 	await assertPortfolioTaxonomies(project);
@@ -335,7 +364,7 @@ export async function createPortfolioProject(project: PortfolioProjectInput): Pr
 				VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
 			args: projectArgs(project, sortOrder)
 		},
-		...tagStatements(project)
+		...lineAndSkillStatements(project)
 	], 'write');
 }
 
@@ -353,11 +382,7 @@ export async function updatePortfolioProject(project: PortfolioProjectInput): Pr
 				WHERE slug = ?`,
 			args: [...args.slice(1), project.slug]
 		},
-		{
-			sql: 'DELETE FROM portfolio_project_tags WHERE portfolio_slug = ?',
-			args: [project.slug]
-		},
-		...tagStatements(project)
+		...lineAndSkillStatements(project)
 	], 'write');
 }
 

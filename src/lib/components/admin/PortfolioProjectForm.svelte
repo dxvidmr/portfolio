@@ -14,13 +14,15 @@
 	let {
 		project = null,
 		kindOptions,
-		tagOptions,
+		researchLineOptions,
+		skillAreas,
 		action,
 		submitLabel
 	}: {
 		project?: PortfolioProjectMetadata | null;
 		kindOptions: PortfolioTaxonomyOption[];
-		tagOptions: PortfolioTaxonomyOption[];
+		researchLineOptions: PortfolioTaxonomyOption[];
+		skillAreas: Array<{ code: string; label: string; skills: PortfolioTaxonomyOption[] }>;
 		action: string;
 		submitLabel: string;
 	} = $props();
@@ -63,13 +65,26 @@
 	<AdminField label="Orden"><Input name="sortOrder" type="number" min="0" value={project?.sortOrder ?? ''} /></AdminField>
 	<div class="col-span-full"><AdminField label="Descripción (ES)" help="Formato permitido: <i>/<em> para cursiva y <b>/<strong> para negrita."><Textarea name="summaryEs" required rows={3} value={project?.summary.es ?? ''} /></AdminField></div>
 	<div class="col-span-full"><AdminField label="Descripción (EN)" help="Formato permitido: <i>/<em> para cursiva y <b>/<strong> para negrita."><Textarea name="summaryEn" rows={3} value={project?.summary.en ?? ''} /></AdminField></div>
-	<TaxonomyCheckboxGroup
-		label="Etiquetas"
-		name="tagCodes"
-		options={tagOptions}
-		selected={project?.tags.map((tag) => tag.code) ?? []}
-		help="Las traducciones se editan en Taxonomías."
-	/>
+	<AdminField label="Línea de investigación" help="El tema de la ficha. Las líneas se editan en Taxonomías y son también las de «Sobre mí».">
+		<Select name="researchLine" value={project?.researchLine?.code ?? ''}>
+			<option value="">Sin línea</option>
+			{#each researchLineOptions as option (option.code)}
+				<option value={option.code}>{option.labelEs}</option>
+			{/each}
+		</Select>
+	</AdminField>
+	<div class="col-span-full grid gap-4">
+		<p class="m-0 font-mono text-meta font-medium tracking-meta text-ink-dim uppercase">Competencias</p>
+		<small class="-mt-2 leading-[1.4] text-ink-faint">Los métodos de la ficha. Es la misma relación que se ve en cada competencia: se puede marcar desde aquí o desde Competencias.</small>
+		{#each skillAreas as area (area.code)}
+			<TaxonomyCheckboxGroup
+				label={area.label}
+				name="skillIds"
+				options={area.skills}
+				selected={project?.skills.map((skill) => String(skill.id)) ?? []}
+			/>
+		{/each}
+	</div>
 	<AdminField label="Enlace principal"><Input name="linkUrl" type="url" value={primaryLink?.url ?? ''} /></AdminField>
 	<AdminField label="Etiqueta del enlace (ES)"><Input name="linkLabelEs" value={primaryLink?.label.es ?? ''} /></AdminField>
 	<AdminField label="Etiqueta del enlace (EN)"><Input name="linkLabelEn" value={primaryLink?.label.en ?? ''} /></AdminField>

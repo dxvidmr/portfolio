@@ -28,6 +28,9 @@
 	let mobileScrollFrame = 0;
 	const allProjects = $derived(projectIndex.map((metadata) => projectFromMetadata(metadata)));
 	const visibleProjects = $derived(projectIndex.map((metadata) => projectFromMetadata(metadata)));
+	// Áreas de las competencias de la ficha, sin repetir y en el orden del vocabulario.
+	const skillAreas = (project: (typeof visibleProjects)[number]) =>
+		[...new Map(project.skills.map((skill) => [skill.area.code, skill.area])).values()].sort((a, b) => a.sortOrder - b.sortOrder);
 	const activeProject = $derived(visibleProjects[activeIndex] ?? visibleProjects[0] ?? null);
 	const shallowProjectSlug = $derived(
 		typeof (page.state as Record<string, unknown>)?.portfolioModal === 'string'
@@ -229,9 +232,9 @@
 						>{@html renderInlineMarkup(projectText(activeProject.summary, locale))}</p>
 						<ul
 							class="mt-4 mb-0 flex list-none flex-wrap gap-x-[14px] gap-y-1.5 p-0 text-ink-faint max-[700px]:mt-3 max-[700px]:gap-x-2.5 max-[700px]:gap-y-1"
-							aria-label={locale === 'es' ? 'Temas' : 'Topics'}
+							aria-label={locale === 'es' ? 'Áreas' : 'Areas'}
 						>
-							{#each activeProject.tags as tag (tag.code)}
+							{#each skillAreas(activeProject) as tag (tag.code)}
 								<li
 									class="label after:pl-[10px] after:text-rule-strong after:content-['/'] last:after:content-none max-[700px]:text-[.72rem] max-[700px]:after:pl-2"
 								>

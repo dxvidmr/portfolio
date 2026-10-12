@@ -17,6 +17,8 @@ function migratedFixture() {
     .replaceAll("'technical_works', 'projects'","'projects'")
     .replace('programme_code TEXT REFERENCES type_vocab(code),\n  nature TEXT REFERENCES type_vocab(code),\n  contribution_es TEXT,\n  contribution_en TEXT,','project_type TEXT REFERENCES type_vocab(code),');
   db.exec(schema);
+  // Las etiquetas de méritos se eliminaron en 058; las migraciones antiguas aún las esperan.
+  db.exec('CREATE TABLE tags(id INTEGER PRIMARY KEY AUTOINCREMENT,slug TEXT UNIQUE NOT NULL,label_es TEXT NOT NULL,label_en TEXT NOT NULL);CREATE TABLE entity_tags(entity_type TEXT NOT NULL,entity_id INTEGER NOT NULL,tag_id INTEGER NOT NULL REFERENCES tags(id),PRIMARY KEY(entity_type,entity_id,tag_id));');
   db.exec(`INSERT INTO type_vocab(code,domain,label_es,label_en) VALUES
     ('national_rd','project_type','Nacional','National'),('transfer','project_type','Transferencia','Transfer'),
     ('internal','project_type','Institucional','Internal'),('external','project_type','Externo','External'),

@@ -33,6 +33,8 @@ export type PortfolioTaxonomyOption = {
 	labelEn: string;
 };
 
+export type PortfolioSkill = { id: number; es: string; en: string; area: PortfolioTaxonomyTerm & { sortOrder: number } };
+
 export type PortfolioProjectMetadata = {
 	slug: string;
 	title: { es: string; en: string };
@@ -40,7 +42,9 @@ export type PortfolioProjectMetadata = {
 	summary: { es: string; en: string };
 	status: { es: string; en: string };
 	period: string;
-	tags: PortfolioTaxonomyTerm[];
+	// Línea de investigación (el «qué») y competencias vinculadas (el «cómo»), con su área.
+	researchLine: PortfolioTaxonomyTerm | null;
+	skills: PortfolioSkill[];
 	links: Array<{ label: { es: string; en: string }; url: string }>;
 	publicationStatus: PortfolioPublicationStatus;
 	sortOrder: number;

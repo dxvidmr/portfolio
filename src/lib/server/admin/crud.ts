@@ -361,7 +361,7 @@ export async function deleteEntity(type: FormEntityType, id: number): Promise<vo
 		sql: 'DELETE FROM documents WHERE entity_type = ? AND entity_id = ?',
 		args: [type, id]
 	});
-	for (const table of ['links', 'entity_tags', 'portfolio_items', 'entry_controls']) {
+	for (const table of ['links', 'portfolio_items', 'entry_controls']) {
 		stmts.push({
 			sql: `DELETE FROM ${table} WHERE entity_type = ? AND entity_id = ?`,
 			args: [type, id]
