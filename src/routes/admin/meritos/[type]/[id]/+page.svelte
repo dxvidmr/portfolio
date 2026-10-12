@@ -234,7 +234,7 @@
 					{#each data.portfolioRelations as relation (relation.slug)}
 						<li>
 							<a class="text-xs leading-snug text-ink hover:text-accent" href={`/admin/portfolio/${relation.slug}`}>
-								{relation.featured ? '★ ' : ''}<InlineTitle text={relation.title} />
+								<InlineTitle text={relation.title} />
 							</a>
 						</li>
 					{/each}

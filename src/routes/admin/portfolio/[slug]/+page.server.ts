@@ -3,14 +3,13 @@ import { error, fail } from '@sveltejs/kit';
 import type { Actions, PageServerLoad } from './$types';
 import { hasProjectStory } from '$lib/content/project-story-registry';
 import { requireAdmin } from '$lib/server/admin/auth';
-import { parseEnabled, parseEntryKey } from '$lib/server/admin/controls';
+import { parseEntryKey } from '$lib/server/admin/controls';
 import {
 	addPortfolioRelation,
 	getPortfolioAdminData,
 	parsePortfolioProjectInput,
 	parsePortfolioSlug,
 	removePortfolioRelation,
-	setPortfolioFeatured,
 	updatePortfolioProject
 } from '$lib/server/admin/portfolio';
 
@@ -75,22 +74,6 @@ export const actions: Actions = {
 		} catch (cause) {
 			console.error('[admin] Error al retirar una relación del portfolio', { message: cause instanceof Error ? cause.message : 'Error desconocido' });
 			return fail(500, { success: false, message: 'No se pudo retirar el mérito.' });
-		}
-	},
-	featured: async ({ request, locals, params }) => {
-		await requireAdmin(locals);
-		const formData = await request.formData();
-		const routeSlug = parsePortfolioSlug(params.slug);
-		const portfolioSlug = routeSlug ? matchingSlug(formData, routeSlug) : null;
-		const entry = parseEntryKey(formData);
-		const featured = parseEnabled(formData.get('featured'));
-		if (!portfolioSlug || !entry || featured == null) return fail(400, { success: false, message: 'Destacado no válido.' });
-		try {
-			const relation = await setPortfolioFeatured(portfolioSlug, entry, featured);
-			return { success: true, message: featured ? 'Mérito destacado en la ficha.' : 'Destacado retirado.', relation };
-		} catch (cause) {
-			console.error('[admin] Error al actualizar el destacado del portfolio', { message: cause instanceof Error ? cause.message : 'Error desconocido' });
-			return fail(500, { success: false, message: 'No se pudo actualizar el destacado.' });
 		}
 	}
 };

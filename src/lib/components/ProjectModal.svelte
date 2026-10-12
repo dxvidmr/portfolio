@@ -14,6 +14,7 @@
 	import ProjectVisual from '$lib/components/ProjectVisual.svelte';
 	import ProjectStory from '$lib/components/projects/ProjectStory.svelte';
 	import EntryMetadata from '$lib/components/EntryMetadata.svelte';
+	import { CV_SEPARATOR } from '$lib/content/cv-format';
 
 	let {
 		project,
@@ -50,28 +51,52 @@
 					close: 'Cerrar ficha',
 					previous: 'Ficha anterior',
 					next: 'Ficha siguiente',
-					status: 'Estado',
 					period: 'Periodo',
 					topics: 'Temas',
 					links: 'Enlaces',
 					sectionMenu: 'Menú de la ficha',
-					related: 'Resultados relacionados',
-					relatedIntro: 'Publicaciones, proyectos y otras actividades vinculadas.',
-					featured: 'Resultado destacado'
+					related: 'Méritos relacionados',
+					groups: {
+						projects: 'Proyectos',
+						publications: 'Publicaciones',
+						talks: 'Comunicaciones',
+						technical_works: 'Trabajos técnicos',
+						teaching: 'Docencia',
+						academic_works: 'Trabajos académicos',
+						service_activities: 'Actividades',
+						courses: 'Formación'
+					} as Record<string, string>
 				}
 			: {
 					close: 'Close entry',
 					previous: 'Previous entry',
 					next: 'Next entry',
-					status: 'Status',
 					period: 'Period',
 					topics: 'Topics',
 					links: 'Links',
 					sectionMenu: 'Entry menu',
-					related: 'Related outputs',
-					relatedIntro: 'Related publications, projects, and other activities.',
-					featured: 'Featured output'
+					related: 'Related work',
+					groups: {
+						projects: 'Projects',
+						publications: 'Publications',
+						talks: 'Talks',
+						technical_works: 'Technical work',
+						teaching: 'Teaching',
+						academic_works: 'Academic work',
+						service_activities: 'Activities',
+						courses: 'Training'
+					} as Record<string, string>
 				}
+	);
+	const groupOrder = ['projects', 'publications', 'talks', 'technical_works', 'teaching', 'academic_works', 'service_activities', 'courses'];
+	const relatedGroups = $derived(
+		[...new Set(relatedItems.map((item) => item.entity_type))]
+			.sort((a, b) => (groupOrder.indexOf(a) + 1 || 99) - (groupOrder.indexOf(b) + 1 || 99))
+			.map((type) => ({
+				type,
+				label: copy.groups[type] ?? entityLabel(type, locale),
+				items: relatedItems.filter((item) => item.entity_type === type)
+			}))
 	);
 	const modalControlClass =
 		'pointer-events-auto relative grid h-[46px] w-[46px] cursor-pointer place-items-center rounded-ui-sm border-0 bg-transparent text-ink opacity-50 [transition:color_180ms_ease,opacity_180ms_ease] hover:bg-transparent hover:text-accent-strong hover:opacity-100 focus-visible:bg-transparent focus-visible:text-accent-strong focus-visible:opacity-100 motion-reduce:transition-none';
@@ -182,8 +207,7 @@
 							{@html renderInlineMarkup(projectText(project.summary, locale))}
 						</p>
 						<dl class="mt-[34px] mb-0 grid max-w-[620px] grid-cols-2 gap-x-[34px] gap-y-3.5 border-t border-rule pt-[18px] max-[700px]:grid-cols-1">
-							<div class="grid gap-1"><dt class="meta text-ink-faint">{copy.status}</dt><dd class="m-0 text-[.78rem]">{projectText(project.status, locale)}</dd></div>
-							<div class="grid gap-1"><dt class="meta text-ink-faint">{copy.period}</dt><dd class="m-0 text-[.78rem]">{project.year}</dd></div>
+							<div class="col-span-full grid gap-1"><dt class="meta text-ink-faint">{copy.period}</dt><dd class="m-0 text-[.78rem]">{[project.year, projectText(project.status, locale)].filter(Boolean).join(CV_SEPARATOR)}</dd></div>
 							{#if project.tags.length}
 								<div class="col-span-full grid gap-1">
 									<dt class="meta text-ink-faint">{copy.topics}</dt>
@@ -258,6 +282,7 @@
 								visual={project.visual}
 								label={projectText(project.kind, locale)}
 								period={project.year}
+								showMeta={false}
 							/>
 						</div>
 					{/key}
@@ -267,55 +292,41 @@
 					<ProjectStory slug={project.slug} {locale} />
 				{/key}
 
-				{#if relatedItems.length}
+				{#if relatedGroups.length}
+					<!-- Méritos vinculados, agrupados por tipo y con los mismos datos que en el CV. -->
 					<section class="border-t border-rule-strong pt-[clamp(58px,8vw,110px)]">
-						<header class="mb-10 grid grid-cols-[minmax(0,1fr)_minmax(260px,.65fr)] items-end gap-9 max-[700px]:grid-cols-1">
-							<div>
-								<h3 class="mt-3.5 mb-0 text-[clamp(2.2rem,5vw,4.8rem)] leading-[.92]">{copy.related}</h3>
-							</div>
-							<p class="m-0 text-[.8rem] text-ink-dim">{copy.relatedIntro}</p>
-						</header>
-						<ol class="m-0 list-none border-t border-rule p-0">
-							{#each relatedItems as item, index (`${item.entity_type}-${item.entity_id}`)}
-								<li class="relative grid grid-cols-[minmax(190px,.65fr)_minmax(0,1.35fr)] gap-[clamp(20px,4vw,60px)] border-b border-rule py-[clamp(20px,3vw,34px)] max-[700px]:grid-cols-1">
-									<div class="meta grid grid-cols-[28px_1fr_40px] gap-3 text-ink-faint">
-									<span class="grid content-start gap-[7px]">
-										{String(index + 1).padStart(2, '0')}
-										{#if item.featured}
-											<span class="text-[.72rem] leading-none text-accent-strong" title={copy.featured} aria-label={copy.featured}>★</span>
-										{/if}
-									</span>
-										<span class="grid gap-[5px]">
-											<span class="text-accent-strong">{entityLabel(item.entity_type, locale)}</span>
-											{#if subtypeLabel(item)}
-												<span class="text-left text-[.62rem] leading-[1.3] text-ink-dim">{subtypeLabel(item)}</span>
-											{/if}
-										</span>
-										<span class="text-right">{itemYear(item.sort_date)}</span>
-									</div>
-									<div>
-										{#if item.url}
-											<a class="group m-0 flex justify-between gap-[18px] font-title text-[clamp(1.15rem,2.2vw,1.8rem)] leading-[1.1] text-ink" href={item.url} target="_blank" rel="noreferrer">
-												<InlineTitle text={item.title} />
-												<span class="grid h-[22px] w-[22px] flex-[0_0_22px] place-items-center text-accent-strong [transition:transform_180ms_ease] group-hover:translate-x-0.5 group-hover:translate-y-[-2px]" aria-hidden="true"><MoveUpRight size={22} strokeWidth={1.7} /></span>
-											</a>
-										{:else}
-											<p class="m-0 flex justify-between gap-[18px] font-title text-[clamp(1.15rem,2.2vw,1.8rem)] leading-[1.1] text-ink"><InlineTitle text={item.title} /></p>
-										{/if}
-										{#if item.metadata}<p class="mt-[9px] mb-0 max-w-[72ch] text-[.72rem] leading-[1.45] text-ink-faint"><EntryMetadata metadata={item.metadata} {locale} title={item.title} /></p>{/if}
-										{#if item.links.length}
-											<div class="mt-2.5 flex flex-wrap gap-1.5">
-												{#each item.links as link (link.url)}
-													<a class={`border px-[7px] py-1 text-[.64rem] no-underline hover:border-accent-strong hover:text-accent-strong focus-visible:border-accent-strong focus-visible:text-accent-strong ${link.is_primary ? 'border-accent-strong text-accent-strong' : 'border-rule text-ink-faint'}`} href={link.url} target="_blank" rel="noreferrer">
-														{additionalLinkLabel(link)}
+						<h3 class="m-0 text-[clamp(2.2rem,5vw,4.8rem)] leading-[.92]">{copy.related}</h3>
+						{#each relatedGroups as group (group.type)}
+							<div class="mt-[clamp(36px,5vw,64px)] grid grid-cols-[minmax(160px,.4fr)_minmax(0,1.6fr)] gap-[clamp(20px,4vw,60px)] max-[700px]:grid-cols-1 max-[700px]:gap-3">
+								<h4 class="label m-0 pt-[clamp(16px,2.2vw,24px)] text-accent-strong max-[700px]:pt-0">{group.label}</h4>
+								<ol class="m-0 list-none border-t border-rule p-0">
+									{#each group.items as item (`${item.entity_type}-${item.entity_id}`)}
+										<li class="grid grid-cols-[56px_minmax(0,1fr)] gap-4 border-b border-rule py-[clamp(16px,2.2vw,24px)]">
+											<span class="label pt-[3px] text-ink-faint">{itemYear(item.sort_date)}</span>
+											<div class="min-w-0">
+												{#if subtypeLabel(item)}<span class="mb-1 block text-[.8rem] leading-[1.3] text-ink-dim">{subtypeLabel(item)}</span>{/if}
+												{#if item.url}
+													<a class="group flex items-start justify-between gap-4 text-[clamp(1.05rem,1.5vw,1.3rem)] font-medium leading-[1.2] tracking-[-0.01em] text-ink" href={item.url} target="_blank" rel="noreferrer">
+														<span><InlineTitle text={item.title} /></span>
+														<span class="mt-px grid h-5 w-5 flex-[0_0_20px] place-items-center text-accent-strong [transition:transform_180ms_ease] group-hover:translate-x-0.5 group-hover:translate-y-[-2px] motion-reduce:transition-none" aria-hidden="true"><MoveUpRight size={19} strokeWidth={1.7} /></span>
 													</a>
-												{/each}
+												{:else}
+													<p class="m-0 text-[clamp(1.05rem,1.5vw,1.3rem)] font-medium leading-[1.2] tracking-[-0.01em] text-ink"><InlineTitle text={item.title} /></p>
+												{/if}
+												{#if item.metadata}<p class="mt-2 mb-0 max-w-[72ch] text-[.76rem] leading-[1.5] text-ink-faint"><EntryMetadata metadata={item.metadata} {locale} title={item.title} /></p>{/if}
+												{#if item.links.length}
+													<div class="mt-2.5 flex flex-wrap gap-x-4 gap-y-1">
+														{#each item.links as link (link.url)}
+															<a class={`label hover:text-ink ${link.is_primary ? 'text-accent-strong' : 'text-ink-dim'}`} href={link.url} target="_blank" rel="noreferrer">{additionalLinkLabel(link)} ↗</a>
+														{/each}
+													</div>
+												{/if}
 											</div>
-										{/if}
-									</div>
-								</li>
-							{/each}
-						</ol>
+										</li>
+									{/each}
+								</ol>
+							</div>
+						{/each}
 					</section>
 				{/if}
 			</div>

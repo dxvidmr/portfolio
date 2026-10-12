@@ -45,7 +45,6 @@ export interface PortfolioCandidate {
 
 export interface PortfolioRelation extends EntryKey {
 	portfolioSlug: string;
-	featured: boolean;
 }
 
 export type PortfolioProjectListItem = PortfolioProjectMetadata & {
@@ -181,7 +180,7 @@ export async function getPortfolioAdminData(portfolioSlug: string): Promise<{
 			ORDER BY (source.sort_date IS NULL) ASC, source.sort_date DESC,
 			         source.title COLLATE NOCASE ASC`),
 		db.execute(`
-			SELECT portfolio_slug, entity_type, entity_id, featured
+			SELECT portfolio_slug, entity_type, entity_id
 			FROM portfolio_items
 			WHERE portfolio_slug = ?`, [portfolioSlug]),
 		getPortfolioTaxonomyOptions()
@@ -210,30 +209,28 @@ export async function getPortfolioAdminData(portfolioSlug: string): Promise<{
 		return [{
 			portfolioSlug,
 			entityType,
-			entityId: Number(row.entity_id),
-			featured: Number(row.featured) === 1
+			entityId: Number(row.entity_id)
 		}];
 	});
 
 	return { project, entries, relations, taxonomy };
 }
 
-export async function getEntryPortfolioRelations(entry: EntryKey): Promise<Array<PortfolioOption & { featured: boolean }>> {
+export async function getEntryPortfolioRelations(entry: EntryKey): Promise<PortfolioOption[]> {
 	const [projects, result] = await Promise.all([getPortfolioProjects(), db.execute({
-		sql: `SELECT portfolio_slug, featured
+		sql: `SELECT portfolio_slug
 			FROM portfolio_items
 			WHERE entity_type = ? AND entity_id = ?`,
 		args: [entry.entityType, entry.entityId]
 	})]);
-	const bySlug = new Map(result.rows.map((row) => [String(row.portfolio_slug), Number(row.featured) === 1]));
+	const linked = new Set(result.rows.map((row) => String(row.portfolio_slug)));
 	return projects
-		.filter((project) => bySlug.has(project.slug))
+		.filter((project) => linked.has(project.slug))
 		.map((project) => ({
 			slug: project.slug,
 			title: project.title.es,
 			kind: project.kind.es,
-			year: project.period,
-			featured: bySlug.get(project.slug) ?? false
+			year: project.period
 		}));
 }
 
@@ -277,12 +274,12 @@ export async function addPortfolioRelation(
 	await assertEntryExists(entry);
 	await db.execute({
 		sql: `INSERT INTO portfolio_items
-				(portfolio_slug, entity_type, entity_id, sort_order, featured)
-			VALUES (?, ?, ?, 0, 0)
+				(portfolio_slug, entity_type, entity_id)
+			VALUES (?, ?, ?)
 			ON CONFLICT (portfolio_slug, entity_type, entity_id) DO NOTHING`,
 		args: [portfolioSlug, entry.entityType, entry.entityId]
 	});
-	return { portfolioSlug, ...entry, featured: false };
+	return { portfolioSlug, ...entry };
 }
 
 export async function removePortfolioRelation(
@@ -295,22 +292,6 @@ export async function removePortfolioRelation(
 			WHERE portfolio_slug = ? AND entity_type = ? AND entity_id = ?`,
 		args: [portfolioSlug, entry.entityType, entry.entityId]
 	});
-}
-
-export async function setPortfolioFeatured(
-	portfolioSlug: string,
-	entry: EntryKey,
-	featured: boolean
-): Promise<PortfolioRelation> {
-	await assertPortfolioProjectExists(portfolioSlug);
-	const result = await db.execute({
-		sql: `UPDATE portfolio_items
-			SET featured = ?
-			WHERE portfolio_slug = ? AND entity_type = ? AND entity_id = ?`,
-		args: [featured ? 1 : 0, portfolioSlug, entry.entityType, entry.entityId]
-	});
-	if (result.rowsAffected === 0) throw new Error('La relación no existe');
-	return { portfolioSlug, ...entry, featured };
 }
 
 const projectArgs = (project: PortfolioProjectInput, sortOrder: number) => [

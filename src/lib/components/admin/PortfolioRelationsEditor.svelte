@@ -21,7 +21,6 @@
 		portfolioSlug: string;
 		entityType: string;
 		entityId: number;
-		featured: boolean;
 	};
 
 	let {
@@ -82,8 +81,7 @@
 			const optimistic: Relation = {
 				portfolioSlug: String(formData.get('portfolioSlug') ?? ''),
 				entityType: entry.entityType,
-				entityId: entry.entityId,
-				featured: false
+				entityId: entry.entityId
 			};
 			const key = `add:${relationKey(optimistic)}`;
 			const existed = relations.some((relation) => relationKey(relation) === relationKey(optimistic));
@@ -109,20 +107,6 @@
 			};
 		};
 
-	const featuredSubmit = (relation: Relation): SubmitFunction =>
-		({ formData }) => {
-			const previous = relation.featured;
-			const next = !relation.featured;
-			const key = `featured:${relationKey(relation)}`;
-			formData.set('featured', next ? '1' : '0');
-			relation.featured = next;
-			pending = [...pending, key];
-			return async ({ result, update }) => {
-				if (result.type !== 'success') relation.featured = previous;
-				pending = pending.filter((item) => item !== key);
-				await update({ reset: false, invalidateAll: false });
-			};
-		};
 </script>
 
 <div class="grid grid-cols-2 items-start gap-8 max-[960px]:grid-cols-1">
@@ -139,10 +123,6 @@
 					<li class="flex min-w-0 items-center justify-between gap-4 border-b border-rule px-2 py-3 max-[620px]:flex-col max-[620px]:items-start">
 						<div class="min-w-0"><div class="mb-1 flex flex-wrap gap-x-3 gap-y-1 text-[0.62rem] text-ink-faint"><span>{item.entry.typeLabel}</span><span>{item.entry.sortDate ?? 'sin fecha'}</span>{#if !item.entry.isPublic}<span class="text-warning">Privada</span>{/if}</div><strong class="block text-xs font-medium leading-snug text-ink"><InlineTitle text={item.entry.title} /></strong></div>
 						<div class="flex shrink-0 gap-1.5">
-							<form method="POST" action="?/featured" use:enhance={featuredSubmit(item.relation)}>
-								<input type="hidden" name="portfolioSlug" value={portfolioSlug} /><input type="hidden" name="entityType" value={item.relation.entityType} /><input type="hidden" name="entityId" value={item.relation.entityId} />
-								<Button type="submit" variant="ghost" size="icon" class={item.relation.featured ? 'text-warning hover:text-warning' : 'text-rule-strong'} disabled={isPending('featured', item.relation)} aria-label={`${item.relation.featured ? 'Desactivar destacado de' : 'Destacar'} ${plainInlineTitle(item.entry.title)}`} title={item.relation.featured ? 'Desactivar destacado' : 'Destacar en la ficha'}>★</Button>
-							</form>
 							<form method="POST" action="?/remove" use:enhance={removeSubmit(item.relation)}>
 								<input type="hidden" name="portfolioSlug" value={portfolioSlug} /><input type="hidden" name="entityType" value={item.relation.entityType} /><input type="hidden" name="entityId" value={item.relation.entityId} />
 								<Button type="submit" variant="danger" size="sm" disabled={isPending('remove', item.relation)}>Eliminar</Button>

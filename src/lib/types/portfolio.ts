@@ -9,7 +9,6 @@ export type PortfolioRelatedItem = {
 	subtype: string | null;
 	subtype_label_es: string | null;
 	subtype_label_en: string | null;
-	detail: string | null;
 	metadata: EntryMetadata | null;
 	url: string | null;
 	links: Array<{
@@ -18,8 +17,6 @@ export type PortfolioRelatedItem = {
 		label_en: string;
 		is_primary: boolean;
 	}>;
-	featured: boolean;
-	sort_order: number;
 };
 
 export type PortfolioPublicationStatus = 'draft' | 'published' | 'archived';

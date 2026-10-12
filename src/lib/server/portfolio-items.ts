@@ -12,7 +12,7 @@ export async function getPortfolioItems(portfolioSlug?: string): Promise<Portfol
 		: "WHERE e.public = 1 AND portfolio_project.publication_status = 'published'";
 	const [result, publicLinks] = await Promise.all([db.execute({
 			sql: `SELECT pi.portfolio_slug, pi.entity_type, pi.entity_id,
-			             pi.featured, pi.sort_order, e.title_cache AS title, e.sort_date,
+			             e.title_cache AS title, e.sort_date,
 			             ${metadata.select}
 		      FROM portfolio_items pi
 		      JOIN portfolio_projects portfolio_project
@@ -46,12 +46,9 @@ export async function getPortfolioItems(portfolioSlug?: string): Promise<Portfol
 			subtype: nullable(row.subtype),
 			subtype_label_es: nullable(row.subtype_label_es),
 			subtype_label_en: nullable(row.subtype_label_en),
-			detail: nullable(row.detail),
 			metadata: entryMetadataFromRow(row),
 			url: canonicalUrl,
-			links,
-			featured: Number(row.featured) === 1,
-			sort_order: Number(row.sort_order)
+			links
 		};
 	});
 }
