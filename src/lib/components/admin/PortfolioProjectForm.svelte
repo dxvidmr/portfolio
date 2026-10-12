@@ -1,6 +1,6 @@
 <script lang="ts">
 	import AdminField from '$lib/components/admin/AdminField.svelte';
-	import TaxonomyCheckboxGroup from '$lib/components/admin/TaxonomyCheckboxGroup.svelte';
+	import Checkbox from '$lib/components/ui/Checkbox.svelte';
 	import Button from '$lib/components/ui/Button.svelte';
 	import Input from '$lib/components/ui/Input.svelte';
 	import Select from '$lib/components/ui/Select.svelte';
@@ -30,6 +30,7 @@
 	const initialProject = untrack(() => project);
 	let publicationStatus = $state(initialProject?.publicationStatus ?? 'draft');
 	const primaryLink = initialProject?.links[0];
+	const selectedSkills = new Set(initialProject?.skills.map((skill) => String(skill.id)) ?? []);
 </script>
 
 <form class="grid grid-cols-2 gap-4 max-[760px]:grid-cols-1" method="POST" {action}>
@@ -76,14 +77,19 @@
 	<div class="col-span-full grid gap-4">
 		<p class="m-0 font-mono text-meta font-medium tracking-meta text-ink-dim uppercase">Competencias</p>
 		<small class="-mt-2 leading-[1.4] text-ink-faint">Los métodos de la ficha. Es la misma relación que se ve en cada competencia: se puede marcar desde aquí o desde Competencias.</small>
-		{#each skillAreas as area (area.code)}
-			<TaxonomyCheckboxGroup
-				label={area.label}
-				name="skillIds"
-				options={area.skills}
-				selected={project?.skills.map((skill) => String(skill.id)) ?? []}
-			/>
-		{/each}
+		<div class="grid grid-cols-2 gap-x-8 gap-y-5 max-[760px]:grid-cols-1">
+			{#each skillAreas as area (area.code)}
+				<fieldset class="m-0 grid content-start gap-1.5 border-0 p-0">
+					<legend class="mb-1.5 p-0 text-xs font-medium text-ink">{area.label}</legend>
+					{#each area.skills as skill (skill.code)}
+						<label class="flex cursor-pointer items-start gap-2.5 text-xs leading-[1.35] text-ink-dim hover:text-ink">
+							<Checkbox name="skillIds" value={skill.code} checked={selectedSkills.has(skill.code)} />
+							<span>{skill.labelEs}</span>
+						</label>
+					{/each}
+				</fieldset>
+			{/each}
+		</div>
 	</div>
 	<AdminField label="Enlace principal"><Input name="linkUrl" type="url" value={primaryLink?.url ?? ''} /></AdminField>
 	<AdminField label="Etiqueta del enlace (ES)"><Input name="linkLabelEs" value={primaryLink?.label.es ?? ''} /></AdminField>

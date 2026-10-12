@@ -1,4 +1,3 @@
-import { db } from '$lib/server/db';
 import { error, fail } from '@sveltejs/kit';
 import type { Actions, PageServerLoad } from './$types';
 import { hasProjectStory } from '$lib/content/project-story-registry';
@@ -16,10 +15,10 @@ import {
 export const load: PageServerLoad = async ({ params, setHeaders }) => {
 	setHeaders({ 'cache-control': 'private, no-store' });
 	const slug = parsePortfolioSlug(params.slug);
-	if (!slug) error(404, 'Elemento no encontrado');
+	if (!slug) error(404, 'Ficha no encontrada');
 	const data = await getPortfolioAdminData(slug);
-	if (!data.project) error(404, 'Elemento no encontrado');
-	return { ...data, project: data.project, hasNarrative: hasProjectStory(slug), skillUses:(await db.execute({sql:'SELECT s.id,s.name_es FROM skill_portfolio_links l JOIN skills s ON s.id=l.skill_id WHERE l.portfolio_slug=? ORDER BY s.sort_order',args:[slug]})).rows.map(r=>({id:Number(r.id),name:String(r.name_es)})) };
+	if (!data.project) error(404, 'Ficha no encontrada');
+	return { ...data, project: data.project, hasNarrative: hasProjectStory(slug) };
 };
 
 const matchingSlug = (formData: FormData, routeSlug: string) => {

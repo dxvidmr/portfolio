@@ -1,6 +1,6 @@
 export const entityDefinitions = {
 	projects: 'Proyectos',
-	technical_works: 'Trabajos técnicos y profesionales',
+	technical_works: 'Trabajos técnicos',
 	publications: 'Publicaciones',
 	academic_works: 'Trabajos académicos',
 	talks: 'Comunicaciones',

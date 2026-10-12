@@ -44,7 +44,7 @@
 	title="Portfolio"
 	description="Fichas de proyecto de la web: estado, orden y méritos relacionados."
 >
-	{#snippet actions()}<ButtonLink href="/admin/portfolio/nuevo" variant="primary">+ Nuevo elemento</ButtonLink>{/snippet}
+	{#snippet actions()}<ButtonLink href="/admin/portfolio/nuevo" variant="primary">+ Nueva ficha</ButtonLink>{/snippet}
 </AdminPageHeader>
 
 <form class="hidden" method="POST" action="?/reorder" use:enhance={reorderSubmit} bind:this={orderForm}>
@@ -68,8 +68,9 @@
 				</span>
 				<span class="flex flex-wrap gap-x-3 gap-y-1 font-mono text-[0.62rem]">
 					<span class={statusClass[project.publicationStatus]}>{statusLabel[project.publicationStatus]}</span>
-					<span class="text-ink-faint">{project.relationCount} relacionados</span>
-					<span class={project.hasNarrative ? 'text-accent-strong' : 'text-ink-faint'}>{project.hasNarrative ? 'Narrativa especial' : 'Plantilla básica'}</span>
+					<span class="text-ink-faint">{project.relationCount} {project.relationCount === 1 ? 'mérito' : 'méritos'}</span>
+					<span class={project.hasNarrative ? 'text-accent-strong' : 'text-ink-faint'}>{project.hasNarrative ? 'Con relato propio' : 'Plantilla básica'}</span>
+					{#if project.researchLine}<span class="text-ink-faint">{project.researchLine.es}</span>{/if}
 				</span>
 			</a>
 		{/snippet}

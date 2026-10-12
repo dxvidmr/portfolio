@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { canLinkToPortfolio } from '$lib/content/portfolio-entry-types';
 	import InlineTitle from '$lib/components/InlineTitle.svelte';
 	import { plainInlineTitle } from '$lib/content/inline-markup';
 	import { page } from '$app/state';
@@ -224,6 +225,7 @@
 				</form>
 			{/if}
 		</div>
+		{#if canLinkToPortfolio(data.entityType)}
 		<div class="grid content-start gap-3 rounded-ui border border-rule p-5">
 			<div>
 				<p class="m-0 text-[0.6rem] tracking-[0.1em] text-ink-faint uppercase">Relación</p>
@@ -246,6 +248,7 @@
 				Gestionar en Portfolio <ExternalLink size={13} strokeWidth={1.7} aria-hidden="true" />
 			</a>
 		</div>
+		{/if}
 	</div>
 	{:else}
 		<div class="grid max-w-[48rem] gap-3 rounded-ui border border-warning p-5">

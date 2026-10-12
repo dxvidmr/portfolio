@@ -112,11 +112,11 @@
 <div class="grid grid-cols-2 items-start gap-8 max-[960px]:grid-cols-1">
 	<section class="min-w-0 border-t border-rule" aria-labelledby="related-title">
 		<header class="flex items-end justify-between gap-4 py-4">
-			<div><p class="m-0 text-[0.68rem] uppercase tracking-[0.1em] text-ink-faint">Selección actual</p><h2 class="mt-1 mb-0 text-base text-ink" id="related-title">Trabajos relacionados</h2></div>
+			<div><p class="m-0 text-[0.68rem] uppercase tracking-[0.1em] text-ink-faint">Selección actual</p><h2 class="mt-1 mb-0 text-base text-ink" id="related-title">Méritos relacionados</h2></div>
 			<span class="text-[0.68rem] text-ink-faint">Orden cronológico</span>
 		</header>
 		{#if currentRelations.length === 0}
-			<p class="m-0 border-t border-rule px-4 py-8 text-center text-xs text-ink-faint">Esta ficha todavía no tiene trabajos relacionados.</p>
+			<p class="m-0 border-t border-rule px-4 py-8 text-center text-xs text-ink-faint">Esta ficha todavía no tiene méritos relacionados.</p>
 		{:else}
 			<ol class="m-0 list-none border-t border-rule p-0">
 				{#each currentRelations as item (`${item.relation.entityType}:${item.relation.entityId}`)}
@@ -135,7 +135,7 @@
 	</section>
 
 	<section class="min-w-0 border-t border-rule" aria-labelledby="add-title">
-		<header class="py-4"><p class="m-0 text-[0.68rem] uppercase tracking-[0.1em] text-ink-faint">Añadir resultados</p><h2 class="mt-1 mb-0 text-base text-ink" id="add-title">Buscar méritos</h2></header>
+		<header class="py-4"><p class="m-0 text-[0.68rem] uppercase tracking-[0.1em] text-ink-faint">Añadir méritos</p><h2 class="mt-1 mb-0 text-base text-ink" id="add-title">Buscar méritos</h2></header>
 		<div class="grid grid-cols-[minmax(0,1fr)_10rem] gap-3 border-t border-rule pt-4 max-[620px]:grid-cols-1">
 			<AdminField label="Buscar por título"><Input type="search" bind:value={query} placeholder="Escribe para filtrar…" /></AdminField>
 			<AdminField label="Tipo"><Select bind:value={type}><option value="">Todos</option>{#each typeOptions as option (option.value)}<option value={option.value}>{option.label}</option>{/each}</Select></AdminField>

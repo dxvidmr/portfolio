@@ -26,7 +26,7 @@ export interface StructuralRelationGroup {
 }
 
 const projectGroups: Array<Omit<StructuralRelationGroup, 'items'>> = [
-	{ entityType: 'technical_works', label: 'Trabajos técnicos y profesionales', description: 'Trabajos realizados dentro de tu participación en este proyecto.' },
+	{ entityType: 'technical_works', label: 'Trabajos técnicos', description: 'Trabajos realizados dentro de tu participación en este proyecto.' },
 	{
 		entityType: 'publications',
 		label: 'Publicaciones',

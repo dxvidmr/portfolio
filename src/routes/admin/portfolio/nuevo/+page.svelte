@@ -8,14 +8,14 @@
 	let { data, form }: { data: PageData; form: ActionData } = $props();
 </script>
 
-<svelte:head><title>Nuevo elemento · cv/admin</title></svelte:head>
+<svelte:head><title>Nueva ficha · cv/admin</title></svelte:head>
 
 {#if form?.message}
 	{#key form}<AdminToast message={form.message} success={form.success} />{/key}
 {/if}
 
 <AdminPageHeader
-	title="Nuevo elemento"
+	title="Nueva ficha"
 	eyebrow="Portfolio"
 	description="La ficha se crea como borrador salvo que elijas publicarla."
 >

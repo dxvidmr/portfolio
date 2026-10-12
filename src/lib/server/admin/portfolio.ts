@@ -1,6 +1,7 @@
 import { db } from '$lib/server/db';
 import { getPortfolioProjects } from '$lib/server/portfolio-projects';
 import { hasProjectStory } from '$lib/content/project-story-registry';
+import { PORTFOLIO_ENTRY_TYPES } from '$lib/content/portfolio-entry-types';
 import type {
 	PortfolioProjectMetadata,
 	PortfolioPublicationStatus,
@@ -196,6 +197,7 @@ export async function getPortfolioAdminData(portfolioSlug: string): Promise<{
 			LEFT JOIN entry_controls AS control
 			  ON control.entity_type = source.entity_type
 			 AND control.entity_id = source.entity_id
+			WHERE source.entity_type IN (${PORTFOLIO_ENTRY_TYPES.map((type) => `'${type}'`).join(', ')})
 			ORDER BY (source.sort_date IS NULL) ASC, source.sort_date DESC,
 			         source.title COLLATE NOCASE ASC`),
 		db.execute(`
